@@ -1,0 +1,43 @@
+# Ignore virtual environments
+.venv/
+env/
+ENV/
+*.env
+
+# Ignore IDE configuration files
+.idea/
+*.iml
+
+# Ignore Python bytecode
+*.pyc
+*.pyo
+__pycache__/
+
+# Ignore log and temporary files
+*.log
+*.tmp
+*.temp
+
+# Ignore checkpoints and model files
+checkpoints/
+*.pt
+*.pth
+*.h5
+
+# Ignore specific file
+firstTry.py
+main.py
+
+# Ignore data directories
+used/
+items/images/
+items/masks/
+items/used/
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Jupyter Notebook checkpoints (if relevant)
+.ipynb_checkpoints/

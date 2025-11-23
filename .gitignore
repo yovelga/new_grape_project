@@ -1,0 +1,16 @@
+# 1. Ignore EVERYTHING by default
+*
+
+# 2. But allow directories (so git can look inside them)
+!*/
+
+# 3. Allow Python files
+!*.py
+
+# 4. Allow specific configuration files (Recommended)
+!.gitignore
+!.env
+!requirements.txt
+!README.md
+!*.bat
+!*.sh
