@@ -24,7 +24,8 @@ from PyQt5.QtWidgets import (
     QPushButton, QFileDialog, QSlider, QHBoxLayout, QStatusBar,
     QSpinBox, QDoubleSpinBox, QCheckBox, QComboBox, QInputDialog,
     QMessageBox, QLineEdit, QGroupBox, QTableWidget, QTableWidgetItem,
-    QPlainTextEdit, QProgressBar, QTabWidget, QGridLayout, QProgressDialog
+    QPlainTextEdit, QProgressBar, QTabWidget, QGridLayout, QProgressDialog,
+    QDialog, QScrollArea
 )
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject
 from PyQt5.QtGui import QImage, QPixmap, QTextCursor
@@ -245,6 +246,106 @@ class QTextEditLogger(logging.Handler, QObject):
         """Emit log record as signal."""
         msg = self.format(record)
         self.log_signal.emit(msg)
+
+
+# ===== Crop Gallery Dialog =====
+
+class CropGalleryDialog(QDialog):
+    """
+    Dialog to display a gallery of crop images in a scrollable grid.
+    Shows CNN candidate crops for visual inspection.
+    """
+
+    def __init__(self, crops: List[np.ndarray], parent=None):
+        """
+        Initialize crop gallery dialog.
+
+        Args:
+            crops: List of numpy arrays (RGB images) to display
+            parent: Parent widget
+        """
+        super().__init__(parent)
+        self.crops = crops
+        self.setWindowTitle(f"CNN Crop Gallery ({len(crops)} crops)")
+        self.setModal(True)
+        self.resize(1000, 700)
+
+        self._build_ui()
+
+    def _build_ui(self):
+        """Build the gallery UI with scrollable grid of crops."""
+        layout = QVBoxLayout(self)
+
+        # Info label
+        info_label = QLabel(f"Total Crops: {len(self.crops)} | Click and scroll to inspect")
+        info_label.setStyleSheet("font-weight: bold; padding: 5px; background-color: #e3f2fd;")
+        layout.addWidget(info_label)
+
+        # Scroll area
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+
+        # Container widget for grid
+        container = QWidget()
+        grid_layout = QGridLayout(container)
+        grid_layout.setSpacing(10)
+
+        # Add crops to grid (4 columns)
+        cols = 4
+        for i, crop in enumerate(self.crops):
+            row = i // cols
+            col = i % cols
+
+            # Create label for crop
+            crop_label = QLabel()
+            crop_label.setFixedSize(220, 220)
+            crop_label.setAlignment(Qt.AlignCenter)
+            crop_label.setStyleSheet("border: 2px solid #2196F3; background-color: white;")
+
+            # Convert numpy array to QPixmap
+            if crop.ndim == 2:
+                crop = cv2.cvtColor(crop, cv2.COLOR_GRAY2RGB)
+
+            h, w, ch = crop.shape
+            bytes_per_line = ch * w
+            q_img = QImage(crop.data, w, h, bytes_per_line, QImage.Format_RGB888)
+            pixmap = QPixmap.fromImage(q_img)
+
+            # Scale to fit label while maintaining aspect ratio
+            scaled_pixmap = pixmap.scaled(210, 210, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            crop_label.setPixmap(scaled_pixmap)
+
+            # Create container with label and index
+            crop_container = QWidget()
+            crop_layout = QVBoxLayout(crop_container)
+            crop_layout.setContentsMargins(0, 0, 0, 0)
+
+            # Index label
+            index_label = QLabel(f"Crop #{i}")
+            index_label.setAlignment(Qt.AlignCenter)
+            index_label.setStyleSheet("font-weight: bold; color: #2196F3;")
+
+            crop_layout.addWidget(index_label)
+            crop_layout.addWidget(crop_label)
+
+            # Add size info
+            size_label = QLabel(f"{w}x{h}px")
+            size_label.setAlignment(Qt.AlignCenter)
+            size_label.setStyleSheet("font-size: 9pt; color: #666;")
+            crop_layout.addWidget(size_label)
+
+            grid_layout.addWidget(crop_container, row, col)
+
+        scroll_area.setWidget(container)
+        layout.addWidget(scroll_area)
+
+        # Close button
+        close_btn = QPushButton("Close")
+        close_btn.setStyleSheet("font-weight: bold; padding: 8px; background-color: #4CAF50; color: white;")
+        close_btn.clicked.connect(self.accept)
+        layout.addWidget(close_btn)
 
 
 # ===== Grid Search Worker Thread =====
@@ -830,8 +931,8 @@ class OptunaWorker(QThread):
 class HSILateDetectionViewer(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("HSI Late Detection Viewer - 5 Panel Layout")
-        self.setGeometry(100, 100, 2000, 800)
+        self.setWindowTitle("HSI Late Detection Viewer - 6 Panel Layout")
+        self.setGeometry(100, 100, 2400, 800)
         self.status_bar = QStatusBar()
         self.setStatusBar(self.status_bar)
 
@@ -840,6 +941,7 @@ class HSILateDetectionViewer(QMainWindow):
         self.hdr_path: Optional[str] = None
         self.rgb_image: Optional[np.ndarray] = None
         self.reflectance_image: Optional[np.ndarray] = None  # REFLECTANCE_*.png for SAM visualization
+        self.cnn_candidates_image: Optional[np.ndarray] = None  # Panel 5: CNN candidates with bboxes
         self.current_band: int = 0
         self.folder_path: str = ""
 
@@ -956,8 +1058,15 @@ class HSILateDetectionViewer(QMainWindow):
         self.rgb_sam_label.setStyleSheet("border: 1px solid #ccc;")
         images_row.addWidget(self.rgb_sam_label)
 
-        # Panel 5: RGB Image Only
-        self.rgb_label = QLabel("5. RGB Image")
+        # Panel 5: CNN Candidates (BBox)
+        self.cnn_candidates_label = QLabel("5. CNN Candidates (BBox)")
+        self.cnn_candidates_label.setFixedSize(300, 300)
+        self.cnn_candidates_label.setAlignment(Qt.AlignCenter)
+        self.cnn_candidates_label.setStyleSheet("border: 1px solid #ccc;")
+        images_row.addWidget(self.cnn_candidates_label)
+
+        # Panel 6: RGB Image Only
+        self.rgb_label = QLabel("6. RGB Image")
         self.rgb_label.setFixedSize(300, 300)
         self.rgb_label.setAlignment(Qt.AlignCenter)
         self.rgb_label.setStyleSheet("border: 1px solid #ccc;")
@@ -1243,7 +1352,14 @@ class HSILateDetectionViewer(QMainWindow):
         self.max_sam_blobs_spin.valueChanged.connect(lambda v: setattr(self, 'max_sam_blobs', int(v)))
         actions_row.addWidget(self.max_sam_blobs_spin)
 
-        screenshot_btn = QPushButton("Screenshot (All 4 Panels)")
+        # Run CNN Debug button - BLUE to stand out
+        self.run_cnn_btn = QPushButton("🔍 Run CNN Debug")
+        self.run_cnn_btn.setStyleSheet("font-weight: bold; padding: 8px; background-color: #2196F3; color: white;")
+        self.run_cnn_btn.setToolTip("Crop detections and save to debug_crops folder")
+        self.run_cnn_btn.clicked.connect(self._debug_cnn_crops)
+        actions_row.addWidget(self.run_cnn_btn)
+
+        screenshot_btn = QPushButton("Screenshot (All 6 Panels)")
         screenshot_btn.clicked.connect(self._save_screenshot)
         actions_row.addWidget(screenshot_btn)
 
@@ -1916,7 +2032,27 @@ class HSILateDetectionViewer(QMainWindow):
                 self._show_image(panel4_viz, self.rgb_sam_label)
                 logger.warning("Panel 4: Using RGB fallback (REFLECTANCE image not found)")
 
-            # Panel 5: RGB Image Only - show plain RGB image
+            # Panel 5: CNN Candidates - show CNN candidates with bboxes (or placeholder)
+            # Use SAME image source as Panel 4 (REFLECTANCE or RGB fallback)
+            if hasattr(self, 'cnn_candidates_image') and self.cnn_candidates_image is not None:
+                # If CNN debug has been run, show the result with bboxes
+                self._show_image(self.cnn_candidates_image, self.cnn_candidates_label)
+            else:
+                # Placeholder: show SAME image as Panel 4 (REFLECTANCE or RGB)
+                if hasattr(self, 'reflectance_image') and self.reflectance_image is not None:
+                    # Use REFLECTANCE image (same as Panel 4)
+                    hsi_h, hsi_w = self.last_detection_mask.shape
+                    refl_resized = cv2.resize(self.reflectance_image, (hsi_w, hsi_h), interpolation=cv2.INTER_LINEAR)
+                    self._show_image(refl_resized, self.cnn_candidates_label)
+                    logger.info("Panel 5: Showing REFLECTANCE image (placeholder until CNN debug)")
+                elif hasattr(self, 'rgb_image') and self.rgb_image is not None:
+                    # Fallback to RGB if REFLECTANCE not available
+                    hsi_h, hsi_w = self.last_detection_mask.shape
+                    rgb_resized = cv2.resize(self.rgb_image, (hsi_w, hsi_h), interpolation=cv2.INTER_LINEAR)
+                    self._show_image(rgb_resized, self.cnn_candidates_label)
+                    logger.info("Panel 5: Showing RGB image (placeholder until CNN debug)")
+
+            # Panel 6: RGB Image Only - show plain RGB image
             if hasattr(self, 'rgb_image') and self.rgb_image is not None:
                 self._show_image(self.rgb_image, self.rgb_label)
 
@@ -2248,6 +2384,173 @@ class HSILateDetectionViewer(QMainWindow):
             self.status_bar.showMessage(f"❌ SAM segmentation failed: {e}")
             QMessageBox.critical(self, "Error", f"SAM2 Blob Segmentation Failed:\n{str(e)}")
 
+    def _debug_cnn_crops(self):
+        """
+        Debug method to crop detected blobs and show them in a gallery dialog.
+        Shows bounding boxes on Panel 5 (using REFLECTANCE image from HS/results).
+
+        FIXES:
+        1. Rotates detection mask 90° CW to align with upright REFLECTANCE
+        2. Uses REFLECTANCE_*.png from HS/results folder (same as Panel 4)
+        3. Shows crops in popup gallery dialog (no file saving)
+        """
+        # Check if detection mask exists
+        if self.last_detection_mask is None:
+            QMessageBox.warning(self, "No Detection", "Run Analysis first to generate detections.")
+            return
+
+        try:
+            # Show progress
+            progress = QProgressDialog("Extracting CNN candidate crops...", None, 0, 0, self)
+            progress.setWindowModality(Qt.WindowModal)
+            progress.show()
+            QApplication.processEvents()
+
+            # ========================================================================
+            # USE REFLECTANCE IMAGE FROM HS/results FOLDER (same as Panel 4)
+            # Load REFLECTANCE_*.png directly from disk if not already loaded
+            # ========================================================================
+            if not hasattr(self, 'reflectance_image') or self.reflectance_image is None:
+                # Try to load REFLECTANCE image
+                if self.hdr_path:
+                    reflectance_path = self._find_reflectance_image()
+                    if reflectance_path and os.path.exists(reflectance_path):
+                        bgr = cv2.imread(reflectance_path)
+                        if bgr is not None:
+                            self.reflectance_image = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
+                            logger.info(f"[CNN DEBUG] Loaded REFLECTANCE image from: {reflectance_path}")
+
+            # Check if we have REFLECTANCE or need to fallback to RGB
+            if hasattr(self, 'reflectance_image') and self.reflectance_image is not None:
+                # Use REFLECTANCE image (UPRIGHT, from HS/results/REFLECTANCE_*.png)
+                source_image_original = self.reflectance_image
+                image_type = "REFLECTANCE"
+                logger.info(f"[CNN DEBUG] Using REFLECTANCE image for Panel 5: {source_image_original.shape[:2]}")
+            elif hasattr(self, 'rgb_image') and self.rgb_image is not None:
+                # Fallback to RGB image
+                source_image_original = self.rgb_image
+                image_type = "RGB"
+                logger.info(f"[CNN DEBUG] Using RGB image for Panel 5 (REFLECTANCE not available): {source_image_original.shape[:2]}")
+            else:
+                progress.close()
+                QMessageBox.warning(self, "No Image", "No REFLECTANCE or RGB image available.")
+                return
+
+            # Resize to match HSI dimensions for BBox alignment
+            hsi_h, hsi_w = self.last_detection_mask.shape
+            source_image = cv2.resize(source_image_original, (hsi_w, hsi_h), interpolation=cv2.INTER_LINEAR)
+            logger.info(f"[CNN DEBUG] Resized {image_type} from {source_image_original.shape[:2]} to {source_image.shape[:2]}")
+
+            # ========================================================================
+            # ROTATE MASK 90° CLOCKWISE
+            # Detection mask is in HSI coordinate space (rotated for display)
+            # Need to rotate it to align with upright REFLECTANCE image
+            # ========================================================================
+            logger.info("[CNN DEBUG] Rotating detection mask 90° CW to align with upright REFLECTANCE")
+            mask_rotated = cv2.rotate(self.last_detection_mask.astype(np.uint8), cv2.ROTATE_90_CLOCKWISE)
+
+            # After rotation, dimensions match source image
+            rotated_h, rotated_w = mask_rotated.shape
+            logger.info(f"[CNN DEBUG] Original mask: {hsi_h}x{hsi_w}, Rotated mask: {rotated_h}x{rotated_w}")
+            logger.info(f"[CNN DEBUG] Source image resized to: {source_image.shape[:2]}")
+
+            # ========================================================================
+            # FIND CONTOURS IN ROTATED MASK
+            # Now contours will be in the same coordinate space as upright image
+            # ========================================================================
+            mask_uint8 = (mask_rotated * 255).astype(np.uint8)
+            contours, _ = cv2.findContours(mask_uint8, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+            logger.info(f"[CNN DEBUG] Found {len(contours)} contours in rotated mask")
+
+            if len(contours) == 0:
+                progress.close()
+                QMessageBox.information(self, "No Contours", "No contours found in detection mask.")
+                return
+
+            # ========================================================================
+            # EXTRACT CROPS AND CREATE VISUALIZATION
+            # ========================================================================
+            viz_image = source_image.copy()
+            crop_list = []
+
+            progress.setMaximum(len(contours))
+
+            # Process each contour
+            for i, contour in enumerate(contours):
+                # Get bounding box
+                x, y, w, h = cv2.boundingRect(contour)
+
+                # Clip bbox to image bounds (safe boundary handling)
+                x = max(0, x)
+                y = max(0, y)
+                x_end = min(rotated_w, x + w)
+                y_end = min(rotated_h, y + h)
+
+                # Skip if bbox is invalid
+                if x_end <= x or y_end <= y:
+                    logger.warning(f"[CNN DEBUG] Skipping invalid bbox {i}: x={x}, y={y}, w={w}, h={h}")
+                    continue
+
+                # Crop from upright source image (REFLECTANCE or RGB)
+                crop = source_image[y:y_end, x:x_end].copy()
+
+                # Skip empty crops
+                if crop.size == 0:
+                    logger.warning(f"[CNN DEBUG] Skipping empty crop {i}")
+                    continue
+
+                # Add to crop list
+                crop_list.append(crop)
+
+                # Draw BLUE rectangle on visualization image
+                cv2.rectangle(viz_image, (x, y), (x_end, y_end), (0, 0, 255), 2)  # Blue, thickness 2
+
+                # Add crop index as text
+                cv2.putText(viz_image, f"{i}", (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX,
+                           0.4, (0, 0, 255), 1, cv2.LINE_AA)
+
+                # Update progress
+                progress.setValue(i + 1)
+                QApplication.processEvents()
+
+            progress.close()
+
+            # ========================================================================
+            # UPDATE PANEL 5 WITH VISUALIZATION
+            # ========================================================================
+            self.cnn_candidates_image = viz_image
+            self._show_image(viz_image, self.cnn_candidates_label)
+
+            # Log results
+            logger.info(f"[CNN DEBUG] ✅ Complete:")
+            logger.info(f"  - Crops Extracted: {len(crop_list)}")
+            logger.info(f"  - Panel 5 updated with bounding boxes")
+            logger.info(f"  - Showing crop gallery dialog")
+
+            self.status_bar.showMessage(
+                f"✅ CNN Debug: {len(crop_list)} crops extracted"
+            )
+
+            # ========================================================================
+            # FIX 3: SHOW CROP GALLERY DIALOG (NO FILE SAVING)
+            # ========================================================================
+            if crop_list:
+                gallery = CropGalleryDialog(crop_list, parent=self)
+                gallery.exec_()
+                logger.info(f"[CNN DEBUG] Crop gallery closed by user")
+            else:
+                QMessageBox.information(
+                    self,
+                    "No Valid Crops",
+                    "No valid crops were extracted. Try adjusting detection thresholds."
+                )
+
+        except Exception as e:
+            logger.exception("[CNN DEBUG] Failed: %s", e)
+            self.status_bar.showMessage(f"❌ CNN Debug failed: {e}")
+            QMessageBox.critical(self, "Error", f"CNN Debug Failed:\n{str(e)}")
+
     def _show_image(self, img: np.ndarray, label: QLabel, is_grayscale: bool = False):
         """Display image in QLabel."""
         if is_grayscale and img.ndim == 2:
@@ -2262,7 +2565,7 @@ class HSILateDetectionViewer(QMainWindow):
         label.setScaledContents(True)
 
     def _save_screenshot(self):
-        """Save screenshot of all 4 panels."""
+        """Save screenshot of all 6 panels."""
         try:
             # Ask for prefix
             options = ["new_detect", "new_patch", "old_detect", "old_patch"]
@@ -2275,14 +2578,15 @@ class HSILateDetectionViewer(QMainWindow):
                 self.status_bar.showMessage("Screenshot cancelled.")
                 return
 
-            # Get pixmaps from all 5 panels
+            # Get pixmaps from all 6 panels
             hsi_band_pm = self.hsi_band_label.pixmap()
             hsi_det_before_pm = self.hsi_detection_before_label.pixmap()
             hsi_det_after_pm = self.hsi_detection_after_label.pixmap()
             rgb_sam_pm = self.rgb_sam_label.pixmap()
+            cnn_candidates_pm = self.cnn_candidates_label.pixmap()
             rgb_pm = self.rgb_label.pixmap()
 
-            if not all([hsi_band_pm, hsi_det_before_pm, hsi_det_after_pm, rgb_sam_pm, rgb_pm]):
+            if not all([hsi_band_pm, hsi_det_before_pm, hsi_det_after_pm, rgb_sam_pm, cnn_candidates_pm, rgb_pm]):
                 self.status_bar.showMessage("Cannot screenshot: missing images")
                 return
 
@@ -2296,15 +2600,16 @@ class HSILateDetectionViewer(QMainWindow):
                 arr = np.frombuffer(ptr, dtype=np.uint8).reshape((h, w, 3))
                 return arr.copy()
 
-            target_size = (300, 300)
+            target_size = (250, 250)  # Smaller to fit 6 panels
             band_np = cv2.resize(qpixmap_to_np(hsi_band_pm), target_size)
             det_before_np = cv2.resize(qpixmap_to_np(hsi_det_before_pm), target_size)
             det_after_np = cv2.resize(qpixmap_to_np(hsi_det_after_pm), target_size)
             rgb_sam_np = cv2.resize(qpixmap_to_np(rgb_sam_pm), target_size)
+            cnn_candidates_np = cv2.resize(qpixmap_to_np(cnn_candidates_pm), target_size)
             rgb_np = cv2.resize(qpixmap_to_np(rgb_pm), target_size)
 
-            # Concatenate horizontally (5 panels)
-            combined = cv2.hconcat([band_np, det_before_np, det_after_np, rgb_sam_np, rgb_np])
+            # Concatenate horizontally (6 panels)
+            combined = cv2.hconcat([band_np, det_before_np, det_after_np, rgb_sam_np, cnn_candidates_np, rgb_np])
 
             # Save to Results folder
             cluster_id = self.current_cluster_id or 'unknown'
