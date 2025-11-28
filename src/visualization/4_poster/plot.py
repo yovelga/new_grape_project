@@ -4,24 +4,24 @@ from wavelengths import WAVELENGTHS
 
 
 def normalize_and_plot(file_path, title):
-    # טוען את הנתונים
+    # Load the data
     df = pd.read_csv(file_path)
 
-    # מזהה את עמודות ה-Band
+    # Identify the Band columns
     band_columns = [col for col in df.columns if col.startswith("Band_")]
 
-    # נרמול מינ-מקס לכל שורה בנפרד
+    # Min-max normalization for each row separately
     df[band_columns] = df[band_columns].apply(
         lambda x: (x - x.min()) / (x.max() - x.min()), axis=1
     )
 
-    # חישוב ממוצע לכל Band
+    # Calculate mean for each Band
     mean_values = df[band_columns].mean()
 
-    # יצירת גרף עם אורכי גל בציר X
+    # Create plot with wavelengths on X axis
     wavelengths = [
         WAVELENGTHS[i + 1] for i in range(len(band_columns))
-    ]  # המרה לאורכי גל
+    ]  # Convert to wavelengths
 
     plt.figure(figsize=(12, 6))
     plt.plot(wavelengths, mean_values, marker="o", linestyle="-", color="b")
@@ -33,9 +33,9 @@ def normalize_and_plot(file_path, title):
     plt.show()
 
 
-# דוגמה להפעלת הפונקציה עם שם קובץ
-file_path_craks = r"C:\Users\yovel\PycharmProjects\pixel_picker\Crack\detected_pixels.csv"  # עדכן לנתיב הנכון
-file_path_no_craks = r"C:\Users\yovel\PycharmProjects\pixel_picker\Not crack\detected_pixels.csv"  # עדכן לנתיב הנכון
+# Example of running the function with file name
+file_path_craks = r"C:\Users\yovel\PycharmProjects\pixel_picker\Crack\detected_pixels.csv"  # Update to the correct path
+file_path_no_craks = r"C:\Users\yovel\PycharmProjects\pixel_picker\Not crack\detected_pixels.csv"  # Update to the correct path
 normalize_and_plot(
     file_path_craks,
     "Reflectance percentage by channel after MIN MAX Normalization for Cracked Grapes Pixels",

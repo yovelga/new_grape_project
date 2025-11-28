@@ -5,8 +5,8 @@ from PIL import Image, ImageDraw, ImageFont
 import os
 
 # ——— פרמטרים ———
-hdr_path = r"/all_raw_data\1_14\25.09.24\HS\results\REFLECTANCE_2024-09-25_015.hdr"
-gif_output = os.path.join(os.path.dirname(hdr_path), "HSI_sequence.gif")
+hdr_path = r"C:\Users\yovel\Desktop\Grape_Project\data\raw\1_14\25.09.24\HS\results\REFLECTANCE_2024-09-25_015.hdr"
+gif_output = os.path.join(r"C:\Users\yovel\Desktop\Grape_Project\src\visualization\4_poster", "HSI_sequence.gif")
 frame_duration = 0.2  # שניות בין מסגרות
 loop_forever = 0  # 0 = אינסוף, 1 = חזרה אחת בלבד
 
