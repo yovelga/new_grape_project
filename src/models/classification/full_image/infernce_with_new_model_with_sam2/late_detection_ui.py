@@ -691,11 +691,12 @@ class OptunaWorker(QThread):
                     study.stop()
 
             # Objective function uses the same evaluation helper
+            ### change parameters hare
             def objective(trial: optuna.Trial) -> float:
                 # Suggest parameters
-                prob_thr = trial.suggest_float("prob_thr", 0.80, 0.99)
-                morph_size = trial.suggest_categorical("morph_size", [0] + list(range(1, 16, 2)))
-                min_blob_size = trial.suggest_int("min_blob_size", 10, 1000)
+                prob_thr = trial.suggest_float("prob_thr", 0.96, 1.0)
+                morph_size = trial.suggest_categorical("morph_size", [0] + list(range(1, 16, 1)))
+                min_blob_size = trial.suggest_int("min_blob_size", 0, 1000)
 
                 # Circularity filtering
                 use_circ = trial.suggest_categorical("use_circularity", [False, True])
@@ -710,7 +711,7 @@ class OptunaWorker(QThread):
                 aspect_ratio_min = None
                 aspect_ratio_limit = None
                 if use_ar:
-                    aspect_ratio_min = trial.suggest_float("aspect_ratio_min", 1.0, 3.0)
+                    aspect_ratio_min = trial.suggest_float("aspect_ratio_min", 1.0, 6.0)
                     aspect_ratio_limit = trial.suggest_float("aspect_ratio_limit", max(3.0, aspect_ratio_min), 10.0)
 
                 # Solidity filtering
@@ -779,13 +780,44 @@ class OptunaWorker(QThread):
             # Run optimization (blocking in thread)
             study.optimize(objective, n_trials=self.n_trials, callbacks=[_optuna_callback])
 
-            # When finished, emit best params/value
+            # When finished, emit best params/value with ALL metrics
             best = study.best_trial
             best_info = {
                 "best_value": float(best.value) if best.value is not None else None,
                 "best_params": dict(best.params)
             }
-            self.log(f"Optuna complete: best F2={best_info['best_value']}")
+
+            # Extract all metrics from best trial
+            acc = best.user_attrs.get("acc", 0.0)
+            prec = best.user_attrs.get("prec", 0.0)
+            rec = best.user_attrs.get("rec", 0.0)
+            f1 = best.user_attrs.get("f1", 0.0)
+            f2 = best.user_attrs.get("f2", 0.0)
+            auc = best.user_attrs.get("auc", 0.0)
+
+            # Format parameters for display
+            self.log("=" * 80)
+            self.log("🎉 OPTUNA OPTIMIZATION COMPLETE!")
+            self.log("=" * 80)
+            self.log("")
+            self.log("📊 BEST METRICS:")
+            self.log(f"  • F2 Score:    {f2:.4f} (optimized metric)")
+            self.log(f"  • F1 Score:    {f1:.4f}")
+            self.log(f"  • Accuracy:    {acc:.4f}")
+            self.log(f"  • Precision:   {prec:.4f}")
+            self.log(f"  • Recall:      {rec:.4f}")
+            self.log(f"  • AUC:         {auc:.4f}")
+            self.log("")
+            self.log("⚙️  BEST PARAMETERS:")
+            for key, value in sorted(best.params.items()):
+                if isinstance(value, float):
+                    self.log(f"  • {key:25s} = {value:.4f}")
+                else:
+                    self.log(f"  • {key:25s} = {value}")
+            self.log("")
+            self.log(f"✓ Optimization completed after {len(study.trials)} trials")
+            self.log("=" * 80)
+
             self.finished_signal.emit(True, best_info)
 
         except Exception as e:
@@ -835,6 +867,8 @@ class HSILateDetectionViewer(QMainWindow):
         self.last_sam_segments: List[np.ndarray] = []
         self.last_sam_overlay: Optional[np.ndarray] = None
         self.max_sam_blobs = 50  # Default max blobs to segment
+        self.last_cluster_mask: Optional[np.ndarray] = None  # Cluster ROI mask for filtering
+        self.use_cluster_filter = False  # Toggle for cluster mask filtering
 
         # Dataset state
         self.dataset_df: Optional[pd.DataFrame] = None
@@ -1165,6 +1199,22 @@ class HSILateDetectionViewer(QMainWindow):
         self.morph_size_spin.valueChanged.connect(lambda v: setattr(self, 'morph_size', int(v)))
         morph_row.addWidget(self.morph_size_spin)
         morph_row.addStretch()
+
+        # Cluster Filter checkbox
+        cluster_filter_row = QHBoxLayout()
+        controls.addLayout(cluster_filter_row)
+        self.use_cluster_filter_chk = QCheckBox("Use Cluster Filter (SAM2 ROI)")
+        self.use_cluster_filter_chk.setChecked(self.use_cluster_filter)
+        self.use_cluster_filter_chk.setToolTip(
+            "Use SAM2 to detect the main grape cluster and filter out background.\n"
+            "This reduces false positives on tripods, walls, and text.\n"
+            "Panel 4 will show the detected cluster boundary in green."
+        )
+        self.use_cluster_filter_chk.stateChanged.connect(
+            lambda state: setattr(self, 'use_cluster_filter', state == Qt.Checked)
+        )
+        cluster_filter_row.addWidget(self.use_cluster_filter_chk)
+        cluster_filter_row.addStretch()
 
         # --- Action buttons row ---
         actions_row = QHBoxLayout()
@@ -1535,11 +1585,76 @@ class HSILateDetectionViewer(QMainWindow):
         self.patch_thr_value = self.patch_thr_combo.itemData(index)
         logger.info("Patch threshold changed to %.2f (%d%%)",
                    self.patch_thr_value, int(self.patch_thr_value * 100))
-        self.status_bar.showMessage(f"Patch threshold: {int(self.patch_thr_value * 100)}%")
 
     def _update_thr(self, v: float):
         """Update probability threshold."""
         self.pix_thr = float(v)
+        logger.info("Probability threshold changed to %.2f", self.pix_thr)
+
+    def _get_cluster_mask(self) -> Optional[np.ndarray]:
+        """
+        Generate a cluster ROI mask using SAM2 with center-point prompt.
+
+        This detects the main grape cluster to filter out background objects
+        (tripods, walls, text) that cause false positives.
+
+        Returns:
+            Binary mask (bool) matching HSI dimensions, or None if detection fails.
+        """
+        try:
+            # Check if RGB image is available
+            if self.rgb_image is None:
+                logger.warning("Cluster mask: No RGB image available")
+                return None
+
+            # Initialize SAM2 if not already done
+            if self.sam2_segmenter is None:
+                logger.info("Cluster mask: Initializing SAM2 predictor...")
+                initial_settings()
+                predictor = initialize_sam2_predictor()
+                self.sam2_segmenter = create_point_segmenter(predictor)
+                logger.info("Cluster mask: SAM2 initialized")
+
+            # Get HSI dimensions (target size)
+            if self.hsi_cube is None:
+                logger.warning("Cluster mask: No HSI cube loaded")
+                return None
+
+            hsi_h, hsi_w = self.hsi_cube.shape[:2]
+
+            # Resize RGB to match HSI dimensions for alignment
+            rgb_resized = cv2.resize(self.rgb_image, (hsi_w, hsi_h), interpolation=cv2.INTER_LINEAR)
+
+            # Define prompt point at image center (where grape cluster typically is)
+            h, w = rgb_resized.shape[:2]
+            center_x, center_y = w // 2, h // 2
+            input_point = np.array([[center_x, center_y]])
+            input_label = np.array([1])  # 1 = foreground point
+
+            logger.info(f"Cluster mask: Using center point ({center_x}, {center_y}) on {w}x{h} image")
+
+            # Use SAM2 predictor with multimask_output to get multiple candidates
+            masks, scores, logits = self.sam2_segmenter.predictor.predict(
+                point_coords=input_point,
+                point_labels=input_label,
+                multimask_output=True
+            )
+
+            # Select mask with highest IoU score (best object match)
+            best_idx = np.argmax(scores)
+            cluster_mask = masks[best_idx]
+
+            logger.info(f"Cluster mask: Selected mask {best_idx} with score {scores[best_idx]:.4f}")
+            logger.info(f"Cluster mask: Coverage {cluster_mask.sum() / cluster_mask.size * 100:.1f}% of image")
+
+            # Cache for visualization
+            self.last_cluster_mask = cluster_mask.astype(bool)
+
+            return cluster_mask.astype(bool)
+
+        except Exception as e:
+            logger.exception(f"Cluster mask generation failed: {e}")
+            return None
 
     def _run_analysis(self):
         """Run full analysis and update all 4 panels."""
@@ -1567,19 +1682,37 @@ class HSILateDetectionViewer(QMainWindow):
                 logger.info("Inverting probabilities")
                 prob_map = 1.0 - prob_map
 
-            # Cache unfiltered detection mask for Panel 2
-            self.last_detection_mask_unfiltered = (prob_map >= self.pix_thr)
+            # =============================================================================
+            # STRICT PIPELINE: 4-Step Processing for Solid Blob Visualization
+            # =============================================================================
+            # This pipeline ensures: Filter noise first → Then merge valid fragments
 
-            # Apply filters if any are enabled (all filters are independent)
+            # Cache unfiltered detection mask for Panel 2 (BEFORE any processing)
+            self.last_detection_mask_unfiltered = (prob_map >= self.pix_thr)
+            logger.info("Pipeline START: Original detection has %d pixels", self.last_detection_mask_unfiltered.sum())
+
+            # -------------------------------------------------------------------------
+            # STEP A: Initial Thresholding (Create binary mask from probabilities)
+            # -------------------------------------------------------------------------
+            initial_binary_mask = (prob_map >= self.pix_thr).astype(bool)
+            logger.info("STEP A (Thresholding): Initial mask created with %d pixels", initial_binary_mask.sum())
+
+            # -------------------------------------------------------------------------
+            # STEP B: Geometric Filtering (CRUCIAL - Remove noise BEFORE morphology)
+            # -------------------------------------------------------------------------
+            # This removes small dots, bad shapes, border blobs BEFORE dilation
+            # Ensures we only dilate VALID fragments, not noise
             use_border = self.use_border_chk.isChecked()
             use_area = self.use_area_chk.isChecked()
             use_circ = self.use_circ_chk.isChecked()
             use_ar = self.use_ar_chk.isChecked()
             use_sol = self.use_sol_chk.isChecked()
 
-            if use_border or use_area or use_circ or use_ar or use_sol or (getattr(self, 'morph_size', 0) > 0):
+            filtered_prob_map = prob_map.copy()  # Preserve original for later
+
+            if use_border or use_area or use_circ or use_ar or use_sol:
                 filter_params = dict(
-                    morph_size=int(getattr(self, 'morph_size', 0)),
+                    morph_size=0,  # NO morphology in filter step - done separately in STEP C
                     border_r=self.border_spin.value(),
                     area_min=self.area_min_spin.value(),
                     area_max=self.area_max_spin.value(),
@@ -1595,14 +1728,96 @@ class HSILateDetectionViewer(QMainWindow):
                     use_aspect_ratio=use_ar,
                     use_solidity=use_sol,
                 )
-                logger.info("Applying advanced filters: %s", filter_params)
-                # Use the advanced filter which supports morphological closing and geometric tests
-                mask_filtered = filter_blobs_advanced(prob_map, self.pix_thr, **filter_params)
-                prob_map = prob_map * mask_filtered
+                logger.info("STEP B (Geometric Filter): Applying filters to remove noise: %s", filter_params)
 
-            # Cache results (after filters)
-            self.last_detection_prob_map = prob_map
-            self.last_detection_mask = (prob_map >= self.pix_thr)
+                # filter_blobs_advanced returns a BOOLEAN mask of valid pixels
+                geometric_filter_mask = filter_blobs_advanced(filtered_prob_map, self.pix_thr, **filter_params)
+
+                # Apply filter: Keep only probability values where geometric filter passed
+                filtered_prob_map = filtered_prob_map * geometric_filter_mask
+
+                filtered_pixel_count = (filtered_prob_map >= self.pix_thr).sum()
+                logger.info("STEP B (Geometric Filter): Complete. Kept %d pixels (removed noise)", filtered_pixel_count)
+            else:
+                logger.info("STEP B (Geometric Filter): SKIPPED (no filters enabled)")
+
+            # -------------------------------------------------------------------------
+            # STEP B.5: Cluster Mask ROI Filter (Remove background false positives)
+            # -------------------------------------------------------------------------
+            # Use SAM2 to detect main grape cluster and filter out background objects
+            # (tripods, walls, text, etc.)
+            if self.use_cluster_filter:
+                logger.info("STEP B.5 (Cluster Filter): Detecting main cluster with SAM2...")
+                cluster_mask = self._get_cluster_mask()
+
+                if cluster_mask is not None:
+                    # Apply cluster mask: Keep only detections inside the cluster ROI
+                    before_cluster_filter = (filtered_prob_map >= self.pix_thr).sum()
+                    filtered_prob_map = filtered_prob_map * cluster_mask.astype(float)
+                    after_cluster_filter = (filtered_prob_map >= self.pix_thr).sum()
+
+                    removed_pixels = before_cluster_filter - after_cluster_filter
+                    logger.info(f"STEP B.5 (Cluster Filter): Complete. Kept {after_cluster_filter} pixels "
+                               f"(removed {removed_pixels} background pixels)")
+                else:
+                    logger.warning("STEP B.5 (Cluster Filter): Failed to generate cluster mask, skipping ROI filter")
+            else:
+                logger.info("STEP B.5 (Cluster Filter): SKIPPED (not enabled)")
+
+            # -------------------------------------------------------------------------
+            # STEP C: Morphological Dilation (THE FIX - Merge valid fragments)
+            # -------------------------------------------------------------------------
+            # Apply dilation to FILTERED data only (noise already removed)
+            # This aggressively merges the remaining valid fragments into solid blobs
+
+            # Start with filtered mask as baseline
+            mask_filtered = (filtered_prob_map >= self.pix_thr).astype(bool)
+
+            if self.morph_size > 0:
+                logger.info("STEP C (Morphological Dilation): Applying dilation (kernel=%d, iterations=1)",
+                           self.morph_size)
+
+                # Create binary mask for dilation (uint8 format required by cv2.dilate)
+                filtered_binary_mask = (mask_filtered.astype("uint8") * 255)
+
+                # Create elliptical structuring element for isotropic (uniform) expansion
+                kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (self.morph_size, self.morph_size))
+
+                # Apply pure DILATION (no erosion step - aggressive gap filling)
+                # iterations=1 provides strong expansion without over-merging
+                dilated_binary_mask = cv2.dilate(filtered_binary_mask, kernel, iterations=1)
+
+                # Convert dilated mask back to boolean
+                mask_final = (dilated_binary_mask > 0).astype(bool)
+
+                dilated_pixel_count = mask_final.sum()
+                logger.info("STEP C (Morphological Dilation): Complete. Dilated to %d pixels (solid blob)",
+                           dilated_pixel_count)
+            else:
+                # No dilation - use filtered mask as-is
+                mask_final = mask_filtered
+                logger.info("STEP C (Morphological Dilation): SKIPPED (morph_size = 0)")
+
+            # -------------------------------------------------------------------------
+            # STEP D: Update State (CRITICAL - Assign dilated mask and update prob_map)
+            # -------------------------------------------------------------------------
+            # CRITICAL FIX: Update prob_map to give expanded pixels meaningful probability values
+            # Problem: Expanded pixels have 0.0 in filtered_prob_map, making them invisible after threshold
+            # Solution: Use np.where to assign minimum probability (0.5) to expanded regions
+            # This ensures dilated pixels are visible in overlay while preserving original probabilities
+            final_prob_map = np.where(mask_final, np.maximum(filtered_prob_map, 0.5), 0.0)
+
+            # Cache final results for UI display
+            self.last_detection_prob_map = final_prob_map
+            self.last_detection_mask = mask_final  # Use dilated mask directly, not re-threshold!
+
+            final_pixel_count = self.last_detection_mask.sum()
+            logger.info("STEP D (Update State): Pipeline COMPLETE. Final mask: %d pixels for Panel 3",
+                       final_pixel_count)
+            logger.info("Pipeline END: Transformation: %d → %d → %d pixels (Initial → Filtered → Dilated)",
+                       self.last_detection_mask_unfiltered.sum(),
+                       (filtered_prob_map >= self.pix_thr).sum(),
+                       final_pixel_count)
 
             # Get base band for overlays
             band_img = cv2.normalize(self.hsi_cube[:, :, self.current_band], None, 0, 255,
@@ -1624,10 +1839,38 @@ class HSILateDetectionViewer(QMainWindow):
             detection_after_rgb = cv2.cvtColor(detection_after_overlay, cv2.COLOR_BGR2RGB)
             self._show_image(detection_after_rgb, self.hsi_detection_after_label)
 
-            # Panel 4: RGB with SAM Segments - will be updated by _show_sam_segments()
-            # Show plain RGB as placeholder (same as SAM will display)
+            # Panel 4: RGB with Cluster Mask + Detected Cracks visualization
+            # Show cluster mask (green) and detected cracks (yellow) for verification
             if hasattr(self, 'rgb_image') and self.rgb_image is not None:
-                self._show_image(self.rgb_image, self.rgb_sam_label)
+                # Resize RGB to match HSI dimensions for proper alignment
+                hsi_h, hsi_w = self.last_detection_mask.shape
+                rgb_resized = cv2.resize(self.rgb_image, (hsi_w, hsi_h), interpolation=cv2.INTER_LINEAR)
+
+                # Start with RGB as base
+                panel4_viz = rgb_resized.copy()
+
+                # If cluster filter is enabled and cluster mask exists, show it
+                if self.use_cluster_filter and self.last_cluster_mask is not None:
+                    # Create semi-transparent GREEN overlay for cluster mask
+                    cluster_overlay = panel4_viz.copy()
+                    green_color = np.array([0, 255, 0], dtype=np.uint8)  # Green in RGB
+                    cluster_overlay[self.last_cluster_mask] = green_color
+                    # Blend with 30% opacity
+                    panel4_viz = cv2.addWeighted(panel4_viz, 0.7, cluster_overlay, 0.3, 0)
+                    logger.info("Panel 4: Added cluster mask visualization (green overlay)")
+
+                # Add detected cracks (yellow overlay) on top
+                if self.last_detection_mask.sum() > 0:
+                    crack_overlay = panel4_viz.copy()
+                    yellow_color = np.array([255, 255, 0], dtype=np.uint8)  # Yellow in RGB
+                    crack_overlay[self.last_detection_mask] = yellow_color
+                    # Blend with 40% opacity (more visible than cluster mask)
+                    panel4_viz = cv2.addWeighted(panel4_viz, 0.6, crack_overlay, 0.4, 0)
+                    logger.info("Panel 4: Added crack detection visualization (yellow overlay)")
+
+                # Rotate 90° clockwise to match display orientation
+                panel4_viz = cv2.rotate(panel4_viz, cv2.ROTATE_90_CLOCKWISE)
+                self._show_image(panel4_viz, self.rgb_sam_label)
 
             # Panel 5: RGB Image Only - show plain RGB image
             if hasattr(self, 'rgb_image') and self.rgb_image is not None:
