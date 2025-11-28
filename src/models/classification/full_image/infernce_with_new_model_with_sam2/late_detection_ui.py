@@ -2386,29 +2386,38 @@ class HSILateDetectionViewer(QMainWindow):
 
     def _debug_cnn_crops(self):
         """
-        Debug method to crop detected blobs and show them in a gallery dialog.
+        Extract crops from SAM segments and show them in a gallery dialog.
         Shows bounding boxes on Panel 5 (using REFLECTANCE image from HS/results).
 
-        FIXES:
-        1. Rotates detection mask 90° CW to align with upright REFLECTANCE
-        2. Uses REFLECTANCE_*.png from HS/results folder (same as Panel 4)
-        3. Shows crops in popup gallery dialog (no file saving)
+        NEW LOGIC:
+        1. Uses SAM segments from Panel 4 (self.last_sam_segments)
+        2. For each segment mask, finds min/max coordinates (LEFT, RIGHT, UP, DOWN)
+        3. Extracts bounding box crop from REFLECTANCE image
+        4. Shows crops in popup gallery dialog
         """
-        # Check if detection mask exists
-        if self.last_detection_mask is None:
-            QMessageBox.warning(self, "No Detection", "Run Analysis first to generate detections.")
+        # Check if SAM segments exist
+        if not hasattr(self, 'last_sam_segments') or not self.last_sam_segments:
+            QMessageBox.warning(
+                self,
+                "No SAM Segments",
+                "Please run 'Show SAM Segments' first to generate segments.\n\n"
+                "Steps:\n"
+                "1. Load images\n"
+                "2. Run Analysis\n"
+                "3. Click '🎯 Show SAM Segments'\n"
+                "4. Then click '🔍 Run CNN Debug'"
+            )
             return
 
         try:
             # Show progress
-            progress = QProgressDialog("Extracting CNN candidate crops...", None, 0, 0, self)
+            progress = QProgressDialog("Extracting crops from SAM segments...", None, 0, 0, self)
             progress.setWindowModality(Qt.WindowModal)
             progress.show()
             QApplication.processEvents()
 
             # ========================================================================
             # USE REFLECTANCE IMAGE FROM HS/results FOLDER (same as Panel 4)
-            # Load REFLECTANCE_*.png directly from disk if not already loaded
             # ========================================================================
             if not hasattr(self, 'reflectance_image') or self.reflectance_image is None:
                 # Try to load REFLECTANCE image
@@ -2425,89 +2434,95 @@ class HSILateDetectionViewer(QMainWindow):
                 # Use REFLECTANCE image (UPRIGHT, from HS/results/REFLECTANCE_*.png)
                 source_image_original = self.reflectance_image
                 image_type = "REFLECTANCE"
-                logger.info(f"[CNN DEBUG] Using REFLECTANCE image for Panel 5: {source_image_original.shape[:2]}")
+                logger.info(f"[CNN DEBUG] Using REFLECTANCE image: {source_image_original.shape[:2]}")
             elif hasattr(self, 'rgb_image') and self.rgb_image is not None:
                 # Fallback to RGB image
                 source_image_original = self.rgb_image
                 image_type = "RGB"
-                logger.info(f"[CNN DEBUG] Using RGB image for Panel 5 (REFLECTANCE not available): {source_image_original.shape[:2]}")
+                logger.info(f"[CNN DEBUG] Using RGB image (REFLECTANCE not available): {source_image_original.shape[:2]}")
             else:
                 progress.close()
                 QMessageBox.warning(self, "No Image", "No REFLECTANCE or RGB image available.")
                 return
 
-            # Resize to match HSI dimensions for BBox alignment
-            hsi_h, hsi_w = self.last_detection_mask.shape
+            # Resize to match HSI dimensions (SAM segments are in HSI coordinate space)
+            hsi_h, hsi_w = self.last_sam_segments[0].shape
             source_image = cv2.resize(source_image_original, (hsi_w, hsi_h), interpolation=cv2.INTER_LINEAR)
             logger.info(f"[CNN DEBUG] Resized {image_type} from {source_image_original.shape[:2]} to {source_image.shape[:2]}")
 
             # ========================================================================
-            # ROTATE MASK 90° CLOCKWISE
-            # Detection mask is in HSI coordinate space (rotated for display)
-            # Need to rotate it to align with upright REFLECTANCE image
+            # PROCESS SAM SEGMENTS - Extract BBox from each segment mask
+            # SAM segments are already in upright coordinate space (no rotation needed)
             # ========================================================================
-            logger.info("[CNN DEBUG] Rotating detection mask 90° CW to align with upright REFLECTANCE")
-            mask_rotated = cv2.rotate(self.last_detection_mask.astype(np.uint8), cv2.ROTATE_90_CLOCKWISE)
+            logger.info(f"[CNN DEBUG] Processing {len(self.last_sam_segments)} SAM segments")
 
-            # After rotation, dimensions match source image
-            rotated_h, rotated_w = mask_rotated.shape
-            logger.info(f"[CNN DEBUG] Original mask: {hsi_h}x{hsi_w}, Rotated mask: {rotated_h}x{rotated_w}")
-            logger.info(f"[CNN DEBUG] Source image resized to: {source_image.shape[:2]}")
-
-            # ========================================================================
-            # FIND CONTOURS IN ROTATED MASK
-            # Now contours will be in the same coordinate space as upright image
-            # ========================================================================
-            mask_uint8 = (mask_rotated * 255).astype(np.uint8)
-            contours, _ = cv2.findContours(mask_uint8, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-            logger.info(f"[CNN DEBUG] Found {len(contours)} contours in rotated mask")
-
-            if len(contours) == 0:
-                progress.close()
-                QMessageBox.information(self, "No Contours", "No contours found in detection mask.")
-                return
-
-            # ========================================================================
-            # EXTRACT CROPS AND CREATE VISUALIZATION
-            # ========================================================================
             viz_image = source_image.copy()
             crop_list = []
 
-            progress.setMaximum(len(contours))
+            progress.setMaximum(len(self.last_sam_segments))
 
-            # Process each contour
-            for i, contour in enumerate(contours):
-                # Get bounding box
-                x, y, w, h = cv2.boundingRect(contour)
-
-                # Clip bbox to image bounds (safe boundary handling)
-                x = max(0, x)
-                y = max(0, y)
-                x_end = min(rotated_w, x + w)
-                y_end = min(rotated_h, y + h)
-
-                # Skip if bbox is invalid
-                if x_end <= x or y_end <= y:
-                    logger.warning(f"[CNN DEBUG] Skipping invalid bbox {i}: x={x}, y={y}, w={w}, h={h}")
+            # Process each SAM segment
+            for i, segment_mask in enumerate(self.last_sam_segments):
+                # Skip empty masks
+                if segment_mask.sum() == 0:
+                    logger.warning(f"[CNN DEBUG] Skipping empty segment {i}")
+                    progress.setValue(i + 1)
+                    QApplication.processEvents()
                     continue
 
-                # Crop from upright source image (REFLECTANCE or RGB)
-                crop = source_image[y:y_end, x:x_end].copy()
+                # Find coordinates where mask is True
+                coords = np.argwhere(segment_mask)
+
+                if len(coords) == 0:
+                    logger.warning(f"[CNN DEBUG] Skipping segment {i} with no coordinates")
+                    progress.setValue(i + 1)
+                    QApplication.processEvents()
+                    continue
+
+                # Get bounding box from mask coordinates
+                # coords are (row, col) = (y, x)
+                y_coords = coords[:, 0]
+                x_coords = coords[:, 1]
+
+                # Find min/max (LEFT, RIGHT, UP, DOWN)
+                y_min = int(y_coords.min())  # UP
+                y_max = int(y_coords.max())  # DOWN
+                x_min = int(x_coords.min())  # LEFT
+                x_max = int(x_coords.max())  # RIGHT
+
+                # Clip to image bounds (safety)
+                y_min = max(0, y_min)
+                x_min = max(0, x_min)
+                y_max = min(hsi_h - 1, y_max)
+                x_max = min(hsi_w - 1, x_max)
+
+                # Skip if bbox is invalid
+                if x_max <= x_min or y_max <= y_min:
+                    logger.warning(f"[CNN DEBUG] Skipping invalid bbox {i}: x=[{x_min},{x_max}], y=[{y_min},{y_max}]")
+                    progress.setValue(i + 1)
+                    QApplication.processEvents()
+                    continue
+
+                # Crop from source image (include max indices)
+                crop = source_image[y_min:y_max+1, x_min:x_max+1].copy()
 
                 # Skip empty crops
                 if crop.size == 0:
                     logger.warning(f"[CNN DEBUG] Skipping empty crop {i}")
+                    progress.setValue(i + 1)
+                    QApplication.processEvents()
                     continue
 
                 # Add to crop list
                 crop_list.append(crop)
 
+                logger.info(f"[CNN DEBUG] Segment {i}: BBox=[x:{x_min}-{x_max}, y:{y_min}-{y_max}], Crop size={crop.shape[:2]}")
+
                 # Draw BLUE rectangle on visualization image
-                cv2.rectangle(viz_image, (x, y), (x_end, y_end), (0, 0, 255), 2)  # Blue, thickness 2
+                cv2.rectangle(viz_image, (x_min, y_min), (x_max, y_max), (0, 0, 255), 2)  # Blue, thickness 2
 
                 # Add crop index as text
-                cv2.putText(viz_image, f"{i}", (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX,
+                cv2.putText(viz_image, f"{i}", (x_min, y_min - 5), cv2.FONT_HERSHEY_SIMPLEX,
                            0.4, (0, 0, 255), 1, cv2.LINE_AA)
 
                 # Update progress
@@ -2524,16 +2539,17 @@ class HSILateDetectionViewer(QMainWindow):
 
             # Log results
             logger.info(f"[CNN DEBUG] ✅ Complete:")
+            logger.info(f"  - SAM Segments Processed: {len(self.last_sam_segments)}")
             logger.info(f"  - Crops Extracted: {len(crop_list)}")
             logger.info(f"  - Panel 5 updated with bounding boxes")
             logger.info(f"  - Showing crop gallery dialog")
 
             self.status_bar.showMessage(
-                f"✅ CNN Debug: {len(crop_list)} crops extracted"
+                f"✅ CNN Debug: {len(crop_list)} crops extracted from SAM segments"
             )
 
             # ========================================================================
-            # FIX 3: SHOW CROP GALLERY DIALOG (NO FILE SAVING)
+            # SHOW CROP GALLERY DIALOG
             # ========================================================================
             if crop_list:
                 gallery = CropGalleryDialog(crop_list, parent=self)
@@ -2543,7 +2559,8 @@ class HSILateDetectionViewer(QMainWindow):
                 QMessageBox.information(
                     self,
                     "No Valid Crops",
-                    "No valid crops were extracted. Try adjusting detection thresholds."
+                    "No valid crops were extracted from SAM segments.\n\n"
+                    "Make sure you ran 'Show SAM Segments' first."
                 )
 
         except Exception as e:
