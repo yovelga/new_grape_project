@@ -2005,10 +2005,20 @@ class HSILateDetectionViewer(QMainWindow):
             logger.warning("Failed to save analysis results: %s", e)
 
     def _show_sam_segments(self):
-        """Generate and display SAM segmentation for detected blobs on REFLECTANCE image."""
+        """
+        BLOB SEGMENTATION MODE:
+        Segment each detected crack/blob (from Panel 3 - after filters) using SAM2.
+        Uses the centroid of each filtered blob as a prompt for SAM2 segmentation.
+
+        IMPORTANT: Image stays UPRIGHT (no rotation applied).
+        """
+        # ========================================================================
+        # Require detection mask from Panel 3 (filtered blobs)
+        # ========================================================================
         if self.last_detection_mask is None:
             QMessageBox.warning(self, "No Detection", "Run Analysis first to generate detections.")
             return
+
         if self.hsi_cube is None:
             QMessageBox.warning(self, "No HSI", "No HSI cube loaded.")
             return
@@ -2028,7 +2038,7 @@ class HSILateDetectionViewer(QMainWindow):
 
         try:
             # Show progress dialog
-            progress = QProgressDialog("Initializing SAM and segmenting blobs...", None, 0, 0, self)
+            progress = QProgressDialog("Testing SAM2 Cluster Detection (Center Point)...", None, 0, 0, self)
             progress.setWindowModality(Qt.WindowModal)
             progress.show()
             QApplication.processEvents()
@@ -2043,94 +2053,200 @@ class HSILateDetectionViewer(QMainWindow):
                 self.sam2_segmenter = create_point_segmenter(predictor)
                 logger.info("SAM2 predictor initialized successfully")
 
-            # Resize source image to match HSI dimensions (512x512) for perfect alignment
-            hsi_h, hsi_w = self.last_detection_mask.shape  # 512x512
+            # ========================================================================
+            # RESIZE SOURCE IMAGE: Match HSI dimensions (512x512)
+            # ========================================================================
+            hsi_h, hsi_w = self.hsi_cube.shape[:2]  # Get HSI dimensions (512x512)
             image_original = source_image
             image_resized = cv2.resize(image_original, (hsi_w, hsi_h), interpolation=cv2.INTER_LINEAR)
-            logger.info(f"Resized {image_type} from {image_original.shape[:2]} to {image_resized.shape[:2]} to match HSI dimensions")
+            logger.info(f"[BLOB SEGMENTATION] Resized {image_type} from {image_original.shape[:2]} to {image_resized.shape[:2]}")
 
-            # Rotate detection mask 90° clockwise to align with source image orientation
-            # This is ONLY for SAM segmentation, doesn't affect the HSI display in other panels
-            detection_mask_rotated = cv2.rotate(self.last_detection_mask.astype(np.uint8), cv2.ROTATE_90_CLOCKWISE)
-            logger.info(f"Rotated detection mask 90° clockwise to align with {image_type} image for SAM")
-
-            # Extract blob centroids from the ROTATED detection mask
-            max_blobs = self.max_sam_blobs
-            logger.info(f"Extracting centroids from rotated detection mask (max_blobs={max_blobs})...")
-            progress.setLabelText(f"Extracting up to {max_blobs} blob centroids...")
+            # ========================================================================
+            # EXTRACT BLOB CENTROIDS: From filtered detection mask (Panel 3 - Stage 3)
+            # ========================================================================
+            progress.setLabelText("Extracting blob centroids from filtered detections...")
             QApplication.processEvents()
 
-            centroids_img = extract_blob_centroids(detection_mask_rotated, max_blobs=max_blobs)
+            # Extract centroids from the FILTERED detection mask (Panel 3 result)
+            max_blobs = self.max_sam_blobs
+            blob_centroids_hsi = extract_blob_centroids(self.last_detection_mask, max_blobs=max_blobs)
 
-            if not centroids_img:
+            if not blob_centroids_hsi:
                 progress.close()
-                QMessageBox.warning(self, "No Blobs",
-                    "No blobs found in detection mask.\n"
+                QMessageBox.warning(
+                    self,
+                    "No Blobs Found",
+                    "No blobs detected in filtered mask (Panel 3).\n\n"
                     "Try:\n"
                     "- Lowering the Prob Thr threshold\n"
-                    "- Disabling some filters\n"
-                    "- Running Analysis again")
+                    "- Disabling some geometric filters\n"
+                    "- Running Analysis again"
+                )
                 return
 
-            logger.info(f"Found {len(centroids_img)} blob centroids from rotated mask, aligned with {image_type}")
-            logger.info(f"Example centroid: {centroids_img[0] if centroids_img else 'N/A'}")
+            logger.info(f"[BLOB SEGMENTATION] Extracted {len(blob_centroids_hsi)} blob centroids from Panel 3 (after filters)")
+            logger.info(f"[BLOB SEGMENTATION] HSI centroids (first 3): {blob_centroids_hsi[:3]}")
 
-            logger.info(f"Found {len(centroids_img)} blob centroids, starting SAM segmentation...")
-            progress.setLabelText(f"Segmenting {len(centroids_img)} blobs with SAM...")
-            progress.setMaximum(len(centroids_img))
+            # ========================================================================
+            # COORDINATE TRANSFORM: Rotate centroids 90° CW to match REFLECTANCE/RGB
+            # ========================================================================
+            # Panel 3 uses HSI coordinate space (rotated 90° CW for display)
+            # Panel 4 uses REFLECTANCE/RGB coordinate space (upright)
+            # Need to transform: (x_hsi, y_hsi) → (x_rgb, y_rgb)
+            # Rotation 90° CW: new_x = h - y, new_y = x
+
+            h_hsi, w_hsi = self.last_detection_mask.shape  # HSI dimensions (512x512)
+            blob_centroids_rgb = []
+
+            for x_hsi, y_hsi in blob_centroids_hsi:
+                # Rotate 90° clockwise to align with upright REFLECTANCE image
+                x_rgb = h_hsi - y_hsi - 1
+                y_rgb = x_hsi
+                blob_centroids_rgb.append((x_rgb, y_rgb))
+
+            logger.info(f"[BLOB SEGMENTATION] Rotated centroids to RGB space (first 3): {blob_centroids_rgb[:3]}")
+
+            progress.setLabelText(f"Segmenting {len(blob_centroids_rgb)} blobs with SAM2...")
+            progress.setMaximum(len(blob_centroids_rgb))
             QApplication.processEvents()
 
-            # Segment each blob with SAM using resized source image with corrected coordinates
-            masks = []
-            for i, point in enumerate(centroids_img):
+            # ========================================================================
+            # SAM2 SEGMENTATION: Segment each blob using its centroid as prompt
+            # ========================================================================
+            # Segment each blob individually using RGB-space centroids
+            all_masks = []
+            successful_segments = 0
+
+            for i, centroid_rgb in enumerate(blob_centroids_rgb):
                 try:
-                    _, mask_bool = self.sam2_segmenter.segment_object_from_array(image_resized, [point])
-                    masks.append(mask_bool)
-                    progress.setValue(i + 1)
-                    QApplication.processEvents()
-                except Exception as e:
-                    logger.warning(f"Failed to segment point {i} at {point}: {e}")
-                    masks.append(np.zeros(image_resized.shape[:2], dtype=bool))
+                    # centroid_rgb is (x, y) tuple in RGB space - convert to [x, y] list for API
+                    point = [centroid_rgb[0], centroid_rgb[1]]
 
-            progress.setLabelText("Creating overlay visualization...")
+                    # Segment this blob using RGB-space coordinates
+                    _, blob_mask = self.sam2_segmenter.segment_object_from_array(
+                        image_resized,
+                        [point]  # Single point prompt in RGB coordinate space
+                    )
+
+                    all_masks.append(blob_mask)
+                    successful_segments += 1
+
+                except Exception as e:
+                    logger.warning(f"[BLOB SEGMENTATION] Failed to segment blob {i} at RGB coords {centroid_rgb}: {e}")
+                    # Add empty mask as placeholder
+                    all_masks.append(np.zeros((hsi_h, hsi_w), dtype=bool))
+
+                # Update progress
+                progress.setValue(i + 1)
+                QApplication.processEvents()
+
+            logger.info(f"[BLOB SEGMENTATION] Successfully segmented {successful_segments}/{len(blob_centroids_rgb)} blobs")
+
+            # ========================================================================
+            # MERGE MASKS: Combine all blob segments into one mask
+            # ========================================================================
+            combined_mask = np.zeros((hsi_h, hsi_w), dtype=bool)
+            for mask in all_masks:
+                combined_mask = np.logical_or(combined_mask, mask)
+
+            logger.info(f"[BLOB SEGMENTATION] Combined coverage: {combined_mask.sum() / combined_mask.size * 100:.1f}% of image")
+
+            # ========================================================================
+            # VISUALIZATION: Colored overlay on UPRIGHT source image (NO ROTATION)
+            # ========================================================================
+            progress.setLabelText("Creating colored segment overlay...")
             QApplication.processEvents()
 
-            # Rotate probability map 90° clockwise to align with source image orientation
-            prob_map_rotated = cv2.rotate(self.last_detection_prob_map, cv2.ROTATE_90_CLOCKWISE)
+            # Create RGB visualization with colored segments
+            # IMPORTANT: Keep image UPRIGHT - do NOT rotate
+            visualization = image_resized.copy()
 
-            # Create colored overlay directly on source image (already in RGB format)
-            # Now source image, prob_map_rotated, and masks are all aligned in the same orientation
-            overlay = create_sam_segment_overlay(
-                image_resized,     # Use resized source image (512x512) - already in RGB format
-                masks,             # Masks extracted from rotated detection mask - aligned with source
-                prob_map=prob_map_rotated,  # Rotated 90° CW to match source
-                alpha=0.4
-            )
+            # Define colors for segments (cycle through if more blobs than colors)
+            colors = [
+                (255, 0, 0),    # Red
+                (0, 255, 0),    # Green
+                (0, 0, 255),    # Blue
+                (255, 255, 0),  # Yellow
+                (255, 0, 255),  # Magenta
+                (0, 255, 255),  # Cyan
+                (255, 128, 0),  # Orange
+                (128, 0, 255),  # Purple
+                (0, 255, 128),  # Spring Green
+                (255, 0, 128),  # Deep Pink
+            ]
 
-            # Display on Panel 4 (RGB SAM Label)
-            # No BGR to RGB conversion needed - overlay is already RGB
-            self._show_image(overlay, self.rgb_sam_label)
+            # Draw each segment with a different color
+            alpha = 0.4
+            for i, mask in enumerate(all_masks):
+                if mask.sum() == 0:
+                    continue  # Skip empty masks
 
-            # Cache results
-            self.last_sam_segments = masks
-            self.last_sam_overlay = overlay
+                color = np.array(colors[i % len(colors)], dtype=np.uint8)
+                overlay = visualization.copy()
+                overlay[mask] = color
+                visualization = cv2.addWeighted(visualization, 1 - alpha, overlay, alpha, 0)
 
-            # Calculate statistics
-            total_segment_pixels = sum(mask.sum() for mask in masks)
-            avg_segment_size = total_segment_pixels / len(masks) if masks else 0
+            # Draw centroid markers (small red circles) using RGB-space coordinates
+            for centroid_rgb in blob_centroids_rgb:
+                cv2.circle(visualization, centroid_rgb, 3, (255, 0, 0), -1)  # Red filled dot
+                cv2.circle(visualization, centroid_rgb, 5, (255, 255, 255), 1)  # White border
+
+            # ========================================================================
+            # DISPLAY: Show UPRIGHT result on Panel 4 (NO ROTATION)
+            # ========================================================================
+            self._show_image(visualization, self.rgb_sam_label)
+
+            # Cache results for potential reuse
+            self.last_sam_segments = all_masks
+            self.last_sam_overlay = visualization
 
             progress.close()
-            logger.info(f"SAM segmentation complete: {len(masks)} segments on {image_type} | avg size={avg_segment_size:.1f}px")
+
+            # ========================================================================
+            # STATUS UPDATE: Report results to user
+            # ========================================================================
+            combined_pixels = int(combined_mask.sum())
+            total_pixels = combined_mask.size
+            coverage_pct = combined_pixels / total_pixels * 100
+            avg_blob_size = combined_pixels / len(blob_centroids_rgb) if blob_centroids_rgb else 0
+
+            logger.info(f"[BLOB SEGMENTATION] ✅ Segmentation Complete:")
+            logger.info(f"  - Image Type: {image_type}")
+            logger.info(f"  - Blobs Detected: {len(blob_centroids_rgb)}")
+            logger.info(f"  - Successfully Segmented: {successful_segments}")
+            logger.info(f"  - Combined Coverage: {combined_pixels:,} pixels ({coverage_pct:.1f}%)")
+            logger.info(f"  - Avg Blob Size: {avg_blob_size:.1f} pixels")
+            logger.info(f"  - Centroids rotated 90° CW (HSI → RGB coordinate transform)")
+            logger.info(f"  - Image kept UPRIGHT (no rotation applied)")
+
             self.status_bar.showMessage(
-                f"✅ SAM segmentation: {len(masks)} segments on Panel 4 ({image_type}+SAM) | "
-                f"avg size={avg_segment_size:.0f}px | "
-                f"total={total_segment_pixels}px"
+                f"✅ SAM SEGMENTATION: {successful_segments}/{len(blob_centroids_rgb)} blobs on {image_type} | "
+                f"Coverage={coverage_pct:.1f}% | "
+                f"Avg={avg_blob_size:.0f}px"
+            )
+
+            # Show info dialog with results
+            QMessageBox.information(
+                self,
+                "SAM2 Blob Segmentation Results",
+                f"🎯 Blob Segmentation Results:\n\n"
+                f"Image Type: {image_type}\n"
+                f"Source: Panel 3 (Filtered Blobs)\n"
+                f"Blobs Detected: {len(blob_centroids_rgb)}\n"
+                f"Successfully Segmented: {successful_segments}\n"
+                f"Combined Coverage: {coverage_pct:.1f}%\n"
+                f"Combined Pixels: {combined_pixels:,}\n"
+                f"Avg Blob Size: {avg_blob_size:.0f} pixels\n\n"
+                f"🌈 Colored overlay shows SAM segments\n"
+                f"🔴 Red dots show blob centroids (prompts)\n"
+                f"🔄 Centroids rotated 90° CW for RGB alignment\n"
+                f"📐 Image displayed UPRIGHT (no rotation)"
             )
 
         except Exception as e:
-            logger.exception("Failed to show SAM segments: %s", e)
-            self.status_bar.showMessage(f"SAM segmentation failed: {e}")
-            QMessageBox.critical(self, "Error", f"SAM segmentation failed:\n{str(e)}")
+            logger.exception("[BLOB SEGMENTATION] Failed: %s", e)
+            self.status_bar.showMessage(f"❌ SAM segmentation failed: {e}")
+            QMessageBox.critical(self, "Error", f"SAM2 Blob Segmentation Failed:\n{str(e)}")
 
     def _show_image(self, img: np.ndarray, label: QLabel, is_grayscale: bool = False):
         """Display image in QLabel."""
