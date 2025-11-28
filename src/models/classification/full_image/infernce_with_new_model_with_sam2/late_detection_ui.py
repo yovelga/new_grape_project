@@ -19,6 +19,11 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import cv2
+import torch
+import torch.nn as nn
+from torchvision import transforms
+from torchvision.models import efficientnet_b0, EfficientNet_B0_Weights
+from PIL import Image
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QLabel, QVBoxLayout, QWidget,
     QPushButton, QFileDialog, QSlider, QHBoxLayout, QStatusBar,
@@ -974,6 +979,13 @@ class HSILateDetectionViewer(QMainWindow):
         self.last_cluster_mask: Optional[np.ndarray] = None  # Cluster ROI mask for filtering
         self.use_cluster_filter = False  # Toggle for cluster mask filtering
 
+        # CNN Classification (for grape/not-grape)
+        self.cnn_model: Optional[torch.nn.Module] = None
+        self.cnn_device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.cnn_transform: Optional[transforms.Compose] = None
+        self.cnn_classifications: List[Dict] = []  # Store classification results
+        self.show_popup_before_cnn = True  # Toggle for showing gallery before CNN
+
         # Dataset state
         self.dataset_df: Optional[pd.DataFrame] = None
         self.dataset_current_index: int = -1
@@ -998,6 +1010,7 @@ class HSILateDetectionViewer(QMainWindow):
         self._setup_logging()
         self._discover_models()
         self._auto_load_model()
+        self._load_cnn_model()  # Load CNN model for classification
 
     def _setup_logging(self):
         """Setup custom logging handler to capture logs in UI."""
@@ -1368,6 +1381,18 @@ class HSILateDetectionViewer(QMainWindow):
             "When unchecked: Show full bounding box region"
         )
         actions_row.addWidget(self.crop_segment_only_chk)
+
+        # Show popup before CNN toggle
+        self.show_popup_before_cnn_chk = QCheckBox("Show Popup Before CNN")
+        self.show_popup_before_cnn_chk.setChecked(True)  # Default: Show popup
+        self.show_popup_before_cnn_chk.setToolTip(
+            "When checked: Show crop gallery before running CNN classification\n"
+            "When unchecked: Run CNN directly without popup"
+        )
+        self.show_popup_before_cnn_chk.stateChanged.connect(
+            lambda state: setattr(self, 'show_popup_before_cnn', state == Qt.Checked)
+        )
+        actions_row.addWidget(self.show_popup_before_cnn_chk)
 
         screenshot_btn = QPushButton("Screenshot (All 6 Panels)")
         screenshot_btn.clicked.connect(self._save_screenshot)
@@ -2394,6 +2419,147 @@ class HSILateDetectionViewer(QMainWindow):
             self.status_bar.showMessage(f"❌ SAM segmentation failed: {e}")
             QMessageBox.critical(self, "Error", f"SAM2 Blob Segmentation Failed:\n{str(e)}")
 
+    def _load_cnn_model(self):
+        """Load the CNN model for grape/not-grape classification."""
+        try:
+            logger.info("[CNN] Loading CNN model for classification...")
+
+            # Model path - use grayscale trained model from original_gray results
+            model_path = Path(r"C:\Users\yovel\Desktop\Grape_Project\src\models\training_classification_model_cnn_for_grapes_berry\train_model\results\original_gray\best_model.pth")
+
+            logger.info(f"[CNN] Looking for model at: {model_path}")
+
+            if not model_path.exists():
+                logger.error(f"[CNN] ❌ Model not found at: {model_path}")
+                logger.warning("[CNN] CNN classification will be disabled")
+                self.cnn_model = None
+                return
+
+            logger.info(f"[CNN] ✅ Model file found")
+            logger.info(f"[CNN] Building model architecture...")
+
+            # Build model architecture (EfficientNet-B0 with GRAYSCALE input)
+            # This matches the training code which uses get_model_gray
+            model = efficientnet_b0(weights=None)
+
+            # Modify first conv for grayscale (1 channel) - SAME AS TRAINING
+            old_conv = model.features[0][0]
+            model.features[0][0] = nn.Conv2d(
+                1,  # 1 input channel (grayscale) - matches training
+                old_conv.out_channels,
+                kernel_size=old_conv.kernel_size,
+                stride=old_conv.stride,
+                padding=old_conv.padding,
+                bias=old_conv.bias is not None
+            )
+            logger.info(f"[CNN] Modified first conv for grayscale (1 channel) - matches training")
+
+            # Modify classifier for 2 classes (grape/not-grape)
+            num_features = model.classifier[1].in_features
+            model.classifier[1] = nn.Linear(num_features, 2)
+            logger.info(f"[CNN] Modified classifier for 2 classes")
+
+            # Load weights
+            logger.info(f"[CNN] Loading checkpoint...")
+            checkpoint = torch.load(str(model_path), map_location=self.cnn_device)
+            logger.info(f"[CNN] Checkpoint loaded, type: {type(checkpoint)}")
+
+            # Load state dict
+            model.load_state_dict(checkpoint)
+            logger.info(f"[CNN] State dict loaded successfully")
+
+            model.to(self.cnn_device)
+            model.eval()
+            logger.info(f"[CNN] Model moved to {self.cnn_device} and set to eval mode")
+
+            self.cnn_model = model
+
+            # Setup preprocessing transforms - EXACTLY MATCH TRAINING
+            # Training uses: Resize(224,224) -> Grayscale(1) -> ToTensor -> Normalize(0.5, 0.5)
+            self.cnn_transform = transforms.Compose([
+                transforms.Resize((224, 224)),
+                transforms.Grayscale(num_output_channels=1),  # 1 channel - matches training
+                transforms.ToTensor(),
+                transforms.Normalize(mean=[0.5], std=[0.5])  # Single channel normalization
+            ])
+            logger.info(f"[CNN] Preprocessing: Resize(224,224) -> Grayscale(1ch) -> Normalize(0.5)")
+
+            logger.info(f"[CNN] ✅ Model loaded successfully from: {model_path}")
+            logger.info(f"[CNN] Device: {self.cnn_device}")
+            logger.info(f"[CNN] Architecture: EfficientNet-B0 (grayscale input)")
+
+        except Exception as e:
+            logger.exception(f"[CNN] Failed to load model: {e}")
+            self.cnn_model = None
+
+    def _preprocess_crop_for_cnn(self, crop: np.ndarray) -> torch.Tensor:
+        """
+        Preprocess a crop for CNN classification - MATCHES TRAINING PIPELINE.
+
+        Args:
+            crop: RGB numpy array (H, W, 3)
+
+        Returns:
+            Preprocessed tensor (1, 1, 224, 224) - single channel grayscale
+        """
+        # Convert numpy (RGB) to PIL Image
+        if crop.ndim == 2:
+            # Already grayscale
+            pil_image = Image.fromarray(crop)
+        else:
+            # RGB -> convert to PIL
+            pil_image = Image.fromarray(crop.astype(np.uint8))
+
+        # Apply transforms (resize, grayscale 1 channel, normalize)
+        # This EXACTLY matches the training pipeline
+        tensor = self.cnn_transform(pil_image)
+
+        # Add batch dimension
+        tensor = tensor.unsqueeze(0)  # (1, 1, 224, 224)
+
+        return tensor
+
+    def _classify_crop(self, crop: np.ndarray) -> Tuple[int, float]:
+        """
+        Classify a single crop as grape (1) or not-grape (0).
+
+        Args:
+            crop: RGB numpy array
+
+        Returns:
+            (predicted_class, confidence) where class is 0 (not-grape) or 1 (grape)
+        """
+        if self.cnn_model is None:
+            # Model not loaded, default to grape (1)
+            logger.warning("[CNN] Model is None, using default classification")
+            return 1, 0.5
+
+        try:
+            # Preprocess
+            tensor = self._preprocess_crop_for_cnn(crop)
+            tensor = tensor.to(self.cnn_device)
+
+            # Inference
+            with torch.no_grad():
+                outputs = self.cnn_model(tensor)
+                probs = torch.softmax(outputs, dim=1)
+                confidence, predicted = torch.max(probs, 1)
+
+            pred_class = predicted.item()
+            conf_score = confidence.item()
+
+            # Get both class probabilities for debugging
+            prob_not_grape = probs[0, 0].item()
+            prob_grape = probs[0, 1].item()
+
+            logger.debug(f"[CNN] Probs: not_grape={prob_not_grape:.3f}, grape={prob_grape:.3f}, pred={pred_class}, conf={conf_score:.3f}")
+
+            return pred_class, conf_score
+
+        except Exception as e:
+            logger.exception(f"[CNN] Classification failed: {e}")
+            return 1, 0.5  # Default to grape
+
     def _debug_cnn_crops(self):
         """
         Extract crops from SAM segments and show them in a gallery dialog.
@@ -2543,16 +2709,12 @@ class HSILateDetectionViewer(QMainWindow):
                     QApplication.processEvents()
                     continue
 
-                # Add to crop list
-                crop_list.append(crop)
-
-
-                # Draw BLUE rectangle on visualization image
-                cv2.rectangle(viz_image, (x_min, y_min), (x_max, y_max), (0, 0, 255), 2)  # Blue, thickness 2
-
-                # Add crop index as text
-                cv2.putText(viz_image, f"{i}", (x_min, y_min - 5), cv2.FONT_HERSHEY_SIMPLEX,
-                           0.4, (0, 0, 255), 1, cv2.LINE_AA)
+                # Store crop with bbox info for later CNN classification
+                crop_list.append({
+                    'crop': crop,
+                    'bbox': (x_min, y_min, x_max, y_max),
+                    'segment_idx': i
+                })
 
                 # Update progress
                 progress.setValue(i + 1)
@@ -2561,8 +2723,97 @@ class HSILateDetectionViewer(QMainWindow):
             progress.close()
 
             # ========================================================================
-            # UPDATE PANEL 5 WITH VISUALIZATION
+            # SHOW POPUP GALLERY (IF ENABLED)
             # ========================================================================
+            if crop_list and self.show_popup_before_cnn:
+                # Show gallery before CNN classification
+                crops_only = [item['crop'] for item in crop_list]
+                mode_text = "Segment Only (Masked)" if self.crop_segment_only_chk.isChecked() else "Full BBox"
+                gallery = CropGalleryDialog(crops_only, parent=self, title_suffix=f" - {mode_text}")
+                gallery.exec_()
+                logger.info(f"[CNN DEBUG] Crop gallery closed by user")
+
+            # ========================================================================
+            # CNN CLASSIFICATION
+            # ========================================================================
+            if self.cnn_model is not None:
+                logger.info(f"[CNN] Starting classification of {len(crop_list)} crops...")
+                progress = QProgressDialog("Running CNN classification...", None, 0, len(crop_list), self)
+                progress.setWindowModality(Qt.WindowModal)
+                progress.show()
+                QApplication.processEvents()
+
+                self.cnn_classifications = []
+
+                for idx, crop_data in enumerate(crop_list):
+                    crop = crop_data['crop']
+                    bbox = crop_data['bbox']
+                    segment_idx = crop_data['segment_idx']
+
+                    # Classify crop
+                    pred_class, confidence = self._classify_crop(crop)
+
+                    # Store result
+                    self.cnn_classifications.append({
+                        'segment_idx': segment_idx,
+                        'bbox': bbox,
+                        'class': pred_class,
+                        'confidence': confidence,
+                        'class_name': 'grape' if pred_class == 1 else 'not_grape'
+                    })
+
+                    logger.info(f"[CNN] Segment {segment_idx}: {['NOT_GRAPE', 'GRAPE'][pred_class]} (conf={confidence:.3f})")
+
+                    progress.setValue(idx + 1)
+                    QApplication.processEvents()
+
+                progress.close()
+                logger.info(f"[CNN] ✅ Classification complete")
+
+                # Count results
+                grape_count = sum(1 for c in self.cnn_classifications if c['class'] == 1)
+                not_grape_count = len(self.cnn_classifications) - grape_count
+                logger.info(f"[CNN] Results: {grape_count} GRAPE, {not_grape_count} NOT_GRAPE")
+
+            else:
+                logger.warning("[CNN] Model not loaded, skipping classification")
+                # Default all to grape
+                self.cnn_classifications = []
+                for idx, crop_data in enumerate(crop_list):
+                    self.cnn_classifications.append({
+                        'segment_idx': crop_data['segment_idx'],
+                        'bbox': crop_data['bbox'],
+                        'class': 1,  # Default: grape
+                        'confidence': 0.5,
+                        'class_name': 'grape'
+                    })
+
+            # ========================================================================
+            # UPDATE PANEL 5 WITH COLOR-CODED BBOXES
+            # GREEN = grape (class 1), RED = not_grape (class 0)
+            # ========================================================================
+            for result in self.cnn_classifications:
+                bbox = result['bbox']
+                x_min, y_min, x_max, y_max = bbox
+                pred_class = result['class']
+                confidence = result['confidence']
+                segment_idx = result['segment_idx']
+
+                # Choose color: GREEN for grape, RED for not-grape
+                if pred_class == 1:
+                    color = (0, 255, 0)  # GREEN (grape)
+                else:
+                    color = (255, 0, 0)  # RED (not-grape)
+
+                # Draw rectangle
+                cv2.rectangle(viz_image, (x_min, y_min), (x_max, y_max), color, 2)
+
+                # Add label with class and confidence
+                label = f"{segment_idx}: {result['class_name']} ({confidence:.2f})"
+                cv2.putText(viz_image, label, (x_min, y_min - 5), cv2.FONT_HERSHEY_SIMPLEX,
+                           0.4, color, 1, cv2.LINE_AA)
+
+            # Update Panel 5
             self.cnn_candidates_image = viz_image
             self._show_image(viz_image, self.cnn_candidates_label)
 
@@ -2572,29 +2823,14 @@ class HSILateDetectionViewer(QMainWindow):
             logger.info(f"  - SAM Segments Processed: {len(self.last_sam_segments)}")
             logger.info(f"  - Crops Extracted: {len(crop_list)}")
             logger.info(f"  - Crop Mode: {crop_mode}")
-            logger.info(f"  - Panel 5 updated with bounding boxes")
-            logger.info(f"  - Showing crop gallery dialog")
+            logger.info(f"  - CNN Classifications: {len(self.cnn_classifications)}")
+            logger.info(f"  - Panel 5 updated with color-coded bounding boxes")
 
+            grape_count = sum(1 for c in self.cnn_classifications if c['class'] == 1)
+            not_grape_count = len(self.cnn_classifications) - grape_count
             self.status_bar.showMessage(
-                f"✅ CNN Debug: {len(crop_list)} crops extracted ({crop_mode})"
+                f"✅ CNN Complete: {grape_count} GRAPE (green), {not_grape_count} NOT_GRAPE (red)"
             )
-
-            # ========================================================================
-            # SHOW CROP GALLERY DIALOG
-            # ========================================================================
-            if crop_list:
-                # Add mode info to gallery title
-                mode_text = "Segment Only (Masked)" if self.crop_segment_only_chk.isChecked() else "Full BBox"
-                gallery = CropGalleryDialog(crop_list, parent=self, title_suffix=f" - {mode_text}")
-                gallery.exec_()
-                logger.info(f"[CNN DEBUG] Crop gallery closed by user")
-            else:
-                QMessageBox.information(
-                    self,
-                    "No Valid Crops",
-                    "No valid crops were extracted from SAM segments.\n\n"
-                    "Make sure you ran 'Show SAM Segments' first."
-                )
 
         except Exception as e:
             logger.exception("[CNN DEBUG] Failed: %s", e)
