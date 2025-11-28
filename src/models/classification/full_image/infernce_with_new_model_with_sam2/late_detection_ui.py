@@ -256,17 +256,18 @@ class CropGalleryDialog(QDialog):
     Shows CNN candidate crops for visual inspection.
     """
 
-    def __init__(self, crops: List[np.ndarray], parent=None):
+    def __init__(self, crops: List[np.ndarray], parent=None, title_suffix: str = ""):
         """
         Initialize crop gallery dialog.
 
         Args:
             crops: List of numpy arrays (RGB images) to display
             parent: Parent widget
+            title_suffix: Optional suffix to add to window title (e.g., " - Segment Only")
         """
         super().__init__(parent)
         self.crops = crops
-        self.setWindowTitle(f"CNN Crop Gallery ({len(crops)} crops)")
+        self.setWindowTitle(f"CNN Crop Gallery ({len(crops)} crops){title_suffix}")
         self.setModal(True)
         self.resize(1000, 700)
 
@@ -1358,6 +1359,15 @@ class HSILateDetectionViewer(QMainWindow):
         self.run_cnn_btn.setToolTip("Crop detections and save to debug_crops folder")
         self.run_cnn_btn.clicked.connect(self._debug_cnn_crops)
         actions_row.addWidget(self.run_cnn_btn)
+
+        # Crop mode toggle - Segment only vs Full BBox
+        self.crop_segment_only_chk = QCheckBox("Segment Only (Masked)")
+        self.crop_segment_only_chk.setChecked(False)  # Default: Full BBox
+        self.crop_segment_only_chk.setToolTip(
+            "When checked: Show only the segment pixels (masked region)\n"
+            "When unchecked: Show full bounding box region"
+        )
+        actions_row.addWidget(self.crop_segment_only_chk)
 
         screenshot_btn = QPushButton("Screenshot (All 6 Panels)")
         screenshot_btn.clicked.connect(self._save_screenshot)
@@ -2503,8 +2513,28 @@ class HSILateDetectionViewer(QMainWindow):
                     QApplication.processEvents()
                     continue
 
-                # Crop from source image (include max indices)
-                crop = source_image[y_min:y_max+1, x_min:x_max+1].copy()
+                # ================================================================
+                # CROP EXTRACTION - Two Modes:
+                # 1. Full BBox: Extract entire bounding box region
+                # 2. Segment Only: Extract segment and mask out background
+                # ================================================================
+                if self.crop_segment_only_chk.isChecked():
+                    # MODE: Segment Only (Masked)
+                    # Extract bbox region and apply mask to show only segment pixels
+                    crop_bbox = source_image[y_min:y_max+1, x_min:x_max+1].copy()
+                    segment_bbox_mask = segment_mask[y_min:y_max+1, x_min:x_max+1].copy()
+
+                    # Create masked crop - set background to black (0,0,0)
+                    crop = crop_bbox.copy()
+                    crop[~segment_bbox_mask] = 0  # Black background where mask is False
+
+                    logger.info(f"[CNN DEBUG] Segment {i}: BBox=[x:{x_min}-{x_max}, y:{y_min}-{y_max}], Mode=SEGMENT_ONLY, Crop size={crop.shape[:2]}")
+                else:
+                    # MODE: Full BBox (Default)
+                    # Extract entire bounding box region without masking
+                    crop = source_image[y_min:y_max+1, x_min:x_max+1].copy()
+
+                    logger.info(f"[CNN DEBUG] Segment {i}: BBox=[x:{x_min}-{x_max}, y:{y_min}-{y_max}], Mode=FULL_BBOX, Crop size={crop.shape[:2]}")
 
                 # Skip empty crops
                 if crop.size == 0:
@@ -2516,7 +2546,6 @@ class HSILateDetectionViewer(QMainWindow):
                 # Add to crop list
                 crop_list.append(crop)
 
-                logger.info(f"[CNN DEBUG] Segment {i}: BBox=[x:{x_min}-{x_max}, y:{y_min}-{y_max}], Crop size={crop.shape[:2]}")
 
                 # Draw BLUE rectangle on visualization image
                 cv2.rectangle(viz_image, (x_min, y_min), (x_max, y_max), (0, 0, 255), 2)  # Blue, thickness 2
@@ -2538,21 +2567,25 @@ class HSILateDetectionViewer(QMainWindow):
             self._show_image(viz_image, self.cnn_candidates_label)
 
             # Log results
+            crop_mode = "SEGMENT_ONLY" if self.crop_segment_only_chk.isChecked() else "FULL_BBOX"
             logger.info(f"[CNN DEBUG] ✅ Complete:")
             logger.info(f"  - SAM Segments Processed: {len(self.last_sam_segments)}")
             logger.info(f"  - Crops Extracted: {len(crop_list)}")
+            logger.info(f"  - Crop Mode: {crop_mode}")
             logger.info(f"  - Panel 5 updated with bounding boxes")
             logger.info(f"  - Showing crop gallery dialog")
 
             self.status_bar.showMessage(
-                f"✅ CNN Debug: {len(crop_list)} crops extracted from SAM segments"
+                f"✅ CNN Debug: {len(crop_list)} crops extracted ({crop_mode})"
             )
 
             # ========================================================================
             # SHOW CROP GALLERY DIALOG
             # ========================================================================
             if crop_list:
-                gallery = CropGalleryDialog(crop_list, parent=self)
+                # Add mode info to gallery title
+                mode_text = "Segment Only (Masked)" if self.crop_segment_only_chk.isChecked() else "Full BBox"
+                gallery = CropGalleryDialog(crop_list, parent=self, title_suffix=f" - {mode_text}")
                 gallery.exec_()
                 logger.info(f"[CNN DEBUG] Crop gallery closed by user")
             else:
