@@ -839,6 +839,7 @@ class HSILateDetectionViewer(QMainWindow):
         self.hsi_cube: Optional[np.ndarray] = None
         self.hdr_path: Optional[str] = None
         self.rgb_image: Optional[np.ndarray] = None
+        self.reflectance_image: Optional[np.ndarray] = None  # REFLECTANCE_*.png for SAM visualization
         self.current_band: int = 0
         self.folder_path: str = ""
 
@@ -1544,6 +1545,19 @@ class HSILateDetectionViewer(QMainWindow):
                     self._show_image(self.rgb_image, self.rgb_label)
                     logger.info("Loaded RGB image: %s", rgb_path)
 
+            # Load REFLECTANCE_*.png image from HS/results for SAM visualization (Panel 4)
+            reflectance_path = self._find_reflectance_image(folder)
+            if reflectance_path:
+                bgr_refl = cv2.imread(reflectance_path)
+                if bgr_refl is not None:
+                    self.reflectance_image = cv2.cvtColor(bgr_refl, cv2.COLOR_BGR2RGB)
+                    logger.info("Loaded REFLECTANCE image for SAM: %s", reflectance_path)
+                else:
+                    logger.warning("Failed to read REFLECTANCE image: %s", reflectance_path)
+                    self.reflectance_image = None
+            else:
+                self.reflectance_image = None
+
             self.status_bar.showMessage(f"Loaded: {self.current_cluster_id} - {self.current_date}")
 
         except Exception as e:
@@ -1563,6 +1577,26 @@ class HSILateDetectionViewer(QMainWindow):
                 if f.lower().endswith(('.jpg', '.jpeg', '.png')):
                     return os.path.join(root, f)
         return None
+
+    def _find_reflectance_image(self, folder: str) -> Optional[str]:
+        """Find REFLECTANCE_*.png image in HS/results folder for SAM visualization."""
+        try:
+            hs_results = os.path.join(folder, "HS", "results")
+            if not os.path.isdir(hs_results):
+                logger.warning(f"HS/results folder not found: {hs_results}")
+                return None
+
+            for f in os.listdir(hs_results):
+                if f.upper().startswith("REFLECTANCE_") and f.lower().endswith('.png'):
+                    reflectance_path = os.path.join(hs_results, f)
+                    logger.info(f"Found REFLECTANCE image: {reflectance_path}")
+                    return reflectance_path
+
+            logger.warning(f"No REFLECTANCE_*.png found in {hs_results}")
+            return None
+        except Exception as e:
+            logger.warning(f"Failed to find REFLECTANCE image: {e}")
+            return None
 
     def _update_band(self):
         """Update HSI band display."""
@@ -1685,7 +1719,14 @@ class HSILateDetectionViewer(QMainWindow):
             # =============================================================================
             # STRICT PIPELINE: 4-Step Processing for Solid Blob Visualization
             # =============================================================================
-            # This pipeline ensures: Filter noise first → Then merge valid fragments
+            # Pipeline order (important):
+            #   STEP A: Threshold -> create initial binary mask from prob_map
+            #   STEP B: Geometric filters (filter_blobs_advanced) -> remove small/noisy blobs
+            #   STEP B.5: Optional Cluster ROI filter (SAM2) -> remove background false positives
+            #   STEP C: Morphological Closing (CLOSE: dilation followed by erosion) -> merge valid fragments
+            #   STEP D: Update state and UI caches
+            # Note: Morphological Closing is applied AFTER geometric filtering so we only merge
+            #       already-validated fragments (avoids merging noise into large blobs).
 
             # Cache unfiltered detection mask for Panel 2 (BEFORE any processing)
             self.last_detection_mask_unfiltered = (prob_map >= self.pix_thr)
@@ -1700,8 +1741,6 @@ class HSILateDetectionViewer(QMainWindow):
             # -------------------------------------------------------------------------
             # STEP B: Geometric Filtering (CRUCIAL - Remove noise BEFORE morphology)
             # -------------------------------------------------------------------------
-            # This removes small dots, bad shapes, border blobs BEFORE dilation
-            # Ensures we only dilate VALID fragments, not noise
             use_border = self.use_border_chk.isChecked()
             use_area = self.use_area_chk.isChecked()
             use_circ = self.use_circ_chk.isChecked()
@@ -1744,8 +1783,6 @@ class HSILateDetectionViewer(QMainWindow):
             # -------------------------------------------------------------------------
             # STEP B.5: Cluster Mask ROI Filter (Remove background false positives)
             # -------------------------------------------------------------------------
-            # Use SAM2 to detect main grape cluster and filter out background objects
-            # (tripods, walls, text, etc.)
             if self.use_cluster_filter:
                 logger.info("STEP B.5 (Cluster Filter): Detecting main cluster with SAM2...")
                 cluster_mask = self._get_cluster_mask()
@@ -1765,56 +1802,48 @@ class HSILateDetectionViewer(QMainWindow):
                 logger.info("STEP B.5 (Cluster Filter): SKIPPED (not enabled)")
 
             # -------------------------------------------------------------------------
-            # STEP C: Morphological Dilation (THE FIX - Merge valid fragments)
+            # STEP C: Morphological Closing (MERGE VALID FRAGMENTS)
             # -------------------------------------------------------------------------
-            # Apply dilation to FILTERED data only (noise already removed)
-            # This aggressively merges the remaining valid fragments into solid blobs
+            # Apply CLOSING to FILTERED data only (noise already removed). Closing is
+            # a dilation followed by erosion which fills small holes and connects nearby
+            # fragments without introducing as much overgrowth as pure dilation.
 
-            # Start with filtered mask as baseline
             mask_filtered = (filtered_prob_map >= self.pix_thr).astype(bool)
 
             if self.morph_size > 0:
-                logger.info("STEP C (Morphological Dilation): Applying dilation (kernel=%d, iterations=1)",
-                           self.morph_size)
+                logger.info("STEP C (Morphological Closing): Applying closing (kernel=%d)", self.morph_size)
 
-                # Create binary mask for dilation (uint8 format required by cv2.dilate)
-                filtered_binary_mask = (mask_filtered.astype("uint8") * 255)
+                # Create uint8 mask required by cv2.morphologyEx
+                filtered_binary_mask = (mask_filtered.astype('uint8') * 255)
 
-                # Create elliptical structuring element for isotropic (uniform) expansion
+                # Elliptical structuring element for isotropic closing
                 kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (self.morph_size, self.morph_size))
 
-                # Apply pure DILATION (no erosion step - aggressive gap filling)
-                # iterations=1 provides strong expansion without over-merging
-                dilated_binary_mask = cv2.dilate(filtered_binary_mask, kernel, iterations=1)
+                # Apply morphological CLOSE (dilation followed by erosion)
+                closed_binary = cv2.morphologyEx(filtered_binary_mask, cv2.MORPH_CLOSE, kernel)
 
-                # Convert dilated mask back to boolean
-                mask_final = (dilated_binary_mask > 0).astype(bool)
+                # Convert back to boolean mask
+                mask_final = (closed_binary > 0).astype(bool)
 
-                dilated_pixel_count = mask_final.sum()
-                logger.info("STEP C (Morphological Dilation): Complete. Dilated to %d pixels (solid blob)",
-                           dilated_pixel_count)
+                closed_pixel_count = mask_final.sum()
+                logger.info("STEP C (Morphological Closing): Complete. Closed to %d pixels (merged blobs)", closed_pixel_count)
             else:
-                # No dilation - use filtered mask as-is
                 mask_final = mask_filtered
-                logger.info("STEP C (Morphological Dilation): SKIPPED (morph_size = 0)")
+                logger.info("STEP C (Morphological Closing): SKIPPED (morph_size = 0)")
 
             # -------------------------------------------------------------------------
-            # STEP D: Update State (CRITICAL - Assign dilated mask and update prob_map)
+            # STEP D: Update State (Assign closed mask and update prob_map)
             # -------------------------------------------------------------------------
-            # CRITICAL FIX: Update prob_map to give expanded pixels meaningful probability values
-            # Problem: Expanded pixels have 0.0 in filtered_prob_map, making them invisible after threshold
-            # Solution: Use np.where to assign minimum probability (0.5) to expanded regions
-            # This ensures dilated pixels are visible in overlay while preserving original probabilities
             final_prob_map = np.where(mask_final, np.maximum(filtered_prob_map, 0.5), 0.0)
 
             # Cache final results for UI display
             self.last_detection_prob_map = final_prob_map
-            self.last_detection_mask = mask_final  # Use dilated mask directly, not re-threshold!
+            self.last_detection_mask = mask_final  # Use closed mask directly
 
             final_pixel_count = self.last_detection_mask.sum()
             logger.info("STEP D (Update State): Pipeline COMPLETE. Final mask: %d pixels for Panel 3",
                        final_pixel_count)
-            logger.info("Pipeline END: Transformation: %d → %d → %d pixels (Initial → Filtered → Dilated)",
+            logger.info("Pipeline END: Transformation: %d → %d → %d pixels (Initial → Filtered → Closed)",
                        self.last_detection_mask_unfiltered.sum(),
                        (filtered_prob_map >= self.pix_thr).sum(),
                        final_pixel_count)
@@ -1839,38 +1868,53 @@ class HSILateDetectionViewer(QMainWindow):
             detection_after_rgb = cv2.cvtColor(detection_after_overlay, cv2.COLOR_BGR2RGB)
             self._show_image(detection_after_rgb, self.hsi_detection_after_label)
 
-            # Panel 4: RGB with Cluster Mask + Detected Cracks visualization
-            # Show cluster mask (green) and detected cracks (yellow) for verification
-            if hasattr(self, 'rgb_image') and self.rgb_image is not None:
-                # Resize RGB to match HSI dimensions for proper alignment
+            # Panel 4: REFLECTANCE image with optional Cluster Mask (clean, no LDA detections)
+            # Use REFLECTANCE_*.png from HS/results for SAM visualization
+            if hasattr(self, 'reflectance_image') and self.reflectance_image is not None:
+                # Resize REFLECTANCE to match HSI dimensions for proper alignment
                 hsi_h, hsi_w = self.last_detection_mask.shape
-                rgb_resized = cv2.resize(self.rgb_image, (hsi_w, hsi_h), interpolation=cv2.INTER_LINEAR)
+                refl_resized = cv2.resize(self.reflectance_image, (hsi_w, hsi_h), interpolation=cv2.INTER_LINEAR)
 
-                # Start with RGB as base
-                panel4_viz = rgb_resized.copy()
+                # Start with REFLECTANCE as base (clean image, no LDA overlays)
+                panel4_viz = refl_resized.copy()
 
-                # If cluster filter is enabled and cluster mask exists, show it
-                if self.use_cluster_filter and self.last_cluster_mask is not None:
-                    # Create semi-transparent GREEN overlay for cluster mask
+                # Rotate cluster mask to align with the upright REFLECTANCE image (if enabled)
+                # HSI panels are shown rotated (90° CW), so masks are in HSI orientation.
+                # For Panel 4 we need mask rotated 90° CW to match the upright REFLECTANCE orientation.
+                cluster_mask_for_refl = None
+                if self.last_cluster_mask is not None:
+                    cluster_mask_for_refl = cv2.rotate(self.last_cluster_mask.astype('uint8'), cv2.ROTATE_90_CLOCKWISE).astype(bool)
+
+                # If cluster filter is enabled and cluster mask exists, show it (rotated)
+                if self.use_cluster_filter and cluster_mask_for_refl is not None:
                     cluster_overlay = panel4_viz.copy()
                     green_color = np.array([0, 255, 0], dtype=np.uint8)  # Green in RGB
-                    cluster_overlay[self.last_cluster_mask] = green_color
-                    # Blend with 30% opacity
+                    cluster_overlay[cluster_mask_for_refl] = green_color
                     panel4_viz = cv2.addWeighted(panel4_viz, 0.7, cluster_overlay, 0.3, 0)
-                    logger.info("Panel 4: Added cluster mask visualization (green overlay)")
+                    logger.info("Panel 4: Added cluster mask visualization (green overlay) on REFLECTANCE image")
 
-                # Add detected cracks (yellow overlay) on top
-                if self.last_detection_mask.sum() > 0:
-                    crack_overlay = panel4_viz.copy()
-                    yellow_color = np.array([255, 255, 0], dtype=np.uint8)  # Yellow in RGB
-                    crack_overlay[self.last_detection_mask] = yellow_color
-                    # Blend with 40% opacity (more visible than cluster mask)
-                    panel4_viz = cv2.addWeighted(panel4_viz, 0.6, crack_overlay, 0.4, 0)
-                    logger.info("Panel 4: Added crack detection visualization (yellow overlay)")
-
-                # Rotate 90° clockwise to match display orientation
-                panel4_viz = cv2.rotate(panel4_viz, cv2.ROTATE_90_CLOCKWISE)
+                # NO LDA detected pixels overlay - Panel 4 is clean for SAM visualization only
+                # DO NOT rotate the final REFLECTANCE viz. It should stay upright to match source image.
                 self._show_image(panel4_viz, self.rgb_sam_label)
+            elif hasattr(self, 'rgb_image') and self.rgb_image is not None:
+                # Fallback: if REFLECTANCE not available, use RGB image
+                hsi_h, hsi_w = self.last_detection_mask.shape
+                rgb_resized = cv2.resize(self.rgb_image, (hsi_w, hsi_h), interpolation=cv2.INTER_LINEAR)
+                panel4_viz = rgb_resized.copy()
+
+                # Show cluster mask only (no LDA detections)
+                cluster_mask_for_rgb = None
+                if self.last_cluster_mask is not None:
+                    cluster_mask_for_rgb = cv2.rotate(self.last_cluster_mask.astype('uint8'), cv2.ROTATE_90_CLOCKWISE).astype(bool)
+
+                if self.use_cluster_filter and cluster_mask_for_rgb is not None:
+                    cluster_overlay = panel4_viz.copy()
+                    green_color = np.array([0, 255, 0], dtype=np.uint8)
+                    cluster_overlay[cluster_mask_for_rgb] = green_color
+                    panel4_viz = cv2.addWeighted(panel4_viz, 0.7, cluster_overlay, 0.3, 0)
+
+                self._show_image(panel4_viz, self.rgb_sam_label)
+                logger.warning("Panel 4: Using RGB fallback (REFLECTANCE image not found)")
 
             # Panel 5: RGB Image Only - show plain RGB image
             if hasattr(self, 'rgb_image') and self.rgb_image is not None:
@@ -1961,15 +2005,25 @@ class HSILateDetectionViewer(QMainWindow):
             logger.warning("Failed to save analysis results: %s", e)
 
     def _show_sam_segments(self):
-        """Generate and display SAM segmentation for detected blobs on RGB image."""
+        """Generate and display SAM segmentation for detected blobs on REFLECTANCE image."""
         if self.last_detection_mask is None:
             QMessageBox.warning(self, "No Detection", "Run Analysis first to generate detections.")
             return
         if self.hsi_cube is None:
             QMessageBox.warning(self, "No HSI", "No HSI cube loaded.")
             return
-        if self.rgb_image is None:
-            QMessageBox.warning(self, "No RGB", "No RGB image loaded. Make sure RGB folder exists.")
+
+        # Use REFLECTANCE image for SAM, fallback to RGB if not available
+        source_image = None
+        image_type = ""
+        if self.reflectance_image is not None:
+            source_image = self.reflectance_image
+            image_type = "REFLECTANCE"
+        elif self.rgb_image is not None:
+            source_image = self.rgb_image
+            image_type = "RGB"
+        else:
+            QMessageBox.warning(self, "No Image", "No REFLECTANCE or RGB image loaded.")
             return
 
         try:
@@ -1989,16 +2043,16 @@ class HSILateDetectionViewer(QMainWindow):
                 self.sam2_segmenter = create_point_segmenter(predictor)
                 logger.info("SAM2 predictor initialized successfully")
 
-            # SOLUTION: Resize RGB image to match HSI dimensions (512x512) for perfect alignment
+            # Resize source image to match HSI dimensions (512x512) for perfect alignment
             hsi_h, hsi_w = self.last_detection_mask.shape  # 512x512
-            rgb_original = self.rgb_image
-            rgb_resized = cv2.resize(rgb_original, (hsi_w, hsi_h), interpolation=cv2.INTER_LINEAR)
-            logger.info(f"Resized RGB from {rgb_original.shape[:2]} to {rgb_resized.shape[:2]} to match HSI dimensions")
+            image_original = source_image
+            image_resized = cv2.resize(image_original, (hsi_w, hsi_h), interpolation=cv2.INTER_LINEAR)
+            logger.info(f"Resized {image_type} from {image_original.shape[:2]} to {image_resized.shape[:2]} to match HSI dimensions")
 
-            # Rotate detection mask 90° clockwise to align with RGB orientation
+            # Rotate detection mask 90° clockwise to align with source image orientation
             # This is ONLY for SAM segmentation, doesn't affect the HSI display in other panels
             detection_mask_rotated = cv2.rotate(self.last_detection_mask.astype(np.uint8), cv2.ROTATE_90_CLOCKWISE)
-            logger.info("Rotated detection mask 90° clockwise to align with RGB image for SAM")
+            logger.info(f"Rotated detection mask 90° clockwise to align with {image_type} image for SAM")
 
             # Extract blob centroids from the ROTATED detection mask
             max_blobs = self.max_sam_blobs
@@ -2006,9 +2060,9 @@ class HSILateDetectionViewer(QMainWindow):
             progress.setLabelText(f"Extracting up to {max_blobs} blob centroids...")
             QApplication.processEvents()
 
-            centroids_rgb = extract_blob_centroids(detection_mask_rotated, max_blobs=max_blobs)
+            centroids_img = extract_blob_centroids(detection_mask_rotated, max_blobs=max_blobs)
 
-            if not centroids_rgb:
+            if not centroids_img:
                 progress.close()
                 QMessageBox.warning(self, "No Blobs",
                     "No blobs found in detection mask.\n"
@@ -2018,38 +2072,38 @@ class HSILateDetectionViewer(QMainWindow):
                     "- Running Analysis again")
                 return
 
-            logger.info(f"Found {len(centroids_rgb)} blob centroids from rotated mask, aligned with RGB")
-            logger.info(f"Example centroid: {centroids_rgb[0] if centroids_rgb else 'N/A'}")
+            logger.info(f"Found {len(centroids_img)} blob centroids from rotated mask, aligned with {image_type}")
+            logger.info(f"Example centroid: {centroids_img[0] if centroids_img else 'N/A'}")
 
-            logger.info(f"Found {len(centroids_rgb)} blob centroids, starting SAM segmentation...")
-            progress.setLabelText(f"Segmenting {len(centroids_rgb)} blobs with SAM...")
-            progress.setMaximum(len(centroids_rgb))
+            logger.info(f"Found {len(centroids_img)} blob centroids, starting SAM segmentation...")
+            progress.setLabelText(f"Segmenting {len(centroids_img)} blobs with SAM...")
+            progress.setMaximum(len(centroids_img))
             QApplication.processEvents()
 
-            # Segment each blob with SAM using resized RGB image with corrected coordinates
+            # Segment each blob with SAM using resized source image with corrected coordinates
             masks = []
-            for i, point in enumerate(centroids_rgb):
+            for i, point in enumerate(centroids_img):
                 try:
-                    _, mask_bool = self.sam2_segmenter.segment_object_from_array(rgb_resized, [point])
+                    _, mask_bool = self.sam2_segmenter.segment_object_from_array(image_resized, [point])
                     masks.append(mask_bool)
                     progress.setValue(i + 1)
                     QApplication.processEvents()
                 except Exception as e:
                     logger.warning(f"Failed to segment point {i} at {point}: {e}")
-                    masks.append(np.zeros(rgb_resized.shape[:2], dtype=bool))
+                    masks.append(np.zeros(image_resized.shape[:2], dtype=bool))
 
             progress.setLabelText("Creating overlay visualization...")
             QApplication.processEvents()
 
-            # Rotate probability map 90° clockwise to align with RGB orientation
+            # Rotate probability map 90° clockwise to align with source image orientation
             prob_map_rotated = cv2.rotate(self.last_detection_prob_map, cv2.ROTATE_90_CLOCKWISE)
 
-            # Create colored overlay directly on RGB image (already in RGB format)
-            # Now RGB, prob_map_rotated, and masks are all aligned in the same orientation
+            # Create colored overlay directly on source image (already in RGB format)
+            # Now source image, prob_map_rotated, and masks are all aligned in the same orientation
             overlay = create_sam_segment_overlay(
-                rgb_resized,       # Use resized RGB (512x512) - already in RGB format
-                masks,             # Masks extracted from rotated detection mask - aligned with RGB
-                prob_map=prob_map_rotated,  # Rotated 90° CW to match RGB
+                image_resized,     # Use resized source image (512x512) - already in RGB format
+                masks,             # Masks extracted from rotated detection mask - aligned with source
+                prob_map=prob_map_rotated,  # Rotated 90° CW to match source
                 alpha=0.4
             )
 
@@ -2066,9 +2120,9 @@ class HSILateDetectionViewer(QMainWindow):
             avg_segment_size = total_segment_pixels / len(masks) if masks else 0
 
             progress.close()
-            logger.info(f"SAM segmentation complete: {len(masks)} segments | avg size={avg_segment_size:.1f}px")
+            logger.info(f"SAM segmentation complete: {len(masks)} segments on {image_type} | avg size={avg_segment_size:.1f}px")
             self.status_bar.showMessage(
-                f"✅ SAM segmentation: {len(masks)} segments on Panel 4 (RGB+SAM) | "
+                f"✅ SAM segmentation: {len(masks)} segments on Panel 4 ({image_type}+SAM) | "
                 f"avg size={avg_segment_size:.0f}px | "
                 f"total={total_segment_pixels}px"
             )
