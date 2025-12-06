@@ -8,10 +8,10 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.abspath(os.path.join(CURRENT_DIR, "..", ".."))
 
 # נתיבים לתיקיות
-TRAIN_DIR = os.path.join(REPO_ROOT, "items", "Data_for_train_and_val", "Train")
-TEST_DIR = os.path.join(REPO_ROOT, "items", "Data_for_train_and_val", "Val")
-IMAGES_DIR = os.path.join(REPO_ROOT, "items", "used")
-TIF_DIR = os.path.join(REPO_ROOT, "items", "masks")
+TRAIN_DIR = os.path.join(REPO_ROOT, "items_for_cnn_train", "Data_for_train_and_val_cnn", "Train")
+TEST_DIR = os.path.join(REPO_ROOT, "items_for_cnn_train", "Data_for_train_and_val_cnn", "Val")
+IMAGES_DIR = os.path.join(REPO_ROOT, "items_for_cnn_train", "used")
+TIF_DIR = os.path.join(REPO_ROOT, "items_for_cnn_train", "masks")
 
 # נתיב למשקולות המודל (שנשמרו בעבר)
 MODEL_SAVE_PATH = os.path.join(

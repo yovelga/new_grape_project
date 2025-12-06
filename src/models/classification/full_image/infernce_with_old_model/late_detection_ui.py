@@ -82,7 +82,7 @@ AVAILABLE_MODELS = {
     # "NEW LDA Multi-class": os.path.join(PROJECT_ROOT, "src", "models", "classification", "full_image", "classification_by_pixel", "Train", "LDA", "lda_model_multi_class.joblib"),  # Empty - needs retraining
 }
 DEFAULT_SEARCH_FOLDER = os.path.join(PROJECT_ROOT, "data", "raw")
-DEFAULT_DATASET_CSV = os.path.join(PROJECT_ROOT, "src", "preprocessing","prepare_dataset", "hole_image", "late_detection", "late_detection_dataset.csv")
+DEFAULT_DATASET_CSV = os.path.join(PROJECT_ROOT, "src", "preprocessing","prepare_dataset_for_full_image_classification", "hole_image", "late_detection", "late_detection_dataset.csv")
 RESULTS_FOLDER = os.path.join(os.path.dirname(__file__), "Results")
 
 
@@ -688,13 +688,44 @@ class OptunaWorker(QThread):
             # Run optimization (blocking in thread)
             study.optimize(objective, n_trials=self.n_trials, callbacks=[_optuna_callback])
 
-            # When finished, emit best params/value
+            # When finished, emit best params/value with ALL metrics
             best = study.best_trial
             best_info = {
                 "best_value": float(best.value) if best.value is not None else None,
                 "best_params": dict(best.params)
             }
-            self.log(f"Optuna complete: best F2={best_info['best_value']}")
+
+            # Extract all metrics from best trial
+            acc = best.user_attrs.get("acc", 0.0)
+            prec = best.user_attrs.get("prec", 0.0)
+            rec = best.user_attrs.get("rec", 0.0)
+            f1 = best.user_attrs.get("f1", 0.0)
+            f2 = best.user_attrs.get("f2", 0.0)
+            auc = best.user_attrs.get("auc", 0.0)
+
+            # Format parameters for display
+            self.log("=" * 80)
+            self.log("🎉 OPTUNA OPTIMIZATION COMPLETE!")
+            self.log("=" * 80)
+            self.log("")
+            self.log("📊 BEST METRICS:")
+            self.log(f"  • F2 Score:    {f2:.4f} (optimized metric)")
+            self.log(f"  • F1 Score:    {f1:.4f}")
+            self.log(f"  • Accuracy:    {acc:.4f}")
+            self.log(f"  • Precision:   {prec:.4f}")
+            self.log(f"  • Recall:      {rec:.4f}")
+            self.log(f"  • AUC:         {auc:.4f}")
+            self.log("")
+            self.log("⚙️  BEST PARAMETERS:")
+            for key, value in sorted(best.params.items()):
+                if isinstance(value, float):
+                    self.log(f"  • {key:25s} = {value:.4f}")
+                else:
+                    self.log(f"  • {key:25s} = {value}")
+            self.log("")
+            self.log(f"✓ Optimization completed after {len(study.trials)} trials")
+            self.log("=" * 80)
+
             self.finished_signal.emit(True, best_info)
 
         except Exception as e:

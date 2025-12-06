@@ -23,7 +23,7 @@ def read_metadata(tif_path):
 
 def main():
     # נתיב לקובץ TIF
-    tif_path = "/storage/yovelg/Grape/items/masks/2024-08-01_003_mask_5.tif"
+    tif_path = "/storage/yovelg/Grape/items_for_cnn_train/masks/2024-08-01_003_mask_5.tif"
     read_metadata(tif_path)
 
 

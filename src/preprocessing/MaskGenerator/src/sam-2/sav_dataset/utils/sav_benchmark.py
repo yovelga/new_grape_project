@@ -366,7 +366,7 @@ def benchmark(
                     gt_root = path.join(gt_root, "Annotations")
                     gt_videos = os.listdir(gt_root)
 
-        # remove non-folder items
+        # remove non-folder items_for_cnn_train
         gt_videos = list(filter(lambda x: path.isdir(path.join(gt_root, x)), gt_videos))
         mask_videos = list(
             filter(lambda x: path.isdir(path.join(mask_root, x)), mask_videos)

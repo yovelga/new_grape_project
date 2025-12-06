@@ -6,10 +6,11 @@ from sklearn.metrics import confusion_matrix, roc_curve, auc
 import numpy as np
 import os
 from typing import Dict, List
-from .train import train_model
-from .model import get_model, get_model_gray
-from .dataset_multi import GrapeDataset
-from .data_transforms import get_train_transforms, get_test_transforms
+from datetime import datetime
+from train import train_model
+from model import get_model_gray
+from dataset_multi import GrapeDataset
+from data_transforms import get_train_transforms, get_test_transforms
 from config import TRAIN_DIR, TEST_DIR, BATCH_SIZE, NUM_EPOCHS
 
 from torch.utils.data import DataLoader
@@ -63,7 +64,7 @@ def plot_roc_curve(y_true: np.ndarray, y_prob: np.ndarray, save_path: str):
     plt.close()
 
 
-def plot_input_mode_comparison(results_summary: List[Dict]):
+def plot_input_mode_comparison(results_summary: List[Dict], save_path: str):
     modes = [r["mode"] for r in results_summary]
     metrics = {
         "F1 Score": [r["best_metrics"]["f1"] for r in results_summary],
@@ -82,31 +83,67 @@ def plot_input_mode_comparison(results_summary: List[Dict]):
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig("input_mode_comparison.png")
+    plt.savefig(save_path)
     plt.close()
 
 
 def main():
+    # GPU setup and debugging
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"\n{'='*60}")
+    print(f"DEVICE INFORMATION:")
+    print(f"{'='*60}")
+    print(f"Using device: {device}")
+    if torch.cuda.is_available():
+        print(f"GPU Name: {torch.cuda.get_device_name(0)}")
+        print(f"GPU Memory: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.2f} GB")
+        print(f"CUDA Version: {torch.version.cuda}")
+        # Set GPU to be more efficient
+        torch.backends.cudnn.benchmark = True
+    else:
+        print("WARNING: CUDA is not available. Training will be slow on CPU.")
+    print(f"{'='*60}\n")
+
     results_summary = []
+
+    # Create dated folder for this training session
+    current_date = datetime.now().strftime("%Y%m%d_%H%M%S")
+    base_save_dir = f"new_models_{current_date}"
+    os.makedirs(base_save_dir, exist_ok=True)
+    print(f"Models and results will be saved to: {base_save_dir}")
+
     # for mode in ["all", "original", "enlarged", "segmentation"]:
-    for mode in ["original"]:
+    # for mode in ["enlarged"]:  # OLD: Train with enlarged mode
+    for mode in ["context_square_segmentation"]:  # NEW: Context-aware square crops with mask (BEST)
         # Use get_model instead of build_model
         model = get_model_gray(num_classes=2)
         model.to(device)
 
         train_dataset = GrapeDataset(
-            root_dir=TRAIN_DIR, input_mode=mode, transform=get_train_transforms()
+            root_dir=TRAIN_DIR,
+            input_mode=mode,
+            transform=get_train_transforms(),
+            balance_mode="oversample"  # Oversample minority class for better balance
         )
         train_loader = DataLoader(
-            train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=8
+            train_dataset,
+            batch_size=BATCH_SIZE,
+            shuffle=True,
+            num_workers=9,  # Reduced for Windows stability
+            pin_memory=True if torch.cuda.is_available() else False,  # Faster GPU transfer
+            persistent_workers=True  # Faster data loading
         )
 
         val_dataset = GrapeDataset(
             root_dir=TEST_DIR, input_mode=mode, transform=get_test_transforms()
         )
         val_loader = DataLoader(
-            val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4
+            val_dataset,
+            batch_size=BATCH_SIZE,
+            shuffle=False,
+            num_workers=2,  # Reduced for Windows stability
+            pin_memory=True if torch.cuda.is_available() else False,  # Faster GPU transfer
+            persistent_workers=True  # Faster data loading
         )
 
         criterion = torch.nn.CrossEntropyLoss()
@@ -117,14 +154,13 @@ def main():
             model, train_loader, val_loader, criterion, optimizer, device, num_epochs
         )
 
-        save_path = f"results/{mode}_gray"
+        # Save model and results in the dated folder
+        save_path = os.path.join(base_save_dir, f"{mode}_gray")
         os.makedirs(save_path, exist_ok=True)
         model_save_path = os.path.join(save_path, "best_model.pth")
         torch.save(model.state_dict(), model_save_path)
         print(f"Model saved to: {model_save_path}")
 
-        save_path = f"results/{mode}_gray"
-        os.makedirs(save_path, exist_ok=True)
         plot_training_history(results["history"], save_path)
         plot_confusion_matrix(
             results["predictions"]["labels"],
@@ -139,7 +175,9 @@ def main():
         results["mode"] = mode
         results_summary.append(results)
 
-    plot_input_mode_comparison(results_summary)
+    # Save comparison plot in the base dated folder
+    comparison_path = os.path.join(base_save_dir, "input_mode_comparison.png")
+    plot_input_mode_comparison(results_summary, comparison_path)
 
 
 if __name__ == "__main__":

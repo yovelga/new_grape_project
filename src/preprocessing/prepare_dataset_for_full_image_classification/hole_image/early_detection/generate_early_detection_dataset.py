@@ -24,9 +24,9 @@ import sys
 EXCEL_PATH = "crack_by_weeks_for_dataset.xlsx"
 SHEET_NAME: Optional[str] = None  # None -> first sheet; or set to a specific sheet name
 GRAPE_ID_COL = "Grape ID"  # original column name in Excel
-LAST_WEEK_COL = "25.09.24"  # TODO: set the exact last-week column name (e.g. "25.09.24")
+LAST_WEEK_COL = "10.07.24"  # TODO: set the exact last-week column name (e.g. "25.09.24")
 OUTPUT_CSV = "early_detection_dataset.csv"
-BASE_RAW_DIR = r"/data/raw"  # base folder for raw data
+BASE_RAW_DIR = r"C:\Users\yovel\Desktop\Grape_Project\data\raw"  # base folder for raw data
 AUTO_DETECT_LAST_WEEK = False  # if True, pick the right-most non-empty week column automatically
 # ====================
 

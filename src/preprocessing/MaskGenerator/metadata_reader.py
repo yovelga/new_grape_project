@@ -4,7 +4,7 @@ import json
 
 # Path to the TIFF file
 HOME = os.getcwd()
-ITEMS_DIR = os.path.join(os.path.dirname(HOME), "items", "masks")
+ITEMS_DIR = os.path.join(os.path.dirname(HOME), "items_for_cnn_train", "masks")
 tif_path = os.path.join(ITEMS_DIR, "2024-08-01_117_mask_139.tif")
 # .
 

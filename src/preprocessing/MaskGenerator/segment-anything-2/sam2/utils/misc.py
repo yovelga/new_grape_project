@@ -120,7 +120,7 @@ class AsyncVideoFrameLoader:
         self.offload_video_to_cpu = offload_video_to_cpu
         self.img_mean = img_mean
         self.img_std = img_std
-        # items in `self.images` will be loaded asynchronously
+        # items_for_cnn_train in `self.images` will be loaded asynchronously
         self.images = [None] * len(img_paths)
         # catch and raise any exceptions in the async loading thread
         self.exception = None

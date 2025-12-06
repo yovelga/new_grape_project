@@ -3,12 +3,12 @@ import shutil
 import random
 
 # Paths for labeled files
-SOURCE_GRAPE_DIR = r"/storage/yovelg/Grape/items/Data_for_train_and_val/Grape"
-SOURCE_NOT_GRAPE_DIR = r"/storage/yovelg/Grape/items/Data_for_train_and_val/Not_Grape"
+SOURCE_GRAPE_DIR = r"/storage/yovelg/Grape/items_for_cnn_train/Data_for_train_and_val_cnn/Grape"
+SOURCE_NOT_GRAPE_DIR = r"/storage/yovelg/Grape/items_for_cnn_train/Data_for_train_and_val_cnn/Not_Grape"
 
 # Paths for Train and Test folders
-DEST_TRAIN_DIR = r"/storage/yovelg/Grape/items/Data_for_train_and_val/Train"
-DEST_TEST_DIR = r"/storage/yovelg/Grape/items/Data_for_train_and_val/Val"
+DEST_TRAIN_DIR = r"/storage/yovelg/Grape/items_for_cnn_train/Data_for_train_and_val_cnn/Train"
+DEST_TEST_DIR = r"/storage/yovelg/Grape/items_for_cnn_train/Data_for_train_and_val_cnn/Val"
 
 # Create Train and Test folders if they don't exist
 os.makedirs(os.path.join(DEST_TRAIN_DIR, "Grape"), exist_ok=True)

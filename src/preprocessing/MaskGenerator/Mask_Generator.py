@@ -13,7 +13,7 @@ import time
 
 # Define global variables
 HOME = os.path.dirname(os.path.abspath(__file__))  # MaskGenerator directory
-ITEMS_DIR = os.path.join(os.path.dirname(HOME), "items")  # General directory for all data
+ITEMS_DIR = os.path.join(os.path.dirname(HOME), "items_for_cnn_train")  # General directory for all data
 SAM2_DIR = os.path.join(HOME, "segment-anything-2")
 SAM_WEIGHTS = os.path.join(SAM2_DIR, "checkpoints", "sam2.1_hiera_large_cleaned.pt")
 print(f"SAM_WEIGHTS:{SAM_WEIGHTS}")

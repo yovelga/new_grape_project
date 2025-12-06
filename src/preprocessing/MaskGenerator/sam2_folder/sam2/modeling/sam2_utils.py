@@ -26,8 +26,8 @@ def select_closest_cond_frames(frame_idx, cond_frame_outputs, max_cond_frame_num
          of `max_cond_frame_num` conditioning frames.
 
     Outputs:
-    - selected_outputs: selected items (keys & values) from `cond_frame_outputs`.
-    - unselected_outputs: items (keys & values) not selected in `cond_frame_outputs`.
+    - selected_outputs: selected items_for_cnn_train (keys & values) from `cond_frame_outputs`.
+    - unselected_outputs: items_for_cnn_train (keys & values) not selected in `cond_frame_outputs`.
     """
     if max_cond_frame_num == -1 or len(cond_frame_outputs) <= max_cond_frame_num:
         selected_outputs = cond_frame_outputs

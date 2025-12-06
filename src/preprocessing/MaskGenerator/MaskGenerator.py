@@ -15,7 +15,7 @@ import time
 HOME = "/storage/yovelg/Grape/"  # Current directory: ObjectJsonizer
 # HOME =os.path.join(os.getcwd(), "MaskGenerator")
 ITEMS_DIR = os.path.join(
-    os.path.dirname(HOME), "items"
+    os.path.dirname(HOME), "items_for_cnn_train"
 )  # General directory for all data
 SAM2_DIR = os.path.join(HOME, "segment-anything-2")
 SAM_WEIGHTS = f"{HOME}/checkpoints/sam2_hiera_large.pt"

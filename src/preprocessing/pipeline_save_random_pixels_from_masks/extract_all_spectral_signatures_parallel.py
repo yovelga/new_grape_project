@@ -170,7 +170,7 @@ def main(base_data_dir, output_parquet_dir):
                 )
                 date_paths.append(full_date_path)
 
-    # Process items in parallel with 16 workers
+    # Process items_for_cnn_train in parallel with 16 workers
     with ThreadPoolExecutor(max_workers=10) as executor:
         future_to_path = {
             executor.submit(process_single_folder, path, output_parquet_dir): path

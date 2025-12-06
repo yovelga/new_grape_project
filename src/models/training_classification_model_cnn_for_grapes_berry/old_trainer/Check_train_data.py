@@ -10,9 +10,9 @@ from PIL import Image
 import tifffile as tiff
 
 # הגדרת נתיבים לקבצים
-TEST_DIR = r"/storage/yovelg/Grape/items/Data_for_train_and_val/Val"
-TRAIN_DIR = r"/storage/yovelg/Grape/items/Data_for_train_and_val/Train"
-IMAGES_DIR = r"/storage/yovelg/Grape/items/used"
+TEST_DIR = r"/storage/yovelg/Grape/items_for_cnn_train/Data_for_train_and_val_cnn/Val"
+TRAIN_DIR = r"/storage/yovelg/Grape/items_for_cnn_train/Data_for_train_and_val_cnn/Train"
+IMAGES_DIR = r"/storage/yovelg/Grape/items_for_cnn_train/used"
 print(f"TRAIN_DIR: {TRAIN_DIR}, IMAGES_DIR: {IMAGES_DIR}")
 
 # הגדרת טרנספורמציות (data augmentation והנרמול)

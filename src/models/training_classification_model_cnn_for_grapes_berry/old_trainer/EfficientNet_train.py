@@ -9,10 +9,10 @@ from PIL import Image
 import tifffile as tiff
 
 # Paths for Train and Test directories
-TRAIN_DIR = r"/storage/yovelg/Grape/items/Data_for_train_and_val/Train"
-TEST_DIR = r"/storage/yovelg/Grape/items/Data_for_train_and_val/Val"
+TRAIN_DIR = r"/storage/yovelg/Grape/items_for_cnn_train/Data_for_train_and_val_cnn/Train"
+TEST_DIR = r"/storage/yovelg/Grape/items_for_cnn_train/Data_for_train_and_val_cnn/Val"
 # Path to the original images
-IMAGES_DIR = r"/storage/yovelg/Grape/items/used"
+IMAGES_DIR = r"/storage/yovelg/Grape/items_for_cnn_train/used"
 
 # Data augmentation and normalization
 transform = transforms.Compose(

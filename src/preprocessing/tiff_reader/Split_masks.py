@@ -4,11 +4,11 @@ import tifffile as tiff
 import json
 
 # dir for tif mask
-SOURCE_DIR = r"/storage/yovelg/Grape/items/masks"
+SOURCE_DIR = r"/storage/yovelg/Grape/items_for_cnn_train/masks"
 
 # dir for destination
-DEST_DIR_GRAPE = r"/storage/yovelg/Grape/items/Data_for_train_and_val/Grape"
-DEST_DIR_NOT_GRAPE = r"/storage/yovelg/Grape/items/Data_for_train_and_val/Not_Grape"
+DEST_DIR_GRAPE = r"/storage/yovelg/Grape/items_for_cnn_train/Data_for_train_and_val_cnn/Grape"
+DEST_DIR_NOT_GRAPE = r"/storage/yovelg/Grape/items_for_cnn_train/Data_for_train_and_val_cnn/Not_Grape"
 
 # create folders
 os.makedirs(DEST_DIR_GRAPE, exist_ok=True)
