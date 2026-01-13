@@ -91,6 +91,93 @@ def load_canon_rgb_image(folder_path):
 
 
 ######################################
+# Mask processing functions
+######################################
+def extract_metadata_from_image_path(image_path):
+    """
+    Extract date_of_capture and cluster_id from image path.
+
+    Example path: C:\\Users\\yovel\\Desktop\\Grape_Project\\data\\raw\\1_13\\25.09.24\\HS\\2024-09-25_014.png
+    Returns: {"date_of_capture": "2024-09-25", "cluster_id": 13}
+
+    :param image_path: Full path to the image file
+    :return: Dictionary with date_of_capture and cluster_id
+    """
+    import re
+    from pathlib import Path
+
+    try:
+        path_parts = Path(image_path).parts
+
+        # Extract cluster_id from folder pattern like "1_13" or "2_05"
+        cluster_id = None
+        for part in path_parts:
+            match = re.match(r'^(\d+)_(\d+)$', part)
+            if match:
+                cluster_id = int(match.group(2))  # Extract the second number (13 from 1_13)
+                break
+
+        # Extract date_of_capture from filename pattern like "2024-09-25_014.png"
+        filename = Path(image_path).stem  # Get filename without extension
+        date_match = re.match(r'^(\d{4}-\d{2}-\d{2})', filename)
+        date_of_capture = date_match.group(1) if date_match else "Unknown"
+
+        return {
+            "date_of_capture": date_of_capture,
+            "cluster_id": cluster_id if cluster_id is not None else 0
+        }
+    except Exception as e:
+        print(f"[backend.py] extract_metadata_from_image_path() - Error extracting metadata: {e}")
+        return {
+            "date_of_capture": "Unknown",
+            "cluster_id": 0
+        }
+
+
+def erode_mask(mask, layers=2, kernel_shape="ellipse"):
+    """
+    Remove outer pixel layers from a binary mask using morphological erosion.
+
+    :param mask: Binary mask (2D numpy array, bool or uint8)
+    :param layers: Number of pixel layers to remove from edges (default=2)
+    :param kernel_shape: "ellipse" (smooth, organic) or "rect" (precise, grid-aligned)
+    :return: Eroded binary mask (same dtype as input), or original if erosion empties it
+    """
+    if layers <= 0:
+        return mask
+
+    # Store original dtype
+    original_dtype = mask.dtype
+    is_bool = (original_dtype == bool)
+
+    # Convert to uint8 for OpenCV
+    if is_bool:
+        mask_uint8 = mask.astype(np.uint8) * 255
+    else:
+        mask_uint8 = (mask > 0).astype(np.uint8) * 255
+
+    # Choose kernel (ellipse is more natural for organic shapes like grapes)
+    if kernel_shape == "ellipse":
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+    else:  # "rect"
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+
+    # Apply erosion with N iterations to remove N layers
+    eroded_mask = cv2.erode(mask_uint8, kernel, iterations=layers)
+
+    # Safety check: if erosion emptied the mask, return original
+    if np.sum(eroded_mask) == 0:
+        print(f"Warning: Erosion with {layers} layers emptied the mask. Returning original.")
+        return mask
+
+    # Convert back to original dtype
+    if is_bool:
+        return (eroded_mask > 0).astype(bool)
+    else:
+        return (eroded_mask > 0).astype(np.uint8)
+
+
+######################################
 # New functions for pixel signature processing
 ######################################
 def get_normalized_signature(pixel):

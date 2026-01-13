@@ -84,12 +84,12 @@ start.bat
 Navigate to the Tagging_tool directory and start the Streamlit app:
 ```bash
 cd ui/Tagging_tool
-streamlit run app.py
+streamlit run app_NEW.py
 ```
 
 Or from the project root:
 ```bash
-streamlit run ui/Tagging_tool/app.py
+streamlit run ui/Tagging_tool/app_NEW.py
 ```
 
 ### 5. Tagging and Navigation

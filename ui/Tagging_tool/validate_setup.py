@@ -61,7 +61,7 @@ def validate_setup():
     if all_passed:
         print("✓ All checks passed! You can run the application.")
         print("\nTo start the application, run:")
-        print("  streamlit run app.py")
+        print("  streamlit run app_NEW.py")
     else:
         print("✗ Some checks failed. Please fix the issues above.")
         print("\nCommon fixes:")

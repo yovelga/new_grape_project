@@ -281,7 +281,7 @@ class InferenceAPI:
 
         # Note that as this method is a generator, we also need to use autocast_context
         # in caller to this method to ensure that it's called under the correct context
-        # (we've added `autocast_context` to `gen_track_with_mask_stream` in app.py).
+        # (we've added `autocast_context` to `gen_track_with_mask_stream` in app_NEW.py).
         with self.autocast_context(), self.inference_lock:
             logger.info(
                 f"propagate in video in session {session_id}: "

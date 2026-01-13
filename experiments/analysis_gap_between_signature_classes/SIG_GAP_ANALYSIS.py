@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 # File paths and setup
 # ------------------------------------------------------------
 load_dotenv()
-CSV_PATH = os.environ["DATASET_1PCT_PATH"]
+CSV_PATH = r"C:\Users\yovel\Desktop\Grape_Project\experiments\analysis_gap_between_signature_classes\all_origin_signatures_results_2026-01-06.csv"
 RESULT_DIR = Path(__file__).parent / "result"
 RESULT_DIR.mkdir(exist_ok=True)
 TXT_PATH = RESULT_DIR / "most_effective_wl_new.txt"
@@ -102,7 +102,7 @@ def main():
     X = X.reindex(sorted(X.columns), axis=1)
     y = (
         df["label"]
-        .replace({"regular": 0, "crack": 1, "healthy": 0, "sick": 1})
+        .replace({"REGULAR": 0, "CRACK": 1, "healthy": 0, "sick": 1})
         .astype(int)
     )
     logger.info(f"Loaded {len(df)} samples with {len(X.columns)} features.")

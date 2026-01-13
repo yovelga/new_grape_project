@@ -51,7 +51,8 @@ from ui.pixel_picker.backend import (
 
 
 BASE_PATH = project_path
-AUTOENCODER_MODEL_PATH = BASE_PATH / "src" / "models" / "training_classification_model_cnn_for_grapes_berry" / "model_weights" / "autoencoder_model.pkl"
+# src/models/classification/pixel_level/one_class/one_class_anomaly_detection/autoencoder_trained_model.joblib
+AUTOENCODER_MODEL_PATH = BASE_PATH / "src/models/classification/pixel_level/one_class/one_class_anomaly_detection/autoencoder_trained_model.joblib"
 CLASS_FILE = BASE_PATH / "data" / "processed" / "segment_classes.json"
 
 sys.path.append(str(project_path))
@@ -148,10 +149,10 @@ class HSI_RGB_Viewer(QMainWindow):
         self.rgb_image_path = None
         self.last_clicked_pixel = None
         self.sam2_segmenter = None
-        self.sam2_auto_generator = None
-        self.current_folder_path = None
-        self.sam_count = None
-        self.rgb_image = None
+        self.sam2_auto_generator = 0
+        self.current_folder_path = 0
+        self.sam_count = 0
+        self.rgb_image = 0
         self.auto_sam_detections = []
         self.current_detection_index = -1
         self.setWindowTitle("HSI and RGB Viewer")
@@ -936,6 +937,12 @@ class HSI_RGB_Viewer(QMainWindow):
             progress.close()
             QMessageBox.warning(self, "Error", f"SAM2 segmentation failed: {e}")
             return
+
+        # Apply erosion to remove 2 outer pixel layers
+        from ui.pixel_picker.backend import erode_mask
+        mask_bool = erode_mask(mask_bool, layers=2, kernel_shape="ellipse")
+        print("[SAM2] Erosion applied (2 layers removed).")
+
         progress.close()
 
         # Overlay on RGB image
@@ -983,10 +990,26 @@ class HSI_RGB_Viewer(QMainWindow):
             )
             json_path = os.path.join(JSON_DIR, f"sample_{self.sam_count}_{stem}.json")
             cv2.imwrite(mask_path, (mask_bool.astype(np.uint8) * 255))
+
+            # Extract metadata from image path
+            from ui.pixel_picker.backend import extract_metadata_from_image_path
+            metadata = extract_metadata_from_image_path(img_path)
+
+            # Save JSON with all required fields
+            json_data = {
+                "image_path": img_path,
+                "mask_path": mask_path,
+                "date_of_capture": metadata["date_of_capture"],
+                "cluster_id": metadata["cluster_id"],
+                "segment_class": segment_class,
+            }
+
             with open(json_path, "w", encoding="utf-8") as f:
-                json.dump({"image_path": img_path, "mask_path": mask_path}, f, indent=2)
+                json.dump(json_data, f, indent=2)
+
             self.status_bar.showMessage(f"Saved ➜ {mask_path}\nJSON ➜ {json_path}")
-            print(f"JSON saved at: {os.path.abspath(json_path)}")  # <-- Added print
+            print(f"JSON saved at: {os.path.abspath(json_path)}")
+            print(f"JSON data: {json_data}")
             self.sam_count += 1
         else:
             self.status_bar.showMessage("Segmentation not saved.")
@@ -1051,6 +1074,10 @@ class HSI_RGB_Viewer(QMainWindow):
     def show_current_detection(self):
         det = self.auto_sam_detections[self.current_detection_index]
         mask = det.mask[0] if isinstance(det.mask, list) else det.mask
+
+        # Apply erosion to remove 2 outer pixel layers
+        from ui.pixel_picker.backend import erode_mask
+        mask = erode_mask(mask, layers=2, kernel_shape="ellipse")
 
         # Overlay on RGB (blue)
         overlay = self.rgb_image.copy()
@@ -1127,6 +1154,11 @@ class HSI_RGB_Viewer(QMainWindow):
 
         det = self.auto_sam_detections[self.current_detection_index]
         mask = det.mask[0]
+
+        # Apply erosion to remove 2 outer pixel layers
+        from ui.pixel_picker.backend import erode_mask
+        mask = erode_mask(mask, layers=2, kernel_shape="ellipse")
+
         segment_class = self.ask_segment_class()
         if not segment_class:
             self.status_bar.showMessage("No class selected, segmentation not saved.")
@@ -1145,18 +1177,26 @@ class HSI_RGB_Viewer(QMainWindow):
         mask_path = os.path.join(MASK_DIR, f"sample_auto_{seg_idx}_{stem}_mask.png")
         json_path = os.path.join(JSON_DIR, f"sample_auto_{seg_idx}_{stem}.json")
         cv2.imwrite(mask_path, (mask.astype(np.uint8) * 255))
+
+        # Extract metadata from image path
+        from ui.pixel_picker.backend import extract_metadata_from_image_path
+        metadata = extract_metadata_from_image_path(img_path)
+
+        # Save JSON with all required fields
+        json_data = {
+            "image_path": img_path,
+            "mask_path": mask_path,
+            "date_of_capture": metadata["date_of_capture"],
+            "cluster_id": metadata["cluster_id"],
+            "segment_class": segment_class,
+        }
+
         with open(json_path, "w", encoding="utf-8") as f:
-            json.dump(
-                {
-                    "image_path": img_path,
-                    "mask_path": mask_path,
-                    "segment_class": segment_class,
-                },
-                f,
-                indent=2,
-            )
+            json.dump(json_data, f, indent=2)
+
         self.status_bar.showMessage(f"Saved ➜ {mask_path}\nJSON ➜ {json_path}")
         print(f"JSON saved at: {os.path.abspath(json_path)}")
+        print(f"JSON data: {json_data}")
 
 
 if __name__ == "__main__":

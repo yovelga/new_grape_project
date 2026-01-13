@@ -74,7 +74,7 @@ def test_complete_workflow():
         print("✓ All workflow tests passed!")
         print("=" * 60)
         print("\nThe Tagging Tool is ready to use.")
-        print("Run 'streamlit run app.py' to start the application.")
+        print("Run 'streamlit run app_NEW.py' to start the application.")
         return True
 
     except Exception as e:

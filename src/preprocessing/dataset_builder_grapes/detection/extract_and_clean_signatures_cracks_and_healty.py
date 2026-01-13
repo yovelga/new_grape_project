@@ -26,19 +26,19 @@ import json
 import matplotlib.pyplot as plt
 
 # --- USER PARAMETERS ---
-CLEAN_DATA = True  # Set to True to clean, False to only extract
-P_LOSS = 0.05      # Fraction of worst outliers to remove
+CLEAN_DATA = False  # Set to True to clean, False to only extract
+P_LOSS = 0.00      # Fraction of worst outliers to remove
 SUBSAMPLE = 20000  # rows for MinCovDet fitting
 SUPPORT = 0.8      # support_fraction for MinCovDet
 
+# --- GLOBALS ---
+today_str = datetime.now().strftime("%Y-%m-%d")
+
 # --- PATHS ---
-JSON_DIR_branch = r"/ui/pixel_picker/sam2_results/old/BRANCH"
-JSON_DIR_regular = r"/ui/pixel_picker/sam2_results/old/REGULAR"
-JSON_DIR_cracked = r"/ui/pixel_picker/sam2_results/old/CRACK"
-JSON_DIR_plastic = r"/ui/pixel_picker/sam2_results/old/PLASTIC"
-JSON_DIR_background = r"/ui/pixel_picker/sam2_results/old/BACKGROUND"
+JSON_DIR_regular = r"C:\Users\yovel\Desktop\Grape_Project\ui\pixel_picker\sam2_results\REGULAR"
+JSON_DIR_cracked = r"C:\Users\yovel\Desktop\Grape_Project\ui\pixel_picker\sam2_results\CRACK"
 RAW_EXPORT_DIR = r"C:\Users\yovel\Desktop\Grape_Project\src\preprocessing\dataset_builder_grapes\detection\raw_exported_data"
-RESULTS_CSV_PATH_all = os.path.join(RAW_EXPORT_DIR, "all_origin_signatures_results.csv")
+RESULTS_CSV_PATH_all = os.path.join(RAW_EXPORT_DIR, f"all_origin_signatures_results_{today_str}.csv")
 OUTPUT_DIR = pathlib.Path(rF"C:\Users\yovel\Desktop\Grape_Project\src\preprocessing\dataset_builder_grapes\detection\dataset\cleaned_{P_LOSS}")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 HDR_PATH = r"C:\Users\yovel\Desktop\Grape_Project\src\preprocessing\dataset_builder_grapes\detection\WL.hdr"
@@ -47,12 +47,12 @@ HDR_PATH = r"C:\Users\yovel\Desktop\Grape_Project\src\preprocessing\dataset_buil
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s: %(message)s")
 
 # --- STAGE 1: EXTRACT SIGNATURES ---
-def normalization_min_max(signature: np.ndarray) -> np.ndarray:
-    return signature
 
 def extract_all_signatures_from_multiple_json_dirs(json_dirs_labels, output_results_csv):
     all_sigs, all_meta = [], []
     total_extracted = 0
+    wavelengths = None  # Will be extracted from first valid HSI cube
+
     for json_dir, label in json_dirs_labels:
         logging.info("Processing directory: %s (label=%s)", json_dir, label)
         for fn in sorted(os.listdir(json_dir)):
@@ -98,7 +98,21 @@ def extract_all_signatures_from_multiple_json_dirs(json_dirs_labels, output_resu
                 continue
             hdr_path = os.path.join(results_dir, hdr_file)
             try:
-                cube = spectral_io.envi.open(hdr_path).load().astype(np.float32)
+                hsi_img = spectral_io.envi.open(hdr_path)
+                cube = hsi_img.load().astype(np.float32)
+
+                # Extract wavelengths from metadata if not already extracted
+                if wavelengths is None:
+                    hsi_metadata = hsi_img.metadata
+                    wl_from_meta = hsi_metadata.get("wavelength") or hsi_metadata.get("wavelengths")
+                    if wl_from_meta:
+                        try:
+                            wavelengths = [float(w) for w in wl_from_meta]
+                            logging.info("Extracted %d wavelengths from ENVI header", len(wavelengths))
+                        except Exception as e:
+                            logging.warning("Failed to parse wavelengths: %s", e)
+                    else:
+                        logging.warning("No wavelength metadata found in ENVI header")
             except Exception as e:
                 logging.warning("Failed to load HSI cube %s: %s", hdr_path, e)
                 continue
@@ -113,8 +127,7 @@ def extract_all_signatures_from_multiple_json_dirs(json_dirs_labels, output_resu
                 hsi_row = W - x0 - 1
                 hsi_col = y0
                 raw_sig = cube[hsi_row, hsi_col, :]
-                norm_sig = normalization_min_max(raw_sig)
-                all_sigs.append(norm_sig)
+                all_sigs.append(raw_sig)
                 all_meta.append({
                     "json_file": fn,
                     "hs_dir": hs_dir,
@@ -127,7 +140,18 @@ def extract_all_signatures_from_multiple_json_dirs(json_dirs_labels, output_resu
                 per_file_count += 1
                 total_extracted += 1
             logging.info("Extracted %d signatures from %s", per_file_count, fn)
-    df_sigs = pd.DataFrame(all_sigs, columns=[f"band_{i}" for i in range(all_sigs[0].shape[0])]) if all_sigs else None
+
+    # Create column names using wavelengths if available
+    if all_sigs:
+        if wavelengths and len(wavelengths) == all_sigs[0].shape[0]:
+            column_names = [f"{wl:.2f}nm" for wl in wavelengths]
+            logging.info("Using wavelength-based column names")
+        else:
+            column_names = [f"band_{i}" for i in range(all_sigs[0].shape[0])]
+            logging.warning("Using band index column names (wavelengths not available or mismatch)")
+        df_sigs = pd.DataFrame(all_sigs, columns=column_names)
+    else:
+        df_sigs = None
     df_meta = pd.DataFrame(all_meta) if all_meta else None
     full_df = pd.concat([df_meta, df_sigs], axis=1) if df_sigs is not None and df_meta is not None else None
     if full_df is not None:
@@ -199,18 +223,13 @@ def clean_all_classes(df, hdr_path):
     wavelengths = load_wavelengths(hdr_path, start=0, end=203)
     cleaned_frames = []
     for class_name in df['label'].unique():
-        if class_name.upper() == "BACKGROUND":
-            logging.info(f"Skipping cleaning for BACKGROUND class.")
-            # Directly append all BACKGROUND rows without cleaning
-            class_df = df[df['label'] == class_name].copy()
-            class_df["is_outlier"] = False
-            cleaned_frames.append(class_df)
-            continue
         class_df = df[df['label'] == class_name].copy()
-        band_cols = [c for c in class_df.columns if c.startswith("band_")]
+        # Support both wavelength-based and band-based column names
+        band_cols = [c for c in class_df.columns if c.endswith("nm") or c.startswith("band_")]
         if not band_cols:
             logging.warning(f"No spectral columns found for class {class_name}.")
             continue
+
         X = class_df[band_cols].values.astype(np.float32)
         mask, center, d2 = mahalanobis_mask(X)
         class_df["is_outlier"] = ~mask
@@ -230,11 +249,8 @@ def clean_all_classes(df, hdr_path):
 
 if __name__ == "__main__":
     json_dirs_labels = [
-        (JSON_DIR_branch, "BRANCH"),
-        (JSON_DIR_plastic, "PLASTIC"),
         (JSON_DIR_regular, "REGULAR"),
         (JSON_DIR_cracked, "CRACK"),
-        (JSON_DIR_background, "BACKGROUND"),
     ]
     logging.info("Starting signature extraction run. Output will be saved to: %s", RESULTS_CSV_PATH_all)
     df_all = extract_all_signatures_from_multiple_json_dirs(json_dirs_labels, RESULTS_CSV_PATH_all)
@@ -242,7 +258,6 @@ if __name__ == "__main__":
         logging.info("Starting cleaning stage...")
         cleaned_df = clean_all_classes(df_all, HDR_PATH)
         if cleaned_df is not None:
-            today_str = datetime.now().strftime("%Y-%m-%d")
             cleaned_path = OUTPUT_DIR / f"all_classes_cleaned_{today_str}.csv"
             cleaned_df.to_csv(cleaned_path, index=False)
             logging.info(f"✅ Saved all cleaned classes to {cleaned_path} ({len(cleaned_df)} rows)")

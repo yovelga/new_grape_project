@@ -25,9 +25,13 @@ RANDOM_STATE = 42
 def load_features_labels(path: str):
     """Read CSV → X (per‑sample min‑max scaled) and y."""
     df = pd.read_csv(path)
+    # Support both wavelength-based (ending with 'nm') and band-based column names
     feature_cols = [c for c in df.columns if c.endswith("nm")]
     if not feature_cols:
-        raise ValueError("No spectral columns ending with 'nm' were found.")
+        # Fallback to band_ columns if wavelength columns not found
+        feature_cols = [c for c in df.columns if c.startswith("band_")]
+    if not feature_cols:
+        raise ValueError("No spectral columns ending with 'nm' or starting with 'band_' were found.")
     # slice desired band indices
     feature_cols = feature_cols[BAND_LOWER : BAND_UPPER + 1]
     X_raw = df[feature_cols].values.astype(np.float32)

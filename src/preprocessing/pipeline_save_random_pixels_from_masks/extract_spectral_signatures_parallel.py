@@ -22,6 +22,7 @@ def run_extraction_to_parquet(masks_dir, hsi_hdr_path, label_dict, output_dir):
     hsi_cube = hsi.load().astype(np.float32)
     print(f"Loaded HSI cube with shape {hsi_cube.shape}")
 
+
     all_signatures = []
     all_metadata = []
 

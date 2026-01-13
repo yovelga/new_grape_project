@@ -16,7 +16,7 @@ def quick_health_check():
 
     # Check 1: Required files exist
     checks_total += 1
-    required_files = ['app.py', 'back.py', 'requirements.txt']
+    required_files = ['app_NEW.py', 'back.py', 'requirements.txt']
     missing_files = [f for f in required_files if not os.path.exists(f)]
 
     if not missing_files:
@@ -61,7 +61,7 @@ def quick_health_check():
 
     if checks_passed == checks_total:
         print("✅ System healthy - ready to use!")
-        print("\nStart the app with: streamlit run app.py")
+        print("\nStart the app with: streamlit run app_NEW.py")
         return True
     else:
         print("⚠️  Some issues detected")
