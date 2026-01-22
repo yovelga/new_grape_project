@@ -203,6 +203,101 @@ class PostprocessPipeline:
 
         return filtered_mask, stats
 
+    def run_debug(self, prob_map: np.ndarray) -> Tuple[np.ndarray, Dict[str, Any], Dict[str, Any]]:
+        """
+        Run the post-processing pipeline with debug outputs.
+
+        This method captures intermediate masks and labeled components for visualization
+        and debugging. It produces the same final result as run() but returns additional
+        debug information.
+
+        Args:
+            prob_map: Probability map (H, W) with values in [0, 1]
+
+        Returns:
+            Tuple of:
+                - final_mask: Binary mask (H, W) with dtype bool (same as run())
+                - stats: Dictionary with pipeline statistics (same as run())
+                - debug: Dictionary with intermediate debug outputs:
+                    - mask_threshold: Binary mask after thresholding (bool)
+                    - mask_after_morph: Binary mask after morphological ops (bool)
+                    - labeled_components: Labeled component map (int32), or None if no blobs
+                    - accepted_blobs: List of BlobFeatures for kept blobs
+                    - rejected_blobs: List of BlobFeatures for removed blobs
+
+        Raises:
+            ValueError: If prob_map is not 2D
+
+        Example:
+            >>> config = PostprocessConfig(prob_threshold=0.5, morph_close_size=5)
+            >>> pipeline = PostprocessPipeline(config)
+            >>> mask, stats, debug = pipeline.run_debug(prob_map)
+            >>> # Visualize intermediate steps
+            >>> viewer.set_image(debug['mask_threshold'])
+            >>> viewer.set_overlay(debug['mask_after_morph'])
+        """
+        if prob_map.ndim != 2:
+            raise ValueError(f"prob_map must be 2D, got {prob_map.ndim}D")
+
+        H, W = prob_map.shape
+        total_pixels = H * W
+
+        # Step 1: Threshold
+        mask_threshold = prob_map >= self.config.prob_threshold
+
+        # Step 2: Morphological closing (if enabled)
+        if self.config.morph_close_size > 0:
+            mask_after_morph = morphological_close(mask_threshold, self.config.morph_close_size)
+        else:
+            mask_after_morph = mask_threshold.copy()
+
+        # Step 3 & 4: Extract blobs and filter
+        labeled, features = extract_all_blob_features(mask_after_morph)
+        num_blobs_before = len(features)
+
+        # Parse aspect ratio
+        ar_min, ar_max = None, None
+        if self.config.aspect_ratio_range is not None:
+            ar_min, ar_max = self.config.aspect_ratio_range
+
+        filtered_mask, accepted, rejected = filter_blobs(
+            labeled=labeled,
+            features=features,
+            min_area=self.config.min_blob_area,
+            circularity_min=self.config.circularity_min,
+            solidity_min=self.config.solidity_min,
+            aspect_ratio_min=ar_min,
+            aspect_ratio_max=ar_max,
+            exclude_border=self.config.exclude_border,
+            border_margin_px=self.config.border_margin_px
+        )
+
+        num_blobs_after = len(accepted)
+
+        # Step 5: Compute statistics
+        total_positive_pixels = int(np.sum(filtered_mask))
+        crack_ratio = total_positive_pixels / total_pixels if total_pixels > 0 else 0.0
+
+        stats = {
+            "num_blobs_before": num_blobs_before,
+            "num_blobs_after": num_blobs_after,
+            "total_positive_pixels": total_positive_pixels,
+            "crack_ratio": crack_ratio,
+            "accepted_blobs": accepted,
+            "rejected_blobs": rejected,
+        }
+
+        # Build debug dictionary
+        debug = {
+            "mask_threshold": mask_threshold,
+            "mask_after_morph": mask_after_morph,
+            "labeled_components": labeled if num_blobs_before > 0 else None,
+            "accepted_blobs": accepted,
+            "rejected_blobs": rejected,
+        }
+
+        return filtered_mask, stats, debug
+
     def __repr__(self) -> str:
         return f"PostprocessPipeline(config={self.config})"
 
@@ -462,7 +557,104 @@ def _run_sanity_checks() -> bool:
     assert stats1["num_blobs_after"] == stats2["num_blobs_after"]
     print("  ✓ Pipeline is deterministic")
 
-    print("\n✅ All pipeline sanity checks passed!")
+    # Test 8: run_debug returns same final result as run
+    prob_map_debug = np.random.rand(60, 60).astype(np.float32)
+    config_debug = PostprocessConfig(
+        prob_threshold=0.5,
+        morph_close_size=5,
+        min_blob_area=10
+    )
+    pipeline_debug = PostprocessPipeline(config_debug)
+
+    mask_regular, stats_regular = pipeline_debug.run(prob_map_debug)
+    mask_debug, stats_debug, debug = pipeline_debug.run_debug(prob_map_debug)
+
+    assert np.array_equal(mask_regular, mask_debug), "run_debug should produce same final mask as run"
+    assert stats_regular["num_blobs_after"] == stats_debug["num_blobs_after"]
+    assert stats_regular["total_positive_pixels"] == stats_debug["total_positive_pixels"]
+    print("  ✓ run_debug produces same result as run (backward compatible)")
+
+    # Test 9: Debug dictionary contains expected keys
+    assert "mask_threshold" in debug, "debug should contain mask_threshold"
+    assert "mask_after_morph" in debug, "debug should contain mask_after_morph"
+    assert "labeled_components" in debug, "debug should contain labeled_components"
+    assert "accepted_blobs" in debug, "debug should contain accepted_blobs"
+    assert "rejected_blobs" in debug, "debug should contain rejected_blobs"
+    print("  ✓ Debug dictionary contains all required keys")
+
+    # Test 10: Debug intermediate masks have correct types and shapes
+    assert debug["mask_threshold"].dtype == bool, "mask_threshold should be bool"
+    assert debug["mask_after_morph"].dtype == bool, "mask_after_morph should be bool"
+    assert debug["mask_threshold"].shape == prob_map_debug.shape
+    assert debug["mask_after_morph"].shape == prob_map_debug.shape
+    print("  ✓ Debug masks have correct types and shapes")
+
+    # Test 11: Labeled components are int32 or None
+    if debug["labeled_components"] is not None:
+        assert debug["labeled_components"].dtype == np.int32, "labeled_components should be int32"
+        assert debug["labeled_components"].shape == prob_map_debug.shape
+    print("  ✓ Labeled components have correct type")
+
+    # Test 12: Verify intermediate steps are captured correctly
+    prob_map_steps = np.zeros((40, 40), dtype=np.float32)
+    prob_map_steps[10:20, 10:20] = 0.8  # Blob with hole
+    prob_map_steps[14:16, 14:16] = 0.3  # Hole below threshold
+
+    config_steps = PostprocessConfig(
+        prob_threshold=0.5,
+        morph_close_size=5  # Should fill the hole
+    )
+    pipeline_steps = PostprocessPipeline(config_steps)
+
+    _, _, debug_steps = pipeline_steps.run_debug(prob_map_steps)
+
+    # After threshold, hole should still be False
+    assert debug_steps["mask_threshold"][14, 14] == False, "Hole should be False after threshold"
+    # After morph, hole should be filled
+    assert debug_steps["mask_after_morph"][14, 14] == True, "Hole should be filled after morph"
+    print("  ✓ Intermediate steps captured correctly (threshold vs morph)")
+
+    # Test 13: Debug mode is deterministic
+    mask_d1, stats_d1, debug_d1 = pipeline_debug.run_debug(prob_map_debug)
+    mask_d2, stats_d2, debug_d2 = pipeline_debug.run_debug(prob_map_debug)
+
+    assert np.array_equal(mask_d1, mask_d2), "run_debug should be deterministic (mask)"
+    assert np.array_equal(debug_d1["mask_threshold"], debug_d2["mask_threshold"])
+    assert np.array_equal(debug_d1["mask_after_morph"], debug_d2["mask_after_morph"])
+    print("  ✓ run_debug is deterministic")
+
+    # Test 14: Debug with no blobs (labeled_components should be None)
+    prob_map_empty = np.zeros((30, 30), dtype=np.float32)
+    config_empty = PostprocessConfig(prob_threshold=0.5)
+    pipeline_empty = PostprocessPipeline(config_empty)
+
+    _, _, debug_empty = pipeline_empty.run_debug(prob_map_empty)
+
+    assert debug_empty["labeled_components"] is None, "labeled_components should be None when no blobs"
+    assert len(debug_empty["accepted_blobs"]) == 0
+    assert len(debug_empty["rejected_blobs"]) == 0
+    print("  ✓ labeled_components is None when no blobs detected")
+
+    # Test 15: Debug blob lists match stats
+    prob_map_blobs = np.zeros((50, 50), dtype=np.float32)
+    prob_map_blobs[5:15, 5:15] = 0.9  # Large blob (100 px)
+    prob_map_blobs[20:22, 20:22] = 0.8  # Small blob (4 px)
+
+    config_blobs = PostprocessConfig(
+        prob_threshold=0.5,
+        min_blob_area=10  # Filter small blob
+    )
+    pipeline_blobs = PostprocessPipeline(config_blobs)
+
+    _, stats_blobs, debug_blobs = pipeline_blobs.run_debug(prob_map_blobs)
+
+    assert len(debug_blobs["accepted_blobs"]) == stats_blobs["num_blobs_after"]
+    assert len(debug_blobs["rejected_blobs"]) == stats_blobs["num_blobs_before"] - stats_blobs["num_blobs_after"]
+    assert debug_blobs["accepted_blobs"] == stats_blobs["accepted_blobs"]
+    assert debug_blobs["rejected_blobs"] == stats_blobs["rejected_blobs"]
+    print("  ✓ Debug blob lists match stats")
+
+    print("\n✅ All pipeline sanity checks passed (including run_debug)!")
     return True
 
 

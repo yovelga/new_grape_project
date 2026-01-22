@@ -177,6 +177,12 @@ class Settings:
         default_factory=lambda: _parse_color_buckets(os.getenv("GRID_COLOR_BUCKETS", ""))
     )
 
+    # ===== HSI Display Orientation =====
+    hsi_rotate_deg: int = field(default_factory=lambda: int(os.getenv("HSI_ROTATE_DEG", "0")))
+    hsi_flip_h: bool = field(default_factory=lambda: _parse_bool(os.getenv("HSI_FLIP_H", "false")))
+    hsi_flip_v: bool = field(default_factory=lambda: _parse_bool(os.getenv("HSI_FLIP_V", "false")))
+    hsi_use_colormap: bool = field(default_factory=lambda: _parse_bool(os.getenv("HSI_USE_COLORMAP", "false")))
+
     # ===== Logging =====
     log_level: str = field(default_factory=lambda: os.getenv("LOG_LEVEL", "INFO"))
     debug: bool = field(default_factory=lambda: _parse_bool(os.getenv("DEBUG", "false")))

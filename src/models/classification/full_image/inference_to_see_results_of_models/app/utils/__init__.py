@@ -1,7 +1,7 @@
 """
 Utilities module.
 
-Provides logging and results I/O utilities.
+Provides logging, results I/O, and image processing utilities.
 """
 
 from .logging import (
@@ -26,6 +26,18 @@ from .results_io import (
     create_experiment_dir,
     NumpyJSONEncoder,
 )
+from .image_ops import (
+    normalize_to_uint8,
+    apply_colormap,
+)
+from .orientation import (
+    ensure_hwc,
+    apply_display_transform,
+    get_transformed_shape,
+    DisplayTransform,
+    validate_2d_for_display,
+    contiguous_array,
+)
 
 __all__ = [
     # Logging
@@ -48,4 +60,21 @@ __all__ = [
     "save_summary",
     "create_experiment_dir",
     "NumpyJSONEncoder",
+    # Image Ops
+    "normalize_to_uint8",
+    "apply_colormap",
+    # Orientation
+    "ensure_hwc",
+    "apply_display_transform",
+    "get_transformed_shape",
+    "DisplayTransform",
+    "validate_2d_for_display",
+    "contiguous_array",
+
+    "save_summary",
+    "create_experiment_dir",
+    "NumpyJSONEncoder",
+    # Image operations
+    "normalize_to_uint8",
+    "apply_colormap"
 ]
