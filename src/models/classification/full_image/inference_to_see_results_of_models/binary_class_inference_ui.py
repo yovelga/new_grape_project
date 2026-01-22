@@ -441,7 +441,7 @@ class VisualDebugTab(QWidget):
         self.thresh_spin.setRange(0.0, 1.0)
         self.thresh_spin.setDecimals(8)
         self.thresh_spin.setSingleStep(0.001)
-        self.thresh_spin.setValue(0.5)
+        self.thresh_spin.setValue(0.9)
         self.thresh_spin.valueChanged.connect(self._rerun_postprocess)
         filter_layout.addWidget(self.thresh_spin, 0, 1)
 
@@ -862,6 +862,11 @@ class VisualDebugTab(QWidget):
             self.viewer_prob_hsi.label.setText("Model Result on HSI")
             self._disable_postprocess()
             self.stats_text.clear()
+
+            # Auto-run inference after successful load
+            if self.cube is not None and self.run_inference_btn.isEnabled():
+                QApplication.processEvents()  # Let UI update first
+                self._run_inference()
 
         except Exception as e:
             show_error(self, "Error", f"Failed to load: {e}")

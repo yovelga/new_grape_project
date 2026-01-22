@@ -118,6 +118,8 @@ def load_rgb(path: Path) -> np.ndarray:
 def find_hsi_rgb(sample_folder: Path) -> Optional[Path]:
     """
     Find HSI-derived RGB image in the same directory as HSI data.
+    
+    HSI RGB files are typically named REFLECTANCE_*.png (same base name as .hdr/.dat files).
 
     Args:
         sample_folder: Path to sample folder containing HSI data
@@ -130,17 +132,30 @@ def find_hsi_rgb(sample_folder: Path) -> Optional[Path]:
     if not sample_folder.exists():
         return None
 
-    # Files containing 'rgb' in filename (HSI-derived typically named this way)
-    for ext in ['png', 'jpg', 'jpeg', 'PNG', 'JPG', 'JPEG']:
-        for candidate in sample_folder.glob(f"*.{ext}"):
-            if 'rgb' in candidate.name.lower():
+    # Search in HS/results subfolder first (typical location)
+    hs_results = sample_folder / "HS" / "results"
+    search_paths = [hs_results, sample_folder] if hs_results.exists() else [sample_folder]
+    
+    for search_path in search_paths:
+        if not search_path.exists():
+            continue
+            
+        # Priority 1: REFLECTANCE_*.png (HSI-derived RGB from spectral data)
+        for ext in ['png', 'PNG']:
+            for candidate in search_path.glob(f"REFLECTANCE_*.{ext}"):
                 return candidate
+        
+        # Priority 2: Files containing 'reflectance' in filename
+        for ext in ['png', 'jpg', 'jpeg', 'PNG', 'JPG', 'JPEG']:
+            for candidate in search_path.glob(f"*.{ext}"):
+                if 'reflectance' in candidate.name.lower():
+                    return candidate
 
-    # Any image file directly in sample folder (fallback)
-    for ext in ['png', 'jpg', 'jpeg', 'PNG', 'JPG', 'JPEG']:
-        matches = list(sample_folder.glob(f"*.{ext}"))
-        if matches:
-            return matches[0]
+        # Priority 3: Files containing 'rgb' in filename (legacy)
+        for ext in ['png', 'jpg', 'jpeg', 'PNG', 'JPG', 'JPEG']:
+            for candidate in search_path.glob(f"*.{ext}"):
+                if 'rgb' in candidate.name.lower():
+                    return candidate
 
     return None
 
