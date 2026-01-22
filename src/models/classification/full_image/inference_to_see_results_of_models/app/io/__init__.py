@@ -9,6 +9,7 @@ from .rgb import (
     find_camera_rgb,
     find_both_rgb_images,
     load_both_rgb_images,
+    find_canon_rgb,
 )
 from .hsi_band import (
     get_band_by_index,
@@ -28,6 +29,7 @@ __all__ = [
     "find_camera_rgb",
     "find_both_rgb_images",
     "load_both_rgb_images",
+    "find_canon_rgb",
     # HSI band extraction
     "get_band_by_index",
     "get_band_by_wavelength",

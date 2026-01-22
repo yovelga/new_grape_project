@@ -8,7 +8,7 @@ Supports both HSI-derived RGB (from hyperspectral data) and camera RGB.
 import numpy as np
 from PIL import Image
 from pathlib import Path
-from typing import Union, Optional, Dict, Tuple
+from typing import Union, Optional, Dict, Tuple, List
 
 
 def find_rgb_image(sample_folder: Path) -> Optional[Path]:
@@ -198,6 +198,131 @@ def find_both_rgb_images(sample_folder: Path) -> Dict[str, Optional[Path]]:
         'hsi_rgb': find_hsi_rgb(sample_folder),
         'camera_rgb': find_camera_rgb(sample_folder),
     }
+
+
+def find_canon_rgb(sample_folder: Path) -> Tuple[Optional[Path], List[str]]:
+    """
+    Find Canon camera RGB image with a robust search strategy.
+
+    Returns:
+        Tuple of (path or None, list of searched locations/patterns)
+    """
+    sample_folder = Path(sample_folder)
+    searched: List[str] = []
+    exts = ["jpg", "jpeg", "JPG", "JPEG", "tif", "tiff", "TIF", "TIFF", "png", "PNG"]
+    prefer_keywords = ("canon", "camera", "dslr", "eos")
+    reject_keywords = ("hsi", "hyper", "hyperspectral", "swir", "nir", "mask", "prob", "pred", "overlay")
+    ignore_dirs = {"hs", "results", "hsi", "hyper", "hyperspectral", "pred", "preds", "masks"}
+    prefer_dirs = ["Canon", "canon", "Camera", "camera", "RGB", "rgb", "VIS", "vis", "Visible", "visible", "Color",
+                   "color", "Colour", "colour"]
+
+    def _log_search(label: str) -> None:
+        searched.append(label)
+
+    def _is_ignored_path(path: Path) -> bool:
+        return any(part.lower() in ignore_dirs for part in path.parts)
+
+    def _is_rejected_name(path: Path) -> bool:
+        name = path.name.lower()
+        return any(k in name for k in reject_keywords)
+
+    def _find_in_dir(dir_path: Path, prefer: bool = True) -> Optional[Path]:
+        _log_search(f"dir: {dir_path}")
+        if not dir_path.exists() or not dir_path.is_dir():
+            return None
+        if _is_ignored_path(dir_path):
+            return None
+        candidates: List[Path] = []
+        for ext in exts:
+            candidates.extend(dir_path.glob(f"*.{ext}"))
+        candidates = [c for c in candidates if not _is_rejected_name(c)]
+        if not candidates:
+            return None
+        candidates = sorted(candidates, key=lambda p: p.name.lower())
+        if prefer:
+            preferred = [p for p in candidates if any(k in p.name.lower() for k in prefer_keywords)]
+            if preferred:
+                return preferred[0]
+        return candidates[0]
+
+    def _find_named_in_dir(dir_path: Path, stems: List[str]) -> Optional[Path]:
+        _log_search(f"dir: {dir_path} (match by stem)")
+        if not dir_path.exists() or not dir_path.is_dir():
+            return None
+        if _is_ignored_path(dir_path):
+            return None
+        candidates: List[Path] = []
+        for ext in exts:
+            candidates.extend(dir_path.glob(f"*.{ext}"))
+        candidates = [c for c in candidates if not _is_rejected_name(c)]
+        if not candidates:
+            return None
+        candidates = sorted(candidates, key=lambda p: p.name.lower())
+        for stem in stems:
+            for c in candidates:
+                if stem.lower() in c.stem.lower():
+                    return c
+        return candidates[0] if len(candidates) == 1 else None
+
+    def _candidate_roots(folder: Path) -> List[Path]:
+        roots: List[Path] = []
+        for candidate in [folder, folder.parent, folder.parent.parent]:
+            if candidate and candidate not in roots:
+                roots.append(candidate)
+        if folder.name.lower() in ignore_dirs and folder.parent not in roots:
+            roots.insert(0, folder.parent)
+        if folder.parent.name.lower() in ignore_dirs and folder.parent.parent not in roots:
+            roots.insert(0, folder.parent.parent)
+        return [r for r in roots if r.exists()]
+
+    if not sample_folder.exists():
+        _log_search(f"missing: {sample_folder}")
+        return None, searched
+
+    if sample_folder.is_file():
+        sample_folder = sample_folder.parent
+
+    roots = _candidate_roots(sample_folder)
+    stems = [sample_folder.name, sample_folder.parent.name]
+
+    # 1) Canon/Camera/RGB subfolders in likely roots
+    for root in roots:
+        for sub in prefer_dirs:
+            found = _find_in_dir(root / sub, prefer=True)
+            if found:
+                return found, searched
+
+    # 2) Parent-level RGB/Canon/Camera folders with matching sample name
+    for root in roots:
+        parent = root.parent
+        for sub in prefer_dirs:
+            found = _find_named_in_dir(parent / sub, stems)
+            if found:
+                return found, searched
+
+    # 3) Files in roots that explicitly mention Canon/Camera
+    for root in roots:
+        _log_search(f"pattern: {root}/*(canon|camera|dslr|eos)*")
+        for ext in exts:
+            for candidate in root.glob(f"*.{ext}"):
+                if _is_rejected_name(candidate):
+                    continue
+                name = candidate.name.lower()
+                if any(k in name for k in prefer_keywords):
+                    return candidate, searched
+
+    # 4) Recursive search for canon/camera filenames, skipping HSI/result folders
+    for root in roots:
+        _log_search(f"pattern: {root}/**/*(canon|camera|dslr|eos)*")
+        for ext in exts:
+            for candidate in root.rglob(f"*.{ext}"):
+                if _is_ignored_path(candidate) or _is_rejected_name(candidate):
+                    continue
+                name = candidate.name.lower()
+                if any(k in name for k in prefer_keywords):
+                    return candidate, searched
+
+    return None, searched
 
 
 def load_both_rgb_images(sample_folder: Path) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:

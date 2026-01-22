@@ -156,18 +156,48 @@ class SklearnAdapter(ModelAdapter):
     @property
     def n_classes(self) -> int:
         """Get number of classes."""
+        # Try classes_ first (standard sklearn attribute)
         if hasattr(self.model, 'classes_'):
-            return len(self.model.classes_)
-        elif hasattr(self.model, 'n_classes_'):
-            return self.model.n_classes_
-        else:
-            # Try to infer from a dummy prediction
             try:
-                dummy_X = np.zeros((1, self._get_n_features()))
-                proba = self.model.predict_proba(dummy_X)
-                return proba.shape[1]
-            except:
-                raise ValueError("Cannot determine number of classes from model")
+                classes = self.model.classes_
+                if classes is not None:
+                    return len(classes)
+            except (AttributeError, ValueError):
+                pass  # Some models have classes_ but it can raise errors
+
+        # Try n_classes_ (some sklearn models like LDA)
+        if hasattr(self.model, 'n_classes_'):
+            try:
+                n_classes = self.model.n_classes_
+                if n_classes is not None:
+                    return int(n_classes)
+            except (AttributeError, ValueError):
+                pass
+
+        # Try _n_classes for some internal sklearn attributes
+        if hasattr(self.model, '_n_classes'):
+            try:
+                return int(self.model._n_classes)
+            except (AttributeError, ValueError):
+                pass
+
+        # For XGBoost: check objective to determine binary vs multi-class
+        if hasattr(self.model, 'objective'):
+            obj = self.model.objective
+            if obj in ['binary:logistic', 'binary:hinge']:
+                return 2
+
+        # Try to infer from a dummy prediction
+        try:
+            dummy_X = np.zeros((1, self._get_n_features()))
+            proba = self.model.predict_proba(dummy_X)
+            return proba.shape[1]
+        except Exception:
+            pass
+
+        # Default fallback: assume binary classification
+        logger.warning(f"Cannot determine n_classes for {type(self.model).__name__}, assuming 2")
+        return 2
 
     @property
     def classes_(self) -> Optional[List[Any]]:

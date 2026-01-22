@@ -34,7 +34,7 @@ from PyQt5.QtGui import QFont
 from app.config.settings import settings
 from app.utils.logging import setup_logger
 from app.ui import ImageViewer
-from app.io import ENVIReader, find_both_rgb_images, load_rgb, get_band_by_index
+from app.io import ENVIReader, load_rgb, get_band_by_index, find_hsi_rgb, find_canon_rgb
 from app.data.dataset import load_dataset_csv
 from app.postprocess import PostprocessPipeline, PostprocessConfig
 from app.utils import normalize_to_uint8, apply_colormap
@@ -71,11 +71,12 @@ class InferenceWorker(QThread):
     error = pyqtSignal(str)
     progress = pyqtSignal(str)
 
-    def __init__(self, cube, model, preprocess_cfg):
+    def __init__(self, cube, model, preprocess_cfg, target_class_index):
         super().__init__()
         self.cube = cube
         self.model = model
         self.preprocess_cfg = preprocess_cfg
+        self.target_class_index = target_class_index
         self._stop = False
 
     def run(self):
@@ -84,7 +85,7 @@ class InferenceWorker(QThread):
             self.progress.emit("Running inference...")
             prob_map = build_prob_map(
                 self.cube, self.model, self.preprocess_cfg,
-                target_class_index=1, chunk_size=100_000
+                target_class_index=self.target_class_index, chunk_size=100_000
             )
             if not self._stop:
                 self.finished.emit(prob_map)
@@ -241,31 +242,50 @@ class VisualDebugTab(QWidget):
 
     def _init_ui(self):
         main_layout = QHBoxLayout(self)
+        main_layout.setSpacing(8)
+        main_layout.setContentsMargins(4, 4, 4, 4)
 
-        # === Left Panel: Controls ===
-        left_panel = QWidget()
-        left_layout = QVBoxLayout(left_panel)
-        left_panel.setMaximumWidth(420)
+        # =====================================================================
+        # LEFT SIDE: CONTROLS (2 columns side-by-side)
+        # =====================================================================
+        controls_widget = QWidget()
+        controls_layout = QHBoxLayout(controls_widget)
+        controls_layout.setSpacing(6)
+        controls_layout.setContentsMargins(0, 0, 0, 0)
+        controls_widget.setFixedWidth(520)
 
-        # Sample Source
-        source_group = QGroupBox("Sample Source")
+        # ----- COLUMN 1: Sample Selection -----
+        col1 = QWidget()
+        col1_layout = QVBoxLayout(col1)
+        col1_layout.setSpacing(4)
+        col1_layout.setContentsMargins(0, 0, 0, 0)
+
+        # Sample Source Group
+        source_group = QGroupBox("Sample Selection")
+        source_group.setStyleSheet("QGroupBox { font-weight: bold; font-size: 11px; }")
         source_layout = QVBoxLayout(source_group)
+        source_layout.setSpacing(4)
 
-        self.folder_radio = QRadioButton("Folder Mode")
-        self.dataset_radio = QRadioButton("Dataset Mode (CSV)")
+        # Mode selection
+        mode_row = QHBoxLayout()
+        self.folder_radio = QRadioButton("Folder")
+        self.dataset_radio = QRadioButton("CSV")
         self.folder_radio.setChecked(True)
         self.folder_radio.toggled.connect(self._on_mode_changed)
-        source_layout.addWidget(self.folder_radio)
-        source_layout.addWidget(self.dataset_radio)
+        mode_row.addWidget(self.folder_radio)
+        mode_row.addWidget(self.dataset_radio)
+        source_layout.addLayout(mode_row)
 
         # Folder controls
         self.folder_controls = QWidget()
         folder_layout = QVBoxLayout(self.folder_controls)
         folder_layout.setContentsMargins(0, 0, 0, 0)
-        folder_btn = QPushButton("Select Folder...")
+        folder_layout.setSpacing(2)
+        folder_btn = QPushButton("📁 Select Folder...")
         folder_btn.clicked.connect(self._select_folder)
         self.folder_label = QLabel("No folder selected")
         self.folder_label.setWordWrap(True)
+        self.folder_label.setStyleSheet("font-size: 10px; color: #666;")
         folder_layout.addWidget(folder_btn)
         folder_layout.addWidget(self.folder_label)
         source_layout.addWidget(self.folder_controls)
@@ -274,169 +294,222 @@ class VisualDebugTab(QWidget):
         self.dataset_controls = QWidget()
         dataset_layout = QVBoxLayout(self.dataset_controls)
         dataset_layout.setContentsMargins(0, 0, 0, 0)
+        dataset_layout.setSpacing(3)
 
-        csv_btn = QPushButton("Load CSV...")
+        csv_btn = QPushButton("📄 Load CSV...")
         csv_btn.clicked.connect(self._load_csv)
         self.csv_label = QLabel("No CSV loaded")
-        self.csv_label.setWordWrap(True)
+        self.csv_label.setStyleSheet("font-size: 10px; color: #666;")
         dataset_layout.addWidget(csv_btn)
         dataset_layout.addWidget(self.csv_label)
 
-        # Navigation
+        # Sample table (compact)
+        self.sample_table = QTableWidget()
+        self.sample_table.setMaximumHeight(100)
+        self.sample_table.setSelectionBehavior(QTableWidget.SelectRows)
+        self.sample_table.setSelectionMode(QTableWidget.SingleSelection)
+        self.sample_table.itemSelectionChanged.connect(self._on_table_selection)
+        self.sample_table.setStyleSheet("font-size: 10px;")
+        dataset_layout.addWidget(self.sample_table)
+
+        # Navigation row
         nav_layout = QHBoxLayout()
-        self.prev_btn = QPushButton("◀ Prev")
-        self.next_btn = QPushButton("Next ▶")
+        nav_layout.setSpacing(2)
+        self.prev_btn = QPushButton("◀")
+        self.prev_btn.setFixedWidth(40)
+        self.next_btn = QPushButton("▶")
+        self.next_btn.setFixedWidth(40)
         self.prev_btn.clicked.connect(self._navigate_prev)
         self.next_btn.clicked.connect(self._navigate_next)
+        self.index_spin = QSpinBox()
+        self.index_spin.setMinimum(0)
+        self.index_spin.setFixedWidth(60)
+        jump_btn = QPushButton("Go")
+        jump_btn.setFixedWidth(35)
+        jump_btn.clicked.connect(self._jump_to_index)
         nav_layout.addWidget(self.prev_btn)
+        nav_layout.addWidget(self.index_spin)
+        nav_layout.addWidget(jump_btn)
         nav_layout.addWidget(self.next_btn)
         dataset_layout.addLayout(nav_layout)
 
-        # Jump to index
-        jump_layout = QHBoxLayout()
-        jump_layout.addWidget(QLabel("Index:"))
-        self.index_spin = QSpinBox()
-        self.index_spin.setMinimum(0)
-        jump_btn = QPushButton("Go")
-        jump_btn.clicked.connect(self._jump_to_index)
-        jump_layout.addWidget(self.index_spin)
-        jump_layout.addWidget(jump_btn)
-        dataset_layout.addLayout(jump_layout)
-
-        # Search grape_id
+        # Search row
         search_layout = QHBoxLayout()
-        search_layout.addWidget(QLabel("Search:"))
+        search_layout.setSpacing(2)
         self.search_edit = QLineEdit()
         self.search_edit.setPlaceholderText("grape_id")
         search_btn = QPushButton("Find")
+        search_btn.setFixedWidth(45)
         search_btn.clicked.connect(self._search_grape_id)
         search_layout.addWidget(self.search_edit)
         search_layout.addWidget(search_btn)
         dataset_layout.addLayout(search_layout)
 
-        # Sample table
-        self.sample_table = QTableWidget()
-        self.sample_table.setMaximumHeight(120)
-        self.sample_table.setSelectionBehavior(QTableWidget.SelectRows)
-        self.sample_table.setSelectionMode(QTableWidget.SingleSelection)
-        self.sample_table.itemSelectionChanged.connect(self._on_table_selection)
-        dataset_layout.addWidget(self.sample_table)
-
         source_layout.addWidget(self.dataset_controls)
         self.dataset_controls.setVisible(False)
 
         # Load Sample button
-        self.load_sample_btn = QPushButton("📂 Load Sample")
+        self.load_sample_btn = QPushButton("📂 LOAD SAMPLE")
         self.load_sample_btn.setEnabled(False)
         self.load_sample_btn.clicked.connect(self._load_current_sample)
-        self.load_sample_btn.setStyleSheet("font-weight: bold; padding: 8px;")
+        self.load_sample_btn.setMinimumHeight(32)
+        self.load_sample_btn.setStyleSheet("font-weight: bold; font-size: 11px; background: #2196F3; color: white;")
         source_layout.addWidget(self.load_sample_btn)
 
-        left_layout.addWidget(source_group)
+        col1_layout.addWidget(source_group)
 
-        # Model
-        model_group = QGroupBox("Model")
-        model_layout = QFormLayout(model_group)
-        self.model_combo = QComboBox()
-        self._refresh_models()
-        model_layout.addRow("Model:", self.model_combo)
-        left_layout.addWidget(model_group)
-
-        # HSI Band Control
-        band_group = QGroupBox("HSI Band Viewer")
+        # HSI Band Viewer (in column 1)
+        band_group = QGroupBox("HSI Band")
+        band_group.setStyleSheet("QGroupBox { font-weight: bold; font-size: 11px; }")
         band_layout = QVBoxLayout(band_group)
+        band_layout.setSpacing(3)
         self.band_label = QLabel("Band: 0 / 0")
+        self.band_label.setStyleSheet("font-size: 10px;")
         self.band_slider = QSlider(Qt.Horizontal)
         self.band_slider.setMinimum(0)
         self.band_slider.setMaximum(0)
         self.band_slider.valueChanged.connect(self._update_hsi_band)
 
-        # Go to wavelength
-        wl_layout = QHBoxLayout()
-        wl_layout.addWidget(QLabel("Go to nm:"))
+        wl_row = QHBoxLayout()
+        wl_row.setSpacing(2)
+        wl_row.addWidget(QLabel("nm:"))
         self.wl_spin = QSpinBox()
         self.wl_spin.setRange(400, 2500)
         self.wl_spin.setValue(700)
+        self.wl_spin.setFixedWidth(60)
         wl_btn = QPushButton("Go")
+        wl_btn.setFixedWidth(35)
         wl_btn.clicked.connect(self._go_to_wavelength)
-        wl_layout.addWidget(self.wl_spin)
-        wl_layout.addWidget(wl_btn)
+        wl_row.addWidget(self.wl_spin)
+        wl_row.addWidget(wl_btn)
+        wl_row.addStretch()
 
         band_layout.addWidget(self.band_label)
         band_layout.addWidget(self.band_slider)
-        band_layout.addLayout(wl_layout)
+        band_layout.addLayout(wl_row)
+        col1_layout.addWidget(band_group)
 
-        left_layout.addWidget(band_group)
+        col1_layout.addStretch()
+        controls_layout.addWidget(col1)
 
+        # ----- COLUMN 2: Model + Filters + Stats -----
+        col2 = QWidget()
+        col2_layout = QVBoxLayout(col2)
+        col2_layout.setSpacing(4)
+        col2_layout.setContentsMargins(0, 0, 0, 0)
 
-        # Inference
-        self.run_inference_btn = QPushButton("▶ Run Inference")
+        # Model Panel
+        model_group = QGroupBox("Model")
+        model_group.setStyleSheet("QGroupBox { font-weight: bold; font-size: 11px; }")
+        model_layout = QVBoxLayout(model_group)
+        model_layout.setSpacing(4)
+
+        self.model_combo = QComboBox()
+        self.model_combo.setStyleSheet("font-size: 10px;")
+        self._refresh_models()
+        model_layout.addWidget(self.model_combo)
+
+        class_row = QHBoxLayout()
+        class_row.addWidget(QLabel("Class:"))
+        self.target_class_combo = QComboBox()
+        self.target_class_combo.setStyleSheet("font-size: 10px;")
+        self._set_target_class_options(2)
+        class_row.addWidget(self.target_class_combo)
+        model_layout.addLayout(class_row)
+
+        preprocess_label = QLabel(f"WL: {settings.wl_min}-{settings.wl_max} + SNV")
+        preprocess_label.setStyleSheet("color: #666; font-size: 9px; font-style: italic;")
+        model_layout.addWidget(preprocess_label)
+
+        self.run_inference_btn = QPushButton("▶ RUN INFERENCE")
         self.run_inference_btn.setEnabled(False)
         self.run_inference_btn.clicked.connect(self._run_inference)
-        self.run_inference_btn.setStyleSheet("font-weight: bold; padding: 10px; background: #4CAF50; color: white;")
-        left_layout.addWidget(self.run_inference_btn)
+        self.run_inference_btn.setMinimumHeight(36)
+        self.run_inference_btn.setStyleSheet("font-weight: bold; font-size: 12px; background: #4CAF50; color: white;")
+        model_layout.addWidget(self.run_inference_btn)
 
         self.progress_label = QLabel("")
-        left_layout.addWidget(self.progress_label)
+        self.progress_label.setStyleSheet("font-size: 10px;")
+        model_layout.addWidget(self.progress_label)
 
-        # Postprocess Controls
-        post_group = QGroupBox("Postprocess Controls (Live)")
-        post_layout = QFormLayout(post_group)
+        col2_layout.addWidget(model_group)
 
+        # Filters Panel (Live Postprocess)
+        filter_group = QGroupBox("Filters (Live)")
+        filter_group.setStyleSheet("QGroupBox { font-weight: bold; font-size: 11px; }")
+        filter_layout = QGridLayout(filter_group)
+        filter_layout.setSpacing(4)
+
+        # Row 0: Threshold
+        filter_layout.addWidget(QLabel("Thresh:"), 0, 0)
         self.thresh_spin = QDoubleSpinBox()
         self.thresh_spin.setRange(0, 1)
         self.thresh_spin.setSingleStep(0.05)
         self.thresh_spin.setValue(0.5)
         self.thresh_spin.valueChanged.connect(self._rerun_postprocess)
+        filter_layout.addWidget(self.thresh_spin, 0, 1)
 
+        # Row 0: Morph
+        filter_layout.addWidget(QLabel("Morph:"), 0, 2)
         self.morph_spin = QSpinBox()
         self.morph_spin.setRange(0, 15)
         self.morph_spin.setSingleStep(2)
         self.morph_spin.setValue(0)
         self.morph_spin.valueChanged.connect(self._rerun_postprocess)
+        filter_layout.addWidget(self.morph_spin, 0, 3)
 
+        # Row 1: Min Area
+        filter_layout.addWidget(QLabel("MinArea:"), 1, 0)
         self.min_area_spin = QSpinBox()
         self.min_area_spin.setRange(0, 10000)
         self.min_area_spin.setSingleStep(10)
         self.min_area_spin.setValue(0)
         self.min_area_spin.valueChanged.connect(self._rerun_postprocess)
+        filter_layout.addWidget(self.min_area_spin, 1, 1)
 
-        self.exclude_border_check = QCheckBox("Exclude Border")
-        self.exclude_border_check.stateChanged.connect(self._rerun_postprocess)
-
+        # Row 1: Border margin
+        filter_layout.addWidget(QLabel("Border:"), 1, 2)
         self.border_margin_spin = QSpinBox()
         self.border_margin_spin.setRange(0, 100)
         self.border_margin_spin.setValue(0)
         self.border_margin_spin.valueChanged.connect(self._rerun_postprocess)
+        filter_layout.addWidget(self.border_margin_spin, 1, 3)
 
-        post_layout.addRow("Threshold:", self.thresh_spin)
-        post_layout.addRow("Morph Close:", self.morph_spin)
-        post_layout.addRow("Min Area:", self.min_area_spin)
-        post_layout.addRow("", self.exclude_border_check)
-        post_layout.addRow("Border Margin:", self.border_margin_spin)
+        # Row 2: Exclude border checkbox
+        self.exclude_border_check = QCheckBox("Exclude Border")
+        self.exclude_border_check.setStyleSheet("font-size: 10px;")
+        self.exclude_border_check.stateChanged.connect(self._rerun_postprocess)
+        filter_layout.addWidget(self.exclude_border_check, 2, 0, 1, 2)
+
+        # Row 2: Label combo
+        self.label_combo = QComboBox()
+        self.label_combo.addItems(["Auto", "Regular", "Crack"])
+        self.label_combo.setStyleSheet("font-size: 10px;")
+        self.label_combo.currentIndexChanged.connect(self._rerun_postprocess)
+        filter_layout.addWidget(QLabel("Label:"), 2, 2)
+        filter_layout.addWidget(self.label_combo, 2, 3)
 
         self.post_status = QLabel("⚠ Run inference first")
-        self.post_status.setStyleSheet("color: orange;")
-        post_layout.addRow("", self.post_status)
+        self.post_status.setStyleSheet("color: orange; font-size: 9px;")
+        filter_layout.addWidget(self.post_status, 3, 0, 1, 4)
 
-        left_layout.addWidget(post_group)
-        # NOTE: _disable_postprocess() is called after grid controls are created
+        col2_layout.addWidget(filter_group)
 
-        # Stats
-        stats_group = QGroupBox("Statistics")
+        # Stats + Grid Panel
+        stats_group = QGroupBox("Stats & Grid")
+        stats_group.setStyleSheet("QGroupBox { font-weight: bold; font-size: 11px; }")
         stats_layout = QVBoxLayout(stats_group)
+        stats_layout.setSpacing(3)
+
         self.stats_text = QTextEdit()
         self.stats_text.setReadOnly(True)
-        self.stats_text.setMaximumHeight(100)
+        self.stats_text.setMaximumHeight(70)
+        self.stats_text.setStyleSheet("font-size: 10px;")
         stats_layout.addWidget(self.stats_text)
-        left_layout.addWidget(stats_group)
-
-        # Grid Search
-        grid_group = QGroupBox("Grid Search Playground")
-        grid_layout = QVBoxLayout(grid_group)
 
         grid_btn_row = QHBoxLayout()
-        self.run_grid_btn = QPushButton("🔍 Run Grid")
+        grid_btn_row.setSpacing(3)
+        self.run_grid_btn = QPushButton("🔍 Grid")
         self.run_grid_btn.setEnabled(False)
         self.run_grid_btn.clicked.connect(self._run_grid_search)
         self.save_grid_btn = QPushButton("💾 Save")
@@ -444,72 +517,137 @@ class VisualDebugTab(QWidget):
         self.save_grid_btn.clicked.connect(self._save_grid_results)
         grid_btn_row.addWidget(self.run_grid_btn)
         grid_btn_row.addWidget(self.save_grid_btn)
-        grid_layout.addLayout(grid_btn_row)
+        stats_layout.addLayout(grid_btn_row)
 
-        self.grid_status = QLabel("⚠ Run inference first")
-        self.grid_status.setStyleSheet("color: orange; font-size: 10px;")
-        grid_layout.addWidget(self.grid_status)
+        self.grid_status = QLabel("")
+        self.grid_status.setStyleSheet("font-size: 9px;")
+        stats_layout.addWidget(self.grid_status)
 
         self.grid_table = QTableWidget()
-        self.grid_table.setMaximumHeight(150)
+        self.grid_table.setMaximumHeight(100)
         self.grid_table.setSelectionBehavior(QTableWidget.SelectRows)
         self.grid_table.setSelectionMode(QTableWidget.SingleSelection)
         self.grid_table.itemSelectionChanged.connect(self._on_grid_row_selected)
-        grid_layout.addWidget(QLabel("Top results (click to preview):"))
-        grid_layout.addWidget(self.grid_table)
+        self.grid_table.setStyleSheet("font-size: 9px;")
+        stats_layout.addWidget(self.grid_table)
 
-        left_layout.addWidget(grid_group)
+        col2_layout.addWidget(stats_group)
+        col2_layout.addStretch()
+        controls_layout.addWidget(col2)
 
-        # Now disable postprocess controls (after all controls created)
+        # Disable postprocess initially
         self._disable_postprocess()
 
-        left_layout.addStretch()
-
-        # === Right Panel: 2x3 Viewer Grid ===
-        right_panel = QWidget()
-        right_layout = QVBoxLayout(right_panel)
+        # =====================================================================
+        # RIGHT SIDE: IMAGES (2x3 grid)
+        # =====================================================================
+        images_widget = QWidget()
+        images_layout = QVBoxLayout(images_widget)
+        images_layout.setContentsMargins(0, 0, 0, 0)
+        images_layout.setSpacing(2)
 
         grid = QGridLayout()
-        grid.setSpacing(5)
+        grid.setSpacing(2)
+        grid.setContentsMargins(0, 0, 0, 0)
 
-        self.viewer_rgb = self._create_viewer("RGB (Camera)")
-        self.viewer_hsi = self._create_viewer("HSI Band")
-        self.viewer_prob = self._create_viewer("Probability Map")
-        self.viewer_thresh = self._create_viewer("After Threshold")
-        self.viewer_morph = self._create_viewer("After Morphology")
-        self.viewer_final = self._create_viewer("Final Mask + Overlay")
+        # Row 1: RGB views
+        self.viewer_rgb_cam = self._create_viewer("RGB (Camera)")
+        self.viewer_rgb_hsi = self._create_viewer("RGB (HSI)")
+        self.viewer_rgb_extra = self._create_viewer("Results on HSI RGB")
 
-        grid.addWidget(self.viewer_rgb, 0, 0)
-        grid.addWidget(self.viewer_hsi, 0, 1)
-        grid.addWidget(self.viewer_prob, 0, 2)
-        grid.addWidget(self.viewer_thresh, 1, 0)
-        grid.addWidget(self.viewer_morph, 1, 1)
-        grid.addWidget(self.viewer_final, 1, 2)
+        # Row 2: HSI + results
+        self.viewer_hsi_band = self._create_viewer("HSI Band")
+        self.viewer_prob_hsi = self._create_viewer("Prob Map")
+        self.viewer_blob_hsi = self._create_viewer("Blobs")
 
-        right_layout.addLayout(grid)
+        grid.addWidget(self.viewer_rgb_cam, 0, 0)
+        grid.addWidget(self.viewer_rgb_hsi, 0, 1)
+        grid.addWidget(self.viewer_rgb_extra, 0, 2)
 
-        main_layout.addWidget(left_panel)
-        main_layout.addWidget(right_panel, stretch=1)
+        grid.addWidget(self.viewer_hsi_band, 1, 0)
+        grid.addWidget(self.viewer_prob_hsi, 1, 1)
+        grid.addWidget(self.viewer_blob_hsi, 1, 2)
+
+        # Equal stretch for all cells
+        for i in range(2):
+            grid.setRowStretch(i, 1)
+        for j in range(3):
+            grid.setColumnStretch(j, 1)
+
+        images_layout.addLayout(grid, stretch=1)
+
+        # Add to main layout
+        main_layout.addWidget(controls_widget)
+        main_layout.addWidget(images_widget, stretch=1)
 
     def _create_viewer(self, label_text):
         widget = QWidget()
         layout = QVBoxLayout(widget)
         layout.setContentsMargins(2, 2, 2, 2)
+        layout.setSpacing(2)
         label = QLabel(label_text)
-        label.setStyleSheet("font-weight: bold; background: #e0e0e0; padding: 4px;")
+        label.setStyleSheet("font-weight: bold; background: #e0e0e0; padding: 4px; font-size: 11px;")
         label.setAlignment(Qt.AlignCenter)
         viewer = ImageViewer()
+        # Let viewer expand to fill available space
         layout.addWidget(label)
-        layout.addWidget(viewer)
+        layout.addWidget(viewer, stretch=1)
         widget.viewer = viewer
+        widget.label = label
         return widget
 
+    def _set_target_class_options(self, n_classes: int) -> None:
+        current = self.target_class_combo.currentData()
+        self.target_class_combo.blockSignals(True)
+        self.target_class_combo.clear()
+        for idx in range(n_classes):
+            if n_classes == 2 and idx == 1:
+                label = f"{idx} - Positive"
+            elif n_classes == 2 and idx == 0:
+                label = f"{idx} - Negative"
+            else:
+                label = f"{idx}"
+            self.target_class_combo.addItem(label, idx)
+        if current is not None and 0 <= int(current) < n_classes:
+            self.target_class_combo.setCurrentIndex(int(current))
+        else:
+            default_idx = 1 if n_classes > 1 else 0
+            self.target_class_combo.setCurrentIndex(default_idx)
+        self.target_class_combo.blockSignals(False)
+
+
     def _refresh_models(self):
+        """Refresh model list with type and class info."""
         self.model_combo.clear()
+        self._model_info_cache = {}  # Cache model info
+
         if settings.models_dir.exists():
+            import joblib
             for ext in ['.joblib', '.pkl', '.pth']:
                 for f in settings.models_dir.glob(f'*{ext}'):
-                    self.model_combo.addItem(f.name, str(f))
+                    try:
+                        model = joblib.load(str(f))
+                        model_type = type(model).__name__
+
+                        # Determine n_classes
+                        n_classes = 2  # Default
+                        if hasattr(model, 'classes_') and model.classes_ is not None:
+                            n_classes = len(model.classes_)
+                        elif hasattr(model, 'n_classes_'):
+                            n_classes = int(model.n_classes_)
+
+                        display_name = f"{f.name} [{model_type}, {n_classes}cls]"
+                        self._model_info_cache[str(f)] = {
+                            'name': f.name, 'type': model_type, 'n_classes': n_classes
+                        }
+                        del model  # Free memory
+                    except Exception as e:
+                        display_name = f"{f.name} [?]"
+
+                    self.model_combo.addItem(display_name, str(f))
+
+        if self.model_combo.count() == 0:
+            self.model_combo.addItem("(No models found)", None)
 
     def _on_mode_changed(self):
         self.current_mode = "folder" if self.folder_radio.isChecked() else "dataset"
@@ -525,7 +663,18 @@ class VisualDebugTab(QWidget):
             self.load_sample_btn.setEnabled(True)
 
     def _load_csv(self):
-        path, _ = QFileDialog.getOpenFileName(self, "Load Dataset CSV", "", "CSV Files (*.csv)")
+        # Default to project's data folder or DATA_DIR from settings
+        default_dir = ""
+        if hasattr(settings, 'data_dir') and settings.data_dir and Path(settings.data_dir).exists():
+            default_dir = str(settings.data_dir)
+        else:
+            # Use the local data/ folder in this UI project
+            ui_project_data = Path(__file__).parent / "data"
+            if not ui_project_data.exists():
+                ui_project_data.mkdir(parents=True, exist_ok=True)
+            default_dir = str(ui_project_data)
+        
+        path, _ = QFileDialog.getOpenFileName(self, "Load Dataset CSV", default_dir, "CSV Files (*.csv)")
         if path:
             try:
                 self.dataset_df = load_dataset_csv(path)
@@ -558,6 +707,15 @@ class VisualDebugTab(QWidget):
         if selected:
             self.current_index = selected[0].row()
             self.index_spin.setValue(self.current_index)
+            # Auto-set label combo based on sample label from dataset
+            row = self.dataset_df.iloc[self.current_index]
+            label = row.get('label', None)
+            if label == 0:
+                self.label_combo.setCurrentIndex(1)  # "0 - Regular (FP=red)"
+            elif label == 1:
+                self.label_combo.setCurrentIndex(2)  # "1 - Crack (TP=green)"
+            else:
+                self.label_combo.setCurrentIndex(0)  # Unknown
 
     def _navigate_prev(self):
         if self.dataset_df is not None and self.current_index > 0:
@@ -612,27 +770,17 @@ class VisualDebugTab(QWidget):
             self.progress_label.setText("Loading sample...")
             QApplication.processEvents()
 
-            # Load RGB
-            rgb_paths = find_both_rgb_images(folder)
-            self.camera_rgb = load_rgb(rgb_paths['camera_rgb']) if rgb_paths.get('camera_rgb') else None
-            self.hsi_rgb = load_rgb(rgb_paths['hsi_rgb']) if rgb_paths.get('hsi_rgb') else None
-
-            # Display RGB without rotation (RGB camera is already in correct orientation)
-            if self.camera_rgb is not None:
-                self.viewer_rgb.viewer.set_image(self.camera_rgb)
-            elif self.hsi_rgb is not None:
-                self.viewer_rgb.viewer.set_image(self.hsi_rgb)
-            else:
-                self.viewer_rgb.viewer.clear()
+            # Load RGB images
+            canon_path, canon_searched = find_canon_rgb(folder)
+            hsi_path = find_hsi_rgb(folder)
+            self.camera_rgb = load_rgb(canon_path) if canon_path else None
+            self.hsi_rgb = load_rgb(hsi_path) if hsi_path else None
 
             # Load HSI - search recursively for .hdr files
-            # Common patterns: folder/*.hdr, folder/HS/results/*.hdr, folder/**/*.hdr
             hdr_files = list(folder.glob("*.hdr"))
             if not hdr_files:
-                # Try HS/results subfolder (common pattern)
                 hdr_files = list(folder.glob("HS/results/*.hdr"))
             if not hdr_files:
-                # Try recursive search
                 hdr_files = list(folder.glob("**/*.hdr"))
 
             # Filter to REFLECTANCE files if multiple found
@@ -641,7 +789,14 @@ class VisualDebugTab(QWidget):
                 if reflectance_files:
                     hdr_files = reflectance_files
 
+            # If we found hdr, try to load RGB from same dir/HS/results
             if hdr_files:
+                hdr_dir = hdr_files[0].parent
+                candidate_rgbs = list(hdr_dir.glob("RGB*.png")) + list(hdr_dir.glob("*RGB*.png"))
+                if not candidate_rgbs and hdr_dir.name.lower() != "results" and hdr_dir.parent.name.lower() == "results":
+                    candidate_rgbs = list(hdr_dir.parent.glob("RGB*.png"))
+                if candidate_rgbs and self.hsi_rgb is None:
+                    self.hsi_rgb = load_rgb(candidate_rgbs[0])
                 reader = ENVIReader(str(hdr_files[0]))
                 self.cube = reader.read()
                 self.wavelengths = reader.get_wavelengths()
@@ -660,13 +815,33 @@ class VisualDebugTab(QWidget):
                 self.cube = None
                 self.run_inference_btn.setEnabled(False)
 
-            # Clear previous
+            # Display RGBs in first row (after potential hdr rgb load)
+            if self.camera_rgb is not None:
+                self.viewer_rgb_cam.label.setText("RGB (Camera)")
+                self.viewer_rgb_cam.viewer.set_image(self.camera_rgb)
+            else:
+                self.viewer_rgb_cam.viewer.clear()
+                self.viewer_rgb_cam.label.setText("RGB (Camera) - Canon RGB not found")
+                if canon_searched:
+                    error_logger.info("Canon RGB not found. Searched:\n" + "\n".join(canon_searched))
+            if self.hsi_rgb is not None:
+                self.viewer_rgb_hsi.viewer.set_image(self.hsi_rgb)
+            else:
+                self.viewer_rgb_hsi.viewer.clear()
+            # Extra slot shows HSI RGB before inference; results overlay after inference
+            if self.hsi_rgb is not None:
+                self.viewer_rgb_extra.viewer.set_image(self.hsi_rgb)
+            elif self.camera_rgb is not None:
+                self.viewer_rgb_extra.viewer.set_image(self.camera_rgb)
+            else:
+                self.viewer_rgb_extra.viewer.clear()
+
+            # Clear previous outputs
             self.prob_map = None
             self.grid_results = None
-            self.viewer_prob.viewer.clear()
-            self.viewer_thresh.viewer.clear()
-            self.viewer_morph.viewer.clear()
-            self.viewer_final.viewer.clear()
+            for v in [self.viewer_prob_hsi, self.viewer_blob_hsi]:
+                v.viewer.clear()
+            self.viewer_prob_hsi.label.setText("Model Result on HSI")
             self._disable_postprocess()
             self.stats_text.clear()
 
@@ -676,8 +851,18 @@ class VisualDebugTab(QWidget):
         finally:
             self.progress_label.setText("")
 
+    def _get_current_hsi_gray(self) -> np.ndarray:
+        """Return current HSI band (rotated grayscale uint8) for overlay bases."""
+        if self.cube is None:
+            return np.zeros((256, 256), dtype=np.uint8)
+        band_idx = self.band_slider.value()
+        band = get_band_by_index(self.cube, band_idx)
+        band_norm = normalize_to_uint8(band, method="percentile")
+        band_rotated = np.rot90(band_norm, k=-1)
+        return band_rotated
+
     def _update_hsi_band(self):
-        """Update HSI band display - shows grayscale with 90° rotation to match RGB."""
+        """Update HSI band display - shows GRAYSCALE with 90° rotation to match RGB."""
         if self.cube is None:
             return
 
@@ -691,9 +876,8 @@ class VisualDebugTab(QWidget):
         # Apply 90° clockwise rotation to match RGB orientation
         # (same as in old project: GIF_HSI.py uses np.rot90(norm, k=-1))
         band_rotated = np.rot90(band_norm, k=-1)
-
-        # Display as GRAYSCALE (2D array goes to Format_Grayscale8)
-        self.viewer_hsi.viewer.set_image(band_rotated)
+        self.viewer_hsi_band.viewer.set_image(band_rotated)
+        self._last_band_rotated = band_rotated
 
         # Update label with wavelength info
         if self.wavelengths is not None and band_idx < len(self.wavelengths):
@@ -714,13 +898,27 @@ class VisualDebugTab(QWidget):
     def _run_inference(self):
         if self.cube is None:
             return
+        # stop previous worker and clear outputs
+        if self.inference_worker and self.inference_worker.isRunning():
+            self.inference_worker.stop()
+            self.inference_worker.wait(2000)
+        self.prob_map = None
+        self.viewer_prob_hsi.viewer.clear()
+        self.viewer_blob_hsi.viewer.clear()
+        self._disable_postprocess()
+
         model_path = self.model_combo.currentData()
         if not model_path:
             show_error(self, "Error", "No model selected")
             return
         try:
             import joblib
-            self.model = joblib.load(model_path)
+            from app.models.adapters_new import SklearnAdapter
+
+            raw_model = joblib.load(model_path)
+            self.model = SklearnAdapter(raw_model, name=Path(model_path).stem)
+            self._set_target_class_options(self.model.n_classes)
+
             from app.config.types import PreprocessConfig
             preprocess_cfg = PreprocessConfig(
                 use_snv=True,
@@ -729,8 +927,13 @@ class VisualDebugTab(QWidget):
                 wl_max=settings.wl_max if self.wavelengths is not None else None
             )
 
-            self.inference_worker = InferenceWorker(self.cube, self.model, preprocess_cfg)
-            self.inference_worker.finished.connect(self._on_inference_done)
+            target_idx = int(self.target_class_combo.currentData())
+            if target_idx >= self.model.n_classes:
+                show_error(self, "Error", f"Target class index out of range (n_classes={self.model.n_classes})")
+                self.run_inference_btn.setEnabled(True)
+                return
+            self.inference_worker = InferenceWorker(self.cube, self.model, preprocess_cfg, target_idx)
+            self.inference_worker.finished.connect(lambda pm, t=target_idx: self._on_inference_done(pm, t))
             self.inference_worker.error.connect(self._on_inference_error)
             self.inference_worker.progress.connect(lambda msg: self.progress_label.setText(msg))
             self.run_inference_btn.setEnabled(False)
@@ -739,18 +942,22 @@ class VisualDebugTab(QWidget):
             show_error(self, "Error", f"Inference failed: {e}")
             log_error("Inference failed", e)
 
-    def _on_inference_done(self, prob_map):
+    def _on_inference_done(self, prob_map, target_idx=None):
         self.prob_map = prob_map
         self.run_inference_btn.setEnabled(True)
         self.progress_label.setText("✓ Inference complete")
 
-        # Apply 90° rotation to match HSI band orientation
+        # Rotate prob map to match HSI orientation
         prob_rotated = np.rot90(prob_map, k=-1)
+        base_gray = self._get_current_hsi_gray()
+        base_rgb = np.stack([base_gray] * 3, axis=-1)
 
-        # Display prob map with colormap (hot = good for probability)
         prob_vis = normalize_to_uint8(prob_rotated, method="percentile")
         prob_colored = apply_colormap(prob_vis / 255.0, name="hot")
-        self.viewer_prob.viewer.set_image(prob_colored)
+        blended = (0.5 * prob_colored + 0.5 * base_rgb).astype(np.uint8)
+        self.viewer_prob_hsi.viewer.set_image(blended)
+        if target_idx is not None:
+            self.viewer_prob_hsi.label.setText(f"Model Result on HSI (Class {target_idx})")
 
         self._enable_postprocess()
         self._rerun_postprocess()
@@ -799,32 +1006,72 @@ class VisualDebugTab(QWidget):
             pipeline = PostprocessPipeline(config)
             final_mask, stats, debug = pipeline.run_debug(self.prob_map)
 
-            # Apply 90° rotation to masks to match HSI orientation
-            mask_thresh_rotated = np.rot90(debug['mask_threshold'].astype(np.uint8) * 255, k=-1)
-            mask_morph_rotated = np.rot90(debug['mask_after_morph'].astype(np.uint8) * 255, k=-1)
             final_mask_rotated = np.rot90(final_mask, k=-1)
+            threshold_mask = debug.get('mask_threshold', None)
+            threshold_mask_rotated = np.rot90(threshold_mask, k=-1) if threshold_mask is not None else None
 
-            # Display threshold and morph masks as binary images (rotated)
-            self.viewer_thresh.viewer.set_image(mask_thresh_rotated)
-            self.viewer_morph.viewer.set_image(mask_morph_rotated)
+            base_gray = self._get_current_hsi_gray()
+            base_rgb = np.stack([base_gray] * 3, axis=-1)
 
-            # Use RGB base image WITHOUT rotation (RGB is already in correct orientation)
-            base = self.camera_rgb.copy() if self.camera_rgb is not None else (
-                self.hsi_rgb.copy() if self.hsi_rgb is not None else
-                np.zeros((*final_mask.shape, 3), dtype=np.uint8))
+            label_idx = self.label_combo.currentIndex()
+            if label_idx == 1:
+                overlay_color = (255, 0, 0)
+            elif label_idx == 2:
+                overlay_color = (0, 255, 0)
+            else:
+                overlay_color = (0, 255, 255)
 
-            # Display final: RGB base (not rotated) + rotated mask overlay
-            self.viewer_final.viewer.set_image(base)
-            self.viewer_final.viewer.set_overlay(final_mask_rotated, alpha=0.6)
-
+            self.viewer_blob_hsi.viewer.set_image(base_rgb)
+            self.viewer_blob_hsi.viewer.set_overlay(final_mask_rotated, alpha=0.6, color=overlay_color)
+            self._update_rgb_extra_results(final_mask_rotated, threshold_mask_rotated)
+            # Stats
+            accepted_count = len(stats.get('accepted_blobs', []))
+            rejected_count = len(stats.get('rejected_blobs', []))
             self.stats_text.setText(
                 f"Blobs Before: {stats['num_blobs_before']}\n"
                 f"Blobs After: {stats['num_blobs_after']}\n"
+                f"Accepted: {accepted_count} | Rejected: {rejected_count}\n"
                 f"Positive Pixels: {stats['total_positive_pixels']}\n"
                 f"Crack Ratio: {stats['crack_ratio']:.4f}"
             )
         except Exception as e:
             log_error("Postprocess failed", e)
+
+    def _apply_mask_overlay(self, base_rgb: np.ndarray, mask: np.ndarray, color: tuple, alpha: float) -> np.ndarray:
+        if mask is None:
+            return base_rgb
+        if mask.dtype != bool:
+            mask = mask.astype(bool)
+        blended = base_rgb.copy()
+        overlay = np.zeros_like(base_rgb, dtype=np.uint8)
+        overlay[:, :] = color
+        blended[mask] = (alpha * overlay[mask] + (1 - alpha) * base_rgb[mask]).astype(np.uint8)
+        return blended
+
+    def _resize_rgb_to_mask(self, rgb: np.ndarray, mask_shape: tuple) -> np.ndarray:
+        if rgb.shape[0] == mask_shape[0] and rgb.shape[1] == mask_shape[1]:
+            return rgb
+        from PIL import Image
+        resized = Image.fromarray(rgb).resize((mask_shape[1], mask_shape[0]), resample=Image.BILINEAR)
+        return np.array(resized, dtype=np.uint8)
+
+    def _update_rgb_extra_results(self, final_mask: np.ndarray, threshold_mask: Optional[np.ndarray]) -> None:
+        # Use HSI RGB for results overlay (not Canon RGB)
+        base = None
+        if self.hsi_rgb is not None:
+            base = self.hsi_rgb
+        elif self.camera_rgb is not None:
+            base = self.camera_rgb
+        if base is None:
+            base = np.zeros((*final_mask.shape, 3), dtype=np.uint8)
+        if base.ndim == 2:
+            base = np.stack([base] * 3, axis=-1)
+        base = self._resize_rgb_to_mask(base, final_mask.shape)
+        result = base.copy()
+        if threshold_mask is not None:
+            result = self._apply_mask_overlay(result, threshold_mask, color=(255, 255, 0), alpha=0.35)
+        result = self._apply_mask_overlay(result, final_mask, color=(0, 255, 0), alpha=0.6)
+        self.viewer_rgb_extra.viewer.set_image(result)
 
     def _run_grid_search(self):
         if self.prob_map is None:
@@ -910,6 +1157,7 @@ class VisualDebugTab(QWidget):
 
     def reset_state(self):
         """Clear all loaded data and reset UI."""
+        self.stop_workers()
         self.cube = None
         self.wavelengths = None
         self.hsi_rgb = None
@@ -918,9 +1166,10 @@ class VisualDebugTab(QWidget):
         self.grid_results = None
         self.model = None
 
-        for v in [self.viewer_rgb, self.viewer_hsi, self.viewer_prob,
-                  self.viewer_thresh, self.viewer_morph, self.viewer_final]:
+        for v in [self.viewer_rgb_cam, self.viewer_rgb_hsi, self.viewer_rgb_extra,
+                  self.viewer_hsi_band, self.viewer_prob_hsi, self.viewer_blob_hsi]:
             v.viewer.clear()
+        self.viewer_rgb_cam.label.setText("RGB (Camera)")
 
         self.stats_text.clear()
         self.grid_table.setRowCount(0)
@@ -928,6 +1177,9 @@ class VisualDebugTab(QWidget):
         self.progress_label.setText("")
         self.band_slider.setValue(0)
         self.band_slider.setMaximum(0)
+        self.label_combo.setCurrentIndex(0)  # Reset to Unknown
+        self._set_target_class_options(2)
+        self.viewer_prob_hsi.label.setText("Model Result on HSI")
         gc.collect()
 
     def stop_workers(self):
@@ -1067,11 +1319,28 @@ class DatasetTuningTab(QWidget):
         layout.addStretch()
 
     def _refresh_models(self):
+        """Refresh model list with type and class info."""
         self.model_combo.clear()
         if settings.models_dir.exists():
+            import joblib
             for ext in ['.joblib', '.pkl', '.pth']:
                 for f in settings.models_dir.glob(f'*{ext}'):
-                    self.model_combo.addItem(f.name, str(f))
+                    try:
+                        model = joblib.load(str(f))
+                        model_type = type(model).__name__
+                        n_classes = 2
+                        if hasattr(model, 'classes_') and model.classes_ is not None:
+                            n_classes = len(model.classes_)
+                        elif hasattr(model, 'n_classes_'):
+                            n_classes = int(model.n_classes_)
+                        display_name = f"{f.name} [{model_type}, {n_classes}cls]"
+                        del model
+                    except Exception:
+                        display_name = f"{f.name} [?]"
+                    self.model_combo.addItem(display_name, str(f))
+
+        if self.model_combo.count() == 0:
+            self.model_combo.addItem("(No models found)", None)
 
     def _select_csv(self, csv_type):
         path, _ = QFileDialog.getOpenFileName(self, f"Select {csv_type} CSV",
@@ -1283,8 +1552,10 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Binary Classification Inference UI")
-        self.setMinimumSize(1400, 900)
+        self.setMinimumSize(1000, 650)
         self._init_ui()
+        # Show maximized by default for best image viewing experience
+        self.showMaximized()
 
     def _init_ui(self):
         central = QWidget()
