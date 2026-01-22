@@ -98,38 +98,6 @@ class InferenceWorker(QThread):
         self._stop = True
 
 
-class GridSearchWorker(QThread):
-    """Background worker for grid search."""
-    finished = pyqtSignal(object)
-    error = pyqtSignal(str)
-    progress = pyqtSignal(str)
-
-    def __init__(self, prob_map, param_grid, metric="crack_ratio"):
-        super().__init__()
-        self.prob_map = prob_map
-        self.param_grid = param_grid
-        self.metric = metric
-        self._stop = False
-
-    def run(self):
-        try:
-            from app.tuning import run_grid_on_prob_map
-            total = 1
-            for v in self.param_grid.values():
-                total *= len(v)
-            self.progress.emit(f"Running grid search ({total} combinations)...")
-            results_df = run_grid_on_prob_map(self.prob_map, self.param_grid, self.metric)
-            if not self._stop:
-                self.finished.emit(results_df)
-        except Exception as e:
-            if not self._stop:
-                log_error("Grid search failed", e)
-                self.error.emit(str(e))
-
-    def stop(self):
-        self._stop = True
-
-
 class OptunaWorker(QThread):
     """Background worker for Optuna tuning."""
     finished = pyqtSignal(dict)
@@ -229,12 +197,13 @@ class VisualDebugTab(QWidget):
         self.camera_rgb = None
         self.model = None
         self.prob_map = None
-        self.grid_results = None
 
+        # Patch analysis state
+        self.patch_flag_mask = None
+        self.patch_stats = None
 
         # Workers
         self.inference_worker = None
-        self.grid_worker = None
 
         self._init_ui()
 
@@ -488,8 +457,8 @@ class VisualDebugTab(QWidget):
 
         bottom_layout.addWidget(filter_group)
 
-        # ----- Stats + Grid Panel -----
-        stats_group = QGroupBox("Stats & Grid")
+        # ----- Stats + Patch Analysis Panel -----
+        stats_group = QGroupBox("Stats & Patch Analysis")
         stats_group.setStyleSheet("QGroupBox { font-weight: bold; font-size: 11px; }")
         stats_layout = QVBoxLayout(stats_group)
         stats_layout.setSpacing(3)
@@ -500,29 +469,29 @@ class VisualDebugTab(QWidget):
         self.stats_text.setStyleSheet("font-size: 10px;")
         stats_layout.addWidget(self.stats_text)
 
-        grid_btn_row = QHBoxLayout()
-        grid_btn_row.setSpacing(4)
-        self.run_grid_btn = QPushButton("🔍 Grid Search")
-        self.run_grid_btn.setEnabled(False)
-        self.run_grid_btn.clicked.connect(self._run_grid_search)
-        self.save_grid_btn = QPushButton("💾 Save")
-        self.save_grid_btn.setEnabled(False)
-        self.save_grid_btn.clicked.connect(self._save_grid_results)
-        grid_btn_row.addWidget(self.run_grid_btn)
-        grid_btn_row.addWidget(self.save_grid_btn)
-        stats_layout.addLayout(grid_btn_row)
-
-        self.grid_status = QLabel("")
-        self.grid_status.setStyleSheet("font-size: 9px;")
-        stats_layout.addWidget(self.grid_status)
-
-        self.grid_table = QTableWidget()
-        self.grid_table.setMaximumHeight(100)
-        self.grid_table.setSelectionBehavior(QTableWidget.SelectRows)
-        self.grid_table.setSelectionMode(QTableWidget.SingleSelection)
-        self.grid_table.itemSelectionChanged.connect(self._on_grid_row_selected)
-        self.grid_table.setStyleSheet("font-size: 9px;")
-        stats_layout.addWidget(self.grid_table)
+        # Patch Analysis Controls
+        patch_controls_row = QHBoxLayout()
+        patch_controls_row.setSpacing(4)
+        
+        patch_controls_row.addWidget(QLabel("Patch Size:"))
+        self.patch_size_combo = QComboBox()
+        self.patch_size_combo.addItems(["4", "8", "16", "32", "64", "128"])
+        self.patch_size_combo.setCurrentIndex(3)  # Default: 32
+        self.patch_size_combo.setStyleSheet("font-size: 10px;")
+        self.patch_size_combo.currentIndexChanged.connect(self._rerun_patch_analysis)
+        patch_controls_row.addWidget(self.patch_size_combo)
+        
+        patch_controls_row.addWidget(QLabel("Patch Crack %:"))
+        self.patch_thresh_spin = QDoubleSpinBox()
+        self.patch_thresh_spin.setRange(0.0, 100.0)
+        self.patch_thresh_spin.setDecimals(1)
+        self.patch_thresh_spin.setSingleStep(1.0)
+        self.patch_thresh_spin.setValue(10.0)
+        self.patch_thresh_spin.setStyleSheet("font-size: 10px;")
+        self.patch_thresh_spin.valueChanged.connect(self._rerun_patch_analysis)
+        patch_controls_row.addWidget(self.patch_thresh_spin)
+        
+        stats_layout.addLayout(patch_controls_row)
 
         bottom_layout.addWidget(stats_group)
         bottom_layout.addStretch()
@@ -551,24 +520,28 @@ class VisualDebugTab(QWidget):
         self.viewer_rgb_cam = self._create_viewer("RGB (Camera)")
         self.viewer_rgb_hsi = self._create_viewer("RGB (HSI)")
         self.viewer_rgb_extra = self._create_viewer("Results on RGB")
+        self.viewer_rgb_patch = self._create_viewer("Patch Map on RGB")
 
         # Row 2: HSI + results
         self.viewer_hsi_band = self._create_viewer("HSI Band (Grayscale)")
         self.viewer_prob_hsi = self._create_viewer("Probability Map")
         self.viewer_blob_hsi = self._create_viewer("Blobs on HSI")
+        self.viewer_hsi_patch = self._create_viewer("Patch Map on HSI")
 
         grid.addWidget(self.viewer_rgb_cam, 0, 0)
         grid.addWidget(self.viewer_rgb_hsi, 0, 1)
         grid.addWidget(self.viewer_rgb_extra, 0, 2)
+        grid.addWidget(self.viewer_rgb_patch, 0, 3)
 
         grid.addWidget(self.viewer_hsi_band, 1, 0)
         grid.addWidget(self.viewer_prob_hsi, 1, 1)
         grid.addWidget(self.viewer_blob_hsi, 1, 2)
+        grid.addWidget(self.viewer_hsi_patch, 1, 3)
 
         # Equal stretch for all cells
         for i in range(2):
             grid.setRowStretch(i, 1)
-        for j in range(3):
+        for j in range(4):
             grid.setColumnStretch(j, 1)
 
         images_layout.addLayout(grid, stretch=1)
@@ -1008,24 +981,19 @@ class VisualDebugTab(QWidget):
 
     def _disable_postprocess(self):
         for w in [self.thresh_spin, self.morph_spin, self.min_area_spin,
-                  self.exclude_border_check, self.border_margin_spin]:
+                  self.exclude_border_check, self.border_margin_spin,
+                  self.patch_size_combo, self.patch_thresh_spin]:
             w.setEnabled(False)
         self.post_status.setText("⚠ Run inference first")
         self.post_status.setStyleSheet("color: orange;")
-        self.run_grid_btn.setEnabled(False)
-        self.save_grid_btn.setEnabled(False)
-        self.grid_status.setText("⚠ Run inference first")
-        self.grid_status.setStyleSheet("color: orange; font-size: 10px;")
 
     def _enable_postprocess(self):
         for w in [self.thresh_spin, self.morph_spin, self.min_area_spin,
-                  self.exclude_border_check, self.border_margin_spin]:
+                  self.exclude_border_check, self.border_margin_spin,
+                  self.patch_size_combo, self.patch_thresh_spin]:
             w.setEnabled(True)
         self.post_status.setText("✓ Controls active")
         self.post_status.setStyleSheet("color: green;")
-        self.run_grid_btn.setEnabled(True)
-        self.grid_status.setText("✓ Grid available")
-        self.grid_status.setStyleSheet("color: green; font-size: 10px;")
 
     def _on_threshold_changed(self):
         """Update both probability visualization and postprocess when threshold changes."""
@@ -1078,6 +1046,10 @@ class VisualDebugTab(QWidget):
                 f"Positive Pixels: {stats['total_positive_pixels']}\n"
                 f"Crack Ratio: {stats['crack_ratio']:.4f}"
             )
+            
+            # Run patch analysis
+            self._run_patch_analysis(final_mask_rotated, threshold_mask_rotated)
+            
         except Exception as e:
             log_error("Postprocess failed", e)
 
@@ -1117,87 +1089,102 @@ class VisualDebugTab(QWidget):
         result = self._apply_mask_overlay(result, final_mask, color=(0, 255, 0), alpha=0.6)
         self.viewer_rgb_extra.viewer.set_image(result)
 
-    def _run_grid_search(self):
+    def _run_patch_analysis(self, final_mask_rotated: np.ndarray, threshold_mask_rotated: Optional[np.ndarray] = None):
+        """Run patch analysis on the blob results (final mask after postprocessing)."""
+        try:
+            # Use final blob mask (results after all postprocessing)
+            mask = final_mask_rotated
+            if mask is None:
+                return
+            
+            # Get parameters from UI
+            patch_size = int(self.patch_size_combo.currentText())
+            patch_threshold_pct = self.patch_thresh_spin.value()
+            
+            H, W = mask.shape
+            patch_flag_mask = np.zeros((H, W), dtype=bool)
+            
+            total_patches = 0
+            flagged_patches = 0
+            max_pct = 0.0
+            flagged_pcts = []
+            
+            # Loop over patches
+            for y in range(0, H, patch_size):
+                for x in range(0, W, patch_size):
+                    y2 = min(y + patch_size, H)
+                    x2 = min(x + patch_size, W)
+                    
+                    patch = mask[y:y2, x:x2]
+                    total_patches += 1
+                    
+                    # Compute crack percentage in this patch
+                    ratio = np.mean(patch.astype(float))
+                    pct = ratio * 100.0
+                    
+                    if pct > max_pct:
+                        max_pct = pct
+                    
+                    # Flag patch if above threshold
+                    if pct >= patch_threshold_pct:
+                        patch_flag_mask[y:y2, x:x2] = True
+                        flagged_patches += 1
+                        flagged_pcts.append(pct)
+            
+            # Store results
+            self.patch_flag_mask = patch_flag_mask
+            avg_flagged_pct = np.mean(flagged_pcts) if flagged_pcts else 0.0
+            
+            self.patch_stats = {
+                'total_patches': total_patches,
+                'flagged_patches': flagged_patches,
+                'max_pct': max_pct,
+                'avg_flagged_pct': avg_flagged_pct,
+                'patch_size': patch_size,
+                'threshold_pct': patch_threshold_pct
+            }
+            
+            # Update visualization
+            self._update_patch_visualization(final_mask_rotated)
+            
+        except Exception as e:
+            log_error("Patch analysis failed", e)
+
+    def _update_patch_visualization(self, final_mask_rotated: np.ndarray):
+        """Update patch visualization in both RGB and HSI viewers."""
+        if self.patch_flag_mask is None:
+            return
+        
+        try:
+            # Patch Map on HSI
+            base_gray = self._get_current_hsi_gray()
+            base_rgb_hsi = np.stack([base_gray] * 3, axis=-1)
+            result_hsi = self._apply_mask_overlay(base_rgb_hsi, self.patch_flag_mask, color=(0, 255, 255), alpha=0.5)
+            self.viewer_hsi_patch.viewer.set_image(result_hsi)
+            
+            # Patch Map on RGB
+            base = None
+            if self.hsi_rgb is not None:
+                base = self.hsi_rgb
+            elif self.camera_rgb is not None:
+                base = self.camera_rgb
+            if base is None:
+                base = np.zeros((*final_mask_rotated.shape, 3), dtype=np.uint8)
+            if base.ndim == 2:
+                base = np.stack([base] * 3, axis=-1)
+            base = self._resize_rgb_to_mask(base, final_mask_rotated.shape)
+            result_rgb = self._apply_mask_overlay(base, self.patch_flag_mask, color=(0, 255, 255), alpha=0.5)
+            self.viewer_rgb_patch.viewer.set_image(result_rgb)
+            
+        except Exception as e:
+            log_error("Patch visualization failed", e)
+
+    def _rerun_patch_analysis(self):
+        """Re-run patch analysis when controls change (no arguments needed)."""
         if self.prob_map is None:
             return
-        try:
-            from app.tuning import get_default_param_grid
-            param_grid = get_default_param_grid()
-            total = 1
-            for v in param_grid.values():
-                total *= len(v)
-
-            reply = QMessageBox.question(self, "Confirm", f"Test {total} combinations?",
-                                          QMessageBox.Yes | QMessageBox.No)
-            if reply == QMessageBox.No:
-                return
-
-            self.grid_worker = GridSearchWorker(self.prob_map, param_grid)
-            self.grid_worker.finished.connect(self._on_grid_done)
-            self.grid_worker.error.connect(self._on_grid_error)
-            self.grid_worker.progress.connect(lambda msg: self.grid_status.setText(msg))
-            self.run_grid_btn.setEnabled(False)
-            self.grid_worker.start()
-        except Exception as e:
-            show_error(self, "Error", f"Grid search failed: {e}")
-
-    def _on_grid_done(self, results_df):
-        self.grid_results = results_df
-        self.run_grid_btn.setEnabled(True)
-        self.save_grid_btn.setEnabled(True)
-        self.grid_status.setText(f"✓ {len(results_df)} combos")
-
-        top_n = 10
-        df = results_df.head(top_n)
-        self.grid_table.setRowCount(len(df))
-        self.grid_table.setColumnCount(len(df.columns))
-        self.grid_table.setHorizontalHeaderLabels(df.columns.tolist())
-        for i, (_, row) in enumerate(df.iterrows()):
-            for j, (col, val) in enumerate(row.items()):
-                item = QTableWidgetItem(f"{val:.4f}" if isinstance(val, float) else str(val))
-                self.grid_table.setItem(i, j, item)
-        self.grid_table.resizeColumnsToContents()
-        self.grid_table.selectRow(0)
-
-    def _on_grid_error(self, msg):
-        self.run_grid_btn.setEnabled(True)
-        self.grid_status.setText("✗ Failed")
-        show_error(self, "Grid Error", msg)
-
-    def _on_grid_row_selected(self):
-        if self.grid_results is None:
-            return
-        selected = self.grid_table.selectedIndexes()
-        if not selected:
-            return
-        row_idx = selected[0].row()
-        row = self.grid_results.iloc[row_idx]
-
-        if 'prob_threshold' in row:
-            self.thresh_spin.setValue(float(row['prob_threshold']))
-        if 'morph_close_size' in row:
-            self.morph_spin.setValue(int(row['morph_close_size']))
-        if 'min_blob_area' in row:
-            self.min_area_spin.setValue(int(row['min_blob_area']))
-        if 'exclude_border' in row:
-            self.exclude_border_check.setChecked(bool(row['exclude_border']))
-        if 'border_margin_px' in row:
-            self.border_margin_spin.setValue(int(row['border_margin_px']))
-
-    def _save_grid_results(self):
-        if self.grid_results is None:
-            return
-        try:
-            from app.tuning import save_grid_results
-            sample_id = "unknown"
-            if self.dataset_df is not None:
-                row = self.dataset_df.iloc[self.current_index]
-                sample_id = f"{row['grape_id']}_{row.get('week_date', '')}"
-            output_dir = settings.results_dir / "single_sample_grids"
-            path = save_grid_results(self.grid_results, output_dir, sample_id)
-            show_info(self, "Saved", f"Saved to:\n{path}")
-        except Exception as e:
-            show_error(self, "Error", f"Save failed: {e}")
+        # Re-run postprocess to get fresh masks, which will trigger patch analysis
+        self._rerun_postprocess()
 
     def reset_state(self):
         """Clear all loaded data and reset UI."""
@@ -1207,16 +1194,16 @@ class VisualDebugTab(QWidget):
         self.hsi_rgb = None
         self.camera_rgb = None
         self.prob_map = None
-        self.grid_results = None
+        self.patch_flag_mask = None
+        self.patch_stats = None
         self.model = None
 
-        for v in [self.viewer_rgb_cam, self.viewer_rgb_hsi, self.viewer_rgb_extra,
-                  self.viewer_hsi_band, self.viewer_prob_hsi, self.viewer_blob_hsi]:
+        for v in [self.viewer_rgb_cam, self.viewer_rgb_hsi, self.viewer_rgb_extra, self.viewer_rgb_patch,
+                  self.viewer_hsi_band, self.viewer_prob_hsi, self.viewer_blob_hsi, self.viewer_hsi_patch]:
             v.viewer.clear()
         self.viewer_rgb_cam.label.setText("RGB (Camera)")
 
         self.stats_text.clear()
-        self.grid_table.setRowCount(0)
         self._disable_postprocess()
         self.progress_label.setText("")
         self.band_slider.setValue(0)
@@ -1231,9 +1218,6 @@ class VisualDebugTab(QWidget):
         if self.inference_worker and self.inference_worker.isRunning():
             self.inference_worker.stop()
             self.inference_worker.wait(2000)
-        if self.grid_worker and self.grid_worker.isRunning():
-            self.grid_worker.stop()
-            self.grid_worker.wait(2000)
 
 
 # ============================================================================
