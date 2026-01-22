@@ -442,7 +442,7 @@ class VisualDebugTab(QWidget):
         self.thresh_spin.setDecimals(8)
         self.thresh_spin.setSingleStep(0.001)
         self.thresh_spin.setValue(0.9)
-        self.thresh_spin.valueChanged.connect(self._rerun_postprocess)
+        self.thresh_spin.valueChanged.connect(self._on_threshold_changed)
         filter_layout.addWidget(self.thresh_spin, 0, 1)
 
         filter_layout.addWidget(QLabel("Morph:"), 0, 2)
@@ -965,23 +965,39 @@ class VisualDebugTab(QWidget):
             show_error(self, "Error", f"Inference failed: {e}")
             log_error("Inference failed", e)
 
+    def _update_prob_visualization(self):
+        """Update probability heat map visualization based on current threshold."""
+        if self.prob_map is None:
+            return
+        
+        # Rotate prob map to match HSI orientation
+        prob_rotated = np.rot90(self.prob_map, k=-1)
+        base_gray = self._get_current_hsi_gray()
+        base_rgb = np.stack([base_gray] * 3, axis=-1)
+
+        # Use threshold from UI to filter probability display
+        threshold = self.thresh_spin.value()
+        above_threshold_mask = prob_rotated > threshold
+        
+        # Create colored heat map showing probability gradients
+        prob_vis = normalize_to_uint8(prob_rotated, method="percentile")
+        prob_colored = apply_colormap(prob_vis / 255.0, name="hot")
+        
+        # Blend colored heat map only where prob > threshold, otherwise show base gray
+        blended = base_rgb.copy()
+        blended[above_threshold_mask] = (0.5 * prob_colored[above_threshold_mask] + 0.5 * base_rgb[above_threshold_mask]).astype(np.uint8)
+        
+        self.viewer_prob_hsi.viewer.set_image(blended)
+
     def _on_inference_done(self, prob_map, target_idx=None):
         self.prob_map = prob_map
         self.run_inference_btn.setEnabled(True)
         self.progress_label.setText("✓ Inference complete")
 
-        # Rotate prob map to match HSI orientation
-        prob_rotated = np.rot90(prob_map, k=-1)
-        base_gray = self._get_current_hsi_gray()
-        base_rgb = np.stack([base_gray] * 3, axis=-1)
-
-        prob_vis = normalize_to_uint8(prob_rotated, method="percentile")
-        prob_colored = apply_colormap(prob_vis / 255.0, name="hot")
-        blended = (0.5 * prob_colored + 0.5 * base_rgb).astype(np.uint8)
-        self.viewer_prob_hsi.viewer.set_image(blended)
         if target_idx is not None:
             self.viewer_prob_hsi.label.setText(f"Model Result on HSI (Class {target_idx})")
-
+        
+        self._update_prob_visualization()
         self._enable_postprocess()
         self._rerun_postprocess()
 
@@ -1010,6 +1026,11 @@ class VisualDebugTab(QWidget):
         self.run_grid_btn.setEnabled(True)
         self.grid_status.setText("✓ Grid available")
         self.grid_status.setStyleSheet("color: green; font-size: 10px;")
+
+    def _on_threshold_changed(self):
+        """Update both probability visualization and postprocess when threshold changes."""
+        self._update_prob_visualization()
+        self._rerun_postprocess()
 
     def _rerun_postprocess(self):
         if self.prob_map is None:
