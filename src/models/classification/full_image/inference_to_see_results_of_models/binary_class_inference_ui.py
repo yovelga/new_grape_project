@@ -26,7 +26,7 @@ from PyQt5.QtWidgets import (
     QSpinBox, QDoubleSpinBox, QLineEdit, QTextEdit, QGroupBox,
     QFormLayout, QFrame, QMessageBox, QSlider,
     QTableWidget, QTableWidgetItem, QHeaderView,
-    QRadioButton, QCheckBox, QGridLayout, QSplitter
+    QRadioButton, QCheckBox, QGridLayout, QSplitter, QSizePolicy
 )
 from PyQt5.QtCore import Qt, QThread, pyqtSignal
 from PyQt5.QtGui import QFont
@@ -215,16 +215,14 @@ class FinalEvalWorker(QThread):
 # ============================================================================
 
 class VisualDebugTab(QWidget):
-    """Visual debugging tab with 2x3 viewer grid and live postprocess."""
+    """Visual debugging tab with 2x3 viewer grid and live postprocess. CSV-only mode."""
 
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        # State
-        self.current_mode = "folder"
+        # State (CSV-only, no folder mode)
         self.dataset_df = None
         self.current_index = 0
-        self.current_folder = None
         self.cube = None
         self.wavelengths = None
         self.hsi_rgb = None
@@ -242,127 +240,128 @@ class VisualDebugTab(QWidget):
 
     def _init_ui(self):
         main_layout = QHBoxLayout(self)
-        main_layout.setSpacing(8)
+        main_layout.setSpacing(0)
         main_layout.setContentsMargins(4, 4, 4, 4)
 
         # =====================================================================
-        # LEFT SIDE: CONTROLS (2 columns side-by-side)
+        # MAIN HORIZONTAL SPLITTER: Left Controls (1/3) | Right Images (2/3)
         # =====================================================================
-        controls_widget = QWidget()
-        controls_layout = QHBoxLayout(controls_widget)
-        controls_layout.setSpacing(6)
-        controls_layout.setContentsMargins(0, 0, 0, 0)
-        controls_widget.setFixedWidth(520)
+        main_splitter = QSplitter(Qt.Horizontal)
+        main_splitter.setHandleWidth(5)
 
-        # ----- COLUMN 1: Sample Selection -----
-        col1 = QWidget()
-        col1_layout = QVBoxLayout(col1)
-        col1_layout.setSpacing(4)
-        col1_layout.setContentsMargins(0, 0, 0, 0)
+        # =====================================================================
+        # LEFT SIDE: Controls Sidebar with internal TOP/BOTTOM splitter
+        # =====================================================================
+        left_widget = QWidget()
+        left_layout = QVBoxLayout(left_widget)
+        left_layout.setSpacing(0)
+        left_layout.setContentsMargins(0, 0, 4, 0)
 
-        # Sample Source Group
-        source_group = QGroupBox("Sample Selection")
-        source_group.setStyleSheet("QGroupBox { font-weight: bold; font-size: 11px; }")
-        source_layout = QVBoxLayout(source_group)
-        source_layout.setSpacing(4)
+        # Vertical splitter inside left panel: TOP (Sample Selection) | BOTTOM (Controls)
+        left_splitter = QSplitter(Qt.Vertical)
+        left_splitter.setHandleWidth(4)
 
-        # Mode selection
-        mode_row = QHBoxLayout()
-        self.folder_radio = QRadioButton("Folder")
-        self.dataset_radio = QRadioButton("CSV")
-        self.folder_radio.setChecked(True)
-        self.folder_radio.toggled.connect(self._on_mode_changed)
-        mode_row.addWidget(self.folder_radio)
-        mode_row.addWidget(self.dataset_radio)
-        source_layout.addLayout(mode_row)
+        # ---------------------------------------------------------------------
+        # LEFT TOP: Sample Selection (CSV-only, Excel-like table)
+        # ---------------------------------------------------------------------
+        top_widget = QWidget()
+        top_layout = QVBoxLayout(top_widget)
+        top_layout.setSpacing(4)
+        top_layout.setContentsMargins(4, 4, 4, 4)
 
-        # Folder controls
-        self.folder_controls = QWidget()
-        folder_layout = QVBoxLayout(self.folder_controls)
-        folder_layout.setContentsMargins(0, 0, 0, 0)
-        folder_layout.setSpacing(2)
-        folder_btn = QPushButton("📁 Select Folder...")
-        folder_btn.clicked.connect(self._select_folder)
-        self.folder_label = QLabel("No folder selected")
-        self.folder_label.setWordWrap(True)
-        self.folder_label.setStyleSheet("font-size: 10px; color: #666;")
-        folder_layout.addWidget(folder_btn)
-        folder_layout.addWidget(self.folder_label)
-        source_layout.addWidget(self.folder_controls)
-
-        # Dataset controls
-        self.dataset_controls = QWidget()
-        dataset_layout = QVBoxLayout(self.dataset_controls)
-        dataset_layout.setContentsMargins(0, 0, 0, 0)
-        dataset_layout.setSpacing(3)
-
+        # CSV Load row
+        csv_row = QHBoxLayout()
+        csv_row.setSpacing(4)
         csv_btn = QPushButton("📄 Load CSV...")
         csv_btn.clicked.connect(self._load_csv)
+        csv_row.addWidget(csv_btn)
         self.csv_label = QLabel("No CSV loaded")
-        self.csv_label.setStyleSheet("font-size: 10px; color: #666;")
-        dataset_layout.addWidget(csv_btn)
-        dataset_layout.addWidget(self.csv_label)
+        self.csv_label.setStyleSheet("font-size: 11px; color: #666;")
+        csv_row.addWidget(self.csv_label, stretch=1)
+        top_layout.addLayout(csv_row)
 
-        # Sample table (compact)
-        self.sample_table = QTableWidget()
-        self.sample_table.setMaximumHeight(100)
-        self.sample_table.setSelectionBehavior(QTableWidget.SelectRows)
-        self.sample_table.setSelectionMode(QTableWidget.SingleSelection)
-        self.sample_table.itemSelectionChanged.connect(self._on_table_selection)
-        self.sample_table.setStyleSheet("font-size: 10px;")
-        dataset_layout.addWidget(self.sample_table)
-
-        # Navigation row
-        nav_layout = QHBoxLayout()
-        nav_layout.setSpacing(2)
-        self.prev_btn = QPushButton("◀")
-        self.prev_btn.setFixedWidth(40)
-        self.next_btn = QPushButton("▶")
-        self.next_btn.setFixedWidth(40)
+        # Navigation row: Prev | Index | Go | Next + Auto-run checkbox
+        nav_row = QHBoxLayout()
+        nav_row.setSpacing(4)
+        self.prev_btn = QPushButton("◀ Prev")
+        self.prev_btn.setFixedWidth(65)
         self.prev_btn.clicked.connect(self._navigate_prev)
-        self.next_btn.clicked.connect(self._navigate_next)
+        nav_row.addWidget(self.prev_btn)
+
         self.index_spin = QSpinBox()
         self.index_spin.setMinimum(0)
         self.index_spin.setFixedWidth(60)
+        nav_row.addWidget(self.index_spin)
+
         jump_btn = QPushButton("Go")
         jump_btn.setFixedWidth(35)
         jump_btn.clicked.connect(self._jump_to_index)
-        nav_layout.addWidget(self.prev_btn)
-        nav_layout.addWidget(self.index_spin)
-        nav_layout.addWidget(jump_btn)
-        nav_layout.addWidget(self.next_btn)
-        dataset_layout.addLayout(nav_layout)
+        nav_row.addWidget(jump_btn)
+
+        self.next_btn = QPushButton("Next ▶")
+        self.next_btn.setFixedWidth(65)
+        self.next_btn.clicked.connect(self._navigate_next)
+        nav_row.addWidget(self.next_btn)
+
+        # Auto-run inference on navigation
+        self.auto_run_check = QCheckBox("Auto-run")
+        self.auto_run_check.setChecked(True)
+        self.auto_run_check.setToolTip("Automatically run inference when navigating with Prev/Next")
+        self.auto_run_check.setStyleSheet("font-size: 10px;")
+        nav_row.addWidget(self.auto_run_check)
+        nav_row.addStretch()
+        top_layout.addLayout(nav_row)
 
         # Search row
-        search_layout = QHBoxLayout()
-        search_layout.setSpacing(2)
+        search_row = QHBoxLayout()
+        search_row.setSpacing(4)
+        search_row.addWidget(QLabel("Search:"))
         self.search_edit = QLineEdit()
         self.search_edit.setPlaceholderText("grape_id")
+        self.search_edit.returnPressed.connect(self._search_grape_id)
+        search_row.addWidget(self.search_edit, stretch=1)
         search_btn = QPushButton("Find")
         search_btn.setFixedWidth(45)
         search_btn.clicked.connect(self._search_grape_id)
-        search_layout.addWidget(self.search_edit)
-        search_layout.addWidget(search_btn)
-        dataset_layout.addLayout(search_layout)
+        search_row.addWidget(search_btn)
+        top_layout.addLayout(search_row)
 
-        source_layout.addWidget(self.dataset_controls)
-        self.dataset_controls.setVisible(False)
+        # CSV Table (Excel-like, expandable)
+        self.sample_table = QTableWidget()
+        self.sample_table.setSelectionBehavior(QTableWidget.SelectRows)
+        self.sample_table.setSelectionMode(QTableWidget.SingleSelection)
+        self.sample_table.itemSelectionChanged.connect(self._on_table_selection)
+        self.sample_table.cellDoubleClicked.connect(self._on_table_double_click)
+        self.sample_table.setStyleSheet("font-size: 11px;")
+        self.sample_table.horizontalHeader().setStretchLastSection(True)
+        top_layout.addWidget(self.sample_table, stretch=1)
 
-        # Load Sample button
-        self.load_sample_btn = QPushButton("📂 LOAD SAMPLE")
+        # Load Sample button (prominent)
+        self.load_sample_btn = QPushButton("📂 LOAD SELECTED SAMPLE")
         self.load_sample_btn.setEnabled(False)
         self.load_sample_btn.clicked.connect(self._load_current_sample)
-        self.load_sample_btn.setMinimumHeight(32)
-        self.load_sample_btn.setStyleSheet("font-weight: bold; font-size: 11px; background: #2196F3; color: white;")
-        source_layout.addWidget(self.load_sample_btn)
+        self.load_sample_btn.setMinimumHeight(36)
+        self.load_sample_btn.setStyleSheet(
+            "font-weight: bold; font-size: 12px; background: #2196F3; color: white;"
+        )
+        top_layout.addWidget(self.load_sample_btn)
 
-        col1_layout.addWidget(source_group)
+        left_splitter.addWidget(top_widget)
 
-        # HSI Band Viewer (in column 1)
+        # ---------------------------------------------------------------------
+        # LEFT BOTTOM: Model + Filters + Stats/Grid (scrollable)
+        # ---------------------------------------------------------------------
+        bottom_widget = QWidget()
+        bottom_layout = QVBoxLayout(bottom_widget)
+        bottom_layout.setSpacing(6)
+        bottom_layout.setContentsMargins(4, 4, 4, 4)
+
+        # ----- HSI Band Panel -----
         band_group = QGroupBox("HSI Band")
         band_group.setStyleSheet("QGroupBox { font-weight: bold; font-size: 11px; }")
         band_layout = QVBoxLayout(band_group)
         band_layout.setSpacing(3)
+
         self.band_label = QLabel("Band: 0 / 0")
         self.band_label.setStyleSheet("font-size: 10px;")
         self.band_slider = QSlider(Qt.Horizontal)
@@ -387,22 +386,15 @@ class VisualDebugTab(QWidget):
         band_layout.addWidget(self.band_label)
         band_layout.addWidget(self.band_slider)
         band_layout.addLayout(wl_row)
-        col1_layout.addWidget(band_group)
+        bottom_layout.addWidget(band_group)
 
-        col1_layout.addStretch()
-        controls_layout.addWidget(col1)
-
-        # ----- COLUMN 2: Model + Filters + Stats -----
-        col2 = QWidget()
-        col2_layout = QVBoxLayout(col2)
-        col2_layout.setSpacing(4)
-        col2_layout.setContentsMargins(0, 0, 0, 0)
-
-        # Model Panel
+        # ----- Model Panel (compact) -----
         model_group = QGroupBox("Model")
         model_group.setStyleSheet("QGroupBox { font-weight: bold; font-size: 11px; }")
+        model_group.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         model_layout = QVBoxLayout(model_group)
-        model_layout.setSpacing(4)
+        model_layout.setSpacing(2)
+        model_layout.setContentsMargins(6, 8, 6, 6)
 
         self.model_combo = QComboBox()
         self.model_combo.setStyleSheet("font-size: 10px;")
@@ -410,46 +402,49 @@ class VisualDebugTab(QWidget):
         model_layout.addWidget(self.model_combo)
 
         class_row = QHBoxLayout()
-        class_row.addWidget(QLabel("Class:"))
+        class_row.setSpacing(4)
+        class_row.addWidget(QLabel("Target:"))
         self.target_class_combo = QComboBox()
         self.target_class_combo.setStyleSheet("font-size: 10px;")
         self._set_target_class_options(2)
-        class_row.addWidget(self.target_class_combo)
+        class_row.addWidget(self.target_class_combo, stretch=1)
         model_layout.addLayout(class_row)
 
-        preprocess_label = QLabel(f"WL: {settings.wl_min}-{settings.wl_max} + SNV")
+        preprocess_label = QLabel(f"WL {settings.wl_min}-{settings.wl_max} + SNV (always ON)")
         preprocess_label.setStyleSheet("color: #666; font-size: 9px; font-style: italic;")
         model_layout.addWidget(preprocess_label)
 
-        self.run_inference_btn = QPushButton("▶ RUN INFERENCE")
+        run_row = QHBoxLayout()
+        run_row.setSpacing(4)
+        self.run_inference_btn = QPushButton("▶ RUN")
         self.run_inference_btn.setEnabled(False)
         self.run_inference_btn.clicked.connect(self._run_inference)
-        self.run_inference_btn.setMinimumHeight(36)
-        self.run_inference_btn.setStyleSheet("font-weight: bold; font-size: 12px; background: #4CAF50; color: white;")
-        model_layout.addWidget(self.run_inference_btn)
-
+        self.run_inference_btn.setFixedHeight(26)
+        self.run_inference_btn.setStyleSheet("font-weight: bold; font-size: 11px; background: #4CAF50; color: white;")
+        run_row.addWidget(self.run_inference_btn)
         self.progress_label = QLabel("")
         self.progress_label.setStyleSheet("font-size: 10px;")
-        model_layout.addWidget(self.progress_label)
+        run_row.addWidget(self.progress_label, stretch=1)
+        model_layout.addLayout(run_row)
 
-        col2_layout.addWidget(model_group)
+        bottom_layout.addWidget(model_group)
 
-        # Filters Panel (Live Postprocess)
-        filter_group = QGroupBox("Filters (Live)")
+        # ----- Filters Panel (Live Postprocess) -----
+        filter_group = QGroupBox("Filters (Live Postprocess)")
         filter_group.setStyleSheet("QGroupBox { font-weight: bold; font-size: 11px; }")
         filter_layout = QGridLayout(filter_group)
         filter_layout.setSpacing(4)
 
-        # Row 0: Threshold
+        # Row 0: Threshold (high precision) + Morph
         filter_layout.addWidget(QLabel("Thresh:"), 0, 0)
         self.thresh_spin = QDoubleSpinBox()
-        self.thresh_spin.setRange(0, 1)
-        self.thresh_spin.setSingleStep(0.05)
+        self.thresh_spin.setRange(0.0, 1.0)
+        self.thresh_spin.setDecimals(8)
+        self.thresh_spin.setSingleStep(0.001)
         self.thresh_spin.setValue(0.5)
         self.thresh_spin.valueChanged.connect(self._rerun_postprocess)
         filter_layout.addWidget(self.thresh_spin, 0, 1)
 
-        # Row 0: Morph
         filter_layout.addWidget(QLabel("Morph:"), 0, 2)
         self.morph_spin = QSpinBox()
         self.morph_spin.setRange(0, 15)
@@ -458,7 +453,7 @@ class VisualDebugTab(QWidget):
         self.morph_spin.valueChanged.connect(self._rerun_postprocess)
         filter_layout.addWidget(self.morph_spin, 0, 3)
 
-        # Row 1: Min Area
+        # Row 1: Min Area + Border
         filter_layout.addWidget(QLabel("MinArea:"), 1, 0)
         self.min_area_spin = QSpinBox()
         self.min_area_spin.setRange(0, 10000)
@@ -467,7 +462,6 @@ class VisualDebugTab(QWidget):
         self.min_area_spin.valueChanged.connect(self._rerun_postprocess)
         filter_layout.addWidget(self.min_area_spin, 1, 1)
 
-        # Row 1: Border margin
         filter_layout.addWidget(QLabel("Border:"), 1, 2)
         self.border_margin_spin = QSpinBox()
         self.border_margin_spin.setRange(0, 100)
@@ -475,27 +469,26 @@ class VisualDebugTab(QWidget):
         self.border_margin_spin.valueChanged.connect(self._rerun_postprocess)
         filter_layout.addWidget(self.border_margin_spin, 1, 3)
 
-        # Row 2: Exclude border checkbox
+        # Row 2: Exclude border + Label
         self.exclude_border_check = QCheckBox("Exclude Border")
         self.exclude_border_check.setStyleSheet("font-size: 10px;")
         self.exclude_border_check.stateChanged.connect(self._rerun_postprocess)
         filter_layout.addWidget(self.exclude_border_check, 2, 0, 1, 2)
 
-        # Row 2: Label combo
+        filter_layout.addWidget(QLabel("Label:"), 2, 2)
         self.label_combo = QComboBox()
         self.label_combo.addItems(["Auto", "Regular", "Crack"])
         self.label_combo.setStyleSheet("font-size: 10px;")
         self.label_combo.currentIndexChanged.connect(self._rerun_postprocess)
-        filter_layout.addWidget(QLabel("Label:"), 2, 2)
         filter_layout.addWidget(self.label_combo, 2, 3)
 
         self.post_status = QLabel("⚠ Run inference first")
         self.post_status.setStyleSheet("color: orange; font-size: 9px;")
         filter_layout.addWidget(self.post_status, 3, 0, 1, 4)
 
-        col2_layout.addWidget(filter_group)
+        bottom_layout.addWidget(filter_group)
 
-        # Stats + Grid Panel
+        # ----- Stats + Grid Panel -----
         stats_group = QGroupBox("Stats & Grid")
         stats_group.setStyleSheet("QGroupBox { font-weight: bold; font-size: 11px; }")
         stats_layout = QVBoxLayout(stats_group)
@@ -508,8 +501,8 @@ class VisualDebugTab(QWidget):
         stats_layout.addWidget(self.stats_text)
 
         grid_btn_row = QHBoxLayout()
-        grid_btn_row.setSpacing(3)
-        self.run_grid_btn = QPushButton("🔍 Grid")
+        grid_btn_row.setSpacing(4)
+        self.run_grid_btn = QPushButton("🔍 Grid Search")
         self.run_grid_btn.setEnabled(False)
         self.run_grid_btn.clicked.connect(self._run_grid_search)
         self.save_grid_btn = QPushButton("💾 Save")
@@ -531,34 +524,38 @@ class VisualDebugTab(QWidget):
         self.grid_table.setStyleSheet("font-size: 9px;")
         stats_layout.addWidget(self.grid_table)
 
-        col2_layout.addWidget(stats_group)
-        col2_layout.addStretch()
-        controls_layout.addWidget(col2)
+        bottom_layout.addWidget(stats_group)
+        bottom_layout.addStretch()
 
-        # Disable postprocess initially
-        self._disable_postprocess()
+        left_splitter.addWidget(bottom_widget)
+
+        # Set default splitter sizes: TOP 40%, BOTTOM 60% (compact CSV table)
+        left_splitter.setSizes([400, 600])
+
+        left_layout.addWidget(left_splitter)
+        main_splitter.addWidget(left_widget)
 
         # =====================================================================
-        # RIGHT SIDE: IMAGES (2x3 grid)
+        # RIGHT SIDE: 2x3 Image Grid
         # =====================================================================
         images_widget = QWidget()
         images_layout = QVBoxLayout(images_widget)
-        images_layout.setContentsMargins(0, 0, 0, 0)
-        images_layout.setSpacing(2)
+        images_layout.setContentsMargins(4, 0, 0, 0)
+        images_layout.setSpacing(4)
 
         grid = QGridLayout()
-        grid.setSpacing(2)
+        grid.setSpacing(4)
         grid.setContentsMargins(0, 0, 0, 0)
 
         # Row 1: RGB views
         self.viewer_rgb_cam = self._create_viewer("RGB (Camera)")
         self.viewer_rgb_hsi = self._create_viewer("RGB (HSI)")
-        self.viewer_rgb_extra = self._create_viewer("Results on HSI RGB")
+        self.viewer_rgb_extra = self._create_viewer("Results on RGB")
 
         # Row 2: HSI + results
-        self.viewer_hsi_band = self._create_viewer("HSI Band")
-        self.viewer_prob_hsi = self._create_viewer("Prob Map")
-        self.viewer_blob_hsi = self._create_viewer("Blobs")
+        self.viewer_hsi_band = self._create_viewer("HSI Band (Grayscale)")
+        self.viewer_prob_hsi = self._create_viewer("Probability Map")
+        self.viewer_blob_hsi = self._create_viewer("Blobs on HSI")
 
         grid.addWidget(self.viewer_rgb_cam, 0, 0)
         grid.addWidget(self.viewer_rgb_hsi, 0, 1)
@@ -575,10 +572,27 @@ class VisualDebugTab(QWidget):
             grid.setColumnStretch(j, 1)
 
         images_layout.addLayout(grid, stretch=1)
+        main_splitter.addWidget(images_widget)
 
-        # Add to main layout
-        main_layout.addWidget(controls_widget)
-        main_layout.addWidget(images_widget, stretch=1)
+        # Set default splitter sizes: LEFT 33%, RIGHT 67%
+        main_splitter.setSizes([330, 670])
+
+        main_layout.addWidget(main_splitter)
+
+        # Disable postprocess initially
+        self._disable_postprocess()
+
+    def _on_table_double_click(self, row, col):
+        """Load sample on double-click."""
+        self.current_index = row
+        self._load_current_sample()
+
+    def keyPressEvent(self, event):
+        """Handle Enter key to load selected sample."""
+        if event.key() in (Qt.Key_Return, Qt.Key_Enter):
+            if self.sample_table.hasFocus() and self.dataset_df is not None:
+                self._load_current_sample()
+        super().keyPressEvent(event)
 
     def _create_viewer(self, label_text):
         widget = QWidget()
@@ -649,19 +663,6 @@ class VisualDebugTab(QWidget):
         if self.model_combo.count() == 0:
             self.model_combo.addItem("(No models found)", None)
 
-    def _on_mode_changed(self):
-        self.current_mode = "folder" if self.folder_radio.isChecked() else "dataset"
-        self.folder_controls.setVisible(self.current_mode == "folder")
-        self.dataset_controls.setVisible(self.current_mode == "dataset")
-        self.load_sample_btn.setEnabled(False)
-
-    def _select_folder(self):
-        folder = QFileDialog.getExistingDirectory(self, "Select Sample Folder", str(settings.default_search_folder))
-        if folder:
-            self.current_folder = Path(folder)
-            self.folder_label.setText(f"📁 {self.current_folder.name}")
-            self.load_sample_btn.setEnabled(True)
-
     def _load_csv(self):
         # Default to project's data folder or DATA_DIR from settings
         default_dir = ""
@@ -718,16 +719,34 @@ class VisualDebugTab(QWidget):
                 self.label_combo.setCurrentIndex(0)  # Unknown
 
     def _navigate_prev(self):
+        """Navigate to previous sample. Auto-runs inference if checkbox is checked."""
         if self.dataset_df is not None and self.current_index > 0:
             self.current_index -= 1
             self.sample_table.selectRow(self.current_index)
             self._update_nav_state()
+            self._auto_load_and_run()
 
     def _navigate_next(self):
+        """Navigate to next sample. Auto-runs inference if checkbox is checked."""
         if self.dataset_df is not None and self.current_index < len(self.dataset_df) - 1:
             self.current_index += 1
             self.sample_table.selectRow(self.current_index)
             self._update_nav_state()
+            self._auto_load_and_run()
+
+    def _auto_load_and_run(self):
+        """Load current sample and auto-run inference if enabled."""
+        if not self.auto_run_check.isChecked():
+            return
+        # Cancel any running inference first
+        if self.inference_worker and self.inference_worker.isRunning():
+            self.inference_worker.stop()
+            self.inference_worker.wait(500)
+        # Load sample then run inference
+        self._load_current_sample()
+        # Schedule inference after sample is loaded
+        if self.cube is not None and self.run_inference_btn.isEnabled():
+            self._run_inference()
 
     def _jump_to_index(self):
         if self.dataset_df is not None:
@@ -754,14 +773,13 @@ class VisualDebugTab(QWidget):
         self.index_spin.setValue(self.current_index)
 
     def _load_current_sample(self):
+        """Load sample from CSV dataset (CSV-only mode)."""
         try:
-            if self.current_mode == "folder":
-                folder = self.current_folder
-            else:
-                if self.dataset_df is None:
-                    return
-                row = self.dataset_df.iloc[self.current_index]
-                folder = Path(row['image_path'])
+            if self.dataset_df is None:
+                show_error(self, "Error", "No CSV loaded. Please load a CSV file first.")
+                return
+            row = self.dataset_df.iloc[self.current_index]
+            folder = Path(row['image_path'])
 
             if not folder or not folder.exists():
                 show_error(self, "Error", f"Folder not found: {folder}")
@@ -1145,8 +1163,8 @@ class VisualDebugTab(QWidget):
             return
         try:
             from app.tuning import save_grid_results
-            sample_id = self.current_folder.name if self.current_folder else "unknown"
-            if self.current_mode == "dataset" and self.dataset_df is not None:
+            sample_id = "unknown"
+            if self.dataset_df is not None:
                 row = self.dataset_df.iloc[self.current_index]
                 sample_id = f"{row['grape_id']}_{row.get('week_date', '')}"
             output_dir = settings.results_dir / "single_sample_grids"
