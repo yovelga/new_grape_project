@@ -186,8 +186,11 @@ class FinalEvalWorker(QThread):
 class VisualDebugTab(QWidget):
     """Visual debugging tab with 2x3 viewer grid and live postprocess. CSV-only mode."""
 
-    def __init__(self, parent=None):
+    def __init__(self, model_manager: ModelManager, parent=None):
         super().__init__(parent)
+
+        # Model manager (shared)
+        self.model_manager = model_manager
 
         # State (CSV-only, no folder mode)
         self.dataset_df = None
@@ -655,18 +658,12 @@ class VisualDebugTab(QWidget):
             return
         
         try:
-            # Use parent window's model manager
-            if hasattr(self.parent(), 'model_manager'):
-                model_manager = self.parent().model_manager
-            else:
-                show_error(self, "Error", "ModelManager not available")
-                return
-            
-            # Load model
-            self.model = model_manager.load_model(model_path_obj)
+            # Load model using shared model manager
+            model_info = self.model_manager.load_model(model_path_obj)
+            self.model = self.model_manager.get_model()  # Get actual model object
             
             # Update target class options
-            self._set_target_class_options(self.model.n_classes)
+            self._set_target_class_options(model_info.n_classes)
             
             # Update status
             self.model_status_label.setText(f"✓ Loaded: {model_path_obj.name}")
@@ -679,7 +676,7 @@ class VisualDebugTab(QWidget):
             if self.cube is not None:
                 self.run_inference_btn.setEnabled(True)
             
-            self.progress_label.setText(f"Model loaded: {self.model.n_classes} classes")
+            self.progress_label.setText(f"Model loaded: {model_info.n_classes} classes")
             
         except Exception as e:
             show_error(self, "Error", f"Failed to load model: {e}")
@@ -1675,7 +1672,7 @@ class MainWindow(QMainWindow):
         # Tabs
         self.tabs = QTabWidget()
 
-        self.visual_tab = VisualDebugTab()
+        self.visual_tab = VisualDebugTab(model_manager=self.model_manager)
         self.tabs.addTab(self.visual_tab, "Visual Debug")
 
         self.tuning_tab = DatasetTuningTab()

@@ -112,41 +112,23 @@ class OptunaWorker(QThread):
         if self.tuner and len(self.tuner.trial_history) > 0:
             trial_info = self.tuner.trial_history[-1]  # Latest trial
             
-            # Build detailed progress message with all metrics
-            msg_lines = []
-            msg_lines.append(f"Trial {trial.number + 1}/{self.n_trials} Complete")
-            msg_lines.append("-" * 70)
-            msg_lines.append(f"Score ({self.optimize_metric.upper()}): {trial.value:.4f} | Best: {study.best_value:.4f} (Trial {study.best_trial.number + 1})")
-            msg_lines.append("")
-            msg_lines.append("Metrics:")
-            msg_lines.append(f"  Accuracy:  {trial_info.get('val_accuracy', 0):.4f} | Balanced Acc: {trial_info.get('val_balanced_accuracy', 0):.4f}")
-            msg_lines.append(f"  Precision: {trial_info.get('val_precision', 0):.4f} | Recall:       {trial_info.get('val_recall', 0):.4f}")
-            msg_lines.append(f"  F1:        {trial_info.get('val_f1', 0):.4f} | F2:           {trial_info.get('val_f2', 0):.4f}")
-            msg_lines.append(f"  Specificity: {trial_info.get('val_specificity', 0):.4f} | NPV:        {trial_info.get('val_npv', 0):.4f}")
-            msg_lines.append(f"  MCC:       {trial_info.get('val_mcc', 0):.4f}")
-            
-            # Add probabilistic metrics if available
-            if 'val_roc_auc' in trial_info:
-                msg_lines.append(f"  ROC-AUC:   {trial_info['val_roc_auc']:.4f}")
-            if 'val_pr_auc' in trial_info:
-                msg_lines.append(f"  PR-AUC:    {trial_info['val_pr_auc']:.4f}")
-            
-            msg_lines.append("")
-            msg_lines.append("Confusion Matrix:")
-            msg_lines.append(f"  TP: {trial_info.get('val_TP', 0):3d} | FP: {trial_info.get('val_FP', 0):3d}")
-            msg_lines.append(f"  FN: {trial_info.get('val_FN', 0):3d} | TN: {trial_info.get('val_TN', 0):3d}")
-            msg_lines.append("")
-            
-            # Parameters
-            msg_lines.append("Parameters:")
-            for key, value in trial.params.items():
-                if isinstance(value, float):
-                    msg_lines.append(f"  {key}: {value:.4f}")
-                else:
-                    msg_lines.append(f"  {key}: {value}")
-            msg_lines.append("")
-            
-            msg = "\n".join(msg_lines)
+            # Build single-line compact message with train+val metrics and parameters
+            msg = (
+                f"T{trial.number + 1}/{self.n_trials}: {self.optimize_metric.upper()}={trial.value:.4f} (Best={study.best_value:.4f}@T{study.best_trial.number + 1}) | "
+                f"VAL[Acc={trial_info.get('val_accuracy', 0):.3f} P={trial_info.get('val_precision', 0):.3f} "
+                f"R={trial_info.get('val_recall', 0):.3f} F1={trial_info.get('val_f1', 0):.3f} "
+                f"F2={trial_info.get('val_f2', 0):.3f} MCC={trial_info.get('val_mcc', 0):.3f} "
+                f"TP={trial_info.get('val_TP', 0)} FP={trial_info.get('val_FP', 0)} "
+                f"FN={trial_info.get('val_FN', 0)} TN={trial_info.get('val_TN', 0)}] | "
+                f"TRAIN[Acc={trial_info.get('train_accuracy', 0):.3f} P={trial_info.get('train_precision', 0):.3f} "
+                f"R={trial_info.get('train_recall', 0):.3f} F1={trial_info.get('train_f1', 0):.3f} "
+                f"F2={trial_info.get('train_f2', 0):.3f} MCC={trial_info.get('train_mcc', 0):.3f}] | "
+                f"PARAMS[pxl_th={trial.params.get('pixel_threshold', 0):.4f} "
+                f"area={trial.params.get('min_blob_area', 0)} "
+                f"morph={trial.params.get('morph_size', 0)} "
+                f"patch={trial.params.get('patch_size', 0)} "
+                f"patch_th={trial.params.get('patch_crack_pct_threshold', 0):.2f}]"
+            )
         else:
             # Fallback if trial history not available
             best_value = study.best_value
