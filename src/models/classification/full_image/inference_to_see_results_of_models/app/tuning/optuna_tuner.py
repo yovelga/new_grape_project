@@ -212,6 +212,16 @@ class OptunaTuner:
         else:  # f2
             score = val_metrics.f2_score
         
+        # Evaluate on test set every 20 trials (for monitoring only, NOT for optimization)
+        test_metrics = None
+        if (trial.number + 1) % 20 == 0:
+            logger.info(f"🔍 Trial {trial.number}: Evaluating on TEST SET (monitoring only, not used for optimization)")
+            test_result = self._evaluate_samples(self.test_samples, params)
+            test_metrics = MetricsCalculator.compute_metrics(
+                test_result['y_true'],
+                test_result['y_pred']
+            )
+        
         # Store comprehensive trial info with all metrics for BOTH train and val
         trial_info = {
             'trial_number': trial.number,
@@ -248,6 +258,22 @@ class OptunaTuner:
             'train_FN': train_metrics.confusion_matrix.FN
         }
         
+        # Add test metrics if evaluated (every 20 trials)
+        if test_metrics is not None:
+            trial_info['test_accuracy'] = float(test_metrics.accuracy)
+            trial_info['test_balanced_accuracy'] = float(test_metrics.balanced_accuracy)
+            trial_info['test_precision'] = float(test_metrics.precision)
+            trial_info['test_recall'] = float(test_metrics.recall)
+            trial_info['test_f1'] = float(test_metrics.f1_score)
+            trial_info['test_f2'] = float(test_metrics.f2_score)
+            trial_info['test_specificity'] = float(test_metrics.specificity)
+            trial_info['test_npv'] = float(test_metrics.npv)
+            trial_info['test_mcc'] = float(test_metrics.mcc)
+            trial_info['test_TP'] = test_metrics.confusion_matrix.TP
+            trial_info['test_FP'] = test_metrics.confusion_matrix.FP
+            trial_info['test_TN'] = test_metrics.confusion_matrix.TN
+            trial_info['test_FN'] = test_metrics.confusion_matrix.FN
+        
         # Add probabilistic metrics if available
         if val_metrics.roc_auc is not None:
             trial_info['val_roc_auc'] = float(val_metrics.roc_auc)
@@ -261,7 +287,7 @@ class OptunaTuner:
         self.trial_history.append(trial_info)
         
         # Single-line logging with train+val metrics and parameters
-        logger.info(
+        log_msg = (
             f"Trial {trial.number}: {self.optimize_metric.upper()}={score:.4f} | "
             f"VAL[Acc={val_metrics.accuracy:.3f} P={val_metrics.precision:.3f} R={val_metrics.recall:.3f} "
             f"F1={val_metrics.f1_score:.3f} F2={val_metrics.f2_score:.3f}] | "
@@ -271,6 +297,15 @@ class OptunaTuner:
             f"morph={suggested['morph_size']} patch={suggested['patch_size']} "
             f"patch_th={suggested['patch_crack_pct_threshold']:.2f}]"
         )
+        
+        # Add test metrics to log if available (every 20 trials - for monitoring only)
+        if test_metrics is not None:
+            log_msg += (
+                f" | 🔍TEST[Acc={test_metrics.accuracy:.3f} P={test_metrics.precision:.3f} "
+                f"R={test_metrics.recall:.3f} F1={test_metrics.f1_score:.3f} F2={test_metrics.f2_score:.3f}]"
+            )
+        
+        logger.info(log_msg)
         
         return score
     

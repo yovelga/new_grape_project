@@ -130,6 +130,16 @@ class OptunaWorker(QThread):
                 f"patch_th={trial.params.get('patch_crack_pct_threshold', 0):.2f} "
                 f"global_th={trial.params.get('global_crack_pct_threshold', 0):.2f}]"
             )
+            
+            # Add test metrics if available (every 20 trials - monitoring only)
+            if 'test_f1' in trial_info:
+                msg += (
+                    f" | 🔍TEST[Acc={trial_info.get('test_accuracy', 0):.3f} "
+                    f"P={trial_info.get('test_precision', 0):.3f} "
+                    f"R={trial_info.get('test_recall', 0):.3f} "
+                    f"F1={trial_info.get('test_f1', 0):.3f} "
+                    f"F2={trial_info.get('test_f2', 0):.3f}]"
+                )
         else:
             # Fallback if trial history not available
             best_value = study.best_value
