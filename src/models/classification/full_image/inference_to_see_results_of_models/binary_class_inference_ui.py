@@ -2,8 +2,8 @@
 Binary Classification Inference UI - Unified Version
 
 Comprehensive UI combining:
-- Tab A: Visual Debug / Image Playground (Folder mode + Dataset browsing)
-- Tab B: Dataset Tuning / Scientific Evaluation (Optuna + Final Test)
+- Tab A: Visual Debug / Image Playground (Interactive image analysis)
+- Tab B: Optuna Tuning (Hyperparameter optimization)
 
 All non-UI logic delegated to app/* modules. Single runnable entrypoint.
 """
@@ -97,87 +97,6 @@ class InferenceWorker(QThread):
 
     def stop(self):
         self._stop = True
-
-
-class OptunaWorker(QThread):
-    """Background worker for Optuna tuning."""
-    finished = pyqtSignal(dict)
-    error = pyqtSignal(str)
-    progress = pyqtSignal(str)
-
-    def __init__(self, train_df, val_df, prob_map_fn, n_trials, seed, output_dir, metric):
-        super().__init__()
-        self.train_df = train_df
-        self.val_df = val_df
-        self.prob_map_fn = prob_map_fn
-        self.n_trials = n_trials
-        self.seed = seed
-        self.output_dir = output_dir
-        self.metric = metric
-        self._stop = False
-
-    def run(self):
-        try:
-            from app.tuning.optuna_runner import run_optuna
-            self.progress.emit("Running Optuna tuning...")
-            best_params, trials_df = run_optuna(
-                train_df=self.train_df,
-                val_df=self.val_df,
-                prob_map_fn=self.prob_map_fn,
-                n_trials=self.n_trials,
-                seed=self.seed,
-                output_dir=self.output_dir,
-                metric=self.metric,
-            )
-            if not self._stop:
-                self.finished.emit({"best_params": best_params, "n_trials": len(trials_df)})
-        except Exception as e:
-            if not self._stop:
-                log_error("Optuna failed", e)
-                self.error.emit(str(e))
-
-    def stop(self):
-        self._stop = True
-
-
-class FinalEvalWorker(QThread):
-    """Background worker for final test evaluation."""
-    finished = pyqtSignal(dict)
-    error = pyqtSignal(str)
-    progress = pyqtSignal(str)
-
-    def __init__(self, test_df, prob_map_fn, best_params, output_dir, train_df, val_df):
-        super().__init__()
-        self.test_df = test_df
-        self.prob_map_fn = prob_map_fn
-        self.best_params = best_params
-        self.output_dir = output_dir
-        self.train_df = train_df
-        self.val_df = val_df
-        self._stop = False
-
-    def run(self):
-        try:
-            from app.tuning.optuna_runner import evaluate_final
-            self.progress.emit("Running final evaluation...")
-            metrics, _ = evaluate_final(
-                test_df=self.test_df,
-                prob_map_fn=self.prob_map_fn,
-                best_params=self.best_params,
-                output_dir=self.output_dir,
-                train_df=self.train_df,
-                val_df=self.val_df,
-            )
-            if not self._stop:
-                self.finished.emit(metrics)
-        except Exception as e:
-            if not self._stop:
-                log_error("Final eval failed", e)
-                self.error.emit(str(e))
-
-    def stop(self):
-        self._stop = True
-
 
 # ============================================================================
 # Tab A: Visual Debug / Image Playground
@@ -1284,358 +1203,89 @@ class VisualDebugTab(QWidget):
 
 
 # ============================================================================
-# Tab B: Dataset Tuning
-# ============================================================================
-
-class DatasetTuningTab(QWidget):
-    """Scientific dataset tuning with Optuna and final test."""
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.train_df = None
-        self.val_df = None
-        self.test_df = None
-        self.best_params = None
-        self.model = None
-        self.model_adapter = None
-        self.output_dir = None
-        self.optuna_worker = None
-        self.final_worker = None
-        self._init_ui()
-
-    def _init_ui(self):
-        layout = QVBoxLayout(self)
-
-        # Data Selection
-        data_group = QGroupBox("Dataset Selection")
-        data_layout = QFormLayout(data_group)
-
-        trainval_row = QHBoxLayout()
-        self.trainval_edit = QLineEdit()
-        self.trainval_edit.setPlaceholderText("Train/Val CSV (70/30 split)...")
-        self.trainval_edit.setReadOnly(True)
-        trainval_btn = QPushButton("Browse...")
-        trainval_btn.clicked.connect(lambda: self._select_csv("trainval"))
-        trainval_row.addWidget(self.trainval_edit)
-        trainval_row.addWidget(trainval_btn)
-        data_layout.addRow("Train/Val CSV:", trainval_row)
-
-        test_row = QHBoxLayout()
-        self.test_edit = QLineEdit()
-        self.test_edit.setPlaceholderText("Test CSV (locked, used once)...")
-        self.test_edit.setReadOnly(True)
-        test_btn = QPushButton("Browse...")
-        test_btn.clicked.connect(lambda: self._select_csv("test"))
-        test_row.addWidget(self.test_edit)
-        test_row.addWidget(test_btn)
-        data_layout.addRow("Test CSV:", test_row)
-
-        model_row = QHBoxLayout()
-        self.model_combo = QComboBox()
-        self._refresh_models()
-        refresh_btn = QPushButton("Refresh")
-        refresh_btn.clicked.connect(self._refresh_models)
-        model_row.addWidget(self.model_combo)
-        model_row.addWidget(refresh_btn)
-        data_layout.addRow("Model:", model_row)
-
-        layout.addWidget(data_group)
-
-        # Config
-        config_group = QGroupBox("Configuration")
-        config_layout = QFormLayout(config_group)
-
-        self.val_split_spin = QDoubleSpinBox()
-        self.val_split_spin.setRange(0.1, 0.5)
-        self.val_split_spin.setSingleStep(0.05)
-        self.val_split_spin.setValue(0.30)
-        config_layout.addRow("Val Split:", self.val_split_spin)
-
-        self.seed_spin = QSpinBox()
-        self.seed_spin.setRange(0, 99999)
-        self.seed_spin.setValue(42)
-        config_layout.addRow("Seed:", self.seed_spin)
-
-        self.trials_spin = QSpinBox()
-        self.trials_spin.setRange(5, 500)
-        self.trials_spin.setValue(50)
-        config_layout.addRow("N Trials:", self.trials_spin)
-
-        self.metric_combo = QComboBox()
-        self.metric_combo.addItems(["f2", "f1", "accuracy", "macro_f1"])
-        config_layout.addRow("Metric:", self.metric_combo)
-
-        layout.addWidget(config_group)
-
-        # Actions
-        actions_group = QGroupBox("Pipeline Steps")
-        actions_layout = QHBoxLayout(actions_group)
-
-        self.prepare_btn = QPushButton("1. Prepare Splits")
-        self.prepare_btn.clicked.connect(self._prepare_splits)
-        actions_layout.addWidget(self.prepare_btn)
-
-        self.optuna_btn = QPushButton("2. Run Optuna (Val)")
-        self.optuna_btn.clicked.connect(self._run_optuna)
-        self.optuna_btn.setEnabled(False)
-        actions_layout.addWidget(self.optuna_btn)
-
-        self.final_btn = QPushButton("3. Final Test (Once)")
-        self.final_btn.clicked.connect(self._run_final_test)
-        self.final_btn.setEnabled(False)
-        actions_layout.addWidget(self.final_btn)
-
-        layout.addWidget(actions_group)
-
-        # Progress
-        self.progress_label = QLabel("")
-        layout.addWidget(self.progress_label)
-
-        # Results
-        results_group = QGroupBox("Results")
-        results_layout = QVBoxLayout(results_group)
-
-        self.splits_table = QTableWidget()
-        self.splits_table.setColumnCount(4)
-        self.splits_table.setHorizontalHeaderLabels(["Split", "Total", "Class 0", "Class 1"])
-        self.splits_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.splits_table.setMaximumHeight(100)
-        results_layout.addWidget(self.splits_table)
-
-        self.results_text = QTextEdit()
-        self.results_text.setReadOnly(True)
-        results_layout.addWidget(self.results_text)
-
-        layout.addWidget(results_group)
-        layout.addStretch()
-
-    def _refresh_models(self):
-        """Refresh model list with type and class info."""
-        self.model_combo.clear()
-        if settings.models_dir.exists():
-            import joblib
-            for ext in ['.joblib', '.pkl', '.pth']:
-                for f in settings.models_dir.glob(f'*{ext}'):
-                    try:
-                        model = joblib.load(str(f))
-                        model_type = type(model).__name__
-                        n_classes = 2
-                        if hasattr(model, 'classes_') and model.classes_ is not None:
-                            n_classes = len(model.classes_)
-                        elif hasattr(model, 'n_classes_'):
-                            n_classes = int(model.n_classes_)
-                        display_name = f"{f.name} [{model_type}, {n_classes}cls]"
-                        del model
-                    except Exception:
-                        display_name = f"{f.name} [?]"
-                    self.model_combo.addItem(display_name, str(f))
-
-        if self.model_combo.count() == 0:
-            self.model_combo.addItem("(No models found)", None)
-
-    def _select_csv(self, csv_type):
-        path, _ = QFileDialog.getOpenFileName(self, f"Select {csv_type} CSV",
-                                               str(settings.default_search_folder), "CSV Files (*.csv)")
-        if path:
-            if csv_type == "trainval":
-                self.trainval_edit.setText(path)
-            else:
-                self.test_edit.setText(path)
-
-    def _prepare_splits(self):
-        try:
-            trainval_path = self.trainval_edit.text()
-            test_path = self.test_edit.text()
-            if not trainval_path or not test_path:
-                show_error(self, "Error", "Select both CSVs")
-                return
-
-            from app.data.dataset import load_and_prepare_splits, get_class_distribution
-
-            self.progress_label.setText("Preparing splits...")
-            QApplication.processEvents()
-
-            self.train_df, self.val_df, self.test_df = load_and_prepare_splits(
-                trainval_path, test_path,
-                val_size=self.val_split_spin.value(),
-                random_state=self.seed_spin.value()
-            )
-
-            self.splits_table.setRowCount(3)
-            for i, (name, df) in enumerate([("Train", self.train_df), ("Val", self.val_df), ("Test", self.test_df)]):
-                dist = get_class_distribution(df)
-                self.splits_table.setItem(i, 0, QTableWidgetItem(name))
-                self.splits_table.setItem(i, 1, QTableWidgetItem(str(len(df))))
-                self.splits_table.setItem(i, 2, QTableWidgetItem(str(dist.get(0, 0))))
-                self.splits_table.setItem(i, 3, QTableWidgetItem(str(dist.get(1, 0))))
-
-            self.progress_label.setText("✓ Splits ready")
-            self.optuna_btn.setEnabled(True)
-            self.results_text.append(f"[{datetime.now():%H:%M:%S}] Splits prepared.\n")
-
-        except Exception as e:
-            log_error("Prepare splits failed", e)
-            show_error(self, "Error", str(e))
-
-    def _load_model(self):
-        model_path = self.model_combo.currentData()
-        if not model_path:
-            raise ValueError("Select a model")
-        if self.model is None:
-            from app.models.loader_new import load_model
-            from app.models.adapters_new import SklearnAdapter
-            self.model = load_model(model_path)
-            self.model_adapter = SklearnAdapter(self.model, name=Path(model_path).stem)
-
-    def _create_prob_map_fn(self) -> Callable[[str], np.ndarray]:
-        from app.io.envi import ENVIReader
-        from app.inference.prob_map import build_prob_map
-        from app.config.types import PreprocessConfig
-        adapter = self.model_adapter
-
-        def fn(image_path: str) -> np.ndarray:
-            folder = Path(image_path)
-            if folder.is_file():
-                folder = folder.parent
-
-            # Search for .hdr files (recursive pattern)
-            hdr = list(folder.glob("*.hdr"))
-            if not hdr:
-                hdr = list(folder.glob("HS/results/*.hdr"))
-            if not hdr:
-                hdr = list(folder.glob("**/*.hdr"))
-
-            # Prefer REFLECTANCE files
-            if len(hdr) > 1:
-                refl = [f for f in hdr if 'REFLECTANCE' in f.name.upper()]
-                if refl:
-                    hdr = refl
-
-            if not hdr:
-                raise FileNotFoundError(f"No .hdr in {folder} or subdirectories")
-
-            reader = ENVIReader(str(hdr[0]))
-            cube = reader.read()
-            wl = reader.get_wavelengths()
-            cfg = PreprocessConfig(use_snv=True, wavelengths=wl,
-                                   wl_min=settings.wl_min if wl else None,
-                                   wl_max=settings.wl_max if wl else None)
-            return build_prob_map(cube, adapter, cfg, target_class_index=1, chunk_size=100_000)
-        return fn
-
-    def _run_optuna(self):
-        try:
-            if self.val_df is None:
-                show_error(self, "Error", "Prepare splits first")
-                return
-            self._load_model()
-            timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-            self.output_dir = str(settings.results_dir / f"tuning_{timestamp}")
-            prob_fn = self._create_prob_map_fn()
-
-            self.optuna_btn.setEnabled(False)
-            self.progress_label.setText("Running Optuna...")
-
-            self.optuna_worker = OptunaWorker(
-                self.train_df, self.val_df, prob_fn,
-                self.trials_spin.value(), self.seed_spin.value(),
-                self.output_dir, self.metric_combo.currentText()
-            )
-            self.optuna_worker.finished.connect(self._on_optuna_done)
-            self.optuna_worker.error.connect(self._on_optuna_error)
-            self.optuna_worker.progress.connect(lambda m: self.progress_label.setText(m))
-            self.optuna_worker.start()
-
-        except Exception as e:
-            log_error("Optuna setup failed", e)
-            show_error(self, "Error", str(e))
-            self.optuna_btn.setEnabled(True)
-
-    def _on_optuna_done(self, result):
-        self.best_params = result["best_params"]
-        self.optuna_btn.setEnabled(True)
-        self.final_btn.setEnabled(True)
-        self.progress_label.setText("✓ Optuna complete")
-        self.results_text.append(
-            f"\n[{datetime.now():%H:%M:%S}] Optuna done:\n"
-            f"  Trials: {result['n_trials']}\n"
-            f"  Best: {self.best_params}\n"
-        )
-
-    def _on_optuna_error(self, msg):
-        self.optuna_btn.setEnabled(True)
-        self.progress_label.setText("✗ Optuna failed")
-        show_error(self, "Optuna Error", msg)
-
-    def _run_final_test(self):
-        try:
-            if self.best_params is None:
-                show_error(self, "Error", "Run Optuna first")
-                return
-            prob_fn = self._create_prob_map_fn()
-
-            self.final_btn.setEnabled(False)
-            self.progress_label.setText("Running final test...")
-
-            self.final_worker = FinalEvalWorker(
-                self.test_df, prob_fn, self.best_params,
-                self.output_dir, self.train_df, self.val_df
-            )
-            self.final_worker.finished.connect(self._on_final_done)
-            self.final_worker.error.connect(self._on_final_error)
-            self.final_worker.progress.connect(lambda m: self.progress_label.setText(m))
-            self.final_worker.start()
-
-        except Exception as e:
-            log_error("Final test failed", e)
-            show_error(self, "Error", str(e))
-            self.final_btn.setEnabled(True)
-
-    def _on_final_done(self, metrics):
-        self.final_btn.setEnabled(True)
-        self.progress_label.setText("✓ Final test complete")
-        self.results_text.append(
-            f"\n[{datetime.now():%H:%M:%S}] FINAL TEST:\n"
-            f"  Accuracy: {metrics.get('accuracy', 0):.4f}\n"
-            f"  Precision: {metrics.get('precision', 0):.4f}\n"
-            f"  Recall: {metrics.get('recall', 0):.4f}\n"
-            f"  F1: {metrics.get('f1', 0):.4f}\n"
-            f"  F2: {metrics.get('f2', 0):.4f}\n"
-            f"  Output: {self.output_dir}\n"
-        )
-        show_info(self, "Complete", f"F2: {metrics.get('f2', 0):.4f}\nSaved to: {self.output_dir}")
-
-    def _on_final_error(self, msg):
-        self.final_btn.setEnabled(True)
-        self.progress_label.setText("✗ Final test failed")
-        show_error(self, "Final Test Error", msg)
-
-    def reset_state(self):
-        """Reset tuning state."""
-        self.train_df = None
-        self.val_df = None
-        self.test_df = None
-        self.best_params = None
-        self.model = None
-        self.model_adapter = None
-        self.splits_table.setRowCount(0)
-        self.results_text.clear()
-        self.optuna_btn.setEnabled(False)
-        self.final_btn.setEnabled(False)
-        self.progress_label.setText("")
-
-    def stop_workers(self):
-        if self.optuna_worker and self.optuna_worker.isRunning():
-            self.optuna_worker.stop()
-            self.optuna_worker.wait(2000)
-        if self.final_worker and self.final_worker.isRunning():
-            self.final_worker.stop()
-            self.final_worker.wait(2000)
-
-
-# ============================================================================
 # Main Window
 # ============================================================================
+
+class MainWindow(QMainWindow):
+    """Main window with tabs for visual debug and Optuna tuning."""
+
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Binary Classification Inference UI")
+        self.setMinimumSize(1000, 650)
+        
+        # Create shared model manager
+        self.model_manager = ModelManager()
+        
+        self._init_ui()
+        # Show maximized by default for best image viewing experience
+        self.showMaximized()
+
+    def _init_ui(self):
+        central = QWidget()
+        self.setCentralWidget(central)
+        layout = QVBoxLayout(central)
+
+        # Header with reset button
+        header_layout = QHBoxLayout()
+        header = QLabel("Binary Classification Inference UI")
+        header.setFont(QFont("Arial", 14, QFont.Bold))
+        header_layout.addWidget(header)
+        header_layout.addStretch()
+
+        reset_btn = QPushButton("🔄 Reset UI State")
+        reset_btn.clicked.connect(self._reset_all)
+        header_layout.addWidget(reset_btn)
+        layout.addLayout(header_layout)
+
+        # Tabs
+        self.tabs = QTabWidget()
+
+        self.visual_tab = VisualDebugTab(model_manager=self.model_manager)
+        self.tabs.addTab(self.visual_tab, "Visual Debug")
+        
+        # Add Optuna hyperparameter tuning tab with shared model manager
+        self.optuna_tab = OptunaTabWidget(model_manager=self.model_manager)
+        self.tabs.addTab(self.optuna_tab, "Optuna Tuning")
+
+        layout.addWidget(self.tabs)
+        self.statusBar().showMessage("Ready")
+
+    def _reset_all(self):
+        """Reset all state in both tabs."""
+        reply = QMessageBox.question(self, "Confirm Reset",
+                                      "Clear all loaded data and reset UI?",
+                                      QMessageBox.Yes | QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            self.visual_tab.reset_state()
+            self.optuna_tab.reset_state()
+            self.statusBar().showMessage("UI state cleared")
+
+    def closeEvent(self, event):
+        """Clean shutdown."""
+        self.visual_tab.stop_workers()
+        self.optuna_tab.stop_workers()
+        gc.collect()
+        event.accept()
+
+
+# ============================================================================
+# Main Entry Point
+# ============================================================================
+
+def main():
+    """Application entrypoint."""
+    app = QApplication(sys.argv)
+    app.setStyle('Fusion')
+
+    window = MainWindow()
+    window.show()
+
+    return app.exec_()
+
+
+if __name__ == "__main__":
+    sys.exit(main())
 
 class MainWindow(QMainWindow):
     """Main window with tabs for visual debug and dataset tuning."""
@@ -1674,9 +1324,6 @@ class MainWindow(QMainWindow):
 
         self.visual_tab = VisualDebugTab(model_manager=self.model_manager)
         self.tabs.addTab(self.visual_tab, "Visual Debug")
-
-        self.tuning_tab = DatasetTuningTab()
-        self.tabs.addTab(self.tuning_tab, "Dataset Tuning")
         
         # Add Optuna hyperparameter tuning tab with shared model manager
         self.optuna_tab = OptunaTabWidget(model_manager=self.model_manager)
@@ -1692,14 +1339,12 @@ class MainWindow(QMainWindow):
                                       QMessageBox.Yes | QMessageBox.No)
         if reply == QMessageBox.Yes:
             self.visual_tab.reset_state()
-            self.tuning_tab.reset_state()
             self.optuna_tab.reset_state()
             self.statusBar().showMessage("UI state cleared")
 
     def closeEvent(self, event):
         """Clean shutdown."""
         self.visual_tab.stop_workers()
-        self.tuning_tab.stop_workers()
         self.optuna_tab.stop_workers()
         gc.collect()
         event.accept()

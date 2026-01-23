@@ -127,7 +127,8 @@ class OptunaWorker(QThread):
                 f"area={trial.params.get('min_blob_area', 0)} "
                 f"morph={trial.params.get('morph_size', 0)} "
                 f"patch={trial.params.get('patch_size', 0)} "
-                f"patch_th={trial.params.get('patch_crack_pct_threshold', 0):.2f}]"
+                f"patch_th={trial.params.get('patch_crack_pct_threshold', 0):.2f} "
+                f"global_th={trial.params.get('global_crack_pct_threshold', 0):.2f}]"
             )
         else:
             # Fallback if trial history not available

@@ -157,6 +157,7 @@ class OptunaTuner:
                 'max_patch_crack_pct': result.max_patch_crack_pct,
                 'num_flagged_patches': result.num_flagged_patches,
                 'total_patches': result.total_patches,
+                'global_crack_pct': result.global_crack_pct,
                 'num_blobs': result.num_blobs,
                 'max_blob_area': result.max_blob_area,
                 'total_crack_pixels': result.total_crack_pixels
@@ -187,7 +188,8 @@ class OptunaTuner:
             min_blob_area=suggested['min_blob_area'],
             morph_size=suggested['morph_size'],
             patch_size=suggested['patch_size'],
-            patch_crack_pct_threshold=suggested['patch_crack_pct_threshold']
+            patch_crack_pct_threshold=suggested['patch_crack_pct_threshold'],
+            global_crack_pct_threshold=suggested['global_crack_pct_threshold']
         )
         
         # Evaluate on validation set

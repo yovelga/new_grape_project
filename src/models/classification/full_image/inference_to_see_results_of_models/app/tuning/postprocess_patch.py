@@ -29,12 +29,14 @@ class PatchClassifierParams:
         morph_size: Morphological closing kernel size (0=disabled, must be odd)
         patch_size: Square patch size in pixels (e.g., 4, 8, 16, 32, 64, 128)
         patch_crack_pct_threshold: If any patch has >= this % crack pixels, classify as CRACK
+        global_crack_pct_threshold: Global crack % threshold - if total image crack % >= this, classify as CRACK
     """
     pixel_threshold: float = 0.90
     min_blob_area: int = 100
     morph_size: int = 5
     patch_size: int = 32
     patch_crack_pct_threshold: float = 10.0  # percentage (0-100)
+    global_crack_pct_threshold: float = 1.0  # percentage (0-100)
     
     def validate(self) -> None:
         """Validate parameters."""
@@ -55,6 +57,9 @@ class PatchClassifierParams:
         
         if not 0.0 <= self.patch_crack_pct_threshold <= 100.0:
             raise ValueError(f"patch_crack_pct_threshold must be in [0, 100], got {self.patch_crack_pct_threshold}")
+        
+        if not 0.0 <= self.global_crack_pct_threshold <= 100.0:
+            raise ValueError(f"global_crack_pct_threshold must be in [0, 100], got {self.global_crack_pct_threshold}")
 
 
 @dataclass
@@ -67,6 +72,7 @@ class ClassificationResult:
         max_patch_crack_pct: Maximum crack percentage found in any patch
         num_flagged_patches: Number of patches exceeding threshold
         total_patches: Total number of patches analyzed
+        global_crack_pct: Global crack percentage of entire image
         num_blobs: Number of blobs after filtering
         max_blob_area: Area of largest blob (pixels)
         total_crack_pixels: Total crack pixels in final mask
@@ -76,6 +82,7 @@ class ClassificationResult:
     max_patch_crack_pct: float
     num_flagged_patches: int
     total_patches: int
+    global_crack_pct: float
     num_blobs: int
     max_blob_area: int
     total_crack_pixels: int
@@ -251,17 +258,20 @@ class PostprocessPatchClassifier:
         # Step 4: Patch analysis
         max_patch_crack_pct, num_flagged_patches, total_patches = self._analyze_patches(mask)
         
-        # Step 5: Image-level decision
-        predicted_label = 1 if num_flagged_patches > 0 else 0
-        
-        # Count total crack pixels
+        # Step 5: Calculate global crack percentage
         total_crack_pixels = int(np.sum(mask))
+        total_pixels = mask.shape[0] * mask.shape[1]
+        global_crack_pct = 100.0 * total_crack_pixels / total_pixels if total_pixels > 0 else 0.0
+        
+        # Step 6: Image-level decision (patch-based OR global percentage)
+        predicted_label = 1 if (num_flagged_patches > 0 or global_crack_pct >= self.params.global_crack_pct_threshold) else 0
         
         return ClassificationResult(
             predicted_label=predicted_label,
             max_patch_crack_pct=max_patch_crack_pct,
             num_flagged_patches=num_flagged_patches,
             total_patches=total_patches,
+            global_crack_pct=global_crack_pct,
             num_blobs=num_blobs,
             max_blob_area=max_blob_area,
             total_crack_pixels=total_crack_pixels,

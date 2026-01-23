@@ -125,8 +125,7 @@ class OptunaTabWidget(QWidget):
         
         # === RIGHT PANEL: Progress and Results ===
         progress_widget = QWidget()
-        progress_widget.setMinimumWidth(520)  # Min width for log panel
-        progress_widget.setMaximumWidth(820)  # Cap width on ultrawide screens
+        progress_widget.setMinimumWidth(1000)  # Wider for single-line logs
         
         progress_layout = QVBoxLayout(progress_widget)
         progress_layout.setContentsMargins(8, 8, 8, 8)
@@ -142,7 +141,7 @@ class OptunaTabWidget(QWidget):
         self.progress_text.setReadOnly(True)
         self.progress_text.setFont(QFont("Consolas", 9))
         self.progress_text.setStyleSheet("background-color: #1e1e1e; color: #d4d4d4;")
-        self.progress_text.setLineWrapMode(QTextEdit.WidgetWidth)  # Word wrap for readability
+        self.progress_text.setLineWrapMode(QTextEdit.NoWrap)  # No wrap for single-line logs
         self.progress_text.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         progress_layout.addWidget(self.progress_text, stretch=1)
         
@@ -156,9 +155,9 @@ class OptunaTabWidget(QWidget):
         splitter.addWidget(scroll_area)  # Left: controls in scroll area
         splitter.addWidget(progress_widget)  # Right: log panel
         
-        # Stretch factors: left panel dominates on ultrawide
-        splitter.setStretchFactor(0, 5)  # Left
-        splitter.setStretchFactor(1, 2)  # Right
+        # Stretch factors: give more space to right panel for wide single-line logs
+        splitter.setStretchFactor(0, 2)  # Left - less space
+        splitter.setStretchFactor(1, 5)  # Right - more space for wide logs
         
         # Restore splitter position from settings
         settings = QSettings("GrapeProject", "OptunaUI")
@@ -394,7 +393,7 @@ class OptunaTabWidget(QWidget):
         self.param_cards['patch_size'].setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         cards_layout.addWidget(self.param_cards['patch_size'], 1, 1)
         
-        # Row 2: patch_crack_pct_threshold (spans 2 columns)
+        # Row 2: patch_crack_pct_threshold, global_crack_pct_threshold
         self.param_cards['patch_crack_pct_threshold'] = FloatRangeCard(
             param_name='patch_crack_pct_threshold',
             display_name='Patch Crack % Threshold',
@@ -405,7 +404,19 @@ class OptunaTabWidget(QWidget):
         )
         self.param_cards['patch_crack_pct_threshold'].setMinimumWidth(420)
         self.param_cards['patch_crack_pct_threshold'].setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
-        cards_layout.addWidget(self.param_cards['patch_crack_pct_threshold'], 2, 0, 1, 2)
+        cards_layout.addWidget(self.param_cards['patch_crack_pct_threshold'], 2, 0)
+        
+        self.param_cards['global_crack_pct_threshold'] = FloatRangeCard(
+            param_name='global_crack_pct_threshold',
+            display_name='Global Crack % Threshold',
+            min_value=0.1,
+            max_value=10.0,
+            step=0.1,
+            decimals=1
+        )
+        self.param_cards['global_crack_pct_threshold'].setMinimumWidth(420)
+        self.param_cards['global_crack_pct_threshold'].setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        cards_layout.addWidget(self.param_cards['global_crack_pct_threshold'], 2, 1)
         
         space_layout.addWidget(cards_widget)
         
@@ -522,7 +533,7 @@ class OptunaTabWidget(QWidget):
         summary_lines = []
         summary_lines.append("{")
         
-        for param_name in ['pixel_threshold', 'min_blob_area', 'morph_size', 'patch_size', 'patch_crack_pct_threshold']:
+        for param_name in ['pixel_threshold', 'min_blob_area', 'morph_size', 'patch_size', 'patch_crack_pct_threshold', 'global_crack_pct_threshold']:
             param = self.search_space.get_param(param_name)
             if param:
                 if param.type in ['float', 'int']:

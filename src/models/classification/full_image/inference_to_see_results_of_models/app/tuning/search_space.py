@@ -117,6 +117,13 @@ class HyperparameterSearchSpace:
                 max_value=50.0,
                 description='Crack percentage threshold for patch flagging (0-100%)'
             ),
+            'global_crack_pct_threshold': HyperparameterSpec(
+                name='global_crack_pct_threshold',
+                type='float',
+                min_value=0.1,
+                max_value=10.0,
+                description='Global image crack % threshold - classify as CRACK if >= this% (0-100%)'
+            ),
         }
     
     def get_param(self, name: str) -> Optional[HyperparameterSpec]:
