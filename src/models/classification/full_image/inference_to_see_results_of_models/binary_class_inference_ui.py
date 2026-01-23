@@ -33,7 +33,8 @@ from PyQt5.QtGui import QFont
 
 from app.config.settings import settings
 from app.utils.logging import setup_logger
-from app.ui import ImageViewer
+from app.ui import ImageViewer, OptunaTabWidget
+from app.models import ModelManager
 from app.io import ENVIReader, load_rgb, get_band_by_index, find_hsi_rgb, find_canon_rgb
 from app.data.dataset import load_dataset_csv
 from app.postprocess import PostprocessPipeline, PostprocessConfig
@@ -365,10 +366,34 @@ class VisualDebugTab(QWidget):
         model_layout.setSpacing(2)
         model_layout.setContentsMargins(6, 8, 6, 6)
 
-        self.model_combo = QComboBox()
-        self.model_combo.setStyleSheet("font-size: 10px;")
-        self._refresh_models()
-        model_layout.addWidget(self.model_combo)
+        # Model selection row: Path edit + Browse + Load buttons
+        model_select_row = QHBoxLayout()
+        model_select_row.setSpacing(4)
+        self.model_path_edit = QLineEdit()
+        self.model_path_edit.setPlaceholderText("No model selected")
+        self.model_path_edit.setReadOnly(True)
+        self.model_path_edit.setStyleSheet("font-size: 10px;")
+        model_select_row.addWidget(self.model_path_edit, stretch=1)
+        
+        browse_model_btn = QPushButton("Browse...")
+        browse_model_btn.setStyleSheet("font-size: 10px;")
+        browse_model_btn.clicked.connect(self._browse_model)
+        model_select_row.addWidget(browse_model_btn)
+        
+        load_model_btn = QPushButton("Load")
+        load_model_btn.setStyleSheet("font-size: 10px; font-weight: bold;")
+        load_model_btn.clicked.connect(self._load_selected_model)
+        model_select_row.addWidget(load_model_btn)
+        
+        model_layout.addLayout(model_select_row)
+        
+        # Model status label
+        self.model_status_label = QLabel("⚠ No model loaded")
+        self.model_status_label.setStyleSheet(
+            "color: #e67e22; font-size: 9px; font-weight: bold; "
+            "padding: 3px; background-color: #fef5e7; border-radius: 3px;"
+        )
+        model_layout.addWidget(self.model_status_label)
 
         class_row = QHBoxLayout()
         class_row.setSpacing(4)
@@ -603,38 +628,67 @@ class VisualDebugTab(QWidget):
         self.target_class_combo.blockSignals(False)
 
 
-    def _refresh_models(self):
-        """Refresh model list with type and class info."""
-        self.model_combo.clear()
-        self._model_info_cache = {}  # Cache model info
-
-        if settings.models_dir.exists():
-            import joblib
-            for ext in ['.joblib', '.pkl', '.pth']:
-                for f in settings.models_dir.glob(f'*{ext}'):
-                    try:
-                        model = joblib.load(str(f))
-                        model_type = type(model).__name__
-
-                        # Determine n_classes
-                        n_classes = 2  # Default
-                        if hasattr(model, 'classes_') and model.classes_ is not None:
-                            n_classes = len(model.classes_)
-                        elif hasattr(model, 'n_classes_'):
-                            n_classes = int(model.n_classes_)
-
-                        display_name = f"{f.name} [{model_type}, {n_classes}cls]"
-                        self._model_info_cache[str(f)] = {
-                            'name': f.name, 'type': model_type, 'n_classes': n_classes
-                        }
-                        del model  # Free memory
-                    except Exception as e:
-                        display_name = f"{f.name} [?]"
-
-                    self.model_combo.addItem(display_name, str(f))
-
-        if self.model_combo.count() == 0:
-            self.model_combo.addItem("(No models found)", None)
+    def _browse_model(self):
+        """Browse for model file."""
+        default_dir = str(settings.models_dir) if settings.models_dir.exists() else str(Path.home())
+        
+        file_path, _ = QFileDialog.getOpenFileName(
+            self,
+            "Select Model File",
+            default_dir,
+            "Model Files (*.joblib *.pkl *.pth);;All Files (*.*)"
+        )
+        
+        if file_path:
+            self.model_path_edit.setText(file_path)
+    
+    def _load_selected_model(self):
+        """Load the selected model using ModelManager."""
+        model_path = self.model_path_edit.text()
+        if not model_path or model_path == "No model selected":
+            show_error(self, "Error", "Please select a model file first")
+            return
+        
+        model_path_obj = Path(model_path)
+        if not model_path_obj.exists():
+            show_error(self, "Error", f"Model file not found: {model_path}")
+            return
+        
+        try:
+            # Use parent window's model manager
+            if hasattr(self.parent(), 'model_manager'):
+                model_manager = self.parent().model_manager
+            else:
+                show_error(self, "Error", "ModelManager not available")
+                return
+            
+            # Load model
+            self.model = model_manager.load_model(model_path_obj)
+            
+            # Update target class options
+            self._set_target_class_options(self.model.n_classes)
+            
+            # Update status
+            self.model_status_label.setText(f"✓ Loaded: {model_path_obj.name}")
+            self.model_status_label.setStyleSheet(
+                "color: #27ae60; font-size: 9px; font-weight: bold; "
+                "padding: 3px; background-color: #e8f8f5; border-radius: 3px;"
+            )
+            
+            # Enable inference button if HSI is loaded
+            if self.cube is not None:
+                self.run_inference_btn.setEnabled(True)
+            
+            self.progress_label.setText(f"Model loaded: {self.model.n_classes} classes")
+            
+        except Exception as e:
+            show_error(self, "Error", f"Failed to load model: {e}")
+            log_error("Model load failed", e)
+            self.model_status_label.setText("✗ Load failed")
+            self.model_status_label.setStyleSheet(
+                "color: #e74c3c; font-size: 9px; font-weight: bold; "
+                "padding: 3px; background-color: #fadbd8; border-radius: 3px;"
+            )
 
     def _load_csv(self):
         # Default to project's data folder or DATA_DIR from settings
@@ -799,7 +853,9 @@ class VisualDebugTab(QWidget):
                     self.band_slider.setValue(num_bands // 2)
                     self._update_hsi_band()
 
-                self.run_inference_btn.setEnabled(True)
+                # Only enable inference if model is also loaded
+                if self.model is not None:
+                    self.run_inference_btn.setEnabled(True)
                 self.progress_label.setText(f"✓ Loaded: {self.cube.shape} (H,W,C) from {hdr_files[0].name}")
             else:
                 show_error(self, "Warning", f"No .hdr file found in {folder} or subdirectories")
@@ -903,17 +959,10 @@ class VisualDebugTab(QWidget):
         self.viewer_blob_hsi.viewer.clear()
         self._disable_postprocess()
 
-        model_path = self.model_combo.currentData()
-        if not model_path:
-            show_error(self, "Error", "No model selected")
+        if self.model is None:
+            show_error(self, "Error", "No model loaded. Please load a model first.")
             return
         try:
-            import joblib
-            from app.models.adapters_new import SklearnAdapter
-
-            raw_model = joblib.load(model_path)
-            self.model = SklearnAdapter(raw_model, name=Path(model_path).stem)
-            self._set_target_class_options(self.model.n_classes)
 
             from app.config.types import PreprocessConfig
             preprocess_cfg = PreprocessConfig(
@@ -922,6 +971,9 @@ class VisualDebugTab(QWidget):
                 wl_min=settings.wl_min if self.wavelengths is not None else None,
                 wl_max=settings.wl_max if self.wavelengths is not None else None
             )
+            
+            # Share model with Optuna tab via parent window
+            self._share_model_with_optuna_tab(self.model, preprocess_cfg)
 
             target_idx = int(self.target_class_combo.currentData())
             if target_idx >= self.model.n_classes:
@@ -1212,6 +1264,20 @@ class VisualDebugTab(QWidget):
         self._set_target_class_options(2)
         self.viewer_prob_hsi.label.setText("Model Result on HSI")
         gc.collect()
+    
+    def _share_model_with_optuna_tab(self, model, preprocess_cfg):
+        """Share loaded model with Optuna tab via parent window."""
+        try:
+            # Navigate to parent MainWindow
+            parent = self.parent()
+            while parent is not None:
+                if isinstance(parent, QMainWindow) and hasattr(parent, 'optuna_tab'):
+                    parent.optuna_tab.set_model_and_config(model, preprocess_cfg)
+                    error_logger.info("Model shared with Optuna tab")
+                    break
+                parent = parent.parent()
+        except Exception as e:
+            error_logger.warning(f"Could not share model with Optuna tab: {e}")
 
     def stop_workers(self):
         """Stop any running workers."""
@@ -1581,6 +1647,10 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("Binary Classification Inference UI")
         self.setMinimumSize(1000, 650)
+        
+        # Create shared model manager
+        self.model_manager = ModelManager()
+        
         self._init_ui()
         # Show maximized by default for best image viewing experience
         self.showMaximized()
@@ -1610,6 +1680,10 @@ class MainWindow(QMainWindow):
 
         self.tuning_tab = DatasetTuningTab()
         self.tabs.addTab(self.tuning_tab, "Dataset Tuning")
+        
+        # Add Optuna hyperparameter tuning tab with shared model manager
+        self.optuna_tab = OptunaTabWidget(model_manager=self.model_manager)
+        self.tabs.addTab(self.optuna_tab, "Optuna Tuning")
 
         layout.addWidget(self.tabs)
         self.statusBar().showMessage("Ready")
@@ -1622,12 +1696,14 @@ class MainWindow(QMainWindow):
         if reply == QMessageBox.Yes:
             self.visual_tab.reset_state()
             self.tuning_tab.reset_state()
+            self.optuna_tab.reset_state()
             self.statusBar().showMessage("UI state cleared")
 
     def closeEvent(self, event):
         """Clean shutdown."""
         self.visual_tab.stop_workers()
         self.tuning_tab.stop_workers()
+        self.optuna_tab.stop_workers()
         gc.collect()
         event.accept()
 
