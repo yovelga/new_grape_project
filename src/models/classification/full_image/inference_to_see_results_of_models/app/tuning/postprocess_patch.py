@@ -60,6 +60,9 @@ class PatchClassifierParams:
         
         if not 0.0 <= self.global_crack_pct_threshold <= 100.0:
             raise ValueError(f"global_crack_pct_threshold must be in [0, 100], got {self.global_crack_pct_threshold}")
+        
+        if self.patch_size < 4:
+            raise ValueError(f"patch_size must be >= 4 (smaller values cause extreme slowdown), got {self.patch_size}")
 
 
 @dataclass
@@ -212,6 +215,10 @@ class PostprocessPatchClassifier:
         num_patches_w = (w + patch_size - 1) // patch_size
         total_patches = num_patches_h * num_patches_w
         
+        # Early exit if no crack pixels at all
+        if not np.any(mask):
+            return 0.0, 0, total_patches
+        
         max_patch_crack_pct = 0.0
         num_flagged_patches = 0
         
@@ -226,10 +233,15 @@ class PostprocessPatchClassifier:
                 # Extract patch
                 patch = mask[y_start:y_end, x_start:x_end]
                 
+                # Early skip for empty patches (optimization)
+                if not np.any(patch):
+                    continue
+                
                 # Compute crack percentage
                 crack_pct = 100.0 * np.mean(patch)
                 
-                max_patch_crack_pct = max(max_patch_crack_pct, crack_pct)
+                if crack_pct > max_patch_crack_pct:
+                    max_patch_crack_pct = crack_pct
                 
                 if crack_pct >= self.params.patch_crack_pct_threshold:
                     num_flagged_patches += 1

@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, QFormLayout,
     QPushButton, QLabel, QComboBox, QSpinBox, QLineEdit, QTextEdit,
     QFileDialog, QMessageBox, QSplitter, QDoubleSpinBox, QGridLayout,
-    QScrollArea, QSizePolicy
+    QScrollArea, QSizePolicy, QMainWindow
 )
 from PyQt5.QtCore import Qt, QSettings
 from PyQt5.QtGui import QFont

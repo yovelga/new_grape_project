@@ -87,7 +87,7 @@ class HyperparameterSearchSpace:
             'pixel_threshold': HyperparameterSpec(
                 name='pixel_threshold',
                 type='float',
-                min_value=0.80,
+                min_value=0.980,
                 max_value=0.999,
                 description='Probability threshold for binarization'
             ),
@@ -95,7 +95,7 @@ class HyperparameterSearchSpace:
                 name='min_blob_area',
                 type='int',
                 min_value=1,
-                max_value=5000,
+                max_value=300,
                 description='Minimum blob area in pixels (smaller removed)'
             ),
             'morph_size': HyperparameterSpec(
@@ -107,14 +107,14 @@ class HyperparameterSearchSpace:
             'patch_size': HyperparameterSpec(
                 name='patch_size',
                 type='categorical',
-                choices=[4, 8, 16, 32, 64, 128],
+                choices=[4, 8, 16, 24, 32, 40, 48, 64, 128 ,256],
                 description='Square patch size in pixels'
             ),
             'patch_crack_pct_threshold': HyperparameterSpec(
                 name='patch_crack_pct_threshold',
                 type='float',
                 min_value=0.1,
-                max_value=50.0,
+                max_value=100.0,
                 description='Crack percentage threshold for patch flagging (0-100%)'
             ),
             'global_crack_pct_threshold': HyperparameterSpec(

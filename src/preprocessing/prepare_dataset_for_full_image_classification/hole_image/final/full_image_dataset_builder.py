@@ -3,14 +3,18 @@ Full-image dataset builder (single-file, single-config).
 
 Goal
 ----
-Generate EXACTLY 4 CSV files for full-image crack detection from a single pipeline.
-- Train/Val: Row 1
+Generate EXACTLY 5 CSV files for full-image crack detection from a single pipeline.
+- Train: Row 1
   - Positive (label=1): ONLY images from TXT file (trusted crack positives)
-  - Negative (label=0): ONLY pre-August images (before 01.08.24 - no cracks exist)
-  - Train/Val split by grape_id to prevent leakage across weeks
+  - Negative (label=0): ONLY images with week_date < 01.09.24 (STRICT constraint)
+- Val: Row 1 (two variants - EARLY and LATE)
+  - Positive grapes: ONE sample per grape (earliest/latest TXT week for that grape, label=1)
+  - Negative grapes: MULTIPLE samples per grape (N_NEGATIVE_WEEKS_PER_GRAPE weeks sampled deterministically, label=0)
+  - CRITICAL: Both val_early and val_late have SAME negative samples (same grapes, same weeks)
+  - Split by grape_id to prevent leakage between train/val
 - Test: Row 2 (two variants)
-  - EARLY: for each grape_id choose the FIRST crack week (>= cutoff). If never cracked -> fallback_week (01.08.24) label=0
-  - LATE:  for each grape_id choose the LAST  crack week (>= cutoff). If never cracked -> fallback_week (01.08.24) label=0
+  - EARLY: for each grape_id choose the FIRST crack week. If never cracked -> random week < 01.09.24, label=0
+  - LATE:  for each grape_id choose the LAST  crack week. If never cracked -> random week < 01.09.24, label=0
 
 Inputs
 ------
@@ -22,11 +26,14 @@ Inputs
 Outputs (CSV)
 -------------
 - train_row1.csv
-- val_row1.csv
+- val_row1_early.csv
+- val_row1_late.csv
 - test_row2_early.csv
 - test_row2_late.csv
 
-Each CSV contains: cluster_id (grape_id), row_id (row), date (week_date), label, image_path
+Each CSV contains: grape_id, row, week_date, label, image_path
+
+GLOBAL CONSTRAINT: All label=0 samples must have week_date < 01.09.24 (exclusive)
 """
 
 from __future__ import annotations
@@ -39,6 +46,20 @@ import sys
 import pandas as pd
 import numpy as np
 import datetime as dt
+
+
+# =========================
+# Global Constants
+# =========================
+
+# CRITICAL: All negative samples (label=0) must come from weeks BEFORE this date
+NEGATIVE_MAX_DATE_EXCLUSIVE = dt.date(2024, 9, 1)  # 01.09.24
+
+# Seed for deterministic random sampling
+RANDOM_SEED = 42
+
+# Number of negative weeks to sample per negative grape in validation sets
+N_NEGATIVE_WEEKS_PER_GRAPE = 6
 
 
 # =========================
@@ -57,12 +78,10 @@ class Config:
     base_raw_dir: str = r"C:\Users\yovel\Desktop\Grape_Project\data\raw"  # Absolute path to raw data directory
 
     # Dates
-    august_cutoff: str = "01.08.24"   # dd.mm.yy: pre-August < cutoff ; August+ >= cutoff
-    test_fallback_week: str = "01.08.24"  # used for row2 grapes with no crack
+    august_cutoff: str = "01.08.24"   # dd.mm.yy: used for identifying crack consideration period
 
     # Splits
-    val_ratio: float = 0.20
-    seed: int = 42
+    val_ratio: float = 0.3
 
     # Which vineyard rows
     trainval_row: int = 1
@@ -161,16 +180,35 @@ def build_image_path(base_dir: str, grape_id: str, week_date: str) -> str:
     return str(Path(base_dir) / grape_id / week_date)
 
 
-def train_val_split_by_cluster_id(cluster_ids: List[str], val_ratio: float, seed: int) -> Dict[str, str]:
-    """Return mapping cluster_id -> 'train'/'val'."""
-    rng = np.random.default_rng(seed)
+def train_val_split_by_cluster_id(cluster_ids: List[str], val_ratio: float) -> Tuple[List[str], List[str]]:
+    """Return (train_grapes, val_grapes) split by cluster_id."""
+    rng = np.random.default_rng(RANDOM_SEED)
     cids = np.array(sorted(set(cluster_ids)))
     rng.shuffle(cids)
 
     n_val = int(round(len(cids) * val_ratio))
-    val_set = set(cids[:n_val].tolist())
+    val_grapes = cids[:n_val].tolist()
+    train_grapes = cids[n_val:].tolist()
 
-    return {cid: ("val" if cid in val_set else "train") for cid in cids.tolist()}
+    return train_grapes, val_grapes
+
+
+def get_negative_pool_weeks(week_cols: List[str]) -> List[str]:
+    """Return weeks that are strictly before NEGATIVE_MAX_DATE_EXCLUSIVE."""
+    return [w for w in week_cols if parse_date(w) < NEGATIVE_MAX_DATE_EXCLUSIVE]
+
+
+def sample_random_week_for_grape(grape_id: str, week_pool: List[str]) -> str:
+    """Deterministically sample one week for a grape from pool."""
+    rng = np.random.default_rng(RANDOM_SEED + hash(grape_id) % (2**31))
+    return rng.choice(week_pool)
+
+
+def sample_multiple_weeks_for_grape(grape_id: str, week_pool: List[str], n: int) -> List[str]:
+    """Deterministically sample up to n weeks for a grape from pool (without replacement)."""
+    rng = np.random.default_rng(RANDOM_SEED + hash(grape_id) % (2**31))
+    available = min(n, len(week_pool))
+    return rng.choice(week_pool, size=available, replace=False).tolist()
 
 
 def save_csv(df: pd.DataFrame, out_path: Path) -> None:
@@ -183,59 +221,135 @@ def save_csv(df: pd.DataFrame, out_path: Path) -> None:
 # Builders
 # =========================
 
-def build_row1_trainval_dataset(
-    row1_grapes: List[str],
+def build_row1_train_dataset(
+    train_grapes: List[str],
     week_cols: List[str],
     crack_pairs: Set[Tuple[str, str]],
-    cutoff: str,
     base_dir: str,
 ) -> pd.DataFrame:
-    """Return row1_full dataset with ONLY pre-August negatives and TXT positives."""
-    cutoff_date = parse_date(cutoff)
-    pre_weeks = [w for w in week_cols if parse_date(w) < cutoff_date]
-
+    """Build train_row1.csv with negatives only from weeks < NEGATIVE_MAX_DATE_EXCLUSIVE."""
+    negative_weeks = get_negative_pool_weeks(week_cols)
     crack_pairs_row1 = {(gid, wk) for (gid, wk) in crack_pairs if extract_row_from_grape_id(gid) == 1}
 
-    # Build records: all pre-August negatives + ONLY crack_pairs positives (override duplicates)
     records: Dict[Tuple[str, str], dict] = {}
 
-    for gid in row1_grapes:
-        for wk in pre_weeks:
+    # Add all negatives from valid week pool
+    for gid in train_grapes:
+        for wk in negative_weeks:
             records[(gid, wk)] = {
                 "grape_id": gid,
                 "row": 1,
                 "week_date": wk,
                 "label": 0,
                 "image_path": build_image_path(base_dir, gid, wk),
-                "source": "pre_august",
             }
 
+    # Override with TXT positives (only for train grapes)
     for gid, wk in crack_pairs_row1:
-        records[(gid, wk)] = {
-            "grape_id": gid,
-            "row": 1,
-            "week_date": wk,
-            "label": 1,
-            "image_path": build_image_path(base_dir, gid, wk),
-            "source": "txt_positive",
-        }
+        if gid in train_grapes:
+            records[(gid, wk)] = {
+                "grape_id": gid,
+                "row": 1,
+                "week_date": wk,
+                "label": 1,
+                "image_path": build_image_path(base_dir, gid, wk),
+            }
 
     return pd.DataFrame(list(records.values()))
+
+
+def build_row1_val_early_late(
+    val_grapes: List[str],
+    week_cols: List[str],
+    crack_pairs: Set[Tuple[str, str]],
+    base_dir: str,
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """Build val_row1_early.csv and val_row1_late.csv.
+    
+    OPTION 3 implementation:
+    - Positives: ONE sample per grape (earliest/latest TXT week)
+    - Negatives: MULTIPLE samples per grape (N_NEGATIVE_WEEKS_PER_GRAPE weeks sampled deterministically)
+    - CRITICAL: Both early and late use the SAME negative samples (same grapes, same weeks)
+    """
+    negative_weeks = get_negative_pool_weeks(week_cols)
+    crack_pairs_row1 = {(gid, wk) for (gid, wk) in crack_pairs if extract_row_from_grape_id(gid) == 1}
+    
+    # Group crack pairs by grape_id
+    crack_by_grape: Dict[str, List[str]] = {}
+    for gid, wk in crack_pairs_row1:
+        if gid not in crack_by_grape:
+            crack_by_grape[gid] = []
+        crack_by_grape[gid].append(wk)
+    
+    # Sort weeks for each grape
+    for gid in crack_by_grape:
+        crack_by_grape[gid] = sorted(crack_by_grape[gid], key=parse_date)
+    
+    early_records = []
+    late_records = []
+    
+    # Pre-compute negative samples for ALL negative grapes (same for both early and late)
+    negative_samples: Dict[str, List[str]] = {}
+    for gid in val_grapes:
+        if gid not in crack_by_grape:
+            # Sample N_NEGATIVE_WEEKS_PER_GRAPE weeks for this negative grape
+            sampled_weeks = sample_multiple_weeks_for_grape(gid, negative_weeks, N_NEGATIVE_WEEKS_PER_GRAPE)
+            negative_samples[gid] = sampled_weeks
+    
+    # Build records
+    for gid in val_grapes:
+        if gid in crack_by_grape:
+            # Positive grape - ONE sample per grape (early = earliest, late = latest)
+            weeks = crack_by_grape[gid]
+            early_week = weeks[0]
+            late_week = weeks[-1]
+            
+            early_records.append({
+                "grape_id": gid,
+                "row": 1,
+                "week_date": early_week,
+                "label": 1,
+                "image_path": build_image_path(base_dir, gid, early_week),
+            })
+            late_records.append({
+                "grape_id": gid,
+                "row": 1,
+                "week_date": late_week,
+                "label": 1,
+                "image_path": build_image_path(base_dir, gid, late_week),
+            })
+        else:
+            # Negative grape - MULTIPLE samples (SAME for both early and late)
+            sampled_weeks = negative_samples[gid]
+            
+            for week in sampled_weeks:
+                record = {
+                    "grape_id": gid,
+                    "row": 1,
+                    "week_date": week,
+                    "label": 0,
+                    "image_path": build_image_path(base_dir, gid, week),
+                }
+                early_records.append(record.copy())
+                late_records.append(record.copy())
+    
+    return pd.DataFrame(early_records), pd.DataFrame(late_records)
 
 
 def build_row2_test_early_late(
     df_excel: pd.DataFrame,
     week_cols: List[str],
     cutoff: str,
-    fallback_week: str,
     base_dir: str,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Return (row2_test_early, row2_test_late).
 
     Aggregates duplicate grape IDs by "any cracked in that week".
+    For negatives (no crack), sample random week from negative pool < NEGATIVE_MAX_DATE_EXCLUSIVE.
     """
     cutoff_date = parse_date(cutoff)
     consider_weeks = [w for w in week_cols if parse_date(w) >= cutoff_date]
+    negative_weeks = get_negative_pool_weeks(week_cols)
 
     # Filter row2 only, normalize grape_id
     df = df_excel.copy()
@@ -246,11 +360,13 @@ def build_row2_test_early_late(
     # Aggregate duplicates by "any cracked"
     df_agg = df.groupby("grape_id")[consider_weeks].agg(lambda s: int(any(is_cracked_cell(v) for v in s))).reset_index()
 
-    def pick_week(row, mode: str) -> Tuple[str, int]:
+    def pick_week(row, mode: str, grape_id: str) -> Tuple[str, int]:
         cracked_weeks = [w for w in consider_weeks if int(row[w]) == 1]
         if cracked_weeks:
             chosen = min(cracked_weeks, key=parse_date) if mode == "early" else max(cracked_weeks, key=parse_date)
             return chosen, 1
+        # No crack - sample random week from negative pool
+        fallback_week = sample_random_week_for_grape(grape_id, negative_weeks)
         return fallback_week, 0
 
     early_records = []
@@ -258,8 +374,8 @@ def build_row2_test_early_late(
 
     for _, r in df_agg.iterrows():
         gid = r["grape_id"]
-        w_early, y_early = pick_week(r, "early")
-        w_late, y_late = pick_week(r, "late")
+        w_early, y_early = pick_week(r, "early", gid)
+        w_late, y_late = pick_week(r, "late", gid)
 
         early_records.append({
             "grape_id": gid,
@@ -267,7 +383,6 @@ def build_row2_test_early_late(
             "week_date": w_early,
             "label": y_early,
             "image_path": build_image_path(base_dir, gid, w_early),
-            "mode": "early",
         })
         late_records.append({
             "grape_id": gid,
@@ -275,7 +390,6 @@ def build_row2_test_early_late(
             "week_date": w_late,
             "label": y_late,
             "image_path": build_image_path(base_dir, gid, w_late),
-            "mode": "late",
         })
 
     df_early = pd.DataFrame(early_records).drop_duplicates(subset=["grape_id"], keep="first")
@@ -289,7 +403,11 @@ def build_row2_test_early_late(
 
 def main() -> None:
     print("=" * 80)
-    print("Full-image dataset builder - Generates EXACTLY 4 CSV files")
+    print("Full-image dataset builder - Generates EXACTLY 5 CSV files")
+    print("=" * 80)
+    print(f"NEGATIVE_MAX_DATE_EXCLUSIVE = {NEGATIVE_MAX_DATE_EXCLUSIVE.strftime('%d.%m.%y')}")
+    print(f"RANDOM_SEED = {RANDOM_SEED}")
+    print(f"N_NEGATIVE_WEEKS_PER_GRAPE = {N_NEGATIVE_WEEKS_PER_GRAPE}")
     print("=" * 80)
 
     # Read Excel
@@ -325,43 +443,43 @@ def main() -> None:
     crack_pairs = parse_crack_txt_pairs(CFG.txt_row1_crack_list_path)
     print(f"- TXT crack pairs parsed: {len(crack_pairs)}")
 
-    # Build row1 dataset
-    row1_full = build_row1_trainval_dataset(
-        row1_grapes=row1_grapes,
+    # Split row1 grapes into train/val
+    train_grapes, val_grapes = train_val_split_by_cluster_id(row1_grapes, CFG.val_ratio)
+    print(f"- Train grapes: {len(train_grapes)}")
+    print(f"- Val grapes: {len(val_grapes)}")
+
+    # Build row1 train dataset
+    row1_train = build_row1_train_dataset(
+        train_grapes=train_grapes,
         week_cols=week_cols,
         crack_pairs=crack_pairs,
-        cutoff=CFG.august_cutoff,
         base_dir=CFG.base_raw_dir,
     )
 
-    # Train/Val split by grape_id
-    split_map = train_val_split_by_cluster_id(row1_grapes, CFG.val_ratio, CFG.seed)
-    row1_full["split"] = row1_full["grape_id"].map(split_map).fillna("train")
+    # Build row1 val datasets (early and late)
+    val_early, val_late = build_row1_val_early_late(
+        val_grapes=val_grapes,
+        week_cols=week_cols,
+        crack_pairs=crack_pairs,
+        base_dir=CFG.base_raw_dir,
+    )
 
-    # Build row2 tests
+    # Build row2 test datasets
     row2_early, row2_late = build_row2_test_early_late(
         df_excel=df_excel,
         week_cols=week_cols,
         cutoff=CFG.august_cutoff,
-        fallback_week=CFG.test_fallback_week,
         base_dir=CFG.base_raw_dir,
     )
 
-    # Save outputs - EXACTLY 4 CSV files
+    # Save outputs - EXACTLY 5 CSV files
     out_dir = CFG.out_dir
     
-    # Row 1: Train and Val (drop internal columns)
-    row1_train = row1_full[row1_full["split"] == "train"].drop(columns=["split", "source"])
-    row1_val = row1_full[row1_full["split"] == "val"].drop(columns=["split", "source"])
-    
-    # Row 2: Early and Late (drop mode column)
-    row2_early_clean = row2_early.drop(columns=["mode"])
-    row2_late_clean = row2_late.drop(columns=["mode"])
-    
     save_csv(row1_train, out_dir / "train_row1.csv")
-    save_csv(row1_val, out_dir / "val_row1.csv")
-    save_csv(row2_early_clean, out_dir / "test_row2_early.csv")
-    save_csv(row2_late_clean, out_dir / "test_row2_late.csv")
+    save_csv(val_early, out_dir / "val_row1_early.csv")
+    save_csv(val_late, out_dir / "val_row1_late.csv")
+    save_csv(row2_early, out_dir / "test_row2_early.csv")
+    save_csv(row2_late, out_dir / "test_row2_late.csv")
 
     # Validation report
     print("\n" + "=" * 80)
@@ -371,23 +489,130 @@ def main() -> None:
     # Row 1 validation
     n_pos_train = len(row1_train[row1_train["label"] == 1])
     n_neg_train = len(row1_train[row1_train["label"] == 0])
-    n_pos_val = len(row1_val[row1_val["label"] == 1])
-    n_neg_val = len(row1_val[row1_val["label"] == 0])
+    n_unique_train = row1_train["grape_id"].nunique()
     
-    print(f"\nRow 1 Train: {len(row1_train)} total ({n_pos_train} positive, {n_neg_train} negative)")
-    print(f"Row 1 Val:   {len(row1_val)} total ({n_pos_val} positive, {n_neg_val} negative)")
+    n_pos_val_early = len(val_early[val_early["label"] == 1])
+    n_neg_val_early = len(val_early[val_early["label"] == 0])
+    n_unique_val_early = val_early["grape_id"].nunique()
+    
+    n_pos_val_late = len(val_late[val_late["label"] == 1])
+    n_neg_val_late = len(val_late[val_late["label"] == 0])
+    n_unique_val_late = val_late["grape_id"].nunique()
+    
+    print(f"\nRow 1 Train: {len(row1_train)} total | {n_unique_train} unique grapes | {n_pos_train} positive | {n_neg_train} negative")
+    print(f"Row 1 Val Early: {len(val_early)} total | {n_unique_val_early} unique grapes | {n_pos_val_early} positive | {n_neg_val_early} negative")
+    print(f"Row 1 Val Late:  {len(val_late)} total | {n_unique_val_late} unique grapes | {n_pos_val_late} positive | {n_neg_val_late} negative")
     
     # Row 2 validation
-    n_pos_early = len(row2_early_clean[row2_early_clean["label"] == 1])
-    n_neg_early = len(row2_early_clean[row2_early_clean["label"] == 0])
-    n_pos_late = len(row2_late_clean[row2_late_clean["label"] == 1])
-    n_neg_late = len(row2_late_clean[row2_late_clean["label"] == 0])
+    n_pos_early = len(row2_early[row2_early["label"] == 1])
+    n_neg_early = len(row2_early[row2_early["label"] == 0])
+    n_unique_early = row2_early["grape_id"].nunique()
     
-    print(f"\nRow 2 Test Early: {len(row2_early_clean)} total ({n_pos_early} positive, {n_neg_early} negative)")
-    print(f"Row 2 Test Late:  {len(row2_late_clean)} total ({n_pos_late} positive, {n_neg_late} negative)")
+    n_pos_late = len(row2_late[row2_late["label"] == 1])
+    n_neg_late = len(row2_late[row2_late["label"] == 0])
+    n_unique_late = row2_late["grape_id"].nunique()
+    
+    print(f"\nRow 2 Test Early: {len(row2_early)} total | {n_unique_early} unique grapes | {n_pos_early} positive | {n_neg_early} negative")
+    print(f"Row 2 Test Late:  {len(row2_late)} total | {n_unique_late} unique grapes | {n_pos_late} positive | {n_neg_late} negative")
+    
+    # Check no grape_id overlap between train and val
+    train_set = set(row1_train["grape_id"].unique())
+    val_early_set = set(val_early["grape_id"].unique())
+    val_late_set = set(val_late["grape_id"].unique())
+    
+    overlap_early = train_set & val_early_set
+    overlap_late = train_set & val_late_set
+    
+    print("\n" + "-" * 80)
+    print("GRAPE_ID OVERLAP CHECK")
+    print("-" * 80)
+    print(f"Train vs Val Early overlap: {len(overlap_early)} grapes")
+    print(f"Train vs Val Late overlap:  {len(overlap_late)} grapes")
+    
+    if overlap_early or overlap_late:
+        print("⚠ WARNING: Found grape_id overlap between train and val!")
+    else:
+        print("✓ No grape_id overlap between train and val sets")
+    
+    # Verify negative date constraint
+    print("\n" + "-" * 80)
+    print("NEGATIVE DATE CONSTRAINT CHECK")
+    print("-" * 80)
+    
+    all_dfs = {
+        "train_row1": row1_train,
+        "val_row1_early": val_early,
+        "val_row1_late": val_late,
+        "test_row2_early": row2_early,
+        "test_row2_late": row2_late,
+    }
+    
+    constraint_violations = False
+    for name, df in all_dfs.items():
+        negatives = df[df["label"] == 0]
+        if len(negatives) > 0:
+            invalid = negatives[negatives["week_date"].apply(lambda w: parse_date(w) >= NEGATIVE_MAX_DATE_EXCLUSIVE)]
+            if len(invalid) > 0:
+                print(f"⚠ {name}: {len(invalid)} negatives violate date constraint!")
+                constraint_violations = True
+            else:
+                print(f"✓ {name}: All {len(negatives)} negatives satisfy date constraint")
+    
+    if not constraint_violations:
+        print("✓ All negative samples satisfy week_date < 01.09.24")
+    
+    # Verify val_early and val_late have same negatives
+    print("\n" + "-" * 80)
+    print("VAL NEGATIVE CONSISTENCY CHECK")
+    print("-" * 80)
+    
+    val_early_neg = val_early[val_early["label"] == 0][["grape_id", "week_date"]].sort_values(["grape_id", "week_date"]).reset_index(drop=True)
+    val_late_neg = val_late[val_late["label"] == 0][["grape_id", "week_date"]].sort_values(["grape_id", "week_date"]).reset_index(drop=True)
+    
+    if val_early_neg.equals(val_late_neg):
+        print(f"✓ val_row1_early and val_row1_late have IDENTICAL negative samples ({len(val_early_neg)} samples)")
+    else:
+        print(f"⚠ WARNING: val_row1_early and val_row1_late have DIFFERENT negative samples!")
+        print(f"  Early negatives: {len(val_early_neg)} | Late negatives: {len(val_late_neg)}")
+    
+    # Check negative grapes consistency
+    early_neg_grapes = set(val_early_neg["grape_id"].unique())
+    late_neg_grapes = set(val_late_neg["grape_id"].unique())
+    
+    if early_neg_grapes == late_neg_grapes:
+        print(f"✓ Both val sets have same negative grapes ({len(early_neg_grapes)} grapes)")
+    else:
+        print(f"⚠ Different negative grapes: Early={len(early_neg_grapes)} vs Late={len(late_neg_grapes)}")
+    
+    # CRITICAL: Verify no image path overlap between train and val
+    print("\n" + "-" * 80)
+    print("IMAGE PATH OVERLAP CHECK (Train vs Val)")
+    print("-" * 80)
+    
+    train_image_paths = set(row1_train["image_path"].unique())
+    val_early_image_paths = set(val_early["image_path"].unique())
+    val_late_image_paths = set(val_late["image_path"].unique())
+    
+    overlap_train_early = train_image_paths & val_early_image_paths
+    overlap_train_late = train_image_paths & val_late_image_paths
+    
+    print(f"Train unique images: {len(train_image_paths)}")
+    print(f"Val Early unique images: {len(val_early_image_paths)}")
+    print(f"Val Late unique images: {len(val_late_image_paths)}")
+    print(f"Train vs Val Early overlap: {len(overlap_train_early)} images")
+    print(f"Train vs Val Late overlap: {len(overlap_train_late)} images")
+    
+    if overlap_train_early or overlap_train_late:
+        print("⚠ WARNING: Found IMAGE OVERLAP between train and val!")
+        if overlap_train_early:
+            print(f"  Overlapping paths (train vs val_early): {list(overlap_train_early)[:5]}...")
+        if overlap_train_late:
+            print(f"  Overlapping paths (train vs val_late): {list(overlap_train_late)[:5]}...")
+    else:
+        print("✓ NO IMAGE OVERLAP: Train and val use completely different images")
     
     print("\n" + "=" * 80)
-    print("✓ Successfully generated EXACTLY 4 CSV files")
+    print("✓ Successfully generated EXACTLY 5 CSV files")
     print("=" * 80)
 
 

@@ -14,6 +14,7 @@ import gc
 from pathlib import Path
 from datetime import datetime
 from typing import Optional, Callable
+import json
 
 sys.path.insert(0, str(Path(__file__).parent))
 
@@ -401,6 +402,21 @@ class VisualDebugTab(QWidget):
         self.post_status = QLabel("⚠ Run inference first")
         self.post_status.setStyleSheet("color: orange; font-size: 9px;")
         filter_layout.addWidget(self.post_status, 3, 0, 1, 4)
+        
+        # Row 4: Load Params JSON button + Parameter source indicator
+        load_json_btn = QPushButton("📂 Load Params JSON")
+        load_json_btn.setStyleSheet(
+            "font-weight: bold; padding: 4px 8px; font-size: 10px; "
+            "background-color: #9b59b6; color: white; border-radius: 3px;"
+        )
+        load_json_btn.setToolTip("Load postprocessing parameters from Optuna experiment JSON")
+        load_json_btn.clicked.connect(self._load_params_json)
+        filter_layout.addWidget(load_json_btn, 4, 0, 1, 2)
+        
+        self.param_source_label = QLabel("ℹ Manual parameters")
+        self.param_source_label.setStyleSheet("color: #666; font-size: 9px; font-style: italic;")
+        self.param_source_label.setToolTip("Shows if parameters were loaded from Optuna JSON")
+        filter_layout.addWidget(self.param_source_label, 4, 2, 1, 2)
 
         bottom_layout.addWidget(filter_group)
 
@@ -861,6 +877,121 @@ class VisualDebugTab(QWidget):
         target = self.wl_spin.value()
         idx = np.argmin(np.abs(self.wavelengths - target))
         self.band_slider.setValue(idx)
+
+    def _load_params_json(self):
+        """Load postprocessing parameters from Optuna experiment JSON for debugging."""
+        # Default to Optuna experiments folder
+        default_dir = Path("C:/Users/yovel/Desktop/Grape_Project/experiments/optuna_full_image")
+        if not default_dir.exists():
+            default_dir = Path.home()
+        
+        filepath, _ = QFileDialog.getOpenFileName(
+            self,
+            "Load Optuna Parameters JSON",
+            str(default_dir),
+            "JSON Files (*.json);;All Files (*.*)"
+        )
+        
+        if not filepath:
+            return
+        
+        try:
+            # Load JSON file
+            with open(filepath, 'r') as f:
+                data = json.load(f)
+            
+            # Expected structure: {"best_params": {...}} or direct params dict
+            if 'best_params' in data:
+                params = data['best_params']
+            elif 'params' in data:
+                params = data['params']
+            else:
+                # Assume root is params dict
+                params = data
+            
+            # Apply parameters to controls
+            loaded_params = []
+            
+            # Pixel threshold (prob_threshold is alias)
+            if 'pixel_threshold' in params or 'prob_threshold' in params:
+                thresh = params.get('pixel_threshold', params.get('prob_threshold'))
+                self.thresh_spin.setValue(thresh)
+                loaded_params.append(f"pixel_threshold={thresh:.6f}")
+            
+            # Min blob area
+            if 'min_blob_area' in params:
+                area = int(params['min_blob_area'])
+                self.min_area_spin.setValue(area)
+                loaded_params.append(f"min_blob_area={area}")
+            
+            # Morph size (morph_close_size is alias)
+            if 'morph_size' in params or 'morph_close_size' in params:
+                morph = int(params.get('morph_size', params.get('morph_close_size')))
+                self.morph_spin.setValue(morph)
+                loaded_params.append(f"morph_size={morph}")
+            
+            # Border margin (border_margin_px is alias)
+            if 'border_margin' in params or 'border_margin_px' in params:
+                border = int(params.get('border_margin', params.get('border_margin_px')))
+                self.border_margin_spin.setValue(border)
+                loaded_params.append(f"border_margin={border}")
+            
+            # Exclude border checkbox
+            if 'exclude_border' in params:
+                exclude = bool(params['exclude_border'])
+                self.exclude_border_check.setChecked(exclude)
+                loaded_params.append(f"exclude_border={exclude}")
+            
+            # Patch size
+            if 'patch_size' in params:
+                patch_size = int(params['patch_size'])
+                idx = self.patch_size_combo.findText(str(patch_size))
+                if idx >= 0:
+                    self.patch_size_combo.setCurrentIndex(idx)
+                    loaded_params.append(f"patch_size={patch_size}")
+                else:
+                    # Not in predefined list - log warning but continue
+                    error_logger.warning(f"Patch size {patch_size} not in predefined choices [4,8,16,32,64,128]")
+                    loaded_params.append(f"patch_size={patch_size} (⚠ not in choices)")
+            
+            # Patch crack percentage threshold
+            if 'patch_crack_pct_threshold' in params:
+                patch_pct = params['patch_crack_pct_threshold']
+                self.patch_thresh_spin.setValue(patch_pct)
+                loaded_params.append(f"patch_crack_pct_threshold={patch_pct:.1f}")
+            
+            # Global crack percentage threshold (info only - not a visual debug control)
+            if 'global_crack_pct_threshold' in params:
+                global_pct = params['global_crack_pct_threshold']
+                loaded_params.append(f"global_crack_pct_threshold={global_pct:.1f} (ℹ info only)")
+            
+            # Update parameter source indicator
+            self.param_source_label.setText(f"✓ Loaded: {Path(filepath).name}")
+            self.param_source_label.setStyleSheet(
+                "color: #27ae60; font-size: 9px; font-style: italic; font-weight: bold;"
+            )
+            
+            if loaded_params:
+                msg = f"Loaded {len(loaded_params)} parameters from:\n{Path(filepath).name}\n\n" + "\n".join(loaded_params)
+                show_info(self, "Parameters Loaded", msg)
+                
+                # Auto-rerun postprocess if we have results
+                if self.prob_map is not None:
+                    self._rerun_postprocess()
+            else:
+                show_error(
+                    self,
+                    "No Parameters Found",
+                    "Could not find any matching parameters in the JSON file.\n\n"
+                    "Expected keys: pixel_threshold, min_blob_area, morph_size, patch_size, etc."
+                )
+        
+        except json.JSONDecodeError as e:
+            show_error(self, "JSON Error", f"Invalid JSON file: {e}")
+            log_error("JSON decode error", e)
+        except Exception as e:
+            show_error(self, "Load Error", f"Failed to load parameters: {e}")
+            log_error("Error loading params JSON", e)
 
 
     def _run_inference(self):
