@@ -370,40 +370,50 @@ class VisualDebugTab(QWidget):
         self.morph_spin.valueChanged.connect(self._rerun_postprocess)
         filter_layout.addWidget(self.morph_spin, 0, 3)
 
-        # Row 1: Min Area + Border
+        # Row 1: Min Area + Max Area
         filter_layout.addWidget(QLabel("MinArea:"), 1, 0)
         self.min_area_spin = QSpinBox()
         self.min_area_spin.setRange(0, 10000)
         self.min_area_spin.setSingleStep(10)
         self.min_area_spin.setValue(0)
-        self.min_area_spin.valueChanged.connect(self._rerun_postprocess)
+        self.min_area_spin.valueChanged.connect(self._on_min_area_changed)
         filter_layout.addWidget(self.min_area_spin, 1, 1)
 
-        filter_layout.addWidget(QLabel("Border:"), 1, 2)
+        filter_layout.addWidget(QLabel("MaxArea:"), 1, 2)
+        self.max_area_spin = QSpinBox()
+        self.max_area_spin.setRange(0, 100000)  # 0 means no limit
+        self.max_area_spin.setSingleStep(100)
+        self.max_area_spin.setValue(0)  # 0 = disabled (no max limit)
+        self.max_area_spin.setToolTip("0 = no maximum limit. Must be > MinArea if set.")
+        self.max_area_spin.valueChanged.connect(self._on_max_area_changed)
+        filter_layout.addWidget(self.max_area_spin, 1, 3)
+
+        # Row 2: Border + Exclude border
+        filter_layout.addWidget(QLabel("Border:"), 2, 0)
         self.border_margin_spin = QSpinBox()
         self.border_margin_spin.setRange(0, 100)
         self.border_margin_spin.setValue(0)
         self.border_margin_spin.valueChanged.connect(self._rerun_postprocess)
-        filter_layout.addWidget(self.border_margin_spin, 1, 3)
+        filter_layout.addWidget(self.border_margin_spin, 2, 1)
 
-        # Row 2: Exclude border + Label
         self.exclude_border_check = QCheckBox("Exclude Border")
         self.exclude_border_check.setStyleSheet("font-size: 10px;")
         self.exclude_border_check.stateChanged.connect(self._rerun_postprocess)
-        filter_layout.addWidget(self.exclude_border_check, 2, 0, 1, 2)
+        filter_layout.addWidget(self.exclude_border_check, 2, 2, 1, 2)
 
-        filter_layout.addWidget(QLabel("Label:"), 2, 2)
+        # Row 3: Label
+        filter_layout.addWidget(QLabel("Label:"), 3, 0)
         self.label_combo = QComboBox()
         self.label_combo.addItems(["Auto", "Regular", "Crack"])
         self.label_combo.setStyleSheet("font-size: 10px;")
         self.label_combo.currentIndexChanged.connect(self._rerun_postprocess)
-        filter_layout.addWidget(self.label_combo, 2, 3)
+        filter_layout.addWidget(self.label_combo, 3, 1)
 
         self.post_status = QLabel("⚠ Run inference first")
         self.post_status.setStyleSheet("color: orange; font-size: 9px;")
-        filter_layout.addWidget(self.post_status, 3, 0, 1, 4)
+        filter_layout.addWidget(self.post_status, 4, 0, 1, 4)
         
-        # Row 4: Load Params JSON button + Parameter source indicator
+        # Row 5: Load Params JSON button + Parameter source indicator
         load_json_btn = QPushButton("📂 Load Params JSON")
         load_json_btn.setStyleSheet(
             "font-weight: bold; padding: 4px 8px; font-size: 10px; "
@@ -411,12 +421,12 @@ class VisualDebugTab(QWidget):
         )
         load_json_btn.setToolTip("Load postprocessing parameters from Optuna experiment JSON")
         load_json_btn.clicked.connect(self._load_params_json)
-        filter_layout.addWidget(load_json_btn, 4, 0, 1, 2)
+        filter_layout.addWidget(load_json_btn, 5, 0, 1, 2)
         
         self.param_source_label = QLabel("ℹ Manual parameters")
         self.param_source_label.setStyleSheet("color: #666; font-size: 9px; font-style: italic;")
         self.param_source_label.setToolTip("Shows if parameters were loaded from Optuna JSON")
-        filter_layout.addWidget(self.param_source_label, 4, 2, 1, 2)
+        filter_layout.addWidget(self.param_source_label, 5, 2, 1, 2)
 
         bottom_layout.addWidget(filter_group)
 
@@ -924,6 +934,16 @@ class VisualDebugTab(QWidget):
                 self.min_area_spin.setValue(area)
                 loaded_params.append(f"min_blob_area={area}")
             
+            # Max blob area
+            if 'max_blob_area' in params:
+                max_area = params['max_blob_area']
+                if max_area is not None:
+                    self.max_area_spin.setValue(int(max_area))
+                    loaded_params.append(f"max_blob_area={int(max_area)}")
+                else:
+                    self.max_area_spin.setValue(0)  # 0 = no limit
+                    loaded_params.append("max_blob_area=0 (no limit)")
+            
             # Morph size (morph_close_size is alias)
             if 'morph_size' in params or 'morph_close_size' in params:
                 morph = int(params.get('morph_size', params.get('morph_close_size')))
@@ -983,7 +1003,7 @@ class VisualDebugTab(QWidget):
                     self,
                     "No Parameters Found",
                     "Could not find any matching parameters in the JSON file.\n\n"
-                    "Expected keys: pixel_threshold, min_blob_area, morph_size, patch_size, etc."
+                    "Expected keys: pixel_threshold, min_blob_area, max_blob_area, morph_size, patch_size, etc."
                 )
         
         except json.JSONDecodeError as e:
@@ -1080,7 +1100,7 @@ class VisualDebugTab(QWidget):
 
     def _disable_postprocess(self):
         for w in [self.thresh_spin, self.morph_spin, self.min_area_spin,
-                  self.exclude_border_check, self.border_margin_spin,
+                  self.max_area_spin, self.exclude_border_check, self.border_margin_spin,
                   self.patch_size_combo, self.patch_thresh_spin]:
             w.setEnabled(False)
         self.post_status.setText("⚠ Run inference first")
@@ -1088,7 +1108,7 @@ class VisualDebugTab(QWidget):
 
     def _enable_postprocess(self):
         for w in [self.thresh_spin, self.morph_spin, self.min_area_spin,
-                  self.exclude_border_check, self.border_margin_spin,
+                  self.max_area_spin, self.exclude_border_check, self.border_margin_spin,
                   self.patch_size_combo, self.patch_thresh_spin]:
             w.setEnabled(True)
         self.post_status.setText("✓ Controls active")
@@ -1099,6 +1119,28 @@ class VisualDebugTab(QWidget):
         self._update_prob_visualization()
         self._rerun_postprocess()
 
+    def _on_min_area_changed(self):
+        """Handle min area change - validate against max area and rerun postprocess."""
+        min_val = self.min_area_spin.value()
+        max_val = self.max_area_spin.value()
+        
+        # If max is set (> 0) and min >= max, adjust max to be min + 100
+        if max_val > 0 and min_val >= max_val:
+            self.max_area_spin.setValue(min_val + 100)
+        
+        self._rerun_postprocess()
+
+    def _on_max_area_changed(self):
+        """Handle max area change - validate against min area and rerun postprocess."""
+        min_val = self.min_area_spin.value()
+        max_val = self.max_area_spin.value()
+        
+        # If max is set (> 0) and max <= min, adjust max to be min + 100
+        if max_val > 0 and max_val <= min_val:
+            self.max_area_spin.setValue(min_val + 100)
+        
+        self._rerun_postprocess()
+
     def _rerun_postprocess(self):
         if self.prob_map is None:
             return
@@ -1107,10 +1149,15 @@ class VisualDebugTab(QWidget):
             if morph > 0 and morph % 2 == 0:
                 morph += 1
 
+            # Get max_blob_area - 0 means no limit (None)
+            max_blob = self.max_area_spin.value()
+            max_blob_area = max_blob if max_blob > 0 else None
+
             config = PostprocessConfig(
                 prob_threshold=self.thresh_spin.value(),
                 morph_close_size=morph,
                 min_blob_area=self.min_area_spin.value(),
+                max_blob_area=max_blob_area,
                 exclude_border=self.exclude_border_check.isChecked(),
                 border_margin_px=self.border_margin_spin.value()
             )

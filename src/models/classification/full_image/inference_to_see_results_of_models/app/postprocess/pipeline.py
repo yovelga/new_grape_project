@@ -29,6 +29,8 @@ class PostprocessConfig:
         morph_close_size: Kernel size for morphological closing.
             Must be odd positive integer. 0 disables morphological closing.
         min_blob_area: Minimum blob area in pixels. Blobs smaller than this are removed.
+        max_blob_area: Maximum blob area in pixels. Blobs larger than this are removed.
+            None disables this filter. Must be > min_blob_area if set.
         exclude_border: Whether to exclude blobs touching the image border.
         border_margin_px: Extra margin from border (pixels). Only used if exclude_border=True.
         circularity_min: Minimum circularity [0, 1]. None disables filter.
@@ -42,12 +44,14 @@ class PostprocessConfig:
         ...     prob_threshold=0.5,
         ...     morph_close_size=5,
         ...     min_blob_area=100,
+        ...     max_blob_area=5000,
         ...     exclude_border=True
         ... )
     """
     prob_threshold: float = 0.5
     morph_close_size: int = 0  # 0 disables
     min_blob_area: int = 0
+    max_blob_area: Optional[int] = None  # None = no limit
     exclude_border: bool = False
     border_margin_px: int = 0
     circularity_min: Optional[float] = None
@@ -75,6 +79,16 @@ class PostprocessConfig:
             raise ValueError(
                 f"min_blob_area must be >= 0, got {self.min_blob_area}"
             )
+
+        if self.max_blob_area is not None:
+            if self.max_blob_area < 0:
+                raise ValueError(
+                    f"max_blob_area must be >= 0 (or None), got {self.max_blob_area}"
+                )
+            if self.max_blob_area <= self.min_blob_area:
+                raise ValueError(
+                    f"max_blob_area ({self.max_blob_area}) must be > min_blob_area ({self.min_blob_area})"
+                )
 
         if self.border_margin_px < 0:
             raise ValueError(
@@ -178,6 +192,7 @@ class PostprocessPipeline:
             labeled=labeled,
             features=features,
             min_area=self.config.min_blob_area,
+            max_area=self.config.max_blob_area,
             circularity_min=self.config.circularity_min,
             solidity_min=self.config.solidity_min,
             aspect_ratio_min=ar_min,
@@ -264,6 +279,7 @@ class PostprocessPipeline:
             labeled=labeled,
             features=features,
             min_area=self.config.min_blob_area,
+            max_area=self.config.max_blob_area,
             circularity_min=self.config.circularity_min,
             solidity_min=self.config.solidity_min,
             aspect_ratio_min=ar_min,

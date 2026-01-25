@@ -26,6 +26,7 @@ class PatchClassifierParams:
     Attributes:
         pixel_threshold: Probability threshold for binarization [0, 1]
         min_blob_area: Minimum blob area in pixels (blobs smaller removed)
+        max_blob_area: Maximum blob area in pixels (blobs larger removed). None = no limit.
         morph_size: Morphological closing kernel size (0=disabled, must be odd)
         patch_size: Square patch size in pixels (e.g., 4, 8, 16, 32, 64, 128)
         patch_crack_pct_threshold: If any patch has >= this % crack pixels, classify as CRACK
@@ -33,6 +34,7 @@ class PatchClassifierParams:
     """
     pixel_threshold: float = 0.90
     min_blob_area: int = 100
+    max_blob_area: Optional[int] = None  # None = no limit
     morph_size: int = 5
     patch_size: int = 32
     patch_crack_pct_threshold: float = 10.0  # percentage (0-100)
@@ -45,6 +47,12 @@ class PatchClassifierParams:
         
         if self.min_blob_area < 0:
             raise ValueError(f"min_blob_area must be >= 0, got {self.min_blob_area}")
+        
+        if self.max_blob_area is not None:
+            if self.max_blob_area < 0:
+                raise ValueError(f"max_blob_area must be >= 0 (or None), got {self.max_blob_area}")
+            if self.max_blob_area <= self.min_blob_area:
+                raise ValueError(f"max_blob_area ({self.max_blob_area}) must be > min_blob_area ({self.min_blob_area})")
         
         if self.morph_size < 0:
             raise ValueError(f"morph_size must be >= 0, got {self.morph_size}")
@@ -161,7 +169,7 @@ class PostprocessPatchClassifier:
         Returns:
             Tuple of (filtered_mask, num_blobs, max_blob_area)
         """
-        if self.params.min_blob_area == 0:
+        if self.params.min_blob_area == 0 and self.params.max_blob_area is None:
             # No filtering, just count blobs
             import cv2
             num_labels, labels = cv2.connectedComponents(mask)
@@ -178,7 +186,7 @@ class PostprocessPatchClassifier:
             
             return mask, num_blobs, max_blob_area
         
-        # Filter by area
+        # Filter by area (min and/or max)
         import cv2
         num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(mask, connectivity=8)
         
@@ -190,10 +198,17 @@ class PostprocessPatchClassifier:
         for label_id in range(1, num_labels):  # Skip background (0)
             area = stats[label_id, cv2.CC_STAT_AREA]
             
-            if area >= self.params.min_blob_area:
-                filtered_mask[labels == label_id] = 1
-                num_blobs += 1
-                max_blob_area = max(max_blob_area, area)
+            # Check min area constraint
+            if area < self.params.min_blob_area:
+                continue
+            
+            # Check max area constraint (if set)
+            if self.params.max_blob_area is not None and area > self.params.max_blob_area:
+                continue
+            
+            filtered_mask[labels == label_id] = 1
+            num_blobs += 1
+            max_blob_area = max(max_blob_area, area)
         
         return filtered_mask, num_blobs, max_blob_area
     

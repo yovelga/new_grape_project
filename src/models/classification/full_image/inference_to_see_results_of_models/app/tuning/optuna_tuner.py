@@ -37,8 +37,7 @@ class OptunaTuner:
     """
     
     def __init__(self,
-                 train_samples: List[Sample],
-                 val_samples: List[Sample],
+                 calibration_samples: List[Sample],
                  test_samples: List[Sample],
                  inference_fn: Callable[[str], np.ndarray],
                  optimize_metric: str = 'f1',
@@ -48,16 +47,14 @@ class OptunaTuner:
         Initialize Optuna tuner.
         
         Args:
-            train_samples: Training samples
-            val_samples: Validation samples
-            test_samples: Test samples
+            calibration_samples: Calibration samples (used for hyperparameter tuning)
+            test_samples: Test samples (used for final evaluation)
             inference_fn: Function that takes image path and returns prob_map (H, W) or (H, W, C)
             optimize_metric: Metric to optimize ('f1' or 'f2')
             output_dir: Directory to save results
             search_space: Hyperparameter search space (uses default if None)
         """
-        self.train_samples = train_samples
-        self.val_samples = val_samples
+        self.calibration_samples = calibration_samples
         self.test_samples = test_samples
         self.inference_fn = inference_fn
         self.optimize_metric = optimize_metric.lower()
@@ -92,8 +89,7 @@ class OptunaTuner:
         self.study: Optional[optuna.Study] = None
         
         logger.info(f"OptunaTuner initialized")
-        logger.info(f"  Train: {len(train_samples)} samples")
-        logger.info(f"  Val: {len(val_samples)} samples")
+        logger.info(f"  Calibration: {len(calibration_samples)} samples")
         logger.info(f"  Test: {len(test_samples)} samples")
         logger.info(f"  Optimize: {optimize_metric.upper()}")
         logger.info(f"  Output: {self.output_dir}")
@@ -192,25 +188,18 @@ class OptunaTuner:
             global_crack_pct_threshold=suggested['global_crack_pct_threshold']
         )
         
-        # Evaluate on validation set
-        val_result = self._evaluate_samples(self.val_samples, params)
-        val_metrics = MetricsCalculator.compute_metrics(
-            val_result['y_true'],
-            val_result['y_pred']
+        # Evaluate on calibration set (used for optimization)
+        calibration_result = self._evaluate_samples(self.calibration_samples, params)
+        calibration_metrics = MetricsCalculator.compute_metrics(
+            calibration_result['y_true'],
+            calibration_result['y_pred']
         )
         
-        # Evaluate on training set
-        train_result = self._evaluate_samples(self.train_samples, params)
-        train_metrics = MetricsCalculator.compute_metrics(
-            train_result['y_true'],
-            train_result['y_pred']
-        )
-        
-        # Get score based on optimize_metric (from validation set)
+        # Get score based on optimize_metric (from calibration set)
         if self.optimize_metric == 'f1':
-            score = val_metrics.f1_score
+            score = calibration_metrics.f1_score
         else:  # f2
-            score = val_metrics.f2_score
+            score = calibration_metrics.f2_score
         
         # Evaluate on test set every 20 trials (for monitoring only, NOT for optimization)
         test_metrics = None
@@ -222,40 +211,26 @@ class OptunaTuner:
                 test_result['y_pred']
             )
         
-        # Store comprehensive trial info with all metrics for BOTH train and val
+        # Store comprehensive trial info with calibration metrics
         trial_info = {
             'trial_number': trial.number,
             'params': suggested.copy(),
             'score': float(score),
             'metric': self.optimize_metric,
-            # Validation metrics
-            'val_accuracy': float(val_metrics.accuracy),
-            'val_balanced_accuracy': float(val_metrics.balanced_accuracy),
-            'val_precision': float(val_metrics.precision),
-            'val_recall': float(val_metrics.recall),
-            'val_f1': float(val_metrics.f1_score),
-            'val_f2': float(val_metrics.f2_score),
-            'val_specificity': float(val_metrics.specificity),
-            'val_npv': float(val_metrics.npv),
-            'val_mcc': float(val_metrics.mcc),
-            'val_TP': val_metrics.confusion_matrix.TP,
-            'val_FP': val_metrics.confusion_matrix.FP,
-            'val_TN': val_metrics.confusion_matrix.TN,
-            'val_FN': val_metrics.confusion_matrix.FN,
-            # Training metrics
-            'train_accuracy': float(train_metrics.accuracy),
-            'train_balanced_accuracy': float(train_metrics.balanced_accuracy),
-            'train_precision': float(train_metrics.precision),
-            'train_recall': float(train_metrics.recall),
-            'train_f1': float(train_metrics.f1_score),
-            'train_f2': float(train_metrics.f2_score),
-            'train_specificity': float(train_metrics.specificity),
-            'train_npv': float(train_metrics.npv),
-            'train_mcc': float(train_metrics.mcc),
-            'train_TP': train_metrics.confusion_matrix.TP,
-            'train_FP': train_metrics.confusion_matrix.FP,
-            'train_TN': train_metrics.confusion_matrix.TN,
-            'train_FN': train_metrics.confusion_matrix.FN
+            # Calibration metrics
+            'calibration_accuracy': float(calibration_metrics.accuracy),
+            'calibration_balanced_accuracy': float(calibration_metrics.balanced_accuracy),
+            'calibration_precision': float(calibration_metrics.precision),
+            'calibration_recall': float(calibration_metrics.recall),
+            'calibration_f1': float(calibration_metrics.f1_score),
+            'calibration_f2': float(calibration_metrics.f2_score),
+            'calibration_specificity': float(calibration_metrics.specificity),
+            'calibration_npv': float(calibration_metrics.npv),
+            'calibration_mcc': float(calibration_metrics.mcc),
+            'calibration_TP': calibration_metrics.confusion_matrix.TP,
+            'calibration_FP': calibration_metrics.confusion_matrix.FP,
+            'calibration_TN': calibration_metrics.confusion_matrix.TN,
+            'calibration_FN': calibration_metrics.confusion_matrix.FN
         }
         
         # Add test metrics if evaluated (every 20 trials)
@@ -275,24 +250,18 @@ class OptunaTuner:
             trial_info['test_FN'] = test_metrics.confusion_matrix.FN
         
         # Add probabilistic metrics if available
-        if val_metrics.roc_auc is not None:
-            trial_info['val_roc_auc'] = float(val_metrics.roc_auc)
-        if val_metrics.pr_auc is not None:
-            trial_info['val_pr_auc'] = float(val_metrics.pr_auc)
-        if train_metrics.roc_auc is not None:
-            trial_info['train_roc_auc'] = float(train_metrics.roc_auc)
-        if train_metrics.pr_auc is not None:
-            trial_info['train_pr_auc'] = float(train_metrics.pr_auc)
+        if calibration_metrics.roc_auc is not None:
+            trial_info['calibration_roc_auc'] = float(calibration_metrics.roc_auc)
+        if calibration_metrics.pr_auc is not None:
+            trial_info['calibration_pr_auc'] = float(calibration_metrics.pr_auc)
         
         self.trial_history.append(trial_info)
         
-        # Single-line logging with train+val metrics and parameters
+        # Single-line logging with calibration metrics and parameters
         log_msg = (
             f"Trial {trial.number}: {self.optimize_metric.upper()}={score:.4f} | "
-            f"VAL[Acc={val_metrics.accuracy:.3f} P={val_metrics.precision:.3f} R={val_metrics.recall:.3f} "
-            f"F1={val_metrics.f1_score:.3f} F2={val_metrics.f2_score:.3f}] | "
-            f"TRAIN[Acc={train_metrics.accuracy:.3f} P={train_metrics.precision:.3f} R={train_metrics.recall:.3f} "
-            f"F1={train_metrics.f1_score:.3f} F2={train_metrics.f2_score:.3f}] | "
+            f"CAL[Acc={calibration_metrics.accuracy:.3f} P={calibration_metrics.precision:.3f} R={calibration_metrics.recall:.3f} "
+            f"F1={calibration_metrics.f1_score:.3f} F2={calibration_metrics.f2_score:.3f}] | "
             f"PARAMS[pxl_th={suggested['pixel_threshold']:.4f} area={suggested['min_blob_area']} "
             f"morph={suggested['morph_size']} patch={suggested['patch_size']} "
             f"patch_th={suggested['patch_crack_pct_threshold']:.2f}]"
@@ -392,8 +361,7 @@ class OptunaTuner:
         # Evaluate each split
         all_predictions = {}
         
-        for split_name, samples in [('train', self.train_samples),
-                                     ('val', self.val_samples),
+        for split_name, samples in [('calibration', self.calibration_samples),
                                      ('test', self.test_samples)]:
             logger.info(f"Evaluating {split_name} split ({len(samples)} samples)...")
             

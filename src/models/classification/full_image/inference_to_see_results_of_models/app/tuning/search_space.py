@@ -87,7 +87,7 @@ class HyperparameterSearchSpace:
             'pixel_threshold': HyperparameterSpec(
                 name='pixel_threshold',
                 type='float',
-                min_value=0.980,
+                min_value=0.970,
                 max_value=0.999,
                 description='Probability threshold for binarization'
             ),
@@ -98,10 +98,17 @@ class HyperparameterSearchSpace:
                 max_value=300,
                 description='Minimum blob area in pixels (smaller removed)'
             ),
+            'max_blob_area': HyperparameterSpec(
+                name='max_blob_area',
+                type='int',
+                min_value=301,
+                max_value=5000,
+                description='Maximum blob area in pixels (larger removed). Must be > min_blob_area'
+            ),
             'morph_size': HyperparameterSpec(
                 name='morph_size',
                 type='categorical',
-                choices=[0, 3, 5, 7, 9, 11, 13, 15],
+                choices=[0, 3, 5, 7, 9, 11, 13],
                 description='Morphological closing kernel size (0=disabled, must be odd)'
             ),
             'patch_size': HyperparameterSpec(

@@ -39,8 +39,7 @@ class OptunaWorker(QThread):
     final_results = pyqtSignal(str)  # report_str
     
     def __init__(self,
-                 train_samples: List[Sample],
-                 val_samples: List[Sample],
+                 calibration_samples: List[Sample],
                  test_samples: List[Sample],
                  inference_fn: Callable[[str], np.ndarray],
                  optimize_metric: str = 'f1',
@@ -54,9 +53,8 @@ class OptunaWorker(QThread):
         Initialize Optuna worker.
         
         Args:
-            train_samples: Training samples
-            val_samples: Validation samples
-            test_samples: Test samples
+            calibration_samples: Calibration samples (used for hyperparameter tuning)
+            test_samples: Test samples (used for final evaluation)
             inference_fn: Function that takes image path and returns prob_map
             optimize_metric: Metric to optimize ('f1' or 'f2')
             n_trials: Number of trials to run
@@ -68,8 +66,7 @@ class OptunaWorker(QThread):
         """
         super().__init__()
         
-        self.train_samples = train_samples
-        self.val_samples = val_samples
+        self.calibration_samples = calibration_samples
         self.test_samples = test_samples
         self.inference_fn = inference_fn
         self.optimize_metric = optimize_metric
@@ -112,19 +109,17 @@ class OptunaWorker(QThread):
         if self.tuner and len(self.tuner.trial_history) > 0:
             trial_info = self.tuner.trial_history[-1]  # Latest trial
             
-            # Build single-line compact message with train+val metrics and parameters
+            # Build single-line compact message with calibration metrics and parameters
             msg = (
                 f"T{trial.number + 1}/{self.n_trials}: {self.optimize_metric.upper()}={trial.value:.4f} (Best={study.best_value:.4f}@T{study.best_trial.number + 1}) | "
-                f"VAL[Acc={trial_info.get('val_accuracy', 0):.3f} P={trial_info.get('val_precision', 0):.3f} "
-                f"R={trial_info.get('val_recall', 0):.3f} F1={trial_info.get('val_f1', 0):.3f} "
-                f"F2={trial_info.get('val_f2', 0):.3f} MCC={trial_info.get('val_mcc', 0):.3f} "
-                f"TP={trial_info.get('val_TP', 0)} FP={trial_info.get('val_FP', 0)} "
-                f"FN={trial_info.get('val_FN', 0)} TN={trial_info.get('val_TN', 0)}] | "
-                f"TRAIN[Acc={trial_info.get('train_accuracy', 0):.3f} P={trial_info.get('train_precision', 0):.3f} "
-                f"R={trial_info.get('train_recall', 0):.3f} F1={trial_info.get('train_f1', 0):.3f} "
-                f"F2={trial_info.get('train_f2', 0):.3f} MCC={trial_info.get('train_mcc', 0):.3f}] | "
+                f"CAL[Acc={trial_info.get('calibration_accuracy', 0):.3f} P={trial_info.get('calibration_precision', 0):.3f} "
+                f"R={trial_info.get('calibration_recall', 0):.3f} F1={trial_info.get('calibration_f1', 0):.3f} "
+                f"F2={trial_info.get('calibration_f2', 0):.3f} MCC={trial_info.get('calibration_mcc', 0):.3f} "
+                f"TP={trial_info.get('calibration_TP', 0)} FP={trial_info.get('calibration_FP', 0)} "
+                f"FN={trial_info.get('calibration_FN', 0)} TN={trial_info.get('calibration_TN', 0)}] | "
                 f"PARAMS[pxl_th={trial.params.get('pixel_threshold', 0):.4f} "
-                f"area={trial.params.get('min_blob_area', 0)} "
+                f"min_area={trial.params.get('min_blob_area', 0)} "
+                f"max_area={trial.params.get('max_blob_area', 'None')} "
                 f"morph={trial.params.get('morph_size', 0)} "
                 f"patch={trial.params.get('patch_size', 0)} "
                 f"patch_th={trial.params.get('patch_crack_pct_threshold', 0):.2f} "
@@ -154,8 +149,7 @@ class OptunaWorker(QThread):
         try:
             # Emit start message
             self.progress_update.emit(f"Initializing Optuna tuner...")
-            self.progress_update.emit(f"Train: {len(self.train_samples)} samples")
-            self.progress_update.emit(f"Val: {len(self.val_samples)} samples")
+            self.progress_update.emit(f"Calibration: {len(self.calibration_samples)} samples")
             self.progress_update.emit(f"Test: {len(self.test_samples)} samples")
             self.progress_update.emit(f"Optimizing: {self.optimize_metric.upper()}")
             self.progress_update.emit(f"Trials: {self.n_trials}")
@@ -163,8 +157,7 @@ class OptunaWorker(QThread):
             
             # Create tuner
             self.tuner = OptunaTuner(
-                train_samples=self.train_samples,
-                val_samples=self.val_samples,
+                calibration_samples=self.calibration_samples,
                 test_samples=self.test_samples,
                 inference_fn=self.inference_fn,
                 optimize_metric=self.optimize_metric,
@@ -174,10 +167,10 @@ class OptunaWorker(QThread):
             
             # Pre-cache all probability maps
             self.progress_update.emit("Pre-caching inference results...")
-            total_samples = len(self.train_samples) + len(self.val_samples) + len(self.test_samples)
+            total_samples = len(self.calibration_samples) + len(self.test_samples)
             cached = 0
             
-            for samples in [self.train_samples, self.val_samples, self.test_samples]:
+            for samples in [self.calibration_samples, self.test_samples]:
                 for sample in samples:
                     if self._stop_requested:
                         self.progress_update.emit("Caching interrupted by stop request")

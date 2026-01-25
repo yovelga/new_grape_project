@@ -62,12 +62,10 @@ class OptunaTabWidget(QWidget):
         self.model_manager = model_manager
         
         # State
-        self.train_loader: Optional[DatasetCSVLoader] = None
-        self.val_loader: Optional[DatasetCSVLoader] = None
+        self.calibration_loader: Optional[DatasetCSVLoader] = None
         self.test_loader: Optional[DatasetCSVLoader] = None
         
-        self.train_samples: List[Sample] = []
-        self.val_samples: List[Sample] = []
+        self.calibration_samples: List[Sample] = []
         self.test_samples: List[Sample] = []
         
         self.worker: Optional[OptunaWorker] = None
@@ -242,27 +240,16 @@ class OptunaTabWidget(QWidget):
         dataset_layout.setContentsMargins(8, 10, 8, 8)
         dataset_layout.setSpacing(6)
         
-        # TRAIN CSV
-        train_row = QHBoxLayout()
-        self.train_path_edit = QLineEdit()
-        self.train_path_edit.setPlaceholderText("No file selected")
-        self.train_path_edit.setReadOnly(True)
-        train_row.addWidget(self.train_path_edit, stretch=1)
-        train_browse_btn = QPushButton("Browse...")
-        train_browse_btn.clicked.connect(lambda: self._browse_csv('train'))
-        train_row.addWidget(train_browse_btn)
-        dataset_layout.addRow("TRAIN CSV:", train_row)
-        
-        # VAL CSV
-        val_row = QHBoxLayout()
-        self.val_path_edit = QLineEdit()
-        self.val_path_edit.setPlaceholderText("No file selected")
-        self.val_path_edit.setReadOnly(True)
-        val_row.addWidget(self.val_path_edit, stretch=1)
-        val_browse_btn = QPushButton("Browse...")
-        val_browse_btn.clicked.connect(lambda: self._browse_csv('val'))
-        val_row.addWidget(val_browse_btn)
-        dataset_layout.addRow("VAL CSV:", val_row)
+        # CALIBRATION CSV (used for hyperparameter tuning)
+        calibration_row = QHBoxLayout()
+        self.calibration_path_edit = QLineEdit()
+        self.calibration_path_edit.setPlaceholderText("No file selected")
+        self.calibration_path_edit.setReadOnly(True)
+        calibration_row.addWidget(self.calibration_path_edit, stretch=1)
+        calibration_browse_btn = QPushButton("Browse...")
+        calibration_browse_btn.clicked.connect(lambda: self._browse_csv('calibration'))
+        calibration_row.addWidget(calibration_browse_btn)
+        dataset_layout.addRow("CALIBRATION CSV:", calibration_row)
         
         # TEST CSV
         test_row = QHBoxLayout()
@@ -354,10 +341,10 @@ class OptunaTabWidget(QWidget):
         self.param_cards['pixel_threshold'] = FloatRangeCard(
             param_name='pixel_threshold',
             display_name='Pixel Threshold',
-            min_value=0.80,
+            min_value=0.970,
             max_value=0.999,
             step=0.001,
-            decimals=3
+            decimals=5
         )
         self.param_cards['pixel_threshold'].setMinimumWidth(420)
         self.param_cards['pixel_threshold'].setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
@@ -367,56 +354,69 @@ class OptunaTabWidget(QWidget):
             param_name='min_blob_area',
             display_name='Min Blob Area',
             min_value=1,
-            max_value=5000,
+            max_value=300,
             step=1
         )
         self.param_cards['min_blob_area'].setMinimumWidth(420)
         self.param_cards['min_blob_area'].setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         cards_layout.addWidget(self.param_cards['min_blob_area'], 0, 1)
         
-        # Row 1: morph_size, patch_size
+        # Row 1: max_blob_area, morph_size
+        self.param_cards['max_blob_area'] = IntRangeCard(
+            param_name='max_blob_area',
+            display_name='Max Blob Area',
+            min_value=301,
+            max_value=5000,
+            step=100
+        )
+        self.param_cards['max_blob_area'].setMinimumWidth(420)
+        self.param_cards['max_blob_area'].setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        cards_layout.addWidget(self.param_cards['max_blob_area'], 1, 0)
+        
         self.param_cards['morph_size'] = CategoricalCard(
             param_name='morph_size',
             display_name='Morphological Size',
-            choices=[0, 3, 5, 7, 9, 11, 13, 15]
+            choices=[0, 3, 5, 7, 9, 11]
         )
         self.param_cards['morph_size'].setMinimumWidth(420)
         self.param_cards['morph_size'].setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
-        cards_layout.addWidget(self.param_cards['morph_size'], 1, 0)
+        cards_layout.addWidget(self.param_cards['morph_size'], 1, 1)
         
+        # Row 2: patch_size, patch_crack_pct_threshold
         self.param_cards['patch_size'] = CategoricalCard(
             param_name='patch_size',
             display_name='Patch Size',
-            choices=[4, 8, 16, 32, 64, 128]
+            choices=[4, 8, 16, 24, 32, 40, 48, 64, 128 ,256]
+            
         )
         self.param_cards['patch_size'].setMinimumWidth(420)
         self.param_cards['patch_size'].setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
-        cards_layout.addWidget(self.param_cards['patch_size'], 1, 1)
+        cards_layout.addWidget(self.param_cards['patch_size'], 2, 0)
         
-        # Row 2: patch_crack_pct_threshold, global_crack_pct_threshold
         self.param_cards['patch_crack_pct_threshold'] = FloatRangeCard(
             param_name='patch_crack_pct_threshold',
             display_name='Patch Crack % Threshold',
             min_value=0.1,
-            max_value=50.0,
+            max_value=100.0,
             step=0.5,
             decimals=1
         )
         self.param_cards['patch_crack_pct_threshold'].setMinimumWidth(420)
         self.param_cards['patch_crack_pct_threshold'].setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
-        cards_layout.addWidget(self.param_cards['patch_crack_pct_threshold'], 2, 0)
+        cards_layout.addWidget(self.param_cards['patch_crack_pct_threshold'], 2, 1)
         
+        # Row 3: global_crack_pct_threshold
         self.param_cards['global_crack_pct_threshold'] = FloatRangeCard(
             param_name='global_crack_pct_threshold',
             display_name='Global Crack % Threshold',
             min_value=0.1,
-            max_value=10.0,
+            max_value=5.0,
             step=0.1,
             decimals=1
         )
         self.param_cards['global_crack_pct_threshold'].setMinimumWidth(420)
         self.param_cards['global_crack_pct_threshold'].setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
-        cards_layout.addWidget(self.param_cards['global_crack_pct_threshold'], 2, 1)
+        cards_layout.addWidget(self.param_cards['global_crack_pct_threshold'], 3, 0)
         
         space_layout.addWidget(cards_widget)
         
@@ -490,6 +490,16 @@ class OptunaTabWidget(QWidget):
             if not is_valid:
                 errors.append(f"{param_name}: {error_msg}")
         
+        # Validate that max_blob_area range is greater than min_blob_area range
+        if 'min_blob_area' in self.param_cards and 'max_blob_area' in self.param_cards:
+            min_spec = self.param_cards['min_blob_area'].get_spec()
+            max_spec = self.param_cards['max_blob_area'].get_spec()
+            # The minimum of max_blob_area range should be > maximum of min_blob_area range
+            if max_spec['min_value'] <= min_spec['max_value']:
+                errors.append(
+                    f"max_blob_area min ({max_spec['min_value']}) must be > min_blob_area max ({min_spec['max_value']})"
+                )
+        
         if errors:
             QMessageBox.warning(
                 self, 
@@ -533,7 +543,7 @@ class OptunaTabWidget(QWidget):
         summary_lines = []
         summary_lines.append("{")
         
-        for param_name in ['pixel_threshold', 'min_blob_area', 'morph_size', 'patch_size', 'patch_crack_pct_threshold', 'global_crack_pct_threshold']:
+        for param_name in ['pixel_threshold', 'min_blob_area', 'max_blob_area', 'morph_size', 'patch_size', 'patch_crack_pct_threshold', 'global_crack_pct_threshold']:
             param = self.search_space.get_param(param_name)
             if param:
                 if param.type in ['float', 'int']:
@@ -770,7 +780,7 @@ class OptunaTabWidget(QWidget):
         
         # Check all prerequisites
         has_model = self.model_manager.is_loaded()
-        has_datasets = (self.train_samples and self.val_samples and self.test_samples)
+        has_datasets = (self.calibration_samples and self.test_samples)
         
         # Ensure ready is strictly boolean
         ready = bool(has_model and has_datasets)
@@ -790,7 +800,7 @@ class OptunaTabWidget(QWidget):
         if not has_model:
             self.start_btn.setToolTip("Please load a model first")
         elif not has_datasets:
-            self.start_btn.setToolTip("Please load and map all three datasets")
+            self.start_btn.setToolTip("Please load and map calibration and test datasets")
         else:
             self.start_btn.setToolTip("Start Optuna hyperparameter tuning")
     
@@ -818,12 +828,9 @@ class OptunaTabWidget(QWidget):
             loader.load_csv(filepath)
             
             # Store loader
-            if split == 'train':
-                self.train_loader = loader
-                self.train_path_edit.setText(filepath)
-            elif split == 'val':
-                self.val_loader = loader
-                self.val_path_edit.setText(filepath)
+            if split == 'calibration':
+                self.calibration_loader = loader
+                self.calibration_path_edit.setText(filepath)
             else:  # test
                 self.test_loader = loader
                 self.test_path_edit.setText(filepath)
@@ -883,8 +890,7 @@ class OptunaTabWidget(QWidget):
         
         try:
             # Apply to all loaded datasets
-            for split, loader in [('train', self.train_loader), 
-                                  ('val', self.val_loader), 
+            for split, loader in [('calibration', self.calibration_loader), 
                                   ('test', self.test_loader)]:
                 if loader is not None:
                     loader.set_column_mapping(label_col, path_col, id_col)
@@ -892,10 +898,8 @@ class OptunaTabWidget(QWidget):
                     # Convert to samples
                     samples = loader.to_samples()
                     
-                    if split == 'train':
-                        self.train_samples = samples
-                    elif split == 'val':
-                        self.val_samples = samples
+                    if split == 'calibration':
+                        self.calibration_samples = samples
                     else:
                         self.test_samples = samples
                     
@@ -913,13 +917,9 @@ class OptunaTabWidget(QWidget):
         """Update dataset summary label."""
         parts = []
         
-        if self.train_samples:
-            crack = sum(1 for s in self.train_samples if s.label == 1)
-            parts.append(f"TRAIN: {len(self.train_samples)} ({crack} CRACK)")
-        
-        if self.val_samples:
-            crack = sum(1 for s in self.val_samples if s.label == 1)
-            parts.append(f"VAL: {len(self.val_samples)} ({crack} CRACK)")
+        if self.calibration_samples:
+            crack = sum(1 for s in self.calibration_samples if s.label == 1)
+            parts.append(f"CALIBRATION: {len(self.calibration_samples)} ({crack} CRACK)")
         
         if self.test_samples:
             crack = sum(1 for s in self.test_samples if s.label == 1)
@@ -938,7 +938,7 @@ class OptunaTabWidget(QWidget):
             self._log("⚠ ERROR: No model loaded")
             return
         
-        if not self.train_samples or not self.val_samples or not self.test_samples:
+        if not self.calibration_samples or not self.test_samples:
             self._log("⚠ ERROR: Missing datasets")
             return
         
@@ -979,8 +979,7 @@ class OptunaTabWidget(QWidget):
         
         # Create and start worker
         self.worker = OptunaWorker(
-            train_samples=self.train_samples,
-            val_samples=self.val_samples,
+            calibration_samples=self.calibration_samples,
             test_samples=self.test_samples,
             inference_fn=inference_fn,
             optimize_metric=optimize_metric,
@@ -1061,15 +1060,12 @@ class OptunaTabWidget(QWidget):
             self.worker.request_stop()
             self.worker.wait()
         
-        self.train_loader = None
-        self.val_loader = None
+        self.calibration_loader = None
         self.test_loader = None
-        self.train_samples = []
-        self.val_samples = []
+        self.calibration_samples = []
         self.test_samples = []
         
-        self.train_path_edit.clear()
-        self.val_path_edit.clear()
+        self.calibration_path_edit.clear()
         self.test_path_edit.clear()
         self.progress_text.clear()
         
