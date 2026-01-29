@@ -191,7 +191,7 @@ DATASET_CONFIGS = {
 
 # Experiment output directory
 TIMESTAMP = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-EXPERIMENT_DIR = Path(rf"C:\Users\yovel\Desktop\Grape_Project\experiments\unified_experiment_{TIMESTAMP}")
+EXPERIMENT_DIR = Path(rf"C:\Users\yovel\Desktop\Grape_Project\experiments\unified_experiment_PR_AUC_{TIMESTAMP}")
 
 
 # ==================== HELPER FUNCTIONS ====================
