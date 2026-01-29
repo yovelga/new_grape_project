@@ -182,6 +182,7 @@ class OptunaTuner:
         params = PatchClassifierParams(
             pixel_threshold=suggested['pixel_threshold'],
             min_blob_area=suggested['min_blob_area'],
+            max_blob_area=suggested.get('max_blob_area'),  # Can be None if not in search space
             morph_size=suggested['morph_size'],
             patch_size=suggested['patch_size'],
             patch_crack_pct_threshold=suggested['patch_crack_pct_threshold'],

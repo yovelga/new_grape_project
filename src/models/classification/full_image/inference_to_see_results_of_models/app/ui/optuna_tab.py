@@ -343,8 +343,8 @@ class OptunaTabWidget(QWidget):
             display_name='Pixel Threshold',
             min_value=0.970,
             max_value=0.999,
-            step=0.001,
-            decimals=5
+            step=0.005,
+            decimals=3
         )
         self.param_cards['pixel_threshold'].setMinimumWidth(420)
         self.param_cards['pixel_threshold'].setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
@@ -366,7 +366,7 @@ class OptunaTabWidget(QWidget):
             param_name='max_blob_area',
             display_name='Max Blob Area',
             min_value=301,
-            max_value=5000,
+            max_value=9000,
             step=100
         )
         self.param_cards['max_blob_area'].setMinimumWidth(420)
@@ -386,8 +386,7 @@ class OptunaTabWidget(QWidget):
         self.param_cards['patch_size'] = CategoricalCard(
             param_name='patch_size',
             display_name='Patch Size',
-            choices=[4, 8, 16, 24, 32, 40, 48, 64, 128 ,256]
-            
+            choices=[4, 8, 16, 24, 32, 40, 48, 64]
         )
         self.param_cards['patch_size'].setMinimumWidth(420)
         self.param_cards['patch_size'].setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)

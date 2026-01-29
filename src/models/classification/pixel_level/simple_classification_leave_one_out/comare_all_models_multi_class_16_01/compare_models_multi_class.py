@@ -16,6 +16,7 @@ Outputs:
 - Split manifest for reproducibility verification
 """
 
+import sys
 import time
 import warnings
 import re
@@ -27,6 +28,10 @@ from tqdm import tqdm
 from typing import List, Dict, Tuple, Optional, Union, Any, NamedTuple
 from dataclasses import dataclass
 import matplotlib.pyplot as plt
+
+_PROJECT_ROOT = Path(__file__).resolve().parents[6]  # Navigate up to Grape_Project
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
 
 from sklearn.model_selection import LeaveOneGroupOut, GroupShuffleSplit
 from sklearn.metrics import (

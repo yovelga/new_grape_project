@@ -102,7 +102,7 @@ class HyperparameterSearchSpace:
                 name='max_blob_area',
                 type='int',
                 min_value=301,
-                max_value=5000,
+                max_value=9000,
                 description='Maximum blob area in pixels (larger removed). Must be > min_blob_area'
             ),
             'morph_size': HyperparameterSpec(
@@ -114,7 +114,7 @@ class HyperparameterSearchSpace:
             'patch_size': HyperparameterSpec(
                 name='patch_size',
                 type='categorical',
-                choices=[4, 8, 16, 24, 32, 40, 48, 64, 128 ,256],
+                choices=[4, 8, 16, 24, 32, 40, 48, 64],
                 description='Square patch size in pixels'
             ),
             'patch_crack_pct_threshold': HyperparameterSpec(
@@ -128,7 +128,7 @@ class HyperparameterSearchSpace:
                 name='global_crack_pct_threshold',
                 type='float',
                 min_value=0.1,
-                max_value=10.0,
+                max_value=5.0,
                 description='Global image crack % threshold - classify as CRACK if >= this% (0-100%)'
             ),
         }
