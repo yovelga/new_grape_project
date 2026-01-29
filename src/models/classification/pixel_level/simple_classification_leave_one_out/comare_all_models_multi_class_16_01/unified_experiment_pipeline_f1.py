@@ -106,14 +106,15 @@ class ExperimentConfig:
     """
     Global experiment configuration.
     
-    OPTIMIZATION STRATEGY: Maximize CRACK ROC-AUC
+    OPTIMIZATION STRATEGY: Maximize Accuracy (ROC-AUC)
     
-    This pipeline optimizes for ROC-AUC performance:
+    This pipeline trains models without class weighting to optimize for overall
+    accuracy. This naturally tends to produce better ROC-AUC scores:
     
-    1. class_weight='balanced' for Logistic Regression, SVM, Random Forest
-    2. sample_weight computed for XGBoost training
-    3. eval_metric='auc' for XGBoost (ROC-AUC)
-    4. Focus on CRACK ROC-AUC as primary metric in reporting
+    1. No class_weight - standard training for accuracy
+    2. No sample_weight for XGBoost - uniform sample importance
+    3. eval_metric='auc' for XGBoost early stopping
+    4. Reports both ROC-AUC and PR-AUC for comparison
     """
     # Dry-run / sanity mode: Set to None for full dataset
     max_samples: Optional[int] = None  # Set to None for full dataset run
@@ -191,7 +192,7 @@ DATASET_CONFIGS = {
 
 # Experiment output directory
 TIMESTAMP = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-EXPERIMENT_DIR = Path(rf"C:\Users\yovel\Desktop\Grape_Project\experiments\unified_experiment_ROC_AUC_{TIMESTAMP}")
+EXPERIMENT_DIR = Path(rf"C:\Users\yovel\Desktop\Grape_Project\experiments\unified_experiment_F1_{TIMESTAMP}")
 
 
 # ==================== HELPER FUNCTIONS ====================
@@ -341,17 +342,17 @@ class PLSDAAdaptive(BaseEstimator, ClassifierMixin):
 
 def get_all_models(config: ExperimentConfig, n_classes: int = 2, crack_class_idx: int = 1) -> List[Tuple[str, Any, bool]]:
     """
-    Get all models for evaluation, optimized for CRACK ROC-AUC.
+    Get all models for evaluation, optimized for Accuracy/ROC-AUC.
     
-    All models that support class_weight use 'balanced' to handle imbalanced data.
-    This helps maximize Precision-Recall performance for the minority CRACK class.
+    Models are trained WITHOUT class_weight to optimize for overall accuracy.
+    This produces better ROC-AUC compared to class-weighted training.
     
     Returns:
         List of (model_name, model_instance, supports_internal_njobs) tuples.
     """
     models = []
     
-    # Logistic Regression (L1) - with class_weight='balanced' for CRACK focus
+    # Logistic Regression (L1) - NO class_weight for accuracy optimization
     if config.models_to_train.get("Logistic Regression (L1)", True):
         models.append((
             "Logistic Regression (L1)",
@@ -362,7 +363,7 @@ def get_all_models(config: ExperimentConfig, n_classes: int = 2, crack_class_idx
                     solver="saga",
                     max_iter=500,
                     tol=1e-3,
-                    class_weight='balanced',  # Focus on minority class (CRACK)
+                    # No class_weight - optimize for accuracy/ROC-AUC
                     n_jobs=config.n_jobs,
                     random_state=config.random_state
                 ))
@@ -370,7 +371,7 @@ def get_all_models(config: ExperimentConfig, n_classes: int = 2, crack_class_idx
             True  # supports n_jobs
         ))
     
-    # SVM (RBF) - with class_weight='balanced' for CRACK focus
+    # SVM (RBF) - NO class_weight for accuracy optimization
     if config.models_to_train.get("SVM (RBF)", True):
         models.append((
             "SVM (RBF)",
@@ -380,14 +381,14 @@ def get_all_models(config: ExperimentConfig, n_classes: int = 2, crack_class_idx
                     kernel="rbf",
                     C=1,
                     probability=True,
-                    class_weight='balanced',  # Focus on minority class (CRACK)
+                    # No class_weight - optimize for accuracy/ROC-AUC
                     random_state=config.random_state
                 ))
             ]),
             False  # no n_jobs support
         ))
     
-    # Random Forest - with class_weight='balanced' for CRACK focus
+    # Random Forest - NO class_weight for accuracy optimization
     if config.models_to_train.get("Random Forest", True):
         models.append((
             "Random Forest",
@@ -396,7 +397,7 @@ def get_all_models(config: ExperimentConfig, n_classes: int = 2, crack_class_idx
                 ("rf", RandomForestClassifier(
                     n_estimators=100,
                     max_depth=10,
-                    class_weight='balanced',  # Focus on minority class (CRACK)
+                    # No class_weight - optimize for accuracy/ROC-AUC
                     n_jobs=config.n_jobs,
                     random_state=config.random_state
                 ))
@@ -729,27 +730,7 @@ def compute_sample_weights(y: np.ndarray, crack_class_idx: int) -> np.ndarray:
     return compute_sample_weight('balanced', y)
 
 
-def optimize_threshold_for_prauc(y_true: np.ndarray, y_prob: np.ndarray, crack_class_idx: int) -> float:
-    """
-    Find the optimal threshold that maximizes F1 score for CRACK class.
-    This helps improve ROC-AUC by finding the best threshold for CRACK detection.
-    """
-    y_binary = (y_true == crack_class_idx).astype(int)
-    
-    if y_binary.sum() == 0 or y_binary.sum() == len(y_binary):
-        return 0.5  # Default threshold if no positive or all positive
-    
-    best_f1 = 0
-    best_threshold = 0.5
-    
-    for threshold in np.arange(0.1, 0.9, 0.05):
-        y_pred_binary = (y_prob >= threshold).astype(int)
-        f1 = f1_score(y_binary, y_pred_binary, zero_division=0)
-        if f1 > best_f1:
-            best_f1 = f1
-            best_threshold = threshold
-    
-    return best_threshold
+# Note: This script trains WITHOUT class_weight to optimize for Accuracy/ROC-AUC
 
 
 def evaluate_single_fold(
@@ -765,9 +746,9 @@ def evaluate_single_fold(
     random_state: int,
 ) -> Dict:
     """
-    Evaluate a single fold with sample weighting for CRACK ROC-AUC optimization.
+    Evaluate a single fold for Accuracy/ROC-AUC optimization.
     
-    Uses sample weights to emphasize the minority CRACK class during training.
+    Trains WITHOUT sample weighting to optimize for overall accuracy.
     """
     train_idx, test_idx, fold_info = fold_data
     fold_start_time = time.time()
@@ -775,27 +756,12 @@ def evaluate_single_fold(
     X_train, X_test = X[train_idx], X[test_idx]
     y_train, y_test = y[train_idx], y[test_idx]
 
-    # Compute sample weights for CRACK-focused training
-    sample_weights = compute_sample_weights(y_train, crack_class_idx)
-
-    # Clone and fit model
+    # Clone and fit model (NO sample weights for accuracy optimization)
     fold_model = clone(model)
     
     train_start = time.time()
     try:
-        # Try to use sample_weight if the model supports it
-        # XGBoost and tree-based models support sample_weight
-        if hasattr(fold_model, 'fit'):
-            try:
-                # Check if model is XGBClassifier (supports sample_weight directly)
-                if isinstance(fold_model, XGBClassifier):
-                    fold_model.fit(X_train, y_train, sample_weight=sample_weights)
-                else:
-                    # For pipelines, try to pass sample_weight to the final estimator
-                    fold_model.fit(X_train, y_train)
-            except TypeError:
-                # Model doesn't support sample_weight, fall back to regular fit
-                fold_model.fit(X_train, y_train)
+        fold_model.fit(X_train, y_train)
     except Exception as e:
         return {
             'fold_idx': fold_info.fold_idx,
@@ -804,7 +770,7 @@ def evaluate_single_fold(
         }
     train_time = time.time() - train_start
 
-    # Predict
+    # Predict (standard prediction, no threshold optimization)
     infer_start = time.time()
     y_pred = fold_model.predict(X_test)
     
@@ -1635,7 +1601,7 @@ if __name__ == "__main__":
         # Models to run
         models_to_train={
             "Logistic Regression (L1)": True,
-            "SVM (RBF)": False,  # Enable SVM with class_weight='balanced'
+            "SVM (RBF)": False,  # SVM (no class_weight for accuracy focus)
             "Random Forest": True,
             "XGBoost": True,
             "MLP (Small)": True,

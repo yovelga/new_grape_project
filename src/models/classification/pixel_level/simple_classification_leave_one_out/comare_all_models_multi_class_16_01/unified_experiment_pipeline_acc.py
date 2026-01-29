@@ -191,7 +191,7 @@ DATASET_CONFIGS = {
 
 # Experiment output directory
 TIMESTAMP = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-EXPERIMENT_DIR = Path(rf"C:\Users\yovel\Desktop\Grape_Project\experiments\unified_experiment_PR_AUC_{TIMESTAMP}")
+EXPERIMENT_DIR = Path(rf"C:\Users\yovel\Desktop\Grape_Project\experiments\unified_experiment_ACC_{TIMESTAMP}")
 
 
 # ==================== HELPER FUNCTIONS ====================
@@ -421,7 +421,7 @@ def get_all_models(config: ExperimentConfig, n_classes: int = 2, crack_class_idx
             True  # supports n_jobs
         ))
     
-    # MLP (Small)
+    # MLP (Small) - No early stopping for fair comparison (trains for exactly max_iter)
     if config.models_to_train.get("MLP (Small)", True):
         models.append((
             "MLP (Small)",
@@ -436,9 +436,7 @@ def get_all_models(config: ExperimentConfig, n_classes: int = 2, crack_class_idx
                     learning_rate='adaptive',
                     learning_rate_init=0.001,
                     max_iter=500,
-                    early_stopping=True,
-                    validation_fraction=0.1,
-                    n_iter_no_change=10,
+                    early_stopping=False,  # Disabled for fair comparison - train full max_iter
                     tol=1e-4,
                     random_state=config.random_state,
                     verbose=False
@@ -729,27 +727,7 @@ def compute_sample_weights(y: np.ndarray, crack_class_idx: int) -> np.ndarray:
     return compute_sample_weight('balanced', y)
 
 
-def optimize_threshold_for_prauc(y_true: np.ndarray, y_prob: np.ndarray, crack_class_idx: int) -> float:
-    """
-    Find the optimal threshold that maximizes F1 score for CRACK class.
-    This helps improve PR-AUC by finding the best precision-recall tradeoff.
-    """
-    y_binary = (y_true == crack_class_idx).astype(int)
-    
-    if y_binary.sum() == 0 or y_binary.sum() == len(y_binary):
-        return 0.5  # Default threshold if no positive or all positive
-    
-    best_f1 = 0
-    best_threshold = 0.5
-    
-    for threshold in np.arange(0.1, 0.9, 0.05):
-        y_pred_binary = (y_prob >= threshold).astype(int)
-        f1 = f1_score(y_binary, y_pred_binary, zero_division=0)
-        if f1 > best_f1:
-            best_f1 = f1
-            best_threshold = threshold
-    
-    return best_threshold
+# Note: This script uses class_weight='balanced' to optimize for F1/PR-AUC
 
 
 def evaluate_single_fold(
