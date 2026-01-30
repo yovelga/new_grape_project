@@ -84,12 +84,100 @@ class ModelManager:
         self.preprocess_cfg: Optional[PreprocessConfig] = None
         self._inference_cache_key: Optional[str] = None
     
+    def _is_autoencoder_folder(self, path: Path) -> bool:
+        """Check if path is an autoencoder model folder."""
+        if path.is_dir():
+            return (path / 'autoencoder_best_model.pt').exists() and \
+                   (path / 'model_config.json').exists() and \
+                   (path / 'scaler.joblib').exists()
+        return False
+    
+    def _load_autoencoder(self, folder_path: Path, preprocess_cfg: PreprocessConfig) -> ModelInfo:
+        """Load autoencoder model from folder."""
+        import torch
+        import torch.nn as nn
+        import json
+        
+        model_file = folder_path / 'autoencoder_best_model.pt'
+        config_file = folder_path / 'model_config.json'
+        scaler_file = folder_path / 'scaler.joblib'
+        
+        logger.info(f"Loading autoencoder from: {folder_path}")
+        
+        # Load config
+        with open(config_file, 'r') as f:
+            config = json.load(f)
+        
+        hidden_dims = tuple(config['hidden_dims'])
+        input_dim = config['input_dim']
+        threshold = config['threshold']
+        training_class = config.get('training_class', 'CRACK')
+        
+        logger.info(f"Autoencoder config: input_dim={input_dim}, hidden_dims={hidden_dims}, "
+                    f"threshold={threshold:.6f}, training_class={training_class}")
+        
+        # Load scaler
+        scaler = joblib.load(str(scaler_file))
+        
+        # Define autoencoder architecture
+        class SpectralAutoencoder(nn.Module):
+            def __init__(self, input_dim: int, hidden_dims):
+                super().__init__()
+                h1, h2, h3 = hidden_dims
+                self.encoder = nn.Sequential(
+                    nn.Linear(input_dim, h1), nn.ReLU(), nn.BatchNorm1d(h1), nn.Dropout(0.2),
+                    nn.Linear(h1, h2), nn.ReLU(), nn.BatchNorm1d(h2), nn.Dropout(0.2),
+                    nn.Linear(h2, h3), nn.ReLU(),
+                )
+                self.decoder = nn.Sequential(
+                    nn.Linear(h3, h2), nn.ReLU(), nn.BatchNorm1d(h2), nn.Dropout(0.2),
+                    nn.Linear(h2, h1), nn.ReLU(), nn.BatchNorm1d(h1), nn.Dropout(0.2),
+                    nn.Linear(h1, input_dim),
+                )
+            def forward(self, x):
+                return self.decoder(self.encoder(x))
+        
+        # Create model and load weights
+        raw_model = SpectralAutoencoder(input_dim, hidden_dims)
+        checkpoint = torch.load(str(model_file), map_location='cpu')
+        
+        # Handle both formats: raw state_dict or checkpoint with 'model_state_dict' key
+        if isinstance(checkpoint, dict) and 'model_state_dict' in checkpoint:
+            state_dict = checkpoint['model_state_dict']
+        else:
+            state_dict = checkpoint
+        
+        raw_model.load_state_dict(state_dict)
+        raw_model.eval()
+        
+        # Wrap in AutoencoderAdapter
+        from app.models.adapters_new import AutoencoderAdapter
+        model = AutoencoderAdapter(
+            raw_model, scaler=scaler, threshold=threshold,
+            training_class=training_class, name=folder_path.name
+        )
+        
+        # Store model and info
+        self.model = model
+        self.model_info = ModelInfo(
+            path=str(folder_path),
+            name=f"Autoencoder ({training_class})",
+            model_type="Autoencoder",
+            n_classes=2,
+            preprocess_cfg=preprocess_cfg
+        )
+        self.preprocess_cfg = preprocess_cfg
+        self._inference_cache_key = f"{folder_path}_{id(model)}"
+        
+        logger.info(f"Autoencoder loaded successfully: threshold={threshold:.6f}")
+        return self.model_info
+
     def load_model(self, model_path: str, preprocess_cfg: Optional[PreprocessConfig] = None) -> ModelInfo:
         """
-        Load model from file.
+        Load model from file or folder.
         
         Args:
-            model_path: Path to model file (.joblib, .pkl, .pth)
+            model_path: Path to model file (.joblib, .pkl) or autoencoder folder
             preprocess_cfg: Optional preprocessing configuration. If None, uses default SNV + wavelength filtering.
             
         Returns:
@@ -105,34 +193,33 @@ class ModelManager:
             raise FileNotFoundError(f"Model file not found: {model_path}")
         
         # Create default preprocessing config if not provided
-        # All models require SNV + wavelength filtering [450-925nm]
         if preprocess_cfg is None:
             preprocess_cfg = PreprocessConfig(
-                use_snv=settings.apply_snv,  # Default: True
-                wl_min=settings.wl_min,      # Default: 450nm
-                wl_max=settings.wl_max,      # Default: 925nm
-                wavelengths=None,  # Will be loaded from .hdr file during inference
+                use_snv=settings.apply_snv,
+                wl_min=settings.wl_min,
+                wl_max=settings.wl_max,
+                wavelengths=None,
                 band_indices=None,
                 use_l2_norm=False
             )
             logger.info(f"Using default preprocessing: SNV={preprocess_cfg.use_snv}, "
                         f"wavelength range=[{preprocess_cfg.wl_min}-{preprocess_cfg.wl_max}]nm")
         
+        # Check if this is an autoencoder folder
+        if self._is_autoencoder_folder(model_path):
+            return self._load_autoencoder(model_path, preprocess_cfg)
+        
         logger.info(f"Loading model from: {model_path}")
         
         try:
-            # Register BoosterWrapper for pickle to find it when loading models
-            # that were trained with the training script's BoosterWrapper class
+            # Register BoosterWrapper for pickle compatibility
             import sys
-            # Make BoosterWrapper available under the training script's module path
             if 'train_xgboost_row1_segments' not in sys.modules:
-                # Create a mock module for pickle compatibility
                 import types
                 mock_module = types.ModuleType('train_xgboost_row1_segments')
                 mock_module.BoosterWrapper = BoosterWrapper
                 sys.modules['train_xgboost_row1_segments'] = mock_module
             
-            # Also register under __main__ in case it was run as a script
             import __main__
             if not hasattr(__main__, 'BoosterWrapper'):
                 __main__.BoosterWrapper = BoosterWrapper

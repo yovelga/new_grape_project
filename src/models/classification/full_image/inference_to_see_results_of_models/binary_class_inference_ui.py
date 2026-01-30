@@ -577,18 +577,28 @@ class VisualDebugTab(QWidget):
 
 
     def _browse_model(self):
-        """Browse for model file."""
+        """Browse for model file or autoencoder folder."""
         default_dir = str(settings.models_dir) if settings.models_dir.exists() else str(Path.home())
         
+        # First try file selection
         file_path, _ = QFileDialog.getOpenFileName(
             self,
-            "Select Model File",
+            "Select Model File (or Cancel to select Autoencoder folder)",
             default_dir,
             "Model Files (*.joblib *.pkl *.pth);;All Files (*.*)"
         )
         
         if file_path:
             self.model_path_edit.setText(file_path)
+        else:
+            # If cancelled, offer folder selection for autoencoder
+            folder_path = QFileDialog.getExistingDirectory(
+                self,
+                "Select Autoencoder Folder (saved_model/)",
+                default_dir
+            )
+            if folder_path:
+                self.model_path_edit.setText(folder_path)
     
     def _load_selected_model(self):
         """Load the selected model using ModelManager."""
@@ -610,12 +620,22 @@ class VisualDebugTab(QWidget):
             # Update target class options
             self._set_target_class_options(model_info.n_classes)
             
-            # Update status
-            self.model_status_label.setText(f"✓ Loaded: {model_path_obj.name}")
-            self.model_status_label.setStyleSheet(
-                "color: #27ae60; font-size: 9px; font-weight: bold; "
-                "padding: 3px; background-color: #e8f8f5; border-radius: 3px;"
-            )
+            # Update status with type-specific styling
+            if model_info.model_type == "Autoencoder":
+                self.model_status_label.setText(f"✓ {model_info.name}")
+                self.model_status_label.setStyleSheet(
+                    "color: #8e44ad; font-size: 9px; font-weight: bold; "
+                    "padding: 3px; background-color: #f5eef8; border-radius: 3px;"
+                )
+                # Auto-select class 1 (CRACK) for autoencoder
+                if self.target_class_combo.count() > 1:
+                    self.target_class_combo.setCurrentIndex(1)
+            else:
+                self.model_status_label.setText(f"✓ Loaded: {model_path_obj.name}")
+                self.model_status_label.setStyleSheet(
+                    "color: #27ae60; font-size: 9px; font-weight: bold; "
+                    "padding: 3px; background-color: #e8f8f5; border-radius: 3px;"
+                )
             
             # Enable inference button if HSI is loaded
             if self.cube is not None:
