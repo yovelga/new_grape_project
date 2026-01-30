@@ -17,6 +17,49 @@ from app.config.settings import settings
 logger = logging.getLogger(__name__)
 
 
+# =====================================================================
+# BoosterWrapper - Required for loading XGBoost models trained with
+# native API and custom PR-AUC early stopping
+# =====================================================================
+class BoosterWrapper:
+    """
+    Wrapper to make xgb.Booster work with sklearn-like interface.
+    
+    This class is used when training XGBoost with the native API (xgb.train)
+    for custom metric early stopping (e.g., CRACK PR-AUC). It provides
+    sklearn-compatible predict() and predict_proba() methods.
+    """
+    def __init__(self, booster, n_classes, best_iteration, best_score):
+        self._Booster = booster
+        self.n_classes_ = n_classes
+        self._classes = np.arange(n_classes)
+        self.best_iteration = best_iteration
+        self.best_score = best_score
+        
+    @property
+    def classes_(self):
+        return self._classes
+    
+    def predict(self, X):
+        import xgboost as xgb
+        dmatrix = xgb.DMatrix(X)
+        probs = self._Booster.predict(dmatrix)
+        if probs.ndim == 1:
+            probs = probs.reshape(-1, self.n_classes_)
+        return np.argmax(probs, axis=1)
+    
+    def predict_proba(self, X):
+        import xgboost as xgb
+        dmatrix = xgb.DMatrix(X)
+        probs = self._Booster.predict(dmatrix)
+        if probs.ndim == 1:
+            probs = probs.reshape(-1, self.n_classes_)
+        return probs
+    
+    def get_booster(self):
+        return self._Booster
+
+
 @dataclass
 class ModelInfo:
     """Model metadata."""
@@ -78,6 +121,22 @@ class ModelManager:
         logger.info(f"Loading model from: {model_path}")
         
         try:
+            # Register BoosterWrapper for pickle to find it when loading models
+            # that were trained with the training script's BoosterWrapper class
+            import sys
+            # Make BoosterWrapper available under the training script's module path
+            if 'train_xgboost_row1_segments' not in sys.modules:
+                # Create a mock module for pickle compatibility
+                import types
+                mock_module = types.ModuleType('train_xgboost_row1_segments')
+                mock_module.BoosterWrapper = BoosterWrapper
+                sys.modules['train_xgboost_row1_segments'] = mock_module
+            
+            # Also register under __main__ in case it was run as a script
+            import __main__
+            if not hasattr(__main__, 'BoosterWrapper'):
+                __main__.BoosterWrapper = BoosterWrapper
+            
             # Load raw model
             raw_model = joblib.load(str(model_path))
             model_type = type(raw_model).__name__

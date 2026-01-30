@@ -16,6 +16,7 @@ NO LOGO, NO CV - just one train/val split for final model training.
 
 import json
 import re
+import sys
 import time
 import warnings
 from datetime import datetime
@@ -23,6 +24,13 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
 from dataclasses import dataclass
 
+# Add project root to Python path for imports
+# Path: src/models/classification/pixel_level/xgboost_row1_train_val/train_xgboost_row1_segments.py
+# parents[0]=xgboost_row1_train_val, [1]=pixel_level, [2]=classification, [3]=models, [4]=src, [5]=Grape_Project
+_PROJECT_ROOT = Path(__file__).resolve().parents[5]  # Navigate up to Grape_Project
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
+    
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
@@ -31,6 +39,7 @@ from sklearn.metrics import (
     accuracy_score, f1_score, precision_score, recall_score,
     roc_auc_score, average_precision_score, confusion_matrix, classification_report
 )
+from sklearn.utils.class_weight import compute_sample_weight
 from xgboost import XGBClassifier
 
 # Import the reusable preprocessing function (same as benchmark)
@@ -75,14 +84,15 @@ DATASET_CONFIGS = [
         grape_classes={"REGULAR", "CRACK"},
         is_3class=False,
     ),
-    DatasetConfig(
-        name="3class",
-        csv_path=CSV_PATH_3CLASS,
-        target_col="label_3class_id",
-        crack_identifier=2,
-        grape_classes={1, 2},  # REGULAR=1, CRACK=2 in 3-class
-        is_3class=True,
-    ),
+    # 3class config disabled - using only multiclass
+    # DatasetConfig(
+    #     name="3class",
+    #     csv_path=CSV_PATH_3CLASS,
+    #     target_col="label_3class_id",
+    #     crack_identifier=2,
+    #     grape_classes={1, 2},  # REGULAR=1, CRACK=2 in 3-class
+    #     is_3class=True,
+    # ),
 ]
 
 # ==================== ROW AND CLUSTER EXTRACTION ====================
@@ -138,10 +148,11 @@ MAX_SAMPLES_PER_CLASS = 50000
 
 # ==================== XGBoost HYPERPARAMETERS ====================
 # Easy to tweak - all XGBoost settings in one place
+# Optimized for Row 1 training with PR-AUC monitoring
 XGBOOST_PARAMS = {
-    "n_estimators": 200,
+    "n_estimators": 1000,
     "max_depth": 6,
-    "learning_rate": 0.1,
+    "learning_rate": 0.05,
     "subsample": 0.8,
     "colsample_bytree": 0.8,
     "reg_lambda": 1.0,
@@ -153,7 +164,7 @@ XGBOOST_PARAMS = {
     "use_label_encoder": False,
 }
 
-EARLY_STOPPING_ROUNDS = 25
+EARLY_STOPPING_ROUNDS = 50
 
 
 # ==================== HELPER FUNCTIONS ====================
@@ -369,63 +380,260 @@ def create_group_train_val_split(
 
 # ==================== TRAINING ====================
 
+class BoosterWrapper:
+    """Wrapper to make xgb.Booster work with sklearn-like interface.
+    Defined at module level for pickle compatibility.
+    """
+    def __init__(self, booster, n_classes, best_iteration, best_score):
+        self._Booster = booster
+        self.n_classes_ = n_classes
+        self._classes = np.arange(n_classes)
+        self.best_iteration = best_iteration
+        self.best_score = best_score
+        
+    @property
+    def classes_(self):
+        return self._classes
+    
+    def predict(self, X):
+        import xgboost as xgb
+        dmatrix = xgb.DMatrix(X)
+        probs = self._Booster.predict(dmatrix)
+        if probs.ndim == 1:
+            probs = probs.reshape(-1, self.n_classes_)
+        return np.argmax(probs, axis=1)
+    
+    def predict_proba(self, X):
+        import xgboost as xgb
+        dmatrix = xgb.DMatrix(X)
+        probs = self._Booster.predict(dmatrix)
+        if probs.ndim == 1:
+            probs = probs.reshape(-1, self.n_classes_)
+        return probs
+    
+    def get_booster(self):
+        return self._Booster
+
+
 def train_xgboost(
     X_train: np.ndarray,
     y_train: np.ndarray,
     X_val: np.ndarray,
     y_val: np.ndarray,
     n_classes: int,
+    crack_class_idx: int,
     early_stopping_rounds: int = EARLY_STOPPING_ROUNDS,
 ) -> Tuple[XGBClassifier, Dict]:
     """
-    Train XGBoost classifier with early stopping.
+    Train XGBoost classifier with early stopping based on CRACK PR-AUC.
+    
+    Uses the native XGBoost API with a custom evaluation function to maximize
+    CRACK class PR-AUC for early stopping.
+    
+    Args:
+        X_train: Training features
+        y_train: Training labels (multi-class)
+        X_val: Validation features (held-out clusters)
+        y_val: Validation labels (multi-class)
+        n_classes: Number of classes
+        crack_class_idx: Index of the CRACK class for PR-AUC calculation
+        early_stopping_rounds: Rounds for early stopping
     
     Returns:
         model: Trained XGBClassifier
         train_info: Dict with training information
     """
+    import xgboost as xgb
+    
     print(f"\n[TRAIN] Training XGBoost...")
     print(f"[TRAIN] Train samples: {len(X_train):,}, Val samples: {len(X_val):,}")
     print(f"[TRAIN] Features: {X_train.shape[1]}")
     print(f"[TRAIN] Classes: {n_classes}")
+    print(f"[TRAIN] CRACK class index: {crack_class_idx}")
+    print(f"[TRAIN] Early stopping: MAXIMIZE CRACK PR-AUC (patience={early_stopping_rounds})")
     
-    # Set eval_metric based on number of classes
-    eval_metric = "mlogloss" if n_classes > 2 else "logloss"
+    # Compute balanced sample weights to handle CRACK class imbalance
+    sample_weights = compute_sample_weight('balanced', y_train)
+    print(f"[TRAIN] Using balanced sample weights (min={sample_weights.min():.4f}, max={sample_weights.max():.4f})")
     
-    # Create model with hyperparameters
-    params = XGBOOST_PARAMS.copy()
-    params["eval_metric"] = eval_metric
+    # Create DMatrix for native XGBoost API
+    dtrain = xgb.DMatrix(X_train, label=y_train, weight=sample_weights)
+    dval = xgb.DMatrix(X_val, label=y_val)
+    
+    # Prepare parameters for native API
+    params = {
+        "max_depth": XGBOOST_PARAMS["max_depth"],
+        "learning_rate": XGBOOST_PARAMS["learning_rate"],  # 'eta' in native API
+        "subsample": XGBOOST_PARAMS["subsample"],
+        "colsample_bytree": XGBOOST_PARAMS["colsample_bytree"],
+        "reg_lambda": XGBOOST_PARAMS["reg_lambda"],
+        "min_child_weight": XGBOOST_PARAMS["min_child_weight"],
+        "gamma": XGBOOST_PARAMS["gamma"],
+        "tree_method": XGBOOST_PARAMS["tree_method"],
+        "seed": XGBOOST_PARAMS["random_state"],
+        "objective": "multi:softprob",
+        "num_class": n_classes,
+        "nthread": -1,
+    }
     
     print(f"[TRAIN] Hyperparameters: {params}")
-    print(f"[TRAIN] Early stopping rounds: {early_stopping_rounds}")
     
-    model = XGBClassifier(**params)
+    # Custom evaluation function for CRACK PR-AUC
+    def crack_prauc_eval(preds: np.ndarray, dtrain: xgb.DMatrix):
+        """
+        Custom evaluation metric: PR-AUC for CRACK class.
+        Returns (metric_name, value, higher_is_better)
+        """
+        labels = dtrain.get_label().astype(int)
+        
+        # preds shape: (n_samples, n_classes) for multi:softprob
+        if preds.ndim == 1:
+            # Reshape if flattened
+            preds = preds.reshape(-1, n_classes)
+        
+        # Extract CRACK class probabilities
+        y_prob_crack = preds[:, crack_class_idx]
+        
+        # Binary labels: 1 if CRACK, 0 otherwise
+        y_true_binary = (labels == crack_class_idx).astype(int)
+        
+        # Calculate PR-AUC
+        if y_true_binary.sum() == 0 or y_true_binary.sum() == len(y_true_binary):
+            score = 0.0
+        else:
+            try:
+                score = average_precision_score(y_true_binary, y_prob_crack)
+            except Exception:
+                score = 0.0
+        
+        return "crack_prauc", float(score)
     
-    # Train with early stopping
+    # Custom callback for detailed progress logging with all metrics
+    class ProgressCallback(xgb.callback.TrainingCallback):
+        def __init__(self, total_rounds, X_val, y_val, crack_idx, print_every=10):
+            self.total_rounds = total_rounds
+            self.X_val = X_val
+            self.y_val = y_val
+            self.crack_idx = crack_idx
+            self.print_every = print_every
+            self.best_prauc = 0.0
+            self.best_iter = 0
+            self.start_time = time.time()
+            self.dval = xgb.DMatrix(X_val)
+            
+        def after_iteration(self, model, epoch, evals_log):
+            if epoch == 0 or (epoch + 1) % self.print_every == 0 or epoch == self.total_rounds - 1:
+                elapsed = time.time() - self.start_time
+                
+                # Get predictions from current model
+                y_prob = model.predict(self.dval)
+                if y_prob.ndim == 1:
+                    y_prob = y_prob.reshape(-1, n_classes)
+                
+                y_pred = np.argmax(y_prob, axis=1)
+                y_prob_crack = y_prob[:, self.crack_idx]
+                y_true_binary = (self.y_val == self.crack_idx).astype(int)
+                
+                # Calculate all metrics
+                acc = accuracy_score(self.y_val, y_pred)
+                
+                # CRACK-specific metrics
+                crack_prec = precision_score(self.y_val, y_pred, labels=[self.crack_idx], average='micro', zero_division=0)
+                crack_rec = recall_score(self.y_val, y_pred, labels=[self.crack_idx], average='micro', zero_division=0)
+                crack_f1 = f1_score(self.y_val, y_pred, labels=[self.crack_idx], average='micro', zero_division=0)
+                
+                # PR-AUC
+                try:
+                    prauc = average_precision_score(y_true_binary, y_prob_crack)
+                except:
+                    prauc = 0.0
+                
+                # Track best PR-AUC
+                if prauc > self.best_prauc:
+                    self.best_prauc = prauc
+                    self.best_iter = epoch
+                
+                # Calculate ETA
+                if epoch > 0:
+                    rate = elapsed / (epoch + 1)
+                    remaining = (self.total_rounds - epoch - 1) * rate
+                    eta_str = f"{remaining/60:.1f}m" if remaining > 60 else f"{remaining:.0f}s"
+                else:
+                    eta_str = "..."
+                
+                # Progress bar
+                pct = (epoch + 1) / self.total_rounds * 100
+                bar_len = 15
+                filled = int(bar_len * (epoch + 1) / self.total_rounds)
+                bar = "█" * filled + "░" * (bar_len - filled)
+                
+                print(f"[{epoch+1:4d}/{self.total_rounds}] {bar} {pct:5.1f}% | "
+                      f"Acc={acc:.3f} | "
+                      f"CRACK: P={crack_prec:.3f} R={crack_rec:.3f} F1={crack_f1:.3f} PR-AUC={prauc:.4f} | "
+                      f"best={self.best_prauc:.4f}@{self.best_iter} | {elapsed:.0f}s ETA={eta_str}")
+            
+            return False  # Don't stop training
+    
+    # Train with native API
+    evals = [(dtrain, "train"), (dval, "val")]
+    evals_result = {}
+    
     start_time = time.time()
-    model.fit(
-        X_train, y_train,
-        eval_set=[(X_val, y_val)],
-        verbose=True,
+    
+    print(f"\n[TRAIN] Starting training with CRACK PR-AUC early stopping...")
+    print(f"[TRAIN] Will stop if no improvement in {early_stopping_rounds} rounds")
+    print(f"[TRAIN] Progress updates every 10 rounds")
+    print(f"[TRAIN] Metrics: Acc=Accuracy, P=Precision, R=Recall, F1=F1-Score, PR-AUC=Area Under PR Curve")
+    print()
+    
+    # Create progress callback
+    progress_cb = ProgressCallback(
+        total_rounds=XGBOOST_PARAMS["n_estimators"],
+        X_val=X_val,
+        y_val=y_val,
+        crack_idx=crack_class_idx,
+        print_every=10
     )
+    
+    booster = xgb.train(
+        params=params,
+        dtrain=dtrain,
+        num_boost_round=XGBOOST_PARAMS["n_estimators"],
+        evals=evals,
+        custom_metric=crack_prauc_eval,
+        early_stopping_rounds=early_stopping_rounds,
+        maximize=True,  # We want to MAXIMIZE PR-AUC
+        evals_result=evals_result,
+        verbose_eval=False,  # We use our custom callback instead
+        callbacks=[progress_cb],
+    )
+    
     train_time = time.time() - start_time
     
-    # Get best iteration (if early stopping occurred)
-    best_iteration = getattr(model, 'best_iteration', model.n_estimators)
-    best_score = getattr(model, 'best_score', None)
+    # Get best iteration and score
+    best_iteration = booster.best_iteration
+    best_score = booster.best_score
     
     print(f"\n[TRAIN] Training completed in {train_time:.1f}s")
     print(f"[TRAIN] Best iteration: {best_iteration}")
-    if best_score is not None:
-        print(f"[TRAIN] Best score: {best_score:.6f}")
+    print(f"[TRAIN] Best CRACK PR-AUC: {best_score:.6f}")
+    
+    # Create wrapper using module-level class (for pickle compatibility)
+    model = BoosterWrapper(booster, n_classes, best_iteration, best_score)
     
     train_info = {
         "train_time_seconds": train_time,
         "best_iteration": best_iteration,
         "best_score": best_score,
+        "best_score_metric": "crack_prauc",
         "n_estimators_used": best_iteration,
         "early_stopping_rounds": early_stopping_rounds,
+        "crack_class_idx": crack_class_idx,
         "hyperparameters": params,
+        "evals_result": {
+            "train_prauc": evals_result.get("train", {}).get("crack_prauc", []),
+            "val_prauc": evals_result.get("val", {}).get("crack_prauc", []),
+        },
     }
     
     return model, train_info
@@ -774,6 +982,7 @@ def main():
                     X_train, y_train,
                     X_val, y_val,
                     n_classes=n_classes,
+                    crack_class_idx=crack_class_idx,
                     early_stopping_rounds=EARLY_STOPPING_ROUNDS,
                 )
             except Exception as e:

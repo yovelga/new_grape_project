@@ -53,6 +53,13 @@ import datetime as dt
 # CRITICAL: All negative samples (label=0) must come from weeks <= 25.07.24
 NEGATIVE_MAX_DATE_EXCLUSIVE = dt.date(2024, 7, 26)  # 26.07.24 (so 25.07.24 is included)
 
+# EARLY DETECTION: Exclude specific dates to make early and late datasets fully separate
+# These dates will be excluded from early detection (but included in late detection)
+EARLY_EXCLUDED_DATES = [
+    dt.date(2024, 9, 25),  # 25.09.24 - last imaging date
+    # dt.date(2024, 9, 18),  # 18.09.24
+]
+
 # Seed for deterministic random sampling
 RANDOM_SEED = 42
 
@@ -162,6 +169,11 @@ def get_negative_pool_weeks(week_cols: List[str]) -> List[str]:
     return [w for w in week_cols if parse_date(w) < NEGATIVE_MAX_DATE_EXCLUSIVE]
 
 
+def is_early_excluded_date(week_str: str) -> bool:
+    """Check if a week date is in the EARLY_EXCLUDED_DATES list."""
+    return parse_date(week_str) in EARLY_EXCLUDED_DATES
+
+
 def sample_random_week_for_grape(grape_id: str, week_pool: List[str]) -> str:
     """Deterministically sample one week for a grape from pool."""
     rng = np.random.default_rng(RANDOM_SEED + hash(grape_id) % (2**31))
@@ -244,42 +256,61 @@ def build_row1_val_early_late(
     """Build val_row1_early.csv and val_row1_late.csv.
 
     - Positives: ONE sample per grape (earliest/latest crack week)
+      - EARLY: Excludes dates in EARLY_EXCLUDED_DATES
+      - LATE: Uses all crack weeks (no restriction)
     - Negatives: MULTIPLE samples per grape (N_NEGATIVE_WEEKS_PER_GRAPE weeks sampled deterministically)
     - CRITICAL: Both early and late use the SAME negative samples (same grapes, same weeks)
     """
     negative_weeks = get_negative_pool_weeks(week_cols)
     crack_pairs_row1 = {(gid, wk) for (gid, wk) in crack_pairs if extract_row_from_grape_id(gid) == 1}
+    
+    # For EARLY detection, exclude dates in EARLY_EXCLUDED_DATES
+    crack_pairs_row1_early = {(gid, wk) for (gid, wk) in crack_pairs_row1 if not is_early_excluded_date(wk)}
 
-    # Group crack pairs by grape_id
-    crack_by_grape: Dict[str, List[str]] = {}
+    # Group crack pairs by grape_id for LATE detection (all weeks)
+    crack_by_grape_late: Dict[str, List[str]] = {}
     for gid, wk in crack_pairs_row1:
-        if gid not in crack_by_grape:
-            crack_by_grape[gid] = []
-        crack_by_grape[gid].append(wk)
+        if gid not in crack_by_grape_late:
+            crack_by_grape_late[gid] = []
+        crack_by_grape_late[gid].append(wk)
+
+    # Group crack pairs by grape_id for EARLY detection (excludes 25.09.24)
+    crack_by_grape_early: Dict[str, List[str]] = {}
+    for gid, wk in crack_pairs_row1_early:
+        if gid not in crack_by_grape_early:
+            crack_by_grape_early[gid] = []
+        crack_by_grape_early[gid].append(wk)
 
     # Sort weeks for each grape
-    for gid in crack_by_grape:
-        crack_by_grape[gid] = sorted(crack_by_grape[gid], key=parse_date)
+    for gid in crack_by_grape_late:
+        crack_by_grape_late[gid] = sorted(crack_by_grape_late[gid], key=parse_date)
+    for gid in crack_by_grape_early:
+        crack_by_grape_early[gid] = sorted(crack_by_grape_early[gid], key=parse_date)
 
     early_records = []
     late_records = []
 
-    # Pre-compute negative samples for ALL negative grapes (same for both early and late)
+    # Determine which grapes are positive for EARLY vs LATE
+    # A grape is positive for EARLY only if it has crack weeks < EARLY_MAX_DATE_EXCLUSIVE
+    # A grape is positive for LATE if it has any crack weeks
+    positive_grapes_early = set(crack_by_grape_early.keys())
+    positive_grapes_late = set(crack_by_grape_late.keys())
+    
+    # Pre-compute negative samples for grapes that are negative in BOTH early and late
+    # Grapes that are positive in late but negative in early (only cracked on 25.09.24) will be handled separately
     negative_samples: Dict[str, List[str]] = {}
     for gid in val_grapes:
-        if gid not in crack_by_grape:
-            # Sample N_NEGATIVE_WEEKS_PER_GRAPE weeks for this negative grape
+        if gid not in positive_grapes_late:  # Negative in both early and late
             sampled_weeks = sample_multiple_weeks_for_grape(gid, negative_weeks, N_NEGATIVE_WEEKS_PER_GRAPE)
             negative_samples[gid] = sampled_weeks
 
     # Build records
     for gid in val_grapes:
-        if gid in crack_by_grape:
-            # Positive grape - ONE sample per grape (early = earliest, late = latest)
-            weeks = crack_by_grape[gid]
+        # Handle EARLY records
+        if gid in positive_grapes_early:
+            # Positive for EARLY - pick earliest crack week (excluding 25.09.24)
+            weeks = crack_by_grape_early[gid]
             early_week = weeks[0]
-            late_week = weeks[-1]
-
             early_records.append({
                 "grape_id": gid,
                 "row": 1,
@@ -287,6 +318,35 @@ def build_row1_val_early_late(
                 "label": 1,
                 "image_path": build_image_path(base_dir, gid, early_week),
             })
+        elif gid in positive_grapes_late:
+            # Grape cracked ONLY on 25.09.24 - treat as negative for EARLY
+            # Sample negative weeks for this grape
+            sampled_weeks = sample_multiple_weeks_for_grape(gid, negative_weeks, N_NEGATIVE_WEEKS_PER_GRAPE)
+            for week in sampled_weeks:
+                early_records.append({
+                    "grape_id": gid,
+                    "row": 1,
+                    "week_date": week,
+                    "label": 0,
+                    "image_path": build_image_path(base_dir, gid, week),
+                })
+        else:
+            # Negative grape - MULTIPLE samples
+            sampled_weeks = negative_samples[gid]
+            for week in sampled_weeks:
+                early_records.append({
+                    "grape_id": gid,
+                    "row": 1,
+                    "week_date": week,
+                    "label": 0,
+                    "image_path": build_image_path(base_dir, gid, week),
+                })
+        
+        # Handle LATE records
+        if gid in positive_grapes_late:
+            # Positive for LATE - pick latest crack week
+            weeks = crack_by_grape_late[gid]
+            late_week = weeks[-1]
             late_records.append({
                 "grape_id": gid,
                 "row": 1,
@@ -295,19 +355,17 @@ def build_row1_val_early_late(
                 "image_path": build_image_path(base_dir, gid, late_week),
             })
         else:
-            # Negative grape - MULTIPLE samples (SAME for both early and late)
+            # Negative grape - MULTIPLE samples (SAME weeks as early for consistency)
             sampled_weeks = negative_samples[gid]
 
             for week in sampled_weeks:
-                record = {
+                late_records.append({
                     "grape_id": gid,
                     "row": 1,
                     "week_date": week,
                     "label": 0,
                     "image_path": build_image_path(base_dir, gid, week),
-                }
-                early_records.append(record.copy())
-                late_records.append(record.copy())
+                })
 
     return pd.DataFrame(early_records), pd.DataFrame(late_records)
 
@@ -321,11 +379,15 @@ def build_row2_test_early_late(
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Return (row2_test_early, row2_test_late).
 
-    For positives: pick earliest/latest crack week >= cutoff
+    For positives:
+      - EARLY: pick earliest crack week >= cutoff, excluding dates in EARLY_EXCLUDED_DATES
+      - LATE: pick latest crack week >= cutoff (no restriction)
     For negatives (no crack): sample random week from negative pool < NEGATIVE_MAX_DATE_EXCLUSIVE.
     """
     cutoff_date = parse_date(cutoff)
     consider_weeks = [w for w in week_cols if parse_date(w) >= cutoff_date]
+    # For EARLY detection, exclude dates in EARLY_EXCLUDED_DATES
+    consider_weeks_early = [w for w in consider_weeks if not is_early_excluded_date(w)]
     negative_weeks = get_negative_pool_weeks(week_cols)
 
     # Filter row2 only
@@ -334,10 +396,21 @@ def build_row2_test_early_late(
     df["row"] = df["grape_id"].apply(extract_row_from_grape_id)
     df = df[df["row"] == 2].copy()
 
-    def pick_week(row, mode: str, grape_id: str) -> Tuple[str, int]:
+    def pick_week_early(row, grape_id: str) -> Tuple[str, int]:
+        """For EARLY: pick earliest crack week, excluding EARLY_EXCLUDED_DATES."""
+        cracked_weeks = [w for w in consider_weeks_early if is_cracked_cell(row[w])]
+        if cracked_weeks:
+            chosen = min(cracked_weeks, key=parse_date)
+            return chosen, 1
+        # No crack in early period - sample random week from negative pool
+        fallback_week = sample_random_week_for_grape(grape_id, negative_weeks)
+        return fallback_week, 0
+    
+    def pick_week_late(row, grape_id: str) -> Tuple[str, int]:
+        """For LATE: pick latest crack week (all weeks considered)."""
         cracked_weeks = [w for w in consider_weeks if is_cracked_cell(row[w])]
         if cracked_weeks:
-            chosen = min(cracked_weeks, key=parse_date) if mode == "early" else max(cracked_weeks, key=parse_date)
+            chosen = max(cracked_weeks, key=parse_date)
             return chosen, 1
         # No crack - sample random week from negative pool
         fallback_week = sample_random_week_for_grape(grape_id, negative_weeks)
@@ -348,8 +421,8 @@ def build_row2_test_early_late(
 
     for _, r in df.iterrows():
         gid = r["grape_id"]
-        w_early, y_early = pick_week(r, "early", gid)
-        w_late, y_late = pick_week(r, "late", gid)
+        w_early, y_early = pick_week_early(r, gid)
+        w_late, y_late = pick_week_late(r, gid)
 
         early_records.append({
             "grape_id": gid,
@@ -380,6 +453,8 @@ def main() -> None:
     print("Full-image dataset builder (MANUALLY LABELED) - Generates EXACTLY 5 CSV files")
     print("=" * 80)
     print(f"NEGATIVE_MAX_DATE_EXCLUSIVE = {NEGATIVE_MAX_DATE_EXCLUSIVE.strftime('%d.%m.%y')}")
+    excluded_dates_str = ', '.join(d.strftime('%d.%m.%y') for d in EARLY_EXCLUDED_DATES) if EARLY_EXCLUDED_DATES else 'None'
+    print(f"EARLY_EXCLUDED_DATES = [{excluded_dates_str}] (early detection excludes these dates)")
     print(f"RANDOM_SEED = {RANDOM_SEED}")
     print(f"N_NEGATIVE_WEEKS_PER_GRAPE = {N_NEGATIVE_WEEKS_PER_GRAPE}")
     print("=" * 80)
