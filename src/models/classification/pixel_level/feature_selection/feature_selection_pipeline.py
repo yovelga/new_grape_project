@@ -21,6 +21,25 @@ Outputs:
     - RFECV Curve showing performance vs number of channels
     - CSV file with final top 10 channels
 
+================================================================================
+NOTE FOR THESIS:
+    For the thesis multiclass-only feature selection with SNV normalization,
+    use the dedicated script: feature_selection_multiclass.py
+    
+    That script provides:
+    - MULTICLASS label setup ONLY (no binary or 3-class variants)
+    - SNV (Standard Normal Variate) normalization applied per-sample
+    - LOGO folds from unified_experiment_pipeline_acc.py
+    - K-sweep evaluation (100 → 1) with extensive artifact logging
+    - PR-AUC(CRACK) as primary metric (one-vs-rest)
+    
+    Run quick test:
+        python quick_test_feature_selection.py --mode multiclass
+    
+    Run full experiment:
+        python feature_selection_multiclass.py --top_k_shap 100 --k_max 100
+================================================================================
+
 Author: Feature Selection Pipeline
 Date: January 2026
 """
@@ -71,9 +90,9 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 # Dataset path
 CSV_PATH_MULTICLASS = Path(r"C:\Users\yovel\Desktop\Grape_Project\src\preprocessing\dataset_builder_grapes\detection\raw_exported_data\all_origin_signatures_results_multiclass_2026-01-16.csv")
 
-# Output directory
+# Output directory - dedicated folder for feature selection experiments
 TIMESTAMP = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-OUTPUT_DIR = Path(rf"C:\Users\yovel\Desktop\Grape_Project\experiments\feature_selection_{TIMESTAMP}")
+OUTPUT_DIR = Path(rf"C:\Users\yovel\Desktop\Grape_Project\results\feature_selection\shap_rfecv_{TIMESTAMP}")
 
 # Feature selection parameters
 RANDOM_STATE = 42
@@ -82,13 +101,14 @@ MIN_FEATURES_TO_SELECT = 1  # Minimum features for RFECV
 RFECV_STEP = 1  # Step size for RFECV
 TARGET_FEATURES = 10  # Target number of final features
 
-# XGBoost parameters
+# XGBoost parameters - GPU accelerated
 XGBOOST_PARAMS = {
-    "n_estimators": 100,
+    "n_estimators": 1000,
     "max_depth": 5,
     "use_label_encoder": False,
     "eval_metric": "mlogloss",
     "tree_method": "hist",
+    "device": "cuda",  # Use GPU for training
     "n_jobs": -1,
     "random_state": RANDOM_STATE,
 }
@@ -382,12 +402,22 @@ def step1_shap_ranking(
     shap_values = explainer.shap_values(X_shap)
     
     # For multi-class, shap_values is a list of arrays (one per class)
+    # or a 3D array (samples, features, classes)
     # Compute mean absolute SHAP across all classes and samples
     if isinstance(shap_values, list):
-        # Stack all class SHAP values and take mean absolute
+        # List of arrays: one array per class, each is (samples, features)
         shap_values_stacked = np.abs(np.stack(shap_values, axis=0)).mean(axis=(0, 1))
+    elif len(shap_values.shape) == 3:
+        # 3D array: (samples, features, classes)
+        shap_values_stacked = np.abs(shap_values).mean(axis=(0, 2))
     else:
+        # 2D array: (samples, features) - binary or regression
         shap_values_stacked = np.abs(shap_values).mean(axis=0)
+    
+    # Ensure it's 1D
+    shap_values_stacked = np.array(shap_values_stacked).flatten()
+    
+    print(f"[DEBUG] SHAP values shape: {shap_values_stacked.shape}, features: {len(feature_names)}")
     
     # Create importance DataFrame
     shap_importance_df = pd.DataFrame({
@@ -701,7 +731,7 @@ def run_feature_selection_pipeline(
     
     X = data.X
     y = data.y
-    feature_names = data.wavelength_names
+    feature_names = data.feature_names
     
     print(f"[PREPROCESS] Dataset: {X.shape[0]} samples, {X.shape[1]} features")
     print(f"[PREPROCESS] Classes: {data.class_names}")
