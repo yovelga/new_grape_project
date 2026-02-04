@@ -1104,7 +1104,7 @@ def evaluate_model(
 
 # ==================== SAVE ARTIFACTS ====================
 
-def write_readme(out_dir: Path, config: DatasetConfig, balance_mode: str, split_info: Dict) -> None:
+def write_readme(out_dir: Path, config: DatasetConfig, balance_mode: str, split_info: Dict, metrics: Dict = None) -> None:
     """
     Write a README.txt with run summary for easy reference.
     """

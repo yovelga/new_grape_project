@@ -1,0 +1,29 @@
+# Local .gitignore for inference_to_see_results_of_models
+# Do not check these into version control
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Logs and temp files
+logs/
+*.log
+temp/
+.cache/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Legacy archives (optional, you may want to keep these)
+# archive_legacy/
+
+# Results (large outputs)
+# results/
+
+# Test outputs
+*.tmp
