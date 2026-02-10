@@ -36,6 +36,7 @@ from app.config.settings import settings
 from app.utils.logging import setup_logger
 from app.ui import ImageViewer, OptunaTabWidget
 from app.models import ModelManager
+from app.models.model_manager import MODEL_CATEGORY_AUTOENCODER
 from app.io import ENVIReader, load_rgb, get_band_by_index, find_hsi_rgb, find_canon_rgb
 from app.data.dataset import load_dataset_csv
 from app.postprocess import PostprocessPipeline, PostprocessConfig
@@ -1129,10 +1130,23 @@ class VisualDebugTab(QWidget):
     def _on_inference_done(self, prob_map, target_idx=None):
         self.prob_map = prob_map
         self.run_inference_btn.setEnabled(True)
-        self.progress_label.setText("✓ Inference complete")
 
-        if target_idx is not None:
-            self.viewer_prob_hsi.label.setText(f"Model Result on HSI (Class {target_idx})")
+        # Check if autoencoder model — show descriptive label
+        model_info = self.model_manager.get_model_info()
+        is_ae = model_info and model_info.model_category == MODEL_CATEGORY_AUTOENCODER
+        
+        if is_ae:
+            self.progress_label.setText(
+                f"✓ Autoencoder inference complete (MSE→Sigmoid probability) | "
+                f"P(CRACK) range: [{prob_map.min():.3f}, {prob_map.max():.3f}]"
+            )
+            self.viewer_prob_hsi.label.setText(
+                f"Autoencoder P(CRACK) — sigmoid(MSE) (Class {target_idx or 1})"
+            )
+        else:
+            self.progress_label.setText("✓ Inference complete")
+            if target_idx is not None:
+                self.viewer_prob_hsi.label.setText(f"Model Result on HSI (Class {target_idx})")
         
         self._update_prob_visualization()
         self._enable_postprocess()
@@ -1411,7 +1425,8 @@ class VisualDebugTab(QWidget):
             parent = self.parent()
             while parent is not None:
                 if isinstance(parent, QMainWindow) and hasattr(parent, 'optuna_tab'):
-                    parent.optuna_tab.set_model_and_config(model, preprocess_cfg)
+                    # Notify Optuna tab that model was loaded externally
+                    parent.optuna_tab.on_model_loaded_externally()
                     error_logger.info("Model shared with Optuna tab")
                     break
                 parent = parent.parent()

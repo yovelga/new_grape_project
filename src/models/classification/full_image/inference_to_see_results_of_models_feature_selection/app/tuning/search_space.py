@@ -74,12 +74,90 @@ class HyperparameterSearchSpace:
     Manages the hyperparameter search space for Optuna tuning.
     
     Provides default search space and allows UI customization.
+    Supports different presets for sklearn/XGBoost vs autoencoder models.
     """
     
-    def __init__(self):
-        """Initialize with default search space."""
+    def __init__(self, preset: str = "default"):
+        """
+        Initialize with search space preset.
+        
+        Args:
+            preset: 'default' for sklearn/XGBoost, 'autoencoder' for autoencoder models
+        """
         self.params: Dict[str, HyperparameterSpec] = {}
-        self._init_default_search_space()
+        self.preset = preset
+        if preset == "autoencoder":
+            self._init_autoencoder_search_space()
+        else:
+            self._init_default_search_space()
+    
+    @classmethod
+    def create_default(cls) -> 'HyperparameterSearchSpace':
+        """Create default search space (sklearn/XGBoost models)."""
+        return cls(preset="default")
+    
+    @classmethod
+    def create_autoencoder(cls) -> 'HyperparameterSearchSpace':
+        """
+        Create autoencoder-specific search space.
+        
+        Key difference: pixel_threshold range is [0.10, 0.95] instead of
+        [0.970, 0.999] because autoencoder probability maps have a very
+        different distribution than sklearn/XGBoost models.
+        """
+        return cls(preset="autoencoder")
+    
+    def _init_autoencoder_search_space(self):
+        """Initialize search space tuned for autoencoder probability maps."""
+        self.params = {
+            'pixel_threshold': HyperparameterSpec(
+                name='pixel_threshold',
+                type='float',
+                min_value=0.10,
+                max_value=0.95,
+                description='Probability threshold for binarization (autoencoder range)'
+            ),
+            'min_blob_area': HyperparameterSpec(
+                name='min_blob_area',
+                type='int',
+                min_value=1,
+                max_value=300,
+                description='Minimum blob area in pixels (smaller removed)'
+            ),
+            'max_blob_area': HyperparameterSpec(
+                name='max_blob_area',
+                type='int',
+                min_value=301,
+                max_value=9000,
+                description='Maximum blob area in pixels (larger removed). Must be > min_blob_area'
+            ),
+            'morph_size': HyperparameterSpec(
+                name='morph_size',
+                type='categorical',
+                choices=[0, 3, 5, 7, 9, 11, 13],
+                description='Morphological closing kernel size (0=disabled, must be odd)'
+            ),
+            'patch_size': HyperparameterSpec(
+                name='patch_size',
+                type='categorical',
+                choices=[4, 8, 16, 24, 32, 40, 48, 64],
+                description='Square patch size in pixels'
+            ),
+            'patch_crack_pct_threshold': HyperparameterSpec(
+                name='patch_crack_pct_threshold',
+                type='float',
+                min_value=0.1,
+                max_value=100.0,
+                description='Crack percentage threshold for patch flagging (0-100%)'
+            ),
+            'global_crack_pct_threshold': HyperparameterSpec(
+                name='global_crack_pct_threshold',
+                type='float',
+                min_value=0.1,
+                max_value=5.0,
+                description='Global image crack % threshold - classify as CRACK if >= this% (0-100%)'
+            ),
+        }
     
     def _init_default_search_space(self):
         """Initialize default search space for patch-based classifier."""

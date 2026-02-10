@@ -28,6 +28,7 @@ from app.tuning.optuna_worker import OptunaWorker
 from app.tuning.search_space import HyperparameterSearchSpace
 from app.ui.hyperparam_cards import FloatRangeCard, IntRangeCard, CategoricalCard
 from app.models import ModelManager
+from app.models.model_manager import MODEL_CATEGORY_AUTOENCODER
 from app.config.settings import settings
 
 logger = logging.getLogger(__name__)
@@ -188,9 +189,16 @@ class OptunaTabWidget(QWidget):
         self.model_path_edit.setReadOnly(True)
         path_layout.addWidget(self.model_path_edit, stretch=1)
         
-        browse_model_btn = QPushButton("Browse...")
+        browse_model_btn = QPushButton("Browse File...")
+        browse_model_btn.setToolTip("Browse for sklearn/XGBoost model file (.pkl/.joblib/.pth)")
         browse_model_btn.clicked.connect(self._browse_model)
         path_layout.addWidget(browse_model_btn)
+        
+        browse_ae_btn = QPushButton("Browse Autoencoder...")
+        browse_ae_btn.setToolTip("Browse for autoencoder model folder (contains autoencoder_best_model.pt + model_config.json + scaler.joblib)")
+        browse_ae_btn.setStyleSheet("color: #8e44ad; font-weight: bold;")
+        browse_ae_btn.clicked.connect(self._browse_autoencoder_folder)
+        path_layout.addWidget(browse_ae_btn)
         
         load_model_btn = QPushButton("Load Model")
         load_model_btn.clicked.connect(self._load_selected_model)
@@ -457,9 +465,15 @@ class OptunaTabWidget(QWidget):
         return space_group
     
     def _reset_search_space(self):
-        """Reset all cards to default values."""
-        # Reset search space model
-        self.search_space = HyperparameterSearchSpace()
+        """Reset all cards to default values (respects loaded model type)."""
+        # Use autoencoder preset if an autoencoder is currently loaded
+        if (self.model_manager.is_loaded() and 
+            self.model_manager.get_model_info().model_category == MODEL_CATEGORY_AUTOENCODER):
+            self.search_space = HyperparameterSearchSpace.create_autoencoder()
+            self._log("Search space reset to autoencoder defaults")
+        else:
+            self.search_space = HyperparameterSearchSpace.create_default()
+            self._log("Search space reset to defaults")
         
         # Reset each card to defaults
         for param_name, card in self.param_cards.items():
@@ -479,6 +493,45 @@ class OptunaTabWidget(QWidget):
         
         self._update_search_space_summary()
         self._log("Search space reset to defaults")
+    
+    def _apply_autoencoder_preset(self):
+        """
+        Apply autoencoder-specific search space preset.
+        
+        Called automatically when an autoencoder model is loaded.
+        Adjusts pixel_threshold range from [0.970, 0.999] to [0.10, 0.95]
+        because autoencoder probability maps have a fundamentally different
+        distribution than sklearn/XGBoost models.
+        """
+        self.search_space = HyperparameterSearchSpace.create_autoencoder()
+        
+        # Update UI cards to reflect new ranges
+        for param_name, card in self.param_cards.items():
+            param = self.search_space.get_param(param_name)
+            if param:
+                spec = {
+                    'name': param.name,
+                    'type': param.type
+                }
+                if param.type in ['float', 'int']:
+                    spec['min_value'] = param.min_value
+                    spec['max_value'] = param.max_value
+                else:  # categorical
+                    spec['choices'] = param.choices
+                
+                card.set_spec(spec)
+        
+        self._update_search_space_summary()
+        
+        # Log the change
+        self._log("")
+        self._log("=" * 60)
+        self._log("AUTOENCODER DETECTED — Search space adjusted automatically")
+        self._log("=" * 60)
+        self._log(f"  pixel_threshold range: [0.10, 0.95] (was [0.970, 0.999])")
+        self._log(f"  Autoencoder outputs MSE converted to probability via P = exp(-MSE/threshold)")
+        self._log(f"  Low MSE → high P(CRACK) because model was trained on CRACK samples")
+        self._log("")
     
     def _apply_search_space(self):
         """Apply search space from cards to model."""
@@ -607,7 +660,7 @@ class OptunaTabWidget(QWidget):
         return run_layout
     
     def _browse_model(self):
-        """Browse for model file."""
+        """Browse for model file (sklearn/XGBoost)."""
         filepath, _ = QFileDialog.getOpenFileName(
             self,
             "Select Model File",
@@ -623,6 +676,45 @@ class OptunaTabWidget(QWidget):
         
         # Update path display
         self.model_path_edit.setText(filepath)
+        
+        # Auto-load model
+        self._load_selected_model()
+    
+    def _browse_autoencoder_folder(self):
+        """Browse for autoencoder model folder."""
+        folder = QFileDialog.getExistingDirectory(
+            self,
+            "Select Autoencoder Model Folder",
+            self.last_model_dir,
+            QFileDialog.ShowDirsOnly
+        )
+        
+        if not folder:
+            return
+        
+        # Validate folder structure
+        folder_path = Path(folder)
+        required_files = ['autoencoder_best_model.pt', 'model_config.json', 'scaler.joblib']
+        missing = [f for f in required_files if not (folder_path / f).exists()]
+        
+        if missing:
+            QMessageBox.warning(
+                self,
+                "Invalid Autoencoder Folder",
+                f"Selected folder is missing required files:\n\n"
+                f"{chr(10).join('  • ' + f for f in missing)}\n\n"
+                f"An autoencoder folder must contain:\n"
+                f"  • autoencoder_best_model.pt\n"
+                f"  • model_config.json\n"
+                f"  • scaler.joblib"
+            )
+            return
+        
+        # Update last directory
+        self.last_model_dir = folder
+        
+        # Update path display
+        self.model_path_edit.setText(folder)
         
         # Auto-load model
         self._load_selected_model()
@@ -643,12 +735,17 @@ class OptunaTabWidget(QWidget):
             # Update UI
             self._update_model_status()
             
+            # Auto-detect autoencoder and apply search space preset
+            if model_info.model_category == MODEL_CATEGORY_AUTOENCODER:
+                self._apply_autoencoder_preset()
+            
             # Log success with preprocessing details
             self._log("=" * 60)
             self._log("Model Loaded Successfully")
             self._log("=" * 60)
             self._log(f"Path: {model_info.path}")
             self._log(f"Type: {model_info.model_type}")
+            self._log(f"Category: {model_info.model_category}")
             self._log(f"Classes: {model_info.n_classes}")
             self._log("")
             self._log("Preprocessing Configuration:")
@@ -724,12 +821,22 @@ class OptunaTabWidget(QWidget):
             # Update target class options
             self._update_target_class_options(model_info.n_classes)
             
-            # Update status label (success)
-            self.model_status_label.setText(f"✓ Model loaded: {model_info.model_type}")
-            self.model_status_label.setStyleSheet(
-                "color: #27ae60; font-weight: bold; font-size: 11px; "
-                "padding: 6px; background-color: #d5f4e6; border-radius: 4px;"
-            )
+            # Update status label (success) — special styling for autoencoder
+            if model_info.model_category == MODEL_CATEGORY_AUTOENCODER:
+                training_class = getattr(self.model_manager.model, 'training_class', 'CRACK')
+                self.model_status_label.setText(
+                    f"✓ Autoencoder loaded ({training_class}) — MSE→Probability conversion active"
+                )
+                self.model_status_label.setStyleSheet(
+                    "color: #8e44ad; font-weight: bold; font-size: 11px; "
+                    "padding: 6px; background-color: #f4ecf7; border-radius: 4px;"
+                )
+            else:
+                self.model_status_label.setText(f"✓ Model loaded: {model_info.model_type}")
+                self.model_status_label.setStyleSheet(
+                    "color: #27ae60; font-weight: bold; font-size: 11px; "
+                    "padding: 6px; background-color: #d5f4e6; border-radius: 4px;"
+                )
             
             # Update info label with preprocessing details
             preprocess_info = ""

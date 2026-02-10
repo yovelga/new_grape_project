@@ -412,8 +412,19 @@ class AutoencoderAdapter(ModelAdapter):
         """
         Predict class probabilities using autoencoder reconstruction error.
         
-        Conversion: error -> probability using exponential decay.
-        P(CRACK) = exp(-error / threshold)
+        Conversion: MSE → probability using sigmoid function.
+        
+        The autoencoder is trained on CRACK samples, so:
+        - Low MSE → sample looks like CRACK → P(CRACK) is HIGH
+        - High MSE → sample is anomalous (not CRACK) → P(CRACK) is LOW
+        
+        We use: P(CRACK) = sigmoid(-(MSE - threshold) / temperature)
+                         = 1 / (1 + exp((MSE - threshold) / temperature))
+        
+        This gives a smooth S-curve centered at the threshold:
+        - MSE << threshold → P(CRACK) ≈ 1.0
+        - MSE == threshold → P(CRACK) = 0.5
+        - MSE >> threshold → P(CRACK) ≈ 0.0
 
         Args:
             X: Input features (N, D) - NOT scaled yet
@@ -432,8 +443,10 @@ class AutoencoderAdapter(ModelAdapter):
         # Compute reconstruction error
         errors = self._get_reconstruction_error(X_scaled.astype(np.float32))
 
-        # Convert error to probability
-        prob_crack = np.exp(-errors / self.threshold)
+        # Convert MSE to probability using sigmoid
+        # temperature controls the steepness of the transition (smaller = sharper)
+        temperature = self.threshold * 0.3  # ~30% of threshold as temperature
+        prob_crack = 1.0 / (1.0 + np.exp((errors - self.threshold) / temperature))
         prob_crack = np.clip(prob_crack, 0.0, 1.0)
         
         # Create (N, 2) probability array: [NOT_CRACK, CRACK]
