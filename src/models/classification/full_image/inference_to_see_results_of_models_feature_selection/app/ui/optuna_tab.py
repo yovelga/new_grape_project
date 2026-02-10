@@ -976,6 +976,11 @@ class OptunaTabWidget(QWidget):
         # Create inference function using model manager with selected target class
         inference_fn = self.model_manager.create_inference_fn(target_class_index=target_class_idx)
         
+        # Get paths for metadata
+        model_path = model_info.path if model_info else None
+        calibration_csv_path = self.calibration_path_edit.text() if self.calibration_path_edit.text() else None
+        test_csv_path = self.test_path_edit.text() if self.test_path_edit.text() else None
+        
         # Create and start worker
         self.worker = OptunaWorker(
             calibration_samples=self.calibration_samples,
@@ -987,7 +992,10 @@ class OptunaTabWidget(QWidget):
             n_jobs=1,
             timeout=None,
             output_dir=output_dir,
-            search_space=self.search_space
+            search_space=self.search_space,
+            model_path=model_path,
+            calibration_csv_path=calibration_csv_path,
+            test_csv_path=test_csv_path
         )
         
         # Connect signals

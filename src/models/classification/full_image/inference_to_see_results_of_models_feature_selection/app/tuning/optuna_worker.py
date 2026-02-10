@@ -48,7 +48,10 @@ class OptunaWorker(QThread):
                  n_jobs: int = 1,
                  timeout: Optional[int] = None,
                  output_dir: Optional[str] = None,
-                 search_space: Optional[HyperparameterSearchSpace] = None):
+                 search_space: Optional[HyperparameterSearchSpace] = None,
+                 model_path: Optional[str] = None,
+                 calibration_csv_path: Optional[str] = None,
+                 test_csv_path: Optional[str] = None):
         """
         Initialize Optuna worker.
         
@@ -63,6 +66,9 @@ class OptunaWorker(QThread):
             timeout: Timeout in seconds
             output_dir: Output directory for results
             search_space: Hyperparameter search space (uses default if None)
+            model_path: Full path to the model file used for inference
+            calibration_csv_path: Path to the calibration CSV dataset file
+            test_csv_path: Path to the test CSV dataset file
         """
         super().__init__()
         
@@ -77,6 +83,14 @@ class OptunaWorker(QThread):
         self.output_dir = output_dir
         self.search_space = search_space
         
+        # Model and dataset paths for metadata
+        self.model_path = model_path
+        self.calibration_csv_path = calibration_csv_path
+        self.test_csv_path = test_csv_path
+        
+        # Collect log messages for saving to file
+        self.log_messages: List[str] = []
+        
         self._stop_requested = False
         self.tuner: Optional[OptunaTuner] = None
     
@@ -84,6 +98,25 @@ class OptunaWorker(QThread):
         """Request worker to stop (graceful cancellation)."""
         self._stop_requested = True
         logger.info("Stop requested for Optuna worker")
+    
+    def _log_and_emit(self, message: str):
+        """Log message and emit to UI, also store for file saving."""
+        self.log_messages.append(message)
+        self.progress_update.emit(message)
+    
+    def _save_log_file(self):
+        """Save collected log messages to a file in the output directory."""
+        if self.tuner is None or not self.log_messages:
+            return
+        
+        try:
+            from pathlib import Path
+            log_path = Path(self.tuner.output_dir) / 'optuna_run.log'
+            with open(log_path, 'w', encoding='utf-8') as f:
+                f.write('\n'.join(self.log_messages))
+            logger.info(f"Log saved to {log_path}")
+        except Exception as e:
+            logger.error(f"Failed to save log file: {e}")
     
     def _trial_callback(self, study, trial):
         """
@@ -142,18 +175,21 @@ class OptunaWorker(QThread):
                    f"Score: {trial.value:.4f} | "
                    f"Best: {best_value:.4f}")
         
-        self.progress_update.emit(msg)
+        self._log_and_emit(msg)
     
     def run(self):
         """Run Optuna study in thread."""
         try:
             # Emit start message
-            self.progress_update.emit(f"Initializing Optuna tuner...")
-            self.progress_update.emit(f"Calibration: {len(self.calibration_samples)} samples")
-            self.progress_update.emit(f"Test: {len(self.test_samples)} samples")
-            self.progress_update.emit(f"Optimizing: {self.optimize_metric.upper()}")
-            self.progress_update.emit(f"Trials: {self.n_trials}")
-            self.progress_update.emit("")
+            self._log_and_emit(f"Initializing Optuna tuner...")
+            self._log_and_emit(f"Model: {self.model_path}")
+            self._log_and_emit(f"Calibration CSV: {self.calibration_csv_path}")
+            self._log_and_emit(f"Test CSV: {self.test_csv_path}")
+            self._log_and_emit(f"Calibration: {len(self.calibration_samples)} samples")
+            self._log_and_emit(f"Test: {len(self.test_samples)} samples")
+            self._log_and_emit(f"Optimizing: {self.optimize_metric.upper()}")
+            self._log_and_emit(f"Trials: {self.n_trials}")
+            self._log_and_emit("")
             
             # Create tuner
             self.tuner = OptunaTuner(
@@ -162,18 +198,22 @@ class OptunaWorker(QThread):
                 inference_fn=self.inference_fn,
                 optimize_metric=self.optimize_metric,
                 output_dir=self.output_dir,
-                search_space=self.search_space
+                search_space=self.search_space,
+                model_path=self.model_path,
+                calibration_csv_path=self.calibration_csv_path,
+                test_csv_path=self.test_csv_path
             )
             
             # Pre-cache all probability maps
-            self.progress_update.emit("Pre-caching inference results...")
+            self._log_and_emit("Pre-caching inference results...")
             total_samples = len(self.calibration_samples) + len(self.test_samples)
             cached = 0
             
             for samples in [self.calibration_samples, self.test_samples]:
                 for sample in samples:
                     if self._stop_requested:
-                        self.progress_update.emit("Caching interrupted by stop request")
+                        self._log_and_emit("Caching interrupted by stop request")
+                        self._save_log_file()
                         return
                     
                     # Get and cache
@@ -181,13 +221,13 @@ class OptunaWorker(QThread):
                     cached += 1
                     
                     if cached % 10 == 0:
-                        self.progress_update.emit(f"Cached {cached}/{total_samples} samples...")
+                        self._log_and_emit(f"Cached {cached}/{total_samples} samples...")
             
-            self.progress_update.emit(f"Cached all {total_samples} samples")
-            self.progress_update.emit(f"Cache stats: {self.tuner.cache}")
-            self.progress_update.emit("")
-            self.progress_update.emit("Starting Optuna optimization...")
-            self.progress_update.emit("-" * 60)
+            self._log_and_emit(f"Cached all {total_samples} samples")
+            self._log_and_emit(f"Cache stats: {self.tuner.cache}")
+            self._log_and_emit("")
+            self._log_and_emit("Starting Optuna optimization...")
+            self._log_and_emit("-" * 60)
             
             # Run study with callback
             callbacks = [self._trial_callback]
@@ -202,47 +242,53 @@ class OptunaWorker(QThread):
             
             # Check if stopped
             if self._stop_requested:
-                self.progress_update.emit("")
-                self.progress_update.emit("Study stopped by user request")
+                self._log_and_emit("")
+                self._log_and_emit("Study stopped by user request")
+                self._save_log_file()
                 return
             
             # Study completed
-            self.progress_update.emit("")
-            self.progress_update.emit("-" * 60)
-            self.progress_update.emit("Study completed!")
-            self.progress_update.emit("")
-            self.progress_update.emit(self.tuner.get_summary())
-            self.progress_update.emit("")
+            self._log_and_emit("")
+            self._log_and_emit("-" * 60)
+            self._log_and_emit("Study completed!")
+            self._log_and_emit("")
+            self._log_and_emit(self.tuner.get_summary())
+            self._log_and_emit("")
             
             self.study_completed.emit()
             
             # Evaluate on all splits
-            self.progress_update.emit("=" * 60)
-            self.progress_update.emit("Evaluating best parameters on all splits...")
-            self.progress_update.emit("")
+            self._log_and_emit("=" * 60)
+            self._log_and_emit("Evaluating best parameters on all splits...")
+            self._log_and_emit("")
             
             report = self.tuner.evaluate_final()
             
             # Save results
-            self.progress_update.emit("Saving results...")
+            self._log_and_emit("Saving results...")
             self.tuner.save_results(report)
             
             # Emit final results
-            self.progress_update.emit("")
-            self.progress_update.emit("=" * 60)
-            self.progress_update.emit("FINAL RESULTS")
-            self.progress_update.emit("=" * 60)
+            self._log_and_emit("")
+            self._log_and_emit("=" * 60)
+            self._log_and_emit("FINAL RESULTS")
+            self._log_and_emit("=" * 60)
             
             report_str = str(report)
-            self.progress_update.emit(report_str)
+            self._log_and_emit(report_str)
             self.final_results.emit(report_str)
             
-            self.progress_update.emit("")
-            self.progress_update.emit(f"All results saved to: {self.tuner.output_dir}")
-            self.progress_update.emit("")
-            self.progress_update.emit("Done!")
+            self._log_and_emit("")
+            self._log_and_emit(f"All results saved to: {self.tuner.output_dir}")
+            self._log_and_emit("")
+            self._log_and_emit("Done!")
+            
+            # Save log file to output directory
+            self._save_log_file()
             
         except Exception as e:
             error_msg = f"Error in Optuna worker: {str(e)}\n{traceback.format_exc()}"
             logger.error(error_msg)
+            self._log_and_emit(f"ERROR: {error_msg}")
+            self._save_log_file()
             self.error_occurred.emit(error_msg)

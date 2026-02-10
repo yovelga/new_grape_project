@@ -118,7 +118,7 @@ OUTLIER_CONTAMINATION = 0.0  # Set to 0 to disable outlier removal, or e.g. 0.05
 WL_MIN = 450
 WL_MAX = 925
 APPLY_SNV = True
-BALANCED = False  # Use full unbalanced dataset for anomaly detection
+BALANCED = True  # Use balanced dataset
 
 # Target anomaly class
 ANOMALY_CLASS = "CRACK"
@@ -981,7 +981,7 @@ def main():
     print(f"  Threshold:          {THRESHOLD_PERCENTILE}th percentile of training normal errors")
     print(f"  Wavelength range:   {WL_MIN}-{WL_MAX} nm")
     print(f"  SNV normalization:  {APPLY_SNV}")
-    print(f"  Balanced dataset:   {BALANCED} (using FULL unbalanced data)")
+    print(f"  Balanced dataset:   {BALANCED}")
     print(f"  Output directory:   {OUTPUT_DIR}")
     print(f"  Device:             {DEVICE}")
     print(f"  Training classes:   {NORMAL_CLASSES}")

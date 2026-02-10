@@ -42,7 +42,10 @@ class OptunaTuner:
                  inference_fn: Callable[[str], np.ndarray],
                  optimize_metric: str = 'f1',
                  output_dir: Optional[str] = None,
-                 search_space: Optional[HyperparameterSearchSpace] = None):
+                 search_space: Optional[HyperparameterSearchSpace] = None,
+                 model_path: Optional[str] = None,
+                 calibration_csv_path: Optional[str] = None,
+                 test_csv_path: Optional[str] = None):
         """
         Initialize Optuna tuner.
         
@@ -53,11 +56,19 @@ class OptunaTuner:
             optimize_metric: Metric to optimize ('f1' or 'f2')
             output_dir: Directory to save results
             search_space: Hyperparameter search space (uses default if None)
+            model_path: Full path to the model file used for inference
+            calibration_csv_path: Path to the calibration CSV dataset file
+            test_csv_path: Path to the test CSV dataset file
         """
         self.calibration_samples = calibration_samples
         self.test_samples = test_samples
         self.inference_fn = inference_fn
         self.optimize_metric = optimize_metric.lower()
+        
+        # Store model and dataset paths for logging/saving
+        self.model_path = model_path
+        self.calibration_csv_path = calibration_csv_path
+        self.test_csv_path = test_csv_path
         
         if self.optimize_metric not in ['f1', 'f2']:
             raise ValueError(f"optimize_metric must be 'f1' or 'f2', got '{optimize_metric}'")
@@ -395,14 +406,20 @@ class OptunaTuner:
         """
         logger.info(f"Saving results to {self.output_dir}")
         
-        # Save best params
+        # Save best params with model and dataset metadata
         best_params_path = self.output_dir / 'study_best_params.json'
         with open(best_params_path, 'w') as f:
             json.dump({
                 'best_trial': self.best_trial_number,
                 'best_score': self.best_score,
                 'best_params': self.best_params,
-                'optimize_metric': self.optimize_metric
+                'optimize_metric': self.optimize_metric,
+                'model_path': self.model_path,
+                'calibration_csv_path': self.calibration_csv_path,
+                'test_csv_path': self.test_csv_path,
+                'n_calibration_samples': len(self.calibration_samples),
+                'n_test_samples': len(self.test_samples),
+                'timestamp': datetime.now().isoformat()
             }, f, indent=2)
         
         # Save trial history

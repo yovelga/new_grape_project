@@ -129,7 +129,7 @@ THRESHOLD_PERCENTILE = 99  # Percentile of training normal errors for threshold
 WL_MIN = 450
 WL_MAX = 925
 APPLY_SNV = True
-BALANCED = False  # CRITICAL: Use full unbalanced dataset
+BALANCED = True  # Use balanced dataset
 
 
 # =============================================================================
@@ -998,7 +998,7 @@ def main():
     print(f"  Threshold:          {THRESHOLD_PERCENTILE}th percentile of training normal errors")
     print(f"  Wavelength range:   {WL_MIN}-{WL_MAX} nm")
     print(f"  SNV normalization:  {APPLY_SNV}")
-    print(f"  Balanced dataset:   {BALANCED} (using FULL unbalanced data)")
+    print(f"  Balanced dataset:   {BALANCED}")
     print(f"  Output directory:   {OUTPUT_DIR}")
     print(f"  Device:             {DEVICE}")
 
