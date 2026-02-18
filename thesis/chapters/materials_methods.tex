@@ -694,6 +694,36 @@ hyperspectral imaging for reducing non-chemical variability without distorting d
 % training partition of the relevant protocol and then applied to the
 % corresponding held-out data without refitting.
 
+\subsection{Cross-Validation and Data Partitioning Strategy}
+\label{subsec:cv_strategy}
+
+\noindent
+To assess generalization to unseen biological samples, Leave-One-Group-Out (LOGO)
+cross-validation was applied at the grape-cluster acquisition level. LOGO was selected
+due to the limited number of available hyperspectral images, which precluded a simple
+held-out test set while still requiring rigorous evaluation of cluster-level
+generalization. All pixels extracted from the same hyperspectral image (corresponding
+to a unique grape cluster) were assigned exclusively to either the training set or the
+test set within each fold. This grouping strategy ensured that evaluation was performed
+on spectral signatures from previously unseen clusters, preventing spatial or spectral
+leakage between partitions.
+
+\medskip
+\noindent
+For multi-class settings with explicit background/distractor classes, a domain-aware
+variant was used: LOGO folds were defined over grape-containing acquisitions, while
+non-grape background samples were assigned to a fixed grouped holdout split (80/20) to
+prevent leakage across semantically distinct domains.
+
+\medskip
+\noindent
+Across all reported protocols, leakage prevention was enforced by design: the
+wavelength restriction (450--925\,nm) is fixed globally, SNV is computed
+independently per spectrum, and any data-dependent operation that requires
+fitting parameters or selecting features is carried out using only the training
+partition of the relevant protocol (or Row~1 for whole-image calibration) and
+then applied to held-out groups (or Row~2) without adaptation.
+
 \subsection{Spectral Discriminability and Informative Wavelength Analysis}
 \label{subsec:spectral_discriminability}
 
@@ -720,6 +750,10 @@ metrics.
 \subsection{Pixel-Level Classification Framework}
 \label{subsec:pixel_level_framework}
 
+\noindent
+\textit{Can cracked and healthy grape tissues be spectrally distinguished at the individual pixel level?}
+
+\medskip
 \noindent
 Pixel-level classification was performed to evaluate whether spectral signatures of individual pixels could discriminate cracked grape tissue from healthy tissue and background materials. Each pixel was treated as an independent observation represented by its SNV-normalized reflectance spectrum.
 
@@ -764,24 +798,19 @@ Both balanced and unbalanced training regimes were investigated. Under the unbal
 \subsubsection{Cross-Validation Protocol}
 
 \noindent
-To assess generalization to unseen biological samples, Leave-One-Group-Out (LOGO) cross-validation was applied at the grape-cluster acquisition level. LOGO was selected due to the limited number of available hyperspectral images, which precluded a simple held-out test set while still requiring rigorous evaluation of cluster-level generalization. All pixels extracted from the same hyperspectral image (corresponding to a unique grape cluster) were assigned exclusively to either the training set or the test set within each fold. This grouping strategy ensured that evaluation was performed on spectral signatures from previously unseen clusters, preventing spatial or spectral leakage between partitions.
-
-\medskip
-\noindent
-For the multi-class formulation with background classes, a domain-aware variant was used: LOGO folds were defined over grape-containing acquisitions, while non-grape background samples were assigned to a fixed grouped holdout split (80/20) to prevent leakage across semantically distinct domains.
+Generalization was evaluated using the Leave-One-Group-Out (LOGO) protocol at the grape-cluster acquisition level, as described in \S\ref{subsec:cv_strategy}. For the multi-class formulation, the domain-aware variant was applied.
 
 \subsubsection{Evaluation Metrics}
 
 \noindent
-Classification performance was quantified using metrics selected for their interpretability under class imbalance. The primary ranking metric for pixel-level classification was \textbf{Precision--Recall Area Under the Curve (PR--AUC)} for the \textit{Cracked} class, computed with \textit{Cracked} treated as the positive class. PR--AUC was preferred over ROC--AUC because its baseline corresponds to the positive-class prevalence, making it more informative when the minority class is of primary interest.
-
-\medskip
-\noindent
-Additional metrics reported included: Accuracy, Balanced Accuracy (macro-average of per-class recall), Precision and Recall for the \textit{Cracked} class, macro-average F1-score, and ROC--AUC for the \textit{Cracked} class. These metrics were computed per fold and summarized as mean $\pm$ standard deviation across folds. Threshold-dependent metrics (Precision, Recall, F1) used the model's default decision rule; for probabilistic classifiers, the standard threshold of 0.5 was applied to predicted probabilities.
+Classification performance was assessed using the metrics and reporting conventions detailed in \S\ref{subsubsec:metrics_rationale}. The primary ranking metric was \textbf{PR--AUC} for the \textit{Cracked} class; supplementary metrics included Accuracy, Balanced Accuracy, Precision, Recall, F1, and ROC--AUC.
 
 
 \subsection{Anomaly Detection Framework}
 \label{subsec:anomaly_detection}
+
+\noindent
+\textit{Can crack damage be detected as a spectral anomaly without explicit class labels?}
 
 \subsubsection{One-Class Formulation}
 
@@ -805,7 +834,7 @@ Three experimental configurations were evaluated, each defining normality differ
 Cross-validation strategies were adapted to each variant's data structure:
 
 \begin{itemize}[leftmargin=1.5em,nosep]
-    \item \textbf{Binary one-class:} Leave-One-Group-Out (LOGO) at the grape-cluster acquisition level, matching the supervised classification protocol (\S\ref{subsec:pixel_level_framework}).
+    \item \textbf{Binary one-class:} Leave-One-Group-Out (LOGO) at the grape-cluster acquisition level (\S\ref{subsec:cv_strategy}).
     \item \textbf{Multi-class (all except Cracked):} Single grouped train/test split (80/20) stratified by acquisition.
     \item \textbf{Multi-class (Cracked only):} Domain-aware cross-validation combining LOGO over \textit{Cracked}-containing acquisitions with a fixed grouped 80/20 split for non-\textit{Cracked} samples to prevent segment leakage.
 \end{itemize}
@@ -816,7 +845,7 @@ For binary one-class IsolationForest (contamination $=0.05$) was applied to remo
 \subsubsection{Spectral Preprocessing}
 
 \noindent
-Pixels were preprocessed as described in \S\ref{subsec:global_preprocessing}. Specifically, SNV normalization was applied per spectrum, and the retained wavelength range was 450--925\,nm (159 bands at $\sim$3\,nm spacing).
+Pixels were preprocessed as described in \S\ref{subsec:global_preprocessing} (SNV normalization, 450--925\,nm range, 159 bands).
 
 \subsubsection{Autoencoder Architecture and Training}
 
@@ -877,49 +906,20 @@ where $e(x)$ is the reconstruction error for spectrum $x$, $\tau$ is the trainin
 % to the dispersion of the training CRACK reconstruction errors. This parameter was
 % defined heuristically.
 
-
-\subsection{Dimensionality Reduction Strategy}
-\label{subsec:dimensionality_reduction}
-
+\medskip
 \noindent
-Dimensionality reduction was investigated as a secondary analysis step at the pixel level, following validation of baseline models on the full spectral representation. As formulated in \S\ref{subsec:pixel_level_framework}, wavelength selection was evaluated separately for binary (\textit{Cracked} vs.\ \textit{Healthy}) and multi-class (with background classes) settings.
-
-\subsubsection{Spectral Preprocessing}
-
-\noindent
-Pixels were preprocessed as described in \S\ref{subsec:global_preprocessing}. SNV normalization was applied per spectrum, and the spectral range was restricted to 450--925 nm, yielding 159 bands at approximately 3 nm spacing.
-
-\subsubsection{Classification Model}
-
-\noindent
-XGBoost was used as the fixed classifier for all wavelength selection experiments, selected as the best-performing model from the preceding pixel-level classification work (\S\ref{subsec:pixel_level_framework}).
-
-\subsubsection{Two Experimental Settings}
-
-\noindent
-Wavelength selection was performed in two independent experiments:
-\begin{itemize}[leftmargin=1.5em,nosep]
-    \item \textbf{Binary setting:} Wavelengths selected for \textit{Cracked} vs.\ \textit{Healthy} classification.
-    \item \textbf{Multi-class setting:} Wavelengths selected for multi-class classification with background classes.
-\end{itemize}
-
-\subsubsection{Train-Test Split Protocol}
-
-\noindent
-For each experimental setting, a single grouped 80/20 held-out split was constructed with group constraints to prevent leakage. For binary classification, the grouping was by grape cluster identity (\textit{CRACK} and \textit{REGULAR} samples). For multi-class classification, grouping was by cluster/segment identity for background classes. The 80\% training subset was used to re-train XGBoost at each BFS step, while the held-out 20\% test subset served as the invariant selection criterion throughout the elimination path.
-
-\subsubsection{Backward Feature Selection (BFS)}
-
-\noindent
-A deterministic wrapper method was applied, starting from the full set of 159 wavelengths and iteratively removing the least informative band at each step. At each removal step, the classifier was re-trained on the 80\% training subset and evaluated on the held-out 20\% test subset. The selection metric was PR--AUC for the \textit{Cracked} class. BFS provides a monotonic elimination path, identifying the minimal wavelength subset preserving near-baseline detection performance.
-
-% Implementation reference (grouped 80/20 BFS split + leakage assertions):
-% src/models/classification/pixel_level/feature_selection/run_bfs_80_20_grapeid.py
-% src/models/classification/pixel_level/feature_selection/run_bfs_prauc_stability_5runs.py
 
 \subsection{Whole-Image Detection and Aggregation Pipeline}
 \label{subsec:full_image_pipeline}
 
+\noindent
+\textit{How can spatial context stabilize noisy pixel-level predictions into reliable image-level decisions?}
+
+\medskip
+\noindent
+Despite strong pixel-level discrimination under controlled labeling conditions, direct application of per-pixel classifiers to unsegmented field images produced spatially scattered predictions: background materials, illumination gradients, and mixed-pixel effects introduced isolated false positives that could not be resolved at the single-pixel level. These limitations motivated a shift toward spatial aggregation at the image level.
+
+\medskip
 \noindent
 Building upon the pixel-level classification outputs, a whole-image detection and
 localization pipeline was developed to enable robust crack identification in realistic
@@ -936,7 +936,7 @@ biologically meaningful image-level interpretation.
 
 \medskip
 \noindent
-All pixel-level models---including the base classifiers, autoencoder variants, and wavelength-reduced models from dimensionality reduction---were fixed at their trained states. No retraining, tuning, or optimization of these models was performed at the whole-image level.
+All pixel-level models---including the base classifiers, autoencoder variants, and wavelength-reduced model variants (\S\ref{subsec:dimensionality_reduction})---were fixed at their trained states. No retraining, tuning, or optimization of these models was performed at the whole-image level.
 
 \subsubsection{Pipeline Architecture and Spatial Aggregation}
 
@@ -1000,6 +1000,57 @@ corresponded to initial onset (absent-to-minimal/incipient cracking) based on ex
 This stratification was applied exclusively at the evaluation stage and did not affect
 model training or aggregation design.
 
+\subsection{Dimensionality Reduction Strategy}
+\label{subsec:dimensionality_reduction}
+
+\noindent
+\textit{How many wavelengths are needed to maintain crack-detection performance?}
+
+\medskip
+\noindent
+With the full detection pipeline established---from pixel-level classification through spatial aggregation---the final methodological question was whether the complete 159-band spectral representation was necessary, or whether a reduced wavelength set could preserve detection performance while simplifying future sensor requirements.
+
+\medskip
+\noindent
+Wavelength selection was evaluated separately for binary (\textit{Cracked} vs.\ \textit{Healthy}) and multi-class (with background classes) settings, as formulated in \S\ref{subsec:pixel_level_framework}.
+
+\subsubsection{Spectral Preprocessing}
+
+\noindent
+Pixels were preprocessed as described in \S\ref{subsec:global_preprocessing} (SNV normalization, 450--925\,nm range, 159 bands).
+
+\subsubsection{Classification Model}
+
+\noindent
+XGBoost was used as the fixed classifier for all wavelength selection experiments, selected as the best-performing model from the preceding pixel-level classification work (\S\ref{subsec:pixel_level_framework}).
+
+\subsubsection{Two Experimental Settings}
+
+\noindent
+Wavelength selection was performed in two independent experiments:
+\begin{itemize}[leftmargin=1.5em,nosep]
+    \item \textbf{Binary setting:} Wavelengths selected for \textit{Cracked} vs.\ \textit{Healthy} classification.
+    \item \textbf{Multi-class setting:} Wavelengths selected for multi-class classification with background classes.
+\end{itemize}
+
+\subsubsection{Train-Test Split Protocol}
+
+\noindent
+For each experimental setting, a single grouped 80/20 held-out split was constructed with group constraints to prevent leakage. For binary classification, the grouping was by grape cluster identity (\textit{CRACK} and \textit{REGULAR} samples). For multi-class classification, grouping was by cluster/segment identity for background classes. The 80\% training subset was used to re-train XGBoost at each BFS step, while the held-out 20\% test subset served as the invariant selection criterion throughout the elimination path.
+
+\subsubsection{Backward Feature Selection (BFS)}
+
+\noindent
+A deterministic wrapper method was applied, starting from the full set of 159 wavelengths and iteratively removing the least informative band at each step. At each removal step, the classifier was re-trained on the 80\% training subset and evaluated on the held-out 20\% test subset. The selection metric was PR--AUC for the \textit{Cracked} class. BFS provides a monotonic elimination path, identifying the minimal wavelength subset preserving near-baseline detection performance.
+
+\medskip
+\noindent
+\textbf{Takeaway.} BFS identified minimal wavelength subsets preserving near-baseline PR--AUC, informing practical multispectral sensor design for field deployment.
+
+% Implementation reference (grouped 80/20 BFS split + leakage assertions):
+% src/models/classification/pixel_level/feature_selection/run_bfs_80_20_grapeid.py
+% src/models/classification/pixel_level/feature_selection/run_bfs_prauc_stability_5runs.py
+
 
 \subsection{Evaluation Protocols and Performance Metrics}
 \label{subsec:evaluation_protocols}
@@ -1050,30 +1101,7 @@ Metrics that require binary decisions (Precision/Recall/F1/F2/MCC) use the model
 \subsubsection{Cross-Validation Strategy}
 
 \noindent
-To assess generalization across biologically independent samples and prevent spatial
-or spectral data leakage, group-aware evaluation protocols were employed.
-Where cross-validation was used, Leave-One-Group-Out (LOGO) was applied at the
-grape-cluster acquisition level so that all pixels originating from the same
-grape cluster (or the same hyperspectral acquisition of a cluster) were assigned
-exclusively to either training or test within a fold. For multi-class settings with
-explicit background/distractor classes, a domain-aware variant was additionally used
-in which grape (or CRACK-containing) groups define LOGO folds while non-grape samples
-are assigned to a fixed grouped hold-out split.
-
-\medskip
-\noindent
-This strategy ensures that evaluation is performed on previously unseen biological
-samples and provides a realistic estimate of model performance under field
-deployment conditions.
-
-\medskip
-\noindent
-Across all reported protocols, leakage prevention was enforced by design: the
-wavelength restriction (450--925 nm) is fixed globally, SNV is computed
-independently per spectrum, and any data-dependent operation that requires
-fitting parameters or selecting features is carried out using only the training
-partition of the relevant protocol (or Row~1 for whole-image calibration) and
-then applied to held-out groups (or Row~2) without adaptation.
+Where cross-validation was used, the LOGO protocol described in \S\ref{subsec:cv_strategy} was applied.
 
 \subsubsection{Evaluation Units and Split Strategy}
 \label{subsubsec:eval_units_splits}
