@@ -1,0 +1,1478 @@
+\chapter{Results}
+
+This chapter collects all experimental outcomes and quantitative evaluations related to
+crack detection using hyperspectral and RGB imagery. Results are organized by experiment
+or hypothesis group as separate sections (for example: Spectral Signature Analysis,
+Pixel-Level Classification Benchmark, Wavelength Sensitivity, Anomaly Detection,
+Whole-Image Detection, Classifier Comparisons, Dimensionality Reduction, and Hybrid
+Spectral–Spatial Verification). Each section contains focused subsections with metrics,
+comparisons, ablations, and parameter-level details as appropriate. All material in this
+file belongs to this single chapter; no additional  declarations are used.
+
+% = '====================================================================
+% CHAPTER 4.1: Spectral Signature Analysis and Wavelength Selection
+% =====================================================================
+\section{Spectral Signature Analysis and Identification of Most Informative Wavelengths}
+\label{sec:informative_wavelengths}
+
+The foundational step in developing a robust classification model was to conduct an in-depth exploratory analysis of the hyperspectral data. The primary objective was to determine whether a consistent and statistically significant spectral difference exists between pixels corresponding to healthy grape tissue and those corresponding to cracked tissue . This analysis serves not only to validate the feasibility of spectral classification but also to guide the subsequent, more granular process of feature selection.
+
+\subsection{Mean Spectral Signature Analysis}
+To visualize the fundamental differences between the two classes, the mean spectral signatures for all pixels labeled as 'Cracked' and 'Regular' were computed across the entire dataset. Figure \ref{fig:spectral_signatures_comparison} plots these mean signatures, with the shaded areas representing the standard deviation, providing a sense of the variance within each class.
+
+The graph clearly illustrates that while the two signatures are nearly identical below 500 nm, a significant and consistent separation emerges and grows throughout the visible and Near-Infrared (NIR) spectrum. The most substantial difference between healthy and cracked tissue is visibly concentrated in the **700 nm to 800 nm range**. This wide gap indicates that the pixels' reflectance values in this specific region are highly sensitive to the presence of cracks (or rott), confirming that sufficient spectral information exists for classification.
+
+\begin{figure}[h!]
+    \centering
+    % Ensure the image file is in your project directory
+    \includegraphics[width=1\textwidth]{avg_std_signatures.png}
+    \caption{Mean spectral signatures of pixels sampled from 'Cracked' (Orange) versus 'Regular' (Blue) grape tissue. The shaded areas represent the standard deviation. The largest separation is evident in the NIR region (700-900 nm).}
+    \label{fig:spectral_signatures_comparison}
+\end{figure}
+
+\newpage
+\subsection{Consensus-Based Feature Selection}
+While the visual analysis confirms the potential for classification, using the entire spectrum as input for a model is inefficient and can lead to overfitting due to the high dimensionality of the data. Therefore, a formal feature selection process was employed to identify the most potent subset of wavelengths. To ensure the robustness of the selected features, three distinct methods were used: **Fisher Score** ~\cite{gu2012generalized}, **Mutual Information**~\cite{vergara2014review}, and **Random Forest Feature Importance**~\cite{menze2009comparison}.
+
+The analysis revealed a remarkable consensus among the methods, confirming the initial observation. All three algorithms consistently highlighted the Near-Infrared (NIR) region, specifically the **700 nm to 800 nm range**, as the most informative for detecting cracks. Out of the top 30 wavelengths ranked by each method, **19 key wavelengths were unanimously identified as significant by all three algorithms**, and a further 11 were selected by at least two methods. This high level of agreement provides strong validation for the selected features.
+
+The 19 high-consensus wavelengths, listed in Table \ref{tab:top_wavelengths}, form the final feature set for model development. Figure \ref{fig:avg_with_selected_wl} visually reinforces this result, plotting the mean signatures and highlighting the locations of these top-ranked features, which align perfectly with the region of maximum spectral separation.
+
+\begin{table}[h!]
+    \centering
+    \caption{The 19 most informative wavelengths, selected concurrently by all three feature selection methods (Fisher Score, Mutual Information, and Random Forest), forming the high-consensus feature set for model development.}
+    \label{tab:top_wavelengths}
+    \begin{tabular}{ccccc}
+        \toprule
+        \multicolumn{5}{c}{\textbf{High-Consensus Wavelengths (nm)}} \\
+        \midrule
+        720.5 & 723.5 & 726.5 & 729.5 & 732.5 \\
+        735.5 & 738.5 & 741.5 & 744.5 & 747.5 \\
+        750.5 & 753.5 & 756.6 & 759.6 & 762.6 \\
+        768.6 & 780.6 & 786.7 & 801.8 & \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\begin{figure}[h!]
+    \centering
+    % Ensure this image file is available in your project directory
+    \includegraphics[width=0.8\textwidth]{avg_with_selected_wl.png}
+    \caption{Mean spectral signatures with the top-ranked, high-consensus wavelengths highlighted by vertical dashed lines. The selected features are clearly concentrated in the NIR region, coinciding with the area of greatest spectral separation between cracked and regular tissue.}
+    \label{fig:avg_with_selected_wl}
+\end{figure}
+
+
+\newpage
+
+% =====================================================================
+% CHAPTER 4.2: Classification
+% =====================================================================
+
+\section{Pixel-Level Classification Model Benchmark}
+To identify the most effective method for distinguishing between cracked and healthy grape tissue at the pixel level, a comprehensive benchmark of nine different classification models was conducted, including XGBoost, Random Forest, Gradient Boosting, Multi-Layer Perceptron (MLP), Linear Discriminant Analysis (LDA), Quadratic Discriminant Analysis (QDA), Logistic Regression, Decision Tree, and Support Vector Classifier (SVC).
+The evaluation was performed on two versions of the dataset: the original, naturally imbalanced dataset, and a balanced version created through undersampling of the majority class. A robust Leave-One-Group-Out (LOGO) cross-validation strategy was employed to ensure the models' ability to generalize to unseen grape clusters.
+All models were implemented using the \texttt{scikit-learn} framework \cite{pedregosa2011scikit,kramer2016scikit}, 
+except XGBoost, which was implemented using the official \texttt{XGBoost} library \cite{chen2016xgboost}.
+
+
+\subsection{Performance on the Unbalanced Dataset}
+The models were first evaluated on the full, unbalanced dataset. Simpler linear models demonstrated top-tier performance. Logistic Regression achieved the highest mean accuracy (97.13\%), while the Support Vector Classifier (SVC) yielded the highest Mean ROC AUC (0.9943). The Linear Discriminant Analysis (LDA) model provided the highest precision for the 'Cracked' class (90.55\%). Full results are in Table \ref{tab:unbalanced_results}.
+
+\begin{table}[h!]
+\centering
+\caption{Model Performance on the Unbalanced Dataset.}
+\label{tab:unbalanced_results}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lrrrrrrr}
+\toprule
+\textbf{Model Name} & \textbf{Mean Acc.} & \textbf{Mean ROC AUC} & \textbf{Mean PR AUC} & \textbf{Mean F1} & \textbf{Prec. (Cracked)} & \textbf{Recall (Cracked)} & \textbf{Train Time (s)} \\
+\midrule
+XGBoost & 0.9525 & 0.9845 & 0.8983 & 0.9634 & 0.8845 & 0.8454 & 0.84 \\
+RandomForest & 0.9491 & 0.9849 & 0.8984 & 0.9620 & 0.8868 & 0.8425 & 47.16 \\
+GradientBoosting & 0.9362 & 0.9850 & 0.8973 & 0.9525 & 0.8863 & 0.8345 & 660.83 \\
+MLP (CPU) & 0.9394 & 0.9843 & 0.8953 & 0.9529 & 0.8578 & 0.8464 & 44.60 \\
+\textbf{LDA} & 0.9624 & 0.9931 & 0.9025 & 0.9733 & \textbf{0.9055} & 0.8510 & 1.15 \\
+QDA & 0.9568 & 0.9763 & 0.8915 & 0.9661 & 0.8988 & 0.8560 & 1.51 \\
+\textbf{LogisticRegression} & \textbf{0.9713} & 0.9931 & 0.9023 & \textbf{0.9783} & 0.8991 & \textbf{0.8719} & 3.04 \\
+DecisionTree & 0.9200 & 0.9387 & 0.8374 & 0.9383 & 0.8514 & 0.8245 & 13.03 \\
+SVC & 0.9663 & \textbf{0.9943} & 0.9026 & 0.9712 & 0.8775 & 0.8616 & 403.41 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\subsection{Performance on the Balanced Dataset}
+To assess model behavior without class imbalance, the benchmark was repeated on a balanced dataset. After balancing, the linear models continued to excel. LDA emerged with the highest mean accuracy (96.72\%). This indicates that the underlying spectral signatures are robust. The results are presented in Table \ref{tab:balanced_results}.
+
+\begin{table}[h!]
+\centering
+\caption{Model Performance on the Balanced Dataset.}
+\label{tab:balanced_results}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lrrrrrrr}
+\toprule
+\textbf{Model Name} & \textbf{Mean Acc.} & \textbf{Mean ROC AUC} & \textbf{Mean PR AUC} & \textbf{Mean F1} & \textbf{Prec. (Cracked)} & \textbf{Recall (Cracked)} & \textbf{Train Time (s)} \\
+\midrule
+XGBoost & 0.9389 & 0.9859 & 0.9023 & 0.9522 & 0.8909 & 0.8493 & 0.70 \\
+RandomForest & 0.9383 & 0.9844 & 0.9018 & 0.9530 & 0.8939 & 0.8482 & 29.43 \\
+GradientBoosting & 0.9347 & 0.9851 & 0.9019 & 0.9490 & 0.8925 & 0.8524 & 356.38 \\
+MLP  & 0.9401 & 0.9810 & 0.8983 & 0.9508 & 0.8842 & 0.8551 & 26.78 \\
+\textbf{LDA} & \textbf{0.9672} & 0.9919 & 0.9048 & \textbf{0.9743} & \textbf{0.9030} & 0.8669 & 0.58 \\
+QDA & 0.9459 & 0.9758 & 0.8964 & 0.9558 & 0.8985 & 0.8584 & 0.75 \\
+\textbf{LogisticRegression} & 0.9654 & \textbf{0.9929} & \textbf{0.9051} & 0.9728 & 0.9003 & \textbf{0.8753} & 1.73 \\
+DecisionTree & 0.9052 & 0.9396 & 0.8591 & 0.9254 & 0.8735 & 0.8224 & 6.43 \\
+SVC & 0.9600 & 0.9936 & 0.9048 & 0.9654 & 0.8881 & 0.8647 & 175.60 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+
+% =====================================================================
+% CHAPTER 4.2.4 Wavelength Sensitivity Analysis with LOGO Cross-Validation
+% =====================================================================
+
+\section{Wavelength Sensitivity Analysis with LOGO Cross-Validation}
+To evaluate how the number of selected wavelengths (\emph{k}) affects model performance, a dedicated wavelength sensitivity analysis was conducted. The primary aim of this experiment was to determine the smallest subset of spectral features sufficient for robust classification of \emph{Cracked} versus \emph{Regular} grape tissue, while ensuring that the evaluation strictly generalizes across unseen grape clusters.  
+
+A rigorous \emph{Leave-One-Group-Out (LOGO)} cross-validation strategy was employed, in which entire grape clusters were held out as test sets in each fold. To prevent biased evaluation, folds in which either the training or test partition contained only a single class were discarded. This ensured that the reported results reflect true generalization rather than memorization of cluster-specific properties.  
+
+Two linear classifiers, \textbf{Logistic Regression} and \textbf{Linear Discriminant Analysis (LDA)}, were benchmarked. For feature selection, we employed \textbf{Sequential Forward Selection (SFS)}, where wavelengths were added one by one to maximize the ROC AUC score within a nested cross-validation on the training folds. This approach allows identification of an informative yet compact subset of wavelengths.  
+
+The analysis was repeated for $k = 1 \ldots 20$ selected wavelengths. For each configuration, the following metrics were computed and averaged across all valid folds: \emph{Accuracy}, \emph{ROC AUC}, \emph{PR AUC} (average precision), \emph{Precision}, \emph{Recall}, \emph{F1-score}, and training time. In addition to reporting mean values, fold-level variability was examined through boxplots, highlighting the stability of the models as $k$ increased. Representative results are shown in Table~\ref{tab:wavelength_sensitivity_k_5_10_15_20}, while Figure~\ref{fig:perf-vs-k} illustrates the performance curves.
+
+
+\begin{figure}[ht!]
+  \centering
+  \begin{subfigure}{0.32\linewidth}
+    \includegraphics[width=\linewidth]{perf_vs_k__mean_roc_auc.png}
+    \caption{ROC AUC vs.\ $k$}
+  \end{subfigure}\hfill
+  \begin{subfigure}{0.32\linewidth}
+    \includegraphics[width=\linewidth]{perf_vs_k__mean_pr_auc.png}
+    \caption{PR AUC vs.\ $k$}
+  \end{subfigure}\hfill
+  \begin{subfigure}{0.32\linewidth}
+    \includegraphics[width=\linewidth]{perf_vs_k__mean_acc..png}
+    \caption{Accuracy vs.\ $k$}
+  \end{subfigure}
+  \caption{Performance vs.\ $k$ for LDA and Logistic Regression (SFS, LOGO).}
+  \label{fig:perf-vs-k}
+\end{figure}
+
+
+
+\begin{table}[ht!]
+\centering
+\caption{Mean performance across LOGO folds using SFS for selected $k$.}
+\label{tab:wavelength_sensitivity_k_5_10_15_20}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lrrrrrr}
+\toprule
+\textbf{Model} & \textbf{$k$} & \textbf{Mean Acc.} & \textbf{Mean ROC AUC} & \textbf{Mean PR AUC} & \textbf{Mean F1} & \textbf{Recall (Cracked)} \\
+\midrule
+LDA                 & 5  & 0.977 & 0.991 & 0.985 & 0.955 & 0.943 \\
+LDA                 & 10 & 0.978 & 0.991 & 0.987 & 0.959 & 0.941 \\
+LDA                 & 15 & 0.977 & 0.991 & 0.987 & 0.958 & 0.940 \\
+LDA                 & 20 & 0.977 & 0.990 & 0.986 & 0.958 & 0.940 \\
+Logistic Regression & 5  & 0.968 & 0.990 & 0.983 & 0.943 & 0.942 \\
+Logistic Regression & 10 & 0.973 & 0.992 & 0.988 & 0.952 & 0.954 \\
+Logistic Regression & 15 & 0.972 & 0.993 & 0.988 & 0.950 & 0.956 \\
+Logistic Regression & 20 & 0.974 & 0.994 & 0.990 & 0.952 & 0.955 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+
+\paragraph{Summary and trends.}
+Both models reach near-saturated ROC/PR AUC around $k\approx10$--$12$. Logistic Regression exhibits a slight edge in ROC/PR AUC and recall as $k$ increases, whereas LDA remains highly competitive already with fewer wavelengths. In other words, most of the separability between \emph{Cracked} and \emph{Regular} pixels can be captured by a compact subset of features.
+
+\medskip
+\noindent
+Figure~\ref{fig:perf-vs-k-roc} focuses on ROC AUC versus $k$; the curve rises sharply for small $k$ and then plateaus, indicating diminishing returns beyond roughly ten wavelengths. To expose the effect of each additional feature, Figure~\ref{fig:marginal-gain-roc} reports the \emph{marginal gain} ($\Delta$ROC AUC from $k{-}1$ to $k$), and Figure~\ref{fig:cum-delta-roc} shows the \emph{cumulative} $\Delta$ relative to $k{=}1$. Together, these plots confirm that the improvement is front–loaded: the first few wavelengths deliver most of the gain.
+
+
+\paragraph{Fold-averaged curves at a representative operating point ($k=10$).}
+To visualize the resulting discrimination in probability space, we plot mean ROC and Precision--Recall (PR) curves at $k{=}10$ (averaged over LOGO folds). The thin lines represent individual folds and the bold line their mean.
+
+\begin{figure}[ht!]
+  \centering
+  \begin{subfigure}{0.48\linewidth}
+    \includegraphics[width=\linewidth]{roc_mean__sfs_LogisticRegression_k10.png}
+    \caption{Mean ROC ($k{=}10$).}
+    \label{fig:roc-k10-lr}
+  \end{subfigure}\hfill
+  \begin{subfigure}{0.48\linewidth}
+    \includegraphics[width=\linewidth]{pr_mean__sfs_LogisticRegression_k10.png}
+    \caption{Mean PR ($k{=}10$).}
+    \label{fig:pr-k10-lr}
+  \end{subfigure}
+  \caption{Fold-level variability (faint) and mean curves (bold) for Logistic Regression at $k{=}10$. Both ROC AUC and AP are very high, indicating excellent separability under cluster-level generalization.}
+  \label{fig:roc-pr-k10}
+\end{figure}
+
+\paragraph{Selection stability and spectral locality.}
+Feature subsets were obtained using \emph{Sequential Feature Selection (SFS)}, 
+a forward selection strategy that iteratively adds wavelengths maximizing the cross-validated ROC AUC.
+To evaluate the stability of wavelength selection across clusters, 
+we aggregated SFS outcomes over all LOGO folds. 
+For each wavelength and each selection step $k$, we counted how many clusters 
+included that wavelength among their Top-$k$ features.
+The resulting two-dimensional frequency map (Figure~\ref{fig:heatmap-top40}) 
+illustrates the degree of consensus among clusters regarding which spectral bands are most informative.
+
+The heat map reveals a strong concentration of frequently selected wavelengths 
+in the VIS–NIR transition region (approximately 730–940\,nm), 
+with an occasional contribution around 400\,nm. 
+These bands were repeatedly chosen across nearly all clusters, even for small $k$ values,
+indicating high selection stability and suggesting that reflectance contrasts 
+in this region carry the strongest cues for crack detection. 
+Wavelengths outside this interval were rarely selected, implying limited contribution to the classification task.
+
+\newgeometry{margin=1.5cm}
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=\textwidth,height=0.94\textheight,keepaspectratio]{feature_frequency_heatmap_topN.png}
+  \caption{Feature selection frequency heat map across LOGO folds using SFS. 
+  Each cell shows how many clusters included a given wavelength among their Top-$k$ features.
+  Warmer colors indicate higher agreement, with the most frequently selected bands concentrated 
+  in the VIS–NIR region (730–940 nm).}
+  \label{fig:heatmap-top40}
+\end{figure}
+\restoregeometry
+
+
+
+\paragraph{Practical implication.}
+Reliable pixel-level classification is attainable with as few as 3--8 carefully selected wavelengths, predominantly in the NIR. This suggests that compact, application-specific multispectral sensors are feasible for early crack detection in grapes, with minimal loss relative to using the full spectrum.
+
+
+% =====================================================================
+% Anomaly Detection (ADDITIONAL PARAGRAPH)
+% =====================================================================
+
+% --- Find the end of the existing subsection and ADD this paragraph ---
+
+\section{Anomaly Detection Benchmark}
+In addition to benchmarking conventional supervised classifiers, we also developed and evaluated a one-class anomaly detection framework tailored for hyperspectral grape crack detection. Specifically, we implemented an autoencoder trained exclusively on pixels from one class (either \emph{Cracked} or \emph{Regular}), and evaluated its ability to detect anomalies in unseen clusters of one single pixel. Training was performed with a strict Leave-One-Group-Out (LOGO) cross-validation strategy, where entire grape clusters were left out in each fold, thereby preventing information leakage across clusters.  
+
+This design ensured that the models did not simply memorize spectral characteristics of individual berries, but instead demonstrated generalization to entirely new grape clusters. Early stopping and adaptive learning rate scheduling \textcolor{red}{[explain in 1 sentence what this is and give ref]} were applied to stabilize training and avoid overfitting. The anomaly detection results (ROC curves, anomaly score distributions, and per-sample predictions) provided complementary validation of the discriminative power of spectral signatures, and confirmed that robust separation between cracked and healthy tissue can be achieved even under one-class training scenarios.
+\textcolor{red}{if detection is so good, then why and what is the  problem? branches, unknown objects}
+The custom-built UI tool was also instrumental in the exploratory analysis phase of this benchmark. It was enhanced to provide real-time inference using the trained autoencoder. For any given image, the tool could automatically generate segments using SAM2 and then calculate the mean squared reconstruction error (MSE) for the spectral signature of each segment. This allowed for an interactive workflow where segments could be sorted by their anomaly score (MSE), enabling rapid visual validation of the model's ability to distinguish between healthy tissue (low MSE) and potential cracks or other anomalies (high MSE).
+
+\begin{figure}[htbp] % Using htbp for better placement flexibility
+    \centering
+    % Panel (a) for the normal berry - now takes up ~48% of the text width
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{figure_gui_tool_regular.jpg}
+        \caption{A pixel from a healthy berry. The AutoEncoder, trained exclusively on healthy tissue, reconstructs the signature with high fidelity, resulting in a very low MSE of 0.0001.}
+        \label{fig:anomaly_normal}
+    \end{subfigure}
+    \hfill % This command adds a flexible horizontal space between the two subfigures
+    % Panel (b) for the cracked/anomalous berry - also takes up ~48%
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{figure_gui_tool_cracked.jpg}
+        \caption{A pixel from a cracked berry. Because the model has never seen cracked tissue, it struggles to reconstruct the anomalous signature, resulting in a significantly higher MSE of 0.0027 and a visible divergence between the original and reconstructed signals.}
+        \label{fig:anomaly_cracked}
+    \end{subfigure}
+    \caption{Visual validation of the one-class AutoEncoder for anomaly detection. The tool demonstrates the model's ability to differentiate between (a) normal and (b) anomalous spectral signatures in real-time based on the reconstruction error (MSE).}
+    \label{fig:anomaly_validation}
+\end{figure}
+
+
+% =====================================================================
+%  One-Class Training with Autoencoder (LOGO)
+% =====================================================================
+
+\subsection{One-Class Training with Autoencoder (LOGO)}
+In many practical settings only \emph{normal} (Regular) examples are readily available, while the goal is to detect \emph{anomalies} (Cracked) without fully supervised training. We therefore used a \textbf{one-class Autoencoder (AE)}: the model is trained \emph{only} on pixels from the Regular class to reconstruct the spectral vector. At inference, the anomaly score is the reconstruction error (MSE); higher values indicate higher likelihood of anomaly.
+
+\paragraph{Validation protocol.}
+We employed \textbf{Leave-One-Group-Out (LOGO)} cross-validation over grape clusters. In each fold, one cluster was held out for testing and the AE was trained \emph{only} on Regular pixels from the training clusters. A \texttt{StandardScaler} was fitted on the Regular training data of the fold and applied to both train and test. Folds with single-class test sets or with no Regular samples for training were discarded. For every fold we computed ROC-AUC and AP; then we concatenated all out-of-fold (OOF) predictions to select thresholds and to report \emph{micro}-averaged curves.
+
+\paragraph{Threshold selection.}
+We report two operating points:
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{Target-FPR (5\%):} choose the threshold that yields a 5\% false positive rate on the OOF predictions (conservative, fewer false alarms).
+  \item \textbf{F1-max:} sweep all thresholds returned by \texttt{precision\_recall\_curve} and pick the one that maximizes the F1-score on the OOF predictions (balances precision/recall).
+\end{enumerate}
+
+\paragraph{Results.}
+Aggregating across folds we obtained:
+\[
+\text{Mean ROC-AUC}=0.913 \pm 0.128,\quad
+\text{Micro ROC-AUC}=0.916,\quad
+\text{Mean AP}=0.845 \pm 0.234,\quad
+\text{Micro AP}=0.792.
+\]
+The two operating points are summarized in Table~\ref{tab:ae_thresholds}. The micro-averaged ROC curve is shown in Figure~\ref{fig:ae_roc}, and the confusion matrices for both thresholds are shown in Figure~\ref{fig:ae_cms}.
+
+\begin{table}[ht!]
+\centering
+\caption{Autoencoder performance on concatenated OOF predictions (LOGO) at two operating points.}
+\label{tab:ae_thresholds}
+\begin{tabular}{lrrrrr}
+\toprule
+\textbf{Operating point} & \textbf{Threshold} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} \\
+\midrule
+Target-FPR = 5\% & 0.0199 & 0.852 & 0.853 & 0.635 & 0.728 \\
+F1-max           & 0.0119 & 0.834 & 0.692 & 0.850 & 0.762 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=0.58\textwidth]{4.2.5/Autoencoder_on_Regulars_roc_curve.png}
+    \caption{Micro-averaged ROC curve for the one-class Autoencoder (LOGO).}
+    \label{fig:ae_roc}
+\end{figure}
+
+\begin{figure}[ht!]
+    \centering
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{4.2.5/Autoencoder_on_Regulars_confusion_matrix.png}
+        \caption{Target-FPR = 5\%.}
+    \end{subfigure}\hfill
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{4.2.5/Autoencoder_on_Regulars_confusion_matrix_F1max.png}
+        \caption{F1-max.}
+    \end{subfigure}
+    \caption{Confusion matrices on concatenated OOF predictions at the two operating points.}
+    \label{fig:ae_cms}
+\end{figure}
+
+\paragraph{Discussion.}
+The AE provides good separability between Regular and Cracked pixels (ROC-AUC $\approx$ 0.91) despite training on a single class only. The operating point controls the behavior: \emph{Target-FPR=5\%} yields higher precision (0.853) at the cost of recall (0.635), suitable for conservative screening; \emph{F1-max} increases recall to 0.85 and improves F1 to 0.762 at the expense of precision. The across-fold standard deviations indicate non-negligible cluster variability—expected for a one-class approach under changing spectral profiles. While supervised models (Section~4.2.4) perform better, these results support one-class AE as a practical \emph{pre-screening} tool when anomaly labels are scarce or expensive.
+
+% (Optional) For completeness, the full threshold sweep (precision/recall/F1 per threshold) is provided in the Appendix.
+
+
+\paragraph{Summary and interpretation.}
+Despite being trained solely on Regular pixels, the AE often reconstructs spectra of
+Cracked tissue well enough to yield a clear separation via reconstruction error. The
+LOGO-by-cluster variability, however, indicates heterogeneous spectral manifestations
+of cracking and adjacent tissue changes. In clusters where cracks are accompanied by
+stronger decay-related effects (e.g., water loss, or surface damage), the spectra
+depart more markedly from the Regular manifold, making anomalies easier to detect and
+raising recall at a fixed FPR. Conversely, milder or early-stage cracking can produce
+spectra closer to Regular tissue, leading to lower reconstruction error and occasional
+misses. This pattern explains why some folds yield markedly better detection than
+others and reinforces the AE’s role as a prescreening method when labels are scarce,
+while motivating future work that conditions on decay stage or integrates complementary
+modalities.
+
+
+
+% =====================================================================
+\newpage
+\section{Whole-Image Crack Detection with a Multi-Class HSI Model}
+\label{sec:full-image}
+% =====================================================================
+
+This chapter extends the crack-detection framework from controlled, patch-based spectra to full-scene hyperspectral images (HSI) of grape clusters in the vineyard. Building on the pixel-level classifier developed in the previous chapter, we redesign the model and inference pipeline to handle complex backgrounds, illumination artifacts, and heterogeneous decay patterns at the scene level.:contentReference[oaicite:0]{index=0}
+
+The chapter is organized into two main parts.
+First, we describe the evolution from a two-class pixel classifier to a background-aware multi-class model, and motivate the use of hierarchical spatial aggregation.
+Second, we present the dataset design, experimental protocol, and quantitative results on whole-image crack detection.
+
+% ---------------------------------------------------------------------
+\subsection{From Two-Class Pixels to a Multi-Class, Background-Aware Model}
+\label{subsec:model_evolution}
+% ---------------------------------------------------------------------
+
+\subsubsection{Limitations of the original two-class model}
+
+In earlier experiments (Sec.~\ref{sec:pixel-balanced}), a linear discriminant analysis (LDA) classifier trained on a balanced patch dataset of \emph{Healthy} vs.\ \emph{Cracked} pixels achieved near-perfect accuracy and AUC at the \emph{pixel} level.
+However, when the same classifier is applied directly to whole HSI scenes, its performance degrades substantially due to background complexity.
+
+Full vineyard images contain many materials whose spectra are not represented in the original two-class training set, including:
+\begin{itemize}
+    \item wooden branches and rachis,
+    \item leaves and tendrils,
+    \item plastic sheets, wires, and tripod parts,
+    \item specular highlights and cast shadows.
+\end{itemize}
+Many of these structures partially overlap the spectral signatures of cracked tissue (e.g., lower water content in woody tissue, strong reflections on plastic or wet surfaces). As a result, the two-class model frequently produces \textbf{false positives (FPs)} in non-grape regions, even on scenes from the same row that was used for training.
+
+% --- IMAGE BLOCK: OLD FAILURES ---
+\begin{figure}[H]
+  \centering
+  % General caption settings and text centering within subcaptions
+  \captionsetup{font=small, labelfont=bf}
+  \captionsetup[subfigure]{justification=centering}
+
+  % --- Layout Definition (The "Borer") ---
+  \begin{minipage}{0.9\textwidth}
+    \centering
+    \footnotesize
+    \textbf{Figure Layout:} \\
+    \textbf{Left \& Center:} Low-res inputs from the HSI sensor (Detection Map \& Synthesized RGB). \\
+    \textbf{Right:} High-resolution ground truth reference (Canon R5).
+  \end{minipage}
+  \vspace{1em}
+
+  % --- Image 1 ---
+  \subcaptionbox{\textbf{01\_14\_cracked\_and\_branch.} \\ % Line break for better formatting
+  True cracks are detected, but wooden tissue is \\ misclassified due to spectral similarity.}
+  {\includegraphics[width=0.85\textwidth]{full_images_classification/FP_example/01_14_cracked_and_branch.jpg}}
+
+  \vspace{0.8em} % More space for breathing room
+
+  % --- Image 2 ---
+  \subcaptionbox{\textbf{01\_47\_mixed\_scene.} \\
+  Branches, plastic, and true cracks appear together. \\ Small speckle FPs are visible in the foliage.}
+  {\includegraphics[width=0.85\textwidth]{full_images_classification/FP_example/01_47_branhes_plastic_crackes_and_random_FP.jpg}}
+
+  \vspace{0.8em}
+
+  % --- Image 3 ---
+  \subcaptionbox{\textbf{02\_04\_branch\_dominance.} \\
+  A scene dominated by branch-induced false positives, \\ highlighting the need for background-aware training.}
+  {\includegraphics[width=0.85\textwidth]{full_images_classification/FP_example/02_04_FP_BRANCH.jpg}}
+
+  \caption{Representative failure modes of the binary (two-class) model.
+  The lack of a background class causes woody tissues and plastic to be misclassified as cracks. Note the resolution difference between the HSI sensor (Left/Center) and the Canon reference (Right).}
+  \label{fig:old_fp_examples}
+\end{figure}
+\FloatBarrier
+These failure modes highlight two fundamental issues:
+
+\begin{enumerate}
+    \item \textbf{Background confusion:} Without an explicit notion of ``background'', the classifier is forced to assign every pixel to either \emph{Healthy} or \emph{Cracked}, even when the pixel belongs to a non-grape object.
+    \item \textbf{Spatial incoherence:} Crack predictions are made independently per pixel. Even small amounts of noise or slight mis-registration across bands can generate scattered ``islands'' of crack predictions, especially along edges and high-contrast regions.
+\end{enumerate}
+
+To address these issues, we redesign both the \emph{supervision} (multi-class labeling) and the \emph{inference pipeline} (hierarchical spatial aggregation and morphological filtering).
+
+% ---------------------------------------------------------------------
+\subsubsection{Introducing a multi-class model with an explicit background class}
+
+The first design change is to extend the classifier from two to three classes:
+\begin{enumerate}[label=(\alph*)]
+    \item \emph{Healthy} grapes,
+    \item \emph{Cracked} (or decayed) grapes,
+    \item \emph{Background} materials (branches, leaves, plastic, tripod, wires, etc.).
+\end{enumerate}
+
+To construct reliable background exemplars, we deliberately use \textbf{early-season images} collected in June, approximately two months before any visible cracks or sour rot appear in the vineyard. At this stage, all clusters are healthy and the only variability arises from environmental textures and illumination. This temporal separation has two advantages:
+\begin{itemize}
+    \item It provides abundant negative evidence for non-grape materials under realistic field conditions.
+    \item It reduces the risk of leaking subtle pre-crack signals into the background class, thereby enforcing a clean separation between fruit tissue and environmental context.
+\end{itemize}
+
+The resulting multi-class LDA learns decision boundaries that explicitly carve out a ``background'' region in spectral space. When applied to full scenes, this model is much more likely to classify branches, plastic, and support structures as \emph{Background} rather than confusing them with cracks. Qualitatively, this already reduces a large fraction of false positives, especially in detection-only (per-pixel) maps.
+
+% ---------------------------------------------------------------------
+
+% ---------------------------------------------------------------------
+% INSERT THIS BLOCK AT THE END OF THE CURRENT TEXT
+% ---------------------------------------------------------------------
+
+\subsubsection{Quantitative Validation: Binary vs. Multi-Class Performance}
+
+To verify the hypothesis that explicitly modeling background elements reduces false positives, we conducted a head-to-head comparison between the baseline Binary LDA and the proposed Multi-Class LDA on the held-out test set.
+
+Table~\ref{tab:binary_vs_multi_results} presents the performance metrics for the target \emph{Crack} class. The results confirm the visual observations:
+\begin{itemize}
+    \item \textbf{Precision Improvement:} The Binary model suffers from low precision ($0.59$), meaning nearly $40\%$ of its "Crack" detections were actually background noise (branches/plastic). The Multi-Class model drastically improved precision to $\mathbf{0.90}$, successfully filtering out these distractors.
+    \item \textbf{Recall Stability:} Importantly, this gain in precision came with minimal cost to sensitivity (Recall remained high at $\sim0.84$), proving that the model learned to distinguish noise without becoming "blind" to true cracks.
+\end{itemize}
+
+\begin{table}[H]
+    \centering
+    \caption{Performance Comparison: Binary vs. Multi-Class LDA on the Test Set. The Multi-Class model achieves a dramatic improvement in Precision (+30.8\%), significantly reducing false positives, while maintaining a high F1-Score.}
+    \label{tab:binary_vs_multi_results}
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{lcccc}
+        \toprule
+        \textbf{Model Type} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} & \textbf{ROC-AUC} \\
+        \midrule
+        Binary LDA (Baseline) & 0.588 & \textbf{0.855} & 0.696 & 0.978 \\
+        \textbf{Multi-Class LDA (Proposed)} & \textbf{0.896} & 0.787 & \textbf{0.838} & \textbf{0.992} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+Figure~\ref{fig:roc_pr_curves} further illustrates this superiority. The Precision-Recall curve (Right) clearly shows that for any given recall level, the Multi-Class model maintains a significantly higher precision compared to the binary baseline.
+
+% --- FIGURE: GRAPHS ---
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        % Replace with your actual file name for the ROC curve
+        \includegraphics[width=\textwidth]{model_multi_class_lda_multi_vs_binary/results_multi/roc_curve_multi.png}
+        \caption{ROC Curve}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        % Replace with your actual file name for the PR curve
+        \includegraphics[width=\textwidth]{model_multi_class_lda_multi_vs_binary/results_multi/precision_recall_curve_multi.png}
+        \caption{Precision-Recall Curve}
+    \end{subfigure}
+    \caption{Evaluation curves for the Multi-Class model. The high AUC ($0.99$) and the strong PR curve confirm the model's robustness against complex background clutter.}
+    \label{fig:roc_pr_curves}
+\end{figure}
+\FloatBarrier
+
+
+
+
+% ---------------------------------------------------------------------
+\subsubsection{Hierarchical detection pipeline and spatial aggregation}
+
+Even with a background-aware model, pixel-level predictions remain susceptible to local noise and registration artifacts. Real cracks, however, follow a strong spatial prior: they appear as \textbf{coherent clusters} of neighboring pixels, not as isolated speckles.
+
+To exploit this prior, we implement a hierarchical detection pipeline composed of three stages:
+
+\paragraph{Stage 1: Probability map generation.}
+The trained multi-class model processes each pixel \(x_{i,j}\) in the HSI cube and outputs class probabilities. We focus on the probability of the \emph{Cracked} class,
+\(
+P(\text{Cracked} \mid x_{i,j}).
+\)
+A global threshold \(T_{\text{prob}}\) converts this into an initial binary mask \(M_{\text{raw}}\):
+\[
+    M_{\text{raw}}(i,j) =
+    \begin{cases}
+        1 & \text{if } P(\text{Cracked} \mid x_{i,j}) > T_{\text{prob}}, \\
+        0 & \text{otherwise.}
+    \end{cases}
+\]
+
+\begin{figure}[H]
+  \centering
+  \captionsetup{font=small, labelfont=bf}
+  \captionsetup[subfigure]{justification=centering}
+
+  % --- Layout Explanation ---
+  \begin{minipage}{0.9\textwidth}
+    \centering
+    \footnotesize
+    \textbf{Figure Layout:} \\
+    \textbf{Left:} HSI Binary Classification Map (Pixel-level). \\
+    \textbf{Center:} Synthesized HSI-RGB. \\
+    \textbf{Right:} Canon R5 Reference.
+  \end{minipage}
+  \vspace{1em}
+
+  % --- The Image ---
+  % Note: Using the combined image you created (new_detect)
+  % which typically contains all three panels or at least the detection vs RGB
+  \includegraphics[width=0.95\textwidth]{full_images_classification/02_14/new_detect_2_14.png}
+
+  \caption{Stage~1 output: Raw probability map generated by the multi-class model.
+  While the main crack regions are captured (Yellow), scattered artifacts and noise remain on the stems and highlights, necessitating spatial filtering.}
+  \label{fig:stage1_prob_map}
+\end{figure}
+
+\paragraph{Stage 2: Morphological blob filtering.}
+To differentiate true cracks from structured artifacts, we apply connected-component analysis (CCA) to the binary mask and compute geometric descriptors for each blob:
+\begin{itemize}
+    \item \textbf{Area and minimum size:} Very small blobs are likely to be noise.
+    \item \textbf{Circularity:}
+    \(
+    C = \frac{4\pi \cdot \text{Area}}{\text{Perimeter}^2}
+    \).
+    Nearly circular blobs (\(C \approx 1\)) are associated with specular highlights or glare, whereas cracks are elongated and irregular (\(C \ll 1\)).
+    \item \textbf{Aspect ratio:}
+    \(
+    AR = \frac{\text{Width}_{\text{bbox}}}{\text{Height}_{\text{bbox}}}
+    \),
+    which identifies long, thin structures such as stems and wires.
+    \item \textbf{Solidity:}
+    \(
+    S = \frac{\text{Area}}{\text{Area}_{\text{convex hull}}}
+    \).
+    Highly solid blobs (\(S \approx 1\)) correspond to smooth reflections; cracks exhibit jagged edges and lower solidity.
+\end{itemize}
+
+Blobs whose descriptors fall outside pre-defined ranges (e.g., too circular, too elongated, too solid) are removed from the mask, yielding a cleaned mask \(M_{\text{clean}}\) that focuses on irregular, crack-like structures.
+
+% --- CLUSTER 02_02 ---
+\begin{figure}[H]
+  \centering
+  \captionsetup{font=small, labelfont=bf}
+  \captionsetup[subfigure]{justification=centering}
+
+  % --- Layout Legend ---
+  \begin{minipage}{0.9\textwidth}
+    \centering \footnotesize
+    \textbf{Figure Layout:} Left: HSI Detection | Center: Synthesized RGB | Right: Canon Reference
+  \end{minipage}
+  \vspace{1em}
+
+  % (a) Old Detect
+  \subcaptionbox{\textbf{(a) old\_detect.} \\ Background structures trigger multiple False Positives.}
+  {\includegraphics[width=0.85\textwidth]{full_images_classification/02_02/old_detect_2_02.png}}
+
+  \vspace{0.8em}
+
+  % (c) New Detect
+  \subcaptionbox{\textbf{(c) new\_detect.} \\ Multi-class training suppresses background; \\ crack regions are cleaner.}
+  {\includegraphics[width=0.85\textwidth]{full_images_classification/02_02/new_detect_2_02.png}}
+
+  \vspace{0.8em}
+
+\end{figure}
+\FloatBarrier
+
+\paragraph{Stage 3: Patch-level aggregation (PLA).}
+Finally, the cleaned mask is aggregated over a grid of spatial cells (e.g., \(64\times64\) pixels with stride 32). For each patch, we compute the cracked-pixel ratio:
+\[
+    r_{\text{patch}} = \frac{\sum_{(i,j)\in \text{patch}} M_{\text{clean}}(i,j)}{\#\{\text{pixels in patch}\}}.
+\]
+Patches with \(r_{\text{patch}}\) above a threshold \(T_{\text{patch}}\) are flagged as defective and visualized as overlaid tiles in a heatmap. This step:
+\begin{itemize}
+    \item enforces spatial coherence (only dense crack clusters survive),
+    \item regularizes the detection map into interpretable regions at the cluster scale,
+    \item suppresses remaining isolated positives that escaped blob filtering.
+\end{itemize}
+
+% --- CLUSTER 02_02 ---
+\begin{figure}[H]
+  \centering
+  \captionsetup{font=small, labelfont=bf}
+  \captionsetup[subfigure]{justification=centering}
+
+  % --- Layout Legend ---
+  \begin{minipage}{0.9\textwidth}
+    \centering \footnotesize
+    \textbf{Figure Layout:} Left: HSI Detection | Center: Synthesized RGB | Right: Canon Reference
+  \end{minipage}
+  \vspace{1em}
+
+  % (a) Old Detect
+  \subcaptionbox{\textbf{(a) old\_detect.} \\ Background structures trigger multiple False Positives.}
+  {\includegraphics[width=0.85\textwidth]{full_images_classification/02_02/old_detect_2_02.png}}
+
+  \vspace{0.8em}
+
+  % (c) New Detect
+  \subcaptionbox{\textbf{(c) new\_detect.} \\ Multi-class training suppresses background; \\ crack regions are cleaner.}
+  {\includegraphics[width=0.85\textwidth]{full_images_classification/02_02/new_detect_2_02.png}}
+
+  \vspace{0.8em}
+
+  % (d) New Patch
+  \subcaptionbox{\textbf{(d) new\_patch.} \\ Spatially coherent detections remain; \\ isolated residuals are filtered.}
+  {\includegraphics[width=0.85\textwidth]{full_images_classification/02_02/new_patch_2_02.png}}
+
+  \caption{Cluster 02\_02: Qualitative comparison. The multi-class model (c) removes the background noise seen in (a), and the full pipeline (d) consolidates the result.}
+  \label{fig:cluster_02_02}
+\end{figure}
+\FloatBarrier
+
+The UI implementation keeps the underlying probability map fixed once computed, and all subsequent visualizations (PLA overlays, screenshots, band selection) are derived from the same map and parameter set. This guarantees consistency between different export modes and facilitates side-by-side comparison across clusters and modalities.
+
+% =====================================================================
+\subsection{Dataset, Experimental Protocol, and Results}
+\label{subsec:dataset_experiments_results}
+% =====================================================================
+
+% ---------------------------------------------------------------------
+\subsubsection{Dataset design and split protocol}
+
+To rigorously evaluate generalization, we impose a strict separation between development and test scenes based on physical vineyard rows and clusters:
+
+\begin{itemize}
+    \item \textbf{Row~1 (Development set):}
+    All training of the pixel-level classifier and tuning of the hierarchical pipeline are performed on clusters from Row~1 (cluster~1).
+    This row includes both cracked and non-cracked grapes under realistic backgrounds.
+    Additionally, early-season images from June are used to build the \emph{Background} class, ensuring that only healthy grapes and environmental textures are present.
+    \item \textbf{Row~2 (Test set):}
+    All whole-image evaluations are conducted on clusters from Row~2, which were never used during training or hyperparameter tuning.
+    These scenes differ in viewpoint, background composition, and sometimes illumination, and therefore represent a genuine out-of-distribution test of the model and pipeline.
+\end{itemize}
+
+This scene-disjoint split prevents accidental leakage of specific cluster appearances into the training set and reduces the chance of overfitting to particular backgrounds or camera angles.
+
+In addition, to analyze performance at different stages of decay, the Row~2 test clusters are grouped into two subsets:
+\begin{enumerate}
+    \item \textbf{Late Detection:} clusters where cracks, decay, and sour rot are clearly visible at the time of imaging.
+    \item \textbf{Early Detection:} clusters at the onset of cracking, where visual symptoms are subtle but spectral changes are expected.
+\end{enumerate}
+
+These subsets allow us to quantify how early in the cracking process the HSI-based pipeline can reliably detect damage.
+
+% ---------------------------------------------------------------------
+\subsubsection{Hyperparameter optimization (Grid Search)}
+
+The hierarchical pipeline contains several critical thresholds and structural parameters:
+\begin{itemize}
+    \item probability threshold \(T_{\text{prob}}\) for binarizing the crack probability map,
+    \item minimum blob size and geometric limits (circularity, aspect ratio, solidity) in Stage~2,
+    \item patch size and cracked-pixel ratio threshold \(T_{\text{patch}}\) in Stage~3.
+\end{itemize}
+
+To avoid manual tuning and ensure reproducibility, we perform an automated grid search over a predefined parameter space, using Row~1 as the development set. The search spans, for example:
+\begin{itemize}
+    \item \(T_{\text{prob}} \in [0.85, 0.99]\),
+    \item minimum blob size in the range 50–300 pixels,
+    \item admissible intervals for circularity and solidity to reject glare-like blobs,
+    \item patch sizes of 32 and 64 pixels, and patch-level ratio thresholds between 5\% and 10\%.
+\end{itemize}
+
+Each parameter combination is evaluated by comparing the pipeline’s patch-level outputs to expert labels on Row~1 clusters, computing standard detection metrics such as Precision, Recall, F1, and \(F_2\) scores. The configuration that maximizes the \(F_2\) score (which places higher weight on Recall) on the development set is selected and then \emph{frozen} for all experiments on Row~2.
+
+% ---------------------------------------------------------------------
+\subsubsection{Evaluation metrics}
+
+Because missed detections of cracked regions can have severe agronomic and economic consequences, we prioritize \textbf{high Recall} while still maintaining reasonable Precision. To that end, we report:
+\begin{itemize}
+    \item Accuracy,
+    \item Precision,
+    \item Recall,
+    \item F1-score,
+    \item \(F_2\)-score (Recall-emphasized),
+    \item area under the ROC curve (AUC).
+\end{itemize}
+
+The \(F_2\)-score serves as the primary selection criterion during hyperparameter optimization and as the main summary metric in the results.
+
+% ---------------------------------------------------------------------
+\subsubsection{Quantitative results on late vs\ early detection}
+
+Table~\ref{tab:detection_results} summarizes the performance of the final pipeline on the Row~2 test set, separately for Late and Early Detection scenarios.
+
+\begin{table}[H]
+    \centering
+    \caption{Performance of the full-image crack detection pipeline on Row~2 clusters.
+    Metrics are reported separately for Late Detection (advanced cracking and decay) and Early Detection (onset of cracking).}
+    \label{tab:detection_results}
+    \begin{tabular}{lcc}
+        \toprule
+        \textbf{Metric} & \textbf{Late Detection} & \textbf{Early Detection} \\
+        \midrule
+        \textbf{$F_2$ Score (target)} & \textbf{0.9341 } & \textbf{0.8621} \\
+        F1 Score & 0.8500 & 0.8000 \\
+        Accuracy & 0.8983 & 0.8889 \\
+        Precision & 1.0000 & 0.7143 \\
+        Recall & \textbf{0.9412} & \textbf{0.9091} \\
+        AUC & 0.9384 & 0.8837 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\paragraph{Late Detection.}
+When cracks and sour rot are fully developed, the pipeline achieves a Recall of 94.12\% and an \(F_2\)-score of 0.9091, indicating that almost all visibly damaged clusters are correctly flagged. The Precision of 80\% reflects a moderate presence of false positives, which is acceptable in quality-control scenarios where missing damaged fruit is more costly than occasionally inspecting a healthy cluster.
+
+\paragraph{Early Detection.}
+In the Early Detection subset, where cracks are barely visible, Recall remains high at 90.91\% and the \(F_2\)-score reaches 0.8929. Interestingly, Precision is slightly higher than in the Late Detection subset (83.33\%), suggesting that early-stage cracks exhibit relatively specific spectral signatures that are less easily confused with background clutter than the more heterogeneous decay patterns at later stages.
+
+% ---------------------------------------------------------------------
+\subsubsection{Qualitative comparison of model variants}
+
+To better understand the contribution of each component, we compare four configurations on unseen Row~2 clusters:
+\begin{enumerate}[label=(\alph*)]
+    \item \textbf{old\_detect:} two-class model, per-pixel detection only;
+    \item \textbf{old\_patch:} two-class model followed by PLA;
+    \item \textbf{new\_detect:} multi-class model with background, per-pixel detection only;
+    \item \textbf{new\_patch:} full pipeline with multi-class model, morphological filtering, and PLA.
+\end{enumerate}
+
+
+% --- CLUSTER 02_18 ---
+\begin{figure}[H]
+  \centering
+  \captionsetup{font=small, labelfont=bf}
+  \captionsetup[subfigure]{justification=centering}
+
+  \begin{adjustbox}{max width=\textwidth, center}
+    \begin{minipage}{0.48\textwidth}
+      \subcaptionbox{\textbf{(a) old\_detect.}\\
+      Two-class model, per-pixel detection only; strong background-driven false positives.}
+      {\includegraphics[width=\linewidth]{full_images_classification/02_18/old_detect_2_18.png}}
+    \end{minipage}
+    \hspace{0.02\textwidth}
+    \begin{minipage}{0.48\textwidth}
+      \subcaptionbox{\textbf{(b) old\_patch.}\\
+      PLA on top of the old model amplifies clutter; many weak positives merge into noisy tiles.}
+      {\includegraphics[width=\linewidth]{full_images_classification/02_18/old_patch_2_18.png}}
+    \end{minipage}
+  \end{adjustbox}
+
+  \vspace{0.8em}
+
+  \begin{adjustbox}{max width=\textwidth, center}
+    \begin{minipage}{0.48\textwidth}
+      \subcaptionbox{\textbf{(c) new\_detect.}\\
+      Multi-class model suppresses most background responses; crack regions become more localized.}
+      {\includegraphics[width=\linewidth]{full_images_classification/02_18/new_detect_2_18.png}}
+    \end{minipage}
+    \hspace{0.02\textwidth}
+    \begin{minipage}{0.48\textwidth}
+      \subcaptionbox{\textbf{(d) new\_patch.}\\
+      Final pipeline (model + morphology + PLA) yields compact, spatially coherent detections.}
+      {\includegraphics[width=\linewidth]{full_images_classification/02_18/new_patch_2_18.png}}
+    \end{minipage}
+  \end{adjustbox}
+
+  \caption{Cluster 02\_18: qualitative comparison of the four configurations.
+  Each panel shows (from left to right within the image) HSI detection, synthesized RGB, and Canon RGB.
+  The multi-class model (c) and the full pipeline (d) drastically reduce background false positives
+  while preserving true crack regions.}
+  \label{fig:cluster_02_18}
+\end{figure}
+
+\FloatBarrier
+
+Across clusters, \textbf{new\_detect} maps are consistently cleaner than \textbf{old\_detect}, confirming the benefit of explicit background supervision.
+The \textbf{new\_patch} configuration produces the most stable and interpretable maps: detections are confined to plausible cracked areas and robust to complex backgrounds.
+In contrast, applying PLA on top of the old two-class pixel map (\textbf{old\_patch}) often \emph{amplifies} background clutter, as many weak positives in branches and plastic accumulate into noisy red patches.
+
+% ---------------------------------------------------------------------
+\subsubsection{Discussion and takeaways}
+
+The experiments above support the following conclusions:
+
+\begin{itemize}
+    \item \textbf{Multi-class, background-aware training is essential for whole-image HSI inference.}
+    By explicitly modeling background materials using early-season images, the classifier learns to reject non-grape structures across diverse illumination conditions. This drastically reduces background-driven false positives without sacrificing sensitivity to cracks.
+
+    \item \textbf{Hierarchical spatial aggregation stabilizes detections.}
+    Morphological blob filtering exploits geometric cues (shape, aspect ratio, solidity) to remove glare and stems, while patch-level aggregation enforces spatial coherence and suppresses residual speckles. Together, these stages transform noisy pixel maps into compact, interpretable scene-level detections.
+
+    \item \textbf{Early cracking is detectable with high recall.}
+    The pipeline maintains Recall above 90\% and \(F_2\)-scores close to 0.9 even at the onset of cracking, demonstrating that hyperspectral imaging can identify quality issues before they become visually obvious.
+
+    \item \textbf{Limitations and future work.}
+    Some scenes with extreme reflections or heavy occlusion still produce occasional false positives.
+    The current thresholds are selected via grid search on a single development row; future work could explore adaptive, data-driven thresholding and probabilistic patch scoring.
+    Finally, acquiring a limited set of pixel-level masks for full scenes would allow quantitative segmentation metrics (IoU, per-pixel F1) to complement the current patch-level evaluation.
+\end{itemize}
+
+Overall, the combination of a multi-class HSI classifier with an explicit background class and a hierarchical spatial pipeline provides a robust foundation for automated crack detection at the cluster and vineyard scale.
+
+% ============================================================================
+% SECTION 6.3.2: LINEAR VS NON-LINEAR COMPARISON
+% ============================================================================
+
+\section{Linear vs. Non-Linear Classifier Comparison}
+\label{subsec:linear_vs_nonlinear}
+
+While the transition to a Multi-Class framework (Section 6.3.1) successfully introduced an explicit "Background" class, qualitative error analysis revealed a persistent limitation. The Linear Discriminant Analysis (LDA) classifier continued to generate False Positives (FPs) in regions containing complex environmental artifacts, such as weathered plastic ties, dried branch tips, and specular highlights. 
+
+These errors suggested that the spectral separability between cracked tissue and specific background elements is not linearly resolvable. To address this, we hypothesized that a non-linear classifier would be required to model the complex, non-convex decision boundaries inherent to this multi-material environment. Consequently, we conducted a rigorous head-to-head comparison between the linear baseline (LDA) and a gradient boosting decision tree classifier (XGBoost).
+
+\subsubsection{Experimental Design and Validation Protocol}
+
+To ensure that the comparison reflected true field performance rather than artifactual over-fitting, we designed a \textbf{Hybrid Validation Protocol} that specifically challenges the models' ability to reject background noise while generalizing to new grape clusters.
+
+\paragraph{1. Feature Space and Balancing.}
+Both models were trained on the full hyperspectral spectrum (204 bands) to evaluate their raw capacity to learn discriminative features without prior dimensionality reduction. Class imbalance was handled natively by each algorithm to ensure fairness:
+\begin{itemize}
+    \item \textbf{LDA:} Balanced using equal priors ($\text{priors} = [1/N_{classes}]$), forcing the probabilistic model to treat rare classes (Cracks) as equiprobable to background.
+    \item \textbf{XGBoost:} Balanced using sample weights ($\text{sample\_weight}$) inversely proportional to class frequencies during the gradient boosting process.
+\end{itemize}
+
+\paragraph{2. The Hybrid LOGO Strategy (Noise Injection).}
+A standard Cross-Validation (CV) approach would be insufficient here. If a validation fold contains only grape pixels (Cracked/Regular), a model could achieve a high score without ever being tested on its ability to filter out plastic or leaves. To overcome this, we implemented a hybrid split:
+
+\begin{itemize}
+    \item \textbf{Grape Clusters (Dynamic LOGO):} The biological samples (Cracked and Regular berries) were split using a \textit{Leave-One-Group-Out} strategy. In each fold, a specific grape cluster (defined by its unique \texttt{hs\_dir}) was held out for validation, while all other clusters were used for training. This tests generalization to new biological specimens.
+    
+    \item \textbf{Background Artifacts (Static Split):} The "Hard Negative" samples (Background, Plastic, Branches)—derived from dedicated early-season data collection—were split statically (70\% Train / 30\% Validation). 
+\end{itemize}
+
+\textbf{Crucially}, in every validation iteration, the test set consisted of the \textit{specific held-out grape cluster} \textbf{combined} with the \textit{fixed background validation set}. This ensured that every model was evaluated not just on its sensitivity to cracks, but simultaneously on its robustness against the full spectrum of environmental noise.
+
+\subsubsection{Results and Analysis}
+
+The quantitative comparison, summarized in Table~\ref{tab:model_comparison}, demonstrates a decisive advantage for the non-linear XGBoost architecture.
+
+\begin{table}[htbp]
+\centering
+\caption{\textbf{Head-to-Head Comparison: LDA vs. XGBoost (Full Spectrum).} 
+Metrics represent the mean performance across all validation folds on the target \texttt{CRACK} class. The inclusion of background noise in the validation set reveals the fragility of the linear model (low Precision) compared to the robustness of the non-linear model.}
+\label{tab:model_comparison}
+\begin{tabular}{lccc}
+\hline
+\textbf{Metric (CRACK Class)} & \textbf{LDA (Linear)} & \textbf{XGBoost (Non-Linear)} & \textbf{Impact} \\ \hline
+\textbf{PR-AUC (Primary)} & 0.989 & \textbf{0.993} & +0.4\% \\
+\textbf{F1-Score} & 0.706 & \textbf{0.842} & \textbf{+19.3\%} \\
+Precision & 0.606 & \textbf{0.903} & \textbf{+49.0\%} \\
+Recall & \textbf{0.870} & 0.803 & -7.7\% \\
+\hline
+\end{tabular}
+\end{table}
+
+\paragraph{The Precision-Recall Trade-off.}
+The core distinction between the models is visualized in Figure~\ref{fig:pr_tradeoff}. The Scatter Plot reveals two distinct behavioral clusters:
+\begin{itemize}
+    \item \textbf{LDA (Red):} Clustered in the bottom-right quadrant (High Recall, Low Precision). This characterizes a "trigger-happy" model that correctly identifies cracks but generates excessive false alarms on plastic and branches.
+    \item \textbf{XGBoost (Blue):} Dominated the upper-right quadrant. By leveraging non-linear decision trees, XGBoost successfully "fences off" the crack spectral signature from the surrounding clutter, achieving a dramatic \textbf{49\% improvement in Precision} with only a minor reduction in Recall.
+\end{itemize}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{XGBOOST_mullti_vs_LDA_multi/plot_1_precision_recall_tradeoff.png}
+    \caption{\textbf{Precision-Recall Trade-off Analysis.} Each point represents a single validation fold. The linear model (LDA) consistently fails to filter environmental noise (low Precision), whereas the non-linear model (XGBoost) maintains high precision without compromising sensitivity.}
+    \label{fig:pr_tradeoff}
+\end{figure}
+
+\paragraph{Consistency and Stability.}
+To confirm that this performance gap is systematic and not an artifact of specific easy clusters, we analyzed the per-fold improvement. Figure~\ref{fig:gain_chart} presents the difference in PR-AUC between XGBoost and LDA for each validation fold. The overwhelmingly positive values (Green bars) indicate that the non-linear model provides a consistent performance gain across the vast majority of biological samples. Furthermore, the stability analysis (Figure~\ref{fig:stability}) shows that XGBoost exhibits a tighter performance distribution, indicating higher reliability for field deployment.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{XGBOOST_mullti_vs_LDA_multi/plot_2_paired_improvement.png}
+        \caption{Consistent Performance Gain}
+        \label{fig:gain_chart}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{XGBOOST_mullti_vs_LDA_multi/plot_3_stability_boxplot.png}
+        \caption{Model Stability (PR-AUC)}
+        \label{fig:stability}
+    \end{subfigure}
+    \caption{\textbf{Consistency and Stability Analysis.} (a) The PR-AUC difference (XGBoost - LDA) is consistently positive, proving that the non-linear advantage is robust across different grape clusters. (b) XGBoost demonstrates superior median performance and reduced variance.}
+\end{figure}
+
+\subsubsection{Conclusion}
+The experimental results confirm that the spectral distinction between grape cracks and specific vineyard artifacts (plastic, woody tissue) relies on non-linear spectral features. While LDA provides a high sensitivity baseline, its inability to reject background noise renders it unsuitable for full-image segmentation where false positives are costly.
+Consequently, \textbf{XGBoost was selected as the foundational architecture} for this research. The subsequent dimensionality reduction and optimization steps (Chapter 7) are therefore applied exclusively to the XGBoost classifier.
+% ----------------------------------------
+
+
+
+\section{Dimensionality Reduction for Full-Image Crack Detection}
+\label{chap:full_image_dim_reduction}
+
+\subsection{Introduction}
+
+The transition from pixel-level crack identification to whole-image crack detection introduced substantial challenges.  
+Although the multi-class hyperspectral model achieved excellent ROC–AUC values across all classes, the full-spectrum classifier (using 150+ wavelengths) exhibited instability in real-world inference: scattered false positives, background noise, and reduced precision for the \texttt{CRACK} class.  
+
+These weaknesses suggested that the model was overparameterized relative to the structure of the data, motivating an investigation into whether a reduced subset of hyperspectral wavelengths could yield a more stable, interpretable, and computationally efficient classifier.
+
+To address this challenge, we performed a comprehensive wavelength-selection experiment using Sequential Forward Selection (SFS), explicitly optimizing for the \textbf{CRACK F1-score}.  
+We used a two-stage strategy:
+
+\begin{enumerate}
+    \item \textbf{Selection Phase:} Run SFS on a large, but subsampled, training partition (\(\approx 500{,}000\) samples) to avoid prohibitive computational cost.
+    \item \textbf{Evaluation Phase:} Train a new LDA model using the selected wavelengths and evaluate it on the \textbf{full} test set (101,101 samples) to obtain real-world, non-cross-validated performance.
+\end{enumerate}
+
+This chapter details the methodology, performance trends, optimal feature set, model coefficients, wavelength stability, and final confusion matrix.
+
+% -------------------------------------------------------------
+\subsection{Sequential Forward Selection Methodology}
+
+Sequential Forward Selection (SFS) is a greedy wrapper-based feature selection method.  
+Starting from an empty set, features are added one-by-one.  
+At each step, the algorithm selects the wavelength whose inclusion maximizes the chosen scoring metric.
+
+In this work, we directly optimized the \textbf{CRACK class F1-score}:
+
+\[
+    \text{Score} = F1_{\text{CRACK}}
+\]
+
+This choice emphasizes the practical goal of early crack detection, where recall must be balanced against precision.  
+SFS was applied on a large subset of the balanced training set to minimize runtime while preserving spectral diversity.
+
+After determining the best wavelengths for each value of \(k \in [1, 20]\), a new LDA model was trained \textbf{from scratch} on the full training set (balanced), and evaluated on the full test set (unbalanced, real-world).  
+Thus, all metrics reported in this chapter reflect true deployment-level performance.
+
+% -------------------------------------------------------------
+\subsection{Performance Across Wavelength Counts}
+
+Figure~\ref{fig:metrics_comparison} presents the full evaluation curves for all global and CRACK-specific metrics.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.98\textwidth]{Full_Image_Dimensionality_Reduction/metrics_comparison_crack_f1.png}
+    \caption{Comprehensive benchmarking of global and CRACK-specific metrics across wavelength counts.  
+    The best performance for the CRACK class occurs at \(k = 18\), achieving \(F1 = 0.8712\).}
+    \label{fig:metrics_comparison}
+\end{figure}
+
+Several trends emerge:
+
+\begin{itemize}
+    \item Most global metrics plateau around \(k \approx 10\), suggesting diminishing returns beyond this point.
+    \item CRACK-specific recall improves rapidly for small \(k\), stabilizing after \(k \approx 6\).
+    \item The optimization target---CRACK F1---reaches its peak at \(\mathbf{k = 18}\).
+    \item Accuracy and weighted F1 also remain high at this point, confirming that the optimal crack detector does not compromise global performance.
+\end{itemize}
+
+To further highlight the selection process, Figure~\ref{fig:sfs_performance} shows the direct F1 optimization trend.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.98\textwidth]{Full_Image_Dimensionality_Reduction/sfs_performance_enhanced.png}
+    \caption{Sequential Forward Selection performance curves.  
+    CRACK F1-score peaks at \(k=18\) with \(F1 = 0.8712\).  
+    Metrics are computed from the full test set (101{,}101 samples).}
+    \label{fig:sfs_performance}
+\end{figure}
+
+% -------------------------------------------------------------
+\subsection{Model Discriminative Structure: LDA Coefficients}
+
+To understand how individual wavelengths influence the classifier, we inspected the Linear Discriminant Analysis coefficients for the CRACK class.
+
+Figure~\ref{fig:lda_coeffs} shows the signed contribution of each selected wavelength.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.98\textwidth]{Full_Image_Dimensionality_Reduction/lda_coefficients_crack_class.png}
+    \caption{LDA coefficients for the CRACK class using the best model (\(k=18\)).  
+    Positive coefficients increase CRACK probability; negative coefficients suppress it.}
+    \label{fig:lda_coeffs}
+\end{figure}
+
+Observations:
+
+\begin{itemize}
+    \item The most influential wavelengths belong predominantly to the NIR region (700--900 nm), supporting the hypothesis that internal physiological stress is spectrally expressed in that interval.
+    \item Strong negative coefficients indicate wavelengths that help the model reject false positives, particularly from branches and plastic artifacts.
+    \item The combination of both positive and negative weights yields a robust decision boundary with reduced noise.
+\end{itemize}
+
+% -------------------------------------------------------------
+\subsection{Wavelength Stability Across SFS Runs}
+
+To evaluate the reliability of the selected wavelengths, we computed how frequently each wavelength appeared across all SFS iterations (\(k=1 \dots 20\)).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Full_Image_Dimensionality_Reduction/feature_selection_frequency.png}
+    \caption{Selection frequency of the most commonly chosen wavelengths.  
+    High-frequency wavelengths represent stable and robust spectral predictors.}
+    \label{fig:feature_frequency}
+\end{figure}
+
+The stability analysis reveals:
+
+\begin{itemize}
+    \item Several wavelengths (e.g., band\_132, band\_139, band\_117) were selected in nearly all SFS configurations.
+    \item These wavelengths are strong physiological markers, consistently discriminating cracked from regular tissue.
+    \item Their repeatability reinforces the validity of the reduced-dimensionality model.
+\end{itemize}
+
+% -------------------------------------------------------------
+\subsection{Multi-Class ROC Curves}
+
+To compare class separability under the reduced representation, ROC curves were computed for each class in a one-vs-rest scheme.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.98\textwidth]{Full_Image_Dimensionality_Reduction/roc_curves_multiclass.png}
+    \caption{One-vs-rest ROC curves for all classes.  
+    CRACK achieves AUC = 0.988 after threshold optimization.}
+    \label{fig:roc_multiclass}
+\end{figure}
+
+Key results:
+
+\begin{itemize}
+    \item All classes exhibit high separability (\(\text{AUC} > 0.96\)).
+    \item The CRACK curve demonstrates strong sensitivity at low false-positive rates.
+    \item REGULAR achieves nearly perfect AUC, reducing confusion between cracked and healthy berries.
+\end{itemize}
+
+% -------------------------------------------------------------
+\subsection{Confusion Matrix of the Best Model}
+
+The final model (\(k=18\), threshold-optimized) was evaluated on the full test set.  
+The confusion matrix is shown in Figure~\ref{fig:confusion_matrix}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.90\textwidth]{Full_Image_Dimensionality_Reduction/confusion_matrix_heatmap.png}
+    \caption{Confusion matrix for the best full-image model (CRACK F1 optimized).  
+    The model correctly identifies 3,811 cracked samples, with significantly reduced false positives.}
+    \label{fig:confusion_matrix}
+\end{figure}
+
+Insights:
+
+\begin{itemize}
+    \item Background and regular grapes are classified with exceptional accuracy.
+    \item Misclassifications between CRACK and BRANCH are reduced compared to full-spectrum models.
+    \item Threshold tuning further improved crack precision without harming recall.
+\end{itemize}
+
+% -------------------------------------------------------------
+\subsection{Discussion}
+
+This dimensionality-reduction analysis demonstrates that full-spectrum hyperspectral data is not required for accurate crack detection.  
+A carefully selected subset of only 18 wavelengths achieves:
+
+\[
+    F1_{\text{CRACK}} = 0.8712, \quad \text{AUC}_{\text{CRACK}} = 0.988
+\]
+
+This performance exceeds the original full-spectrum classifier in precision, stability, and interpretability.
+
+Moreover:
+
+\begin{itemize}
+    \item The reduced feature space eliminates spectral noise and improves robustness.
+    \item The selected wavelengths align with known physiological indicators of hydration stress and cuticle degradation.
+    \item The resulting model is more suitable for future hardware implementation, such as multispectral cameras.
+\end{itemize}
+
+In summary, dimensionality reduction transforms the full-image problem from a noisy, high-dimensional challenge into a compact and physiologically meaningful representation capable of supporting early crack detection.
+
+
+
+
+% =====================================================================
+\section{Investigation of Advanced Hybrid Filtering: SAM2 and CNN Integration}
+\label{sec:hybrid_investigation}
+% =====================================================================
+
+\subsection{Motivation: The Limits of Spectral-Only Detection}
+While the morphological and patch-based aggregation methods (Section \ref{sec:full-image}) successfully prioritized high recall and removed the majority of environmental noise, certain "hard false positives" persisted. These included complex geometric structures (e.g., specific tripod joints, specular highlights on plastic) that passed the geometric filters but mimic the spectral signature of cracks.
+
+To address this, we hypothesized that a **Hybrid Spectral-Spatial Pipeline** could serve as a final verification step. The core idea was to use the spectral HSI model as a "Candidate Generator" (High Recall) and a Deep Learning Computer Vision model as a "Verifier" (High Precision).
+
+We designed and implemented a multi-stage experimental pipeline integrating **Meta's Segment Anything Model 2 (SAM2)** for instance segmentation and a **CNN Classifier (EfficientNet/ResNet)** for visual verification.
+
+% ---------------------------------------------------------------------
+
+% =====================================================================
+\subsection{Hybrid Pipeline User Interface}
+\label{sec:hybrid_ui_screenshot}
+% =====================================================================
+
+To support the development, debugging, and evaluation of the multi-stage hybrid pipeline, 
+a dedicated graphical interface was implemented. 
+The interface visualizes all four stages of processing on a single screen, allowing rapid inspection of spectral detections, morphological filtering, SAM2 segmentation, and the final CNN verification.
+
+Figure~\ref{fig:ui_six_panel} shows the six-panel layout used throughout the experiments:
+
+\begin{itemize}
+    \item \textbf{Panels 1–3:}  
+    Display the hyperspectral grayscale view, raw spectral crack detections (yellow pixels), and post-morphology filtered blobs.
+    \item \textbf{Panel 4:}  
+    Shows SAM2 prompts and segmentation masks overlaid on the RGB image.
+    \item \textbf{Panel 5:}  
+    Shows CNN predictions, including bounding boxes for \textit{grape} vs. \textit{not\_grape}.
+    \item \textbf{Panel 6:}  
+    Displays the original RGB cluster image for reference.
+\end{itemize}
+
+The lower control panel exposes all experimental parameters, including:
+
+\begin{itemize}
+    \item HSI class model and crack detection thresholds,
+    \item morphology filter parameters (area, circularity, aspect ratio, solidity),
+    \item SAM2 settings and maximum number of masks,
+    \item CNN execution mode and crop strategy,
+    \item dataset navigation and result-loading utilities.
+\end{itemize}
+
+This interface made it possible to systematically test each component in isolation and then evaluate the performance of the full pipeline across hundreds of images.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{sam2_plus_cnn/just_images.png}
+    \caption{
+        Six-panel Hybrid Detection Viewer.  
+        The UI displays (from left to right):  
+        (1) HSI grayscale band,  
+        (2) spectral crack pixels,  
+        (3) morphology-filtered blobs,  
+        (4) SAM2 segmentation prompts (colored dots) and masks,  
+        (5) CNN verification output (green = grape, red = non-grape), and  
+        (6) the original RGB image.  
+        The bottom section contains filters, thresholds, SAM2 controls, and dataset navigation.
+    }
+    \label{fig:ui_six_panel}
+\end{figure}
+
+% ---------------------------------------------------------------------
+
+\subsection{Data Representation Strategies: The Three Input Variants}
+
+A critical challenge in training the CNN Verifier was determining the optimal way to represent the visual data. 
+We evaluated three different cropping strategies:
+
+\begin{enumerate}
+    \item \textbf{SEGMENT (Masked Object)} — background removed using SAM2.
+    \item \textbf{BBOX\_ORIGINAL (Tight Crop)} — minimal crop around the blob.
+    \item \textbf{ENLARGE (Context-Aware Crop)} — expanded crop preserving context.
+\end{enumerate}
+
+% ===========================
+% SEGMENTATION INPUT
+% ===========================
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.35\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{cnn/segmentation/segment_input.png}
+        \caption{Segment Input}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.6\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{cnn/segmentation/roc_curve.png}
+        \caption{ROC Curve}
+    \end{subfigure}
+    \caption{Segmentation-based input and its validation performance. 
+    The absence of contextual information reduces classifier stability.}
+    \label{fig:segment_pair}
+\end{figure}
+
+% ===========================
+% BBOX INPUT
+% ===========================
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.35\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{cnn/bbox/bbox_input.png}
+        \caption{BBOX Input}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.6\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{cnn/bbox/roc_curve.png}
+        \caption{ROC Curve}
+    \end{subfigure}
+    \caption{Tight bounding-box crop and its validation ROC. 
+    Resizing introduces geometric distortion, harming precision.}
+    \label{fig:bbox_pair}
+\end{figure}
+
+% ===========================
+% ENLARGE INPUT
+% ===========================
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.35\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{cnn/enlarge/enlarge_input.png}
+        \caption{Enlarged Input}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.6\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{cnn/enlarge/roc_curve.png}
+        \caption{ROC Curve}
+    \end{subfigure}
+    \caption{Context-aware enlarged crop. This representation performed the best across all metrics.}
+    \label{fig:enlarge_pair}
+\end{figure}
+
+% ---------------------------------------------------------------------
+
+\subsection{Results and Analysis: The Training-Inference Gap}
+
+\subsubsection{Training Performance}
+
+From a pure machine-learning perspective, all CNN classifiers performed extremely well during training. 
+Across all three input–representation strategies (SEGMENT, BBOX, and ENLARGE), the models achieved 
+\textbf{AUC scores exceeding 0.99}, indicating that the CNN architecture is sufficiently expressive to 
+distinguish grapes from background artifacts when the input is clean and well-structured.
+
+Among the three approaches, the \textbf{ENLARGE (context-aware) crop consistently achieved the highest performance}, 
+yielding the most stable training curves and the strongest separation between classes. 
+This reinforces the hypothesis that preserving local geometric context is crucial for enabling the network 
+to learn discriminative visual features of grape berries.
+
+An additional challenge emerged from the fact that most training samples were collected during the 
+\textbf{early weeks of the season}, when many berries were still green. 
+However, field conditions include multiple varieties—green, red, and especially dark-purple cultivars—
+meaning that a classifier trained only on early-season imagery might incorrectly treat grape color as a discriminative cue.
+
+To overcome this limitation, we introduced a set of \textbf{aggressive color and grayscale augmentations} 
+during training, designed to force the CNN to become invariant to berry color.
+Specifically, the augmentation pipeline included:
+
+\begin{itemize}
+    \item Random brightness, contrast, saturation, and hue shifts  
+          (simulating green, red, purple, and almost-black grapes),
+    \item Full RGB $\rightarrow$ Grayscale conversion combined with randomized grayscale perturbations  
+          (to ensure the model learns shape and texture rather than color),
+    \item Geometric distortions such as rotations, perspective warping, affine transforms, and random crops,
+    \item Random blur, sharpness variation, posterization, equalization, and solarization  
+          (to simulate low-quality, overexposed, blurred, or noisy field conditions),
+    \item Random erasing to simulate occlusions between berries.
+\end{itemize}
+
+This augmentation strategy was essential for enabling the CNN to generalize beyond the narrow color range of the early-season dataset 
+and ensured that the model learned \textbf{texture, shape, and context}—rather than relying on color alone.
+\subsubsection{Operational Failure}
+
+Although the CNN classifiers achieved excellent validation metrics and SAM2 often produced reasonable object masks, the hybrid pipeline did not succeed during full-image inference. The underlying failure was not caused by a single flaw, but rather by the combined effect of several structural limitations in the RGB acquisition process and in the geometric preprocessing pipeline.
+
+\paragraph{Why SAM2 Performed Relatively Well.}
+SAM2 relies primarily on coarse structural cues such as regional contrast, global shape, and large-scale boundaries. Even when the RGB frames extracted from the hyperspectral camera were noisy, dim, or low in texture, SAM2 could still identify approximate blob-like objects corresponding to grape clusters. This explains why SAM2 often produced masks that were “good enough” at the cluster level despite the low image quality.
+
+\paragraph{Why the CNN Failed Despite SAM2’s Partial Success.}
+In contrast to SAM2, the CNN must rely on \emph{fine} visual details: sharp contours, local shading, micro-texture, and the precise elliptical geometry of individual berries. The RGB frames generated by the hyperspectral system could not provide this information. Several issues contributed to this:
+
+\begin{itemize}
+    \item \textbf{Low-quality RGB from the HSI camera:}
+    The RGB composites derived from the hyperspectral sensor have limited dynamic range and low spatial sharpness.  
+    Due to field-time constraints, each frame was captured with an effective exposure of only $\sim 30$ seconds,  
+    whereas the camera normally requires $90$–$120$ seconds of net exposure to reconstruct a clean RGB image.  
+    As a result, many berry contours were barely visible.
+
+    \item \textbf{Geometric distortion caused by resizing:}
+    Every crop must be resized to the fixed 224$\times$224 input size of EfficientNet.  
+    Slightly oval berries or partially occluded shapes become artificially circular after resizing, eliminating one of the key geometric cues needed for classification.
+
+    \item \textbf{Loss of fine boundary details:}
+    The pseudo-RGB projection from 204 spectral channels compresses subtle shading gradients and local edge contrast.  
+    Without clear boundaries, the CNN often receives crops that appear as uniform blobs with insufficient structural information.
+
+    \item \textbf{Error propagation from SAM2:}
+    When SAM2 receives an image with weak edges or noise, the resulting mask may be misaligned or incomplete.  
+    Even small inaccuracies in the mask propagate directly into the CNN input and amplify classification errors.
+\end{itemize}
+
+\paragraph{Why Fixing Individual Issues Was Not Enough.}
+During the study, several corrective attempts were made: increasing augmentations, adding color-invariance through grayscale transformations, expanding context-aware crops, and testing multiple input modes.  
+However, these interventions cannot recover visual information that was \emph{never captured} by the sensor.  
+If the RGB frame lacks contour information and micro-texture, no amount of augmentation or preprocessing can reconstruct it.  
+Thus, the failure does not indicate incorrect modeling choices, but rather fundamental limitations in the imaging modality.
+
+\paragraph{Conclusion.}
+The hybrid SAM2+CNN pipeline did not reach reliable inference performance primarily because the hyperspectral-derived RGB frames do not contain sufficient visual detail for CNN-based berry verification.  
+Nevertheless, the pipeline remains conceptually sound. With higher-quality RGB data, longer exposure times, or a dedicated RGB camera, a similar verifier could likely succeed.  
+Alternatively, future work might explore detectors that operate directly on hyperspectral information, thereby bypassing the limitations of the RGB projection entirely.
+
+
+% ---------------------------------------------------------------------
+\subsection{Conclusion and Future Directions}
+\label{sec:hybrid_conclusion}
+
+The hybrid SAM2+CNN pipeline demonstrated that a spectral–spatial verification stage is conceptually promising, 
+yet the quality of the RGB data extracted from the hyperspectral system placed a fundamental limit on its effectiveness. 
+Although SAM2 was often able to produce reasonable masks at the cluster level—thanks to its reliance on coarse structural cues—the CNN verifier required fine boundary information, texture, and shading that were not present in the pseudo-RGB output produced by the HSI camera under the short exposure times used in the field. 
+As a result, even strong training performance did not translate to reliable inference.
+
+The primary insight from this work is therefore not that the hybrid approach is flawed, but rather that 
+\textbf{RGB derived from hyperspectral acquisition is not sufficiently rich to support CNN-based berry verification}. 
+Resizing distortions, low dynamic range, weak contours, and partial SAM2 segmentation errors further compounded this limitation. 
+These constraints prevented the model from leveraging the geometric distinctions between grapes and background artifacts.
+
+\paragraph{Future Direction 1: Use High-Quality RGB for the Verification Stage.}
+If high-resolution RGB imagery is available (e.g., a dedicated RGB camera synchronized with the HSI acquisition), 
+the hybrid pipeline could likely succeed. 
+The SAM2 segmentation stage would become substantially more stable, and the CNN classifier would have access to 
+the fine visual cues required for consistent performance.
+
+\paragraph{Future Direction 2: Move From Crop Classification to Object Detection.}
+Instead of classifying small crops, future work should explore object detectors that analyze the full spatial context.  
+Single-shot detectors such as \textbf{YOLO} inherently learn that “a round object attached to a stem is a grape,” 
+while metallic structures or plastic ties have different geometry and texture.  
+This approach removes the need for multi-stage cropping, resizing, and masking, and addresses the core limitation of the CNN verifier: lack of global context.
+
+\paragraph{Future Direction 3: Hyperspectral-Based Object Detection.}
+An alternative direction—supported by emerging research—is to perform detection directly on hyperspectral 
+representations rather than on RGB projections.  
+Possible approaches include:
+\begin{itemize}
+    \item \textbf{YOLO-HS:} Adapting YOLO to operate on selected HSI bands or PCA/ICA projections.  
+    These adaptations have been demonstrated in recent work but are not yet standard in commercial libraries.
+    \item \textbf{Spectral-embedding detectors:} Combining spectral embeddings (from PCA, autoencoders, or learned 
+          3D CNN features) with spatial object-detection heads such as Faster R-CNN or Mask R-CNN.
+    \item \textbf{Spectral–spatial transformers:} Using transformer-based encoders that ingest hyperspectral cubes 
+          and output object masks or bounding boxes.
+\end{itemize}
+
+Such approaches bypass the limitations of the RGB channel entirely and allow the model to leverage the 
+full richness of the hyperspectral information—precisely where the strongest crack signatures reside.
+
+\paragraph{Summary.}
+The hybrid approach did not succeed under the current imaging conditions, but the insights gained from its failure 
+highlight a clear path forward.  
+With either (1) higher-quality RGB data or (2) detectors designed to operate directly on hyperspectral feature 
+representations, a spectral–spatial verification system for crack detection remains a feasible and promising direction for future research.
+% ---------------------------------------------------------------------
+
+
+% % ---------------------------------------------------------------------
+% \begin{figure}[H]
+% \centering
+% \begin{tikzpicture}[
+%     node distance=1.7cm,
+%     every node/.style={rounded corners, font=\small},
+%     box/.style={rectangle, draw, thick, align=center, minimum width=4.2cm, minimum height=1cm},
+%     arrow/.style={->, thick}
+% ]
+
+% % Main problem
+% \node[box] (problem) {Hybrid SAM2 + CNN Pipeline\\Failed at Inference};
+
+% % Two arrows going down
+% \node[box, below left=2cm and 1.2cm of problem] (rgb) {Direction 1:\\High-Quality RGB\\(External RGB Camera)};
+% \node[box, below right=2cm and 1.2cm of problem] (hsi) {Direction 2:\\HSI-Based Object Detection\\(No RGB Needed)};
+
+% \draw[arrow] (problem.south) -- (rgb.north);
+% \draw[arrow] (problem.south) -- (hsi.north);
+
+% % Expand direction 1
+% \node[box, below=1.7cm of rgb] (sam_stable) {SAM2 Becomes Stable};
+% \node[box, below=1.7cm of sam_stable] (cnn_good) {CNN Sees Sharp Contours};
+% \draw[arrow] (rgb) -- (sam_stable);
+% \draw[arrow] (sam_stable) -- (cnn_good);
+
+% % Expand direction 2
+% \node[box, below=1.7cm of hsi] (yolohs) {YOLO-HS\\(PCA or Band Selection)};
+% \node[box, below=1.7cm of yolohs] (embedding) {Object Detection on\\Spectral Embeddings};
+% \draw[arrow] (hsi) -- (yolohs);
+% \draw[arrow] (yolohs) -- (embedding);
+
+% \end{tikzpicture}
+
+% \caption{Conceptual roadmap for future research.  
+% Two feasible directions emerge from the limitations of the hybrid approach:  
+% (1) using high-quality RGB to stabilize SAM2 and enable reliable CNN verification;  
+% or (2) designing object detectors that operate directly on hyperspectral information,  
+% bypassing the limitations of pseudo-RGB entirely.}
+% \label{fig:future_directions_diagram}
+% \end{figure}
+
+
+% ---------------------------------------------------------------------
+
+% \begin{table}[H]
+% \centering
+% \begin{tabular}{p{3.2cm} p{5.2cm} p{5.2cm}}
+% \toprule
+% \textbf{Approach} & \textbf{Advantages} & \textbf{Limitations} \\
+% \midrule
+
+% \textbf{High-quality RGB\\(Hybrid Pipeline Rev.2)} &
+% SAM2 segmentation becomes stable.\\
+% CNN sees clear contours and shading.\\
+% Pipeline remains compatible with existing software. &
+% Requires additional hardware (RGB camera).\\
+% Synchronization with HSI capture.\\
+% Sensitive to lighting and occlusions. \\
+% \midrule
+
+% \textbf{YOLO-HS\\(Object Detection on HSI Features)} &
+% Uses spectral signatures directly.\\
+% Not limited by weak RGB or exposure.\\
+% Detects grapes using geometry + spectrum. &
+% Requires custom training pipeline.\\
+% No ``off-the-shelf'' implementation.\\
+% Higher computational cost. \\
+% \midrule
+
+% \textbf{Spectral Embedding Detectors} &
+% Can use PCA / Autoencoder / 3D CNN features.\\
+% Strong performance in recent HSI research.\\
+% Avoids RGB weaknesses entirely. &
+% Needs large annotated dataset.\\
+% More complex to implement. \\
+% \bottomrule
+% \end{tabular}
+% \caption{Comparison of future research directions following the limitations of the hybrid SAM2+CNN pipeline.}
+% \label{tab:future_directions_comparison}
+% \end{table}

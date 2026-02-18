@@ -1,0 +1,789 @@
+\chapter{Experimental Results}
+\label{ch:results}
+
+\section{Overview of Experimental Results}
+This chapter presents the quantitative results obtained from the experimental evaluation of hyperspectral-based crack detection and prediction methods. The results are organized to follow the logical progression of the experimental pipeline, beginning with spectral characterization, continuing through pixel-level and whole-image modeling, and concluding with temporal and longitudinal analyses.
+
+Only empirical findings are reported in this chapter, without interpretation or comparison to prior studies.
+
+\section{Spectral Signature Characterization}
+This section examines the spectral properties of grape tissue to establish whether measurable differences exist between healthy and cracked samples prior to any modeling stage.
+
+\subsection{Mean Spectral Signatures of Healthy and Cracked Tissue}
+Mean spectral signatures were computed for pixels sampled from healthy and cracked grape tissue across the full VIS--NIR range. 
+The analysis focuses on class-level spectral trends and variability, without applying any classification or predictive modeling.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{results/Spectral_Signature_Characterization/spectral_signatures_mean_std.png}
+    \caption{Mean spectral signatures ($\pm$ standard deviation) for healthy and cracked tissue across the VIS--NIR range.}
+    \label{fig:mean_signatures}
+\end{figure}
+
+\FloatBarrier
+
+\noindent
+To provide a compact quantitative summary, reflectance values were aggregated over two broad spectral regions corresponding to the visible (VIS) and near-infrared (NIR) ranges.
+
+\FloatBarrier
+
+\begin{table}[htbp]
+    \centering
+    \caption{Summary statistics of reflectance values across spectral regions for healthy and cracked tissue.}
+    \label{tab:reflectance_stats}
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{@{}lcccc@{}}
+        \toprule
+        Spectral Region & Class & Mean Reflectance & Std. Dev. & Median \\
+        \midrule
+        VIS (400--700\,nm) & Healthy & 0.218 & 0.128 & 0.186 \\
+                          & Cracked & 0.137 & 0.076 & 0.123 \\
+        NIR (700--1000\,nm) & Healthy & 0.660 & 0.114 & 0.630 \\
+                           & Cracked & 0.450 & 0.121 & 0.425 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\FloatBarrier
+\newpage
+
+\subsection{Spectral Separability Across Wavelength Regions}
+This subsection quantifies the degree of spectral separation between healthy and cracked tissue across predefined wavelength regions.
+The goal is to identify spectral ranges exhibiting the strongest inter-class contrast, without invoking classification models.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{results/Spectral_Signature_Characterization/separability_metrics.png}
+    \caption{Wavelength-wise spectral separability metrics between healthy and cracked tissue, including absolute mean difference, Cohen's $d$, and Fisher score.}
+    \label{fig:spectral_separability}
+\end{figure}
+
+\noindent
+To facilitate regional-level comparison, the wavelength-wise separability measures were aggregated over predefined spectral regions.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Regional spectral separability metrics between healthy and cracked tissue.
+    Mean values are averaged across wavelengths within each range, while peak values
+    indicate the maximum separability and the corresponding wavelength.}
+    \label{tab:separability_scores}
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{@{}lccc@{}}
+        \toprule
+        Metric & VIS Range & NIR Range & Full Spectrum \\
+        \midrule
+        Mean $|\Delta \mu|$ (Abs. Mean Diff.) 
+            & 0.0810 & 0.2101 & 0.1422 \\
+        Max $|\Delta \mu|$ (nm) 
+            & 0.2325 (708.6) & 0.3704 (726.5) & 0.3704 (726.5) \\
+        \midrule
+        Mean Cohen's $d$ 
+            & 0.6330 & 1.6217 & 1.1014 \\
+        Max Cohen's $d$ (nm) 
+            & 1.1910 (699.5) & 2.6877 (756.6) & 2.6877 (756.6) \\
+        \midrule
+        Mean Fisher Score 
+            & 0.2895 & 1.6590 & 0.9436 \\
+        Max Fisher Score (nm) 
+            & 0.8821 (694.5) & 3.6311 (747.5) & 3.6311 (747.5) \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{results/Spectral_Signature_Characterization/regional_comparison.png}
+    \caption{Regional visual summary of mean reflectance ($\pm$1 STD) and absolute mean difference between healthy and cracked tissue in the VIS and NIR ranges. This figure provides an intuitive visualization of the regional trends quantified in Table~\ref{tab:separability_scores}.}
+    \label{fig:regional_summary}
+\end{figure}
+
+\FloatBarrier
+
+
+\section{Pixel-Level Classification Performance}
+This section reports the performance of supervised pixel-level classification models trained on hyperspectral signatures.
+
+\subsection{Experimental Setup and Evaluation Protocol}
+Pixel-level classification performance was evaluated using a cross-validation framework designed to assess generalization across grape clusters.
+Standard classification metrics were computed for all experiments.
+
+\graphicspath{{results/Binary_Pixel_Level_Classification/}}
+
+% ==========================================================
+% Binary Pixel-Level Classification Results
+% ==========================================================
+\subsection{Binary Pixel-Level Classification Results}
+
+Binary pixel-level classification was evaluated for distinguishing healthy from cracked tissue.
+Performance was assessed using Accuracy, ROC--AUC, and PR--AUC, together with class-specific Precision and Recall
+for the \textit{Cracked} class (positive class).
+
+Two sampling regimes were considered: the original naturally imbalanced distribution and a class-balanced configuration.
+
+\subsubsection{Unbalanced vs.\ Balanced Training Sets}
+
+Results obtained under both sampling regimes are summarized jointly on the following landscape page.
+Table~\ref{tab:pixel_metrics_unbalanced} reports the classification performance obtained using the original unbalanced dataset,
+while Table~\ref{tab:pixel_metrics_balanced} presents the corresponding results obtained under balanced sampling.
+The identical evaluation protocol and model set are used in both cases, enabling a direct comparison between regimes.
+
+\FloatBarrier
+% =========================================================
+% BOTH TABLES ON SAME LANDSCAPE PAGE (WITH VALUES)
+% =========================================================
+\clearpage
+\begin{landscape}
+\thispagestyle{plain}
+
+% -----------------------------
+% UNBALANCED
+% -----------------------------
+\begin{table}[p]
+    \centering
+    \caption{Pixel-level classification metrics (unbalanced training set). Values are reported as mean $\pm$ standard deviation across folds where available. Precision and recall are reported for the \textit{Cracked} class; F1 is the weighted F1-score.}
+    \label{tab:pixel_metrics_unbalanced}
+    \small
+    \renewcommand{\arraystretch}{1.25}
+    \setlength{\tabcolsep}{7pt}
+    \begin{adjustbox}{width=1.18\textwidth,center}
+    \begin{tabular}{@{}lccccc@{}}
+        \toprule
+        Model & Accuracy & Precision  & Recall  & F1  & ROC--AUC \\
+        \midrule
+        PLS-DA                    & 0.9927 $\pm$ 0.0168 & 0.9999 & 0.9682 & 0.9924 & 1.0000 $\pm$ 0.0000 \\
+        Logistic Regression (L1)  & 0.9962 $\pm$ 0.0074 & 0.9890 & 0.9948 & 0.9963 & 0.9996 $\pm$ 0.0012 \\
+        SVM (RBF)                 & 0.9938 $\pm$ 0.0094 & 0.9943 & 0.9787 & 0.9938 & 0.9997 $\pm$ 0.0010 \\
+        Random Forest            & 0.9968 $\pm$ 0.0055 & 0.9964 & 0.9904 & 0.9968 & 0.9990 $\pm$ 0.0035 \\
+        XGBoost                  & 0.9947 $\pm$ 0.0103 & 0.9953 & 0.9798 & 0.9946 & 1.0000 $\pm$ 0.0000 \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+\vspace{1.3cm}
+
+% -----------------------------
+% BALANCED
+% -----------------------------
+\begin{table}[p]
+    \centering
+    \caption{Pixel-level classification metrics (balanced training set). Values are reported as mean $\pm$ standard deviation across folds where available. Precision and recall are reported for the \textit{Cracked} class; F1 is the weighted F1-score.}
+    \label{tab:pixel_metrics_balanced}
+    \small
+    \renewcommand{\arraystretch}{1.25}
+    \setlength{\tabcolsep}{7pt}
+    \begin{adjustbox}{width=1.18\textwidth,center}
+    \begin{tabular}{@{}lccccc@{}}
+        \toprule
+        Model & Accuracy & Precision  & Recall  & F1  & ROC--AUC \\
+        \midrule
+        PLS-DA                    & 0.9961 $\pm$ 0.0086 & 0.9998 & 0.9929 & 0.9961 & 1.0000 $\pm$ 0.0000 \\
+        Logistic Regression (L1)  & 0.9930 $\pm$ 0.0148 & 0.9994 & 0.9861 & 0.9930 & 0.9999 $\pm$ 0.0002 \\
+        SVM (RBF)                 & 0.9876 $\pm$ 0.0202 & 0.9948 & 0.9771 & 0.9875 & 0.9998 $\pm$ 0.0007 \\
+        Random Forest            & 0.9935 $\pm$ 0.0110 & 0.9970 & 0.9882 & 0.9934 & 0.9990 $\pm$ 0.0038 \\
+        XGBoost                  & 0.9934 $\pm$ 0.0107 & 0.9972 & 0.9882 & 0.9933 & 1.0000 $\pm$ 0.0001 \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+\end{landscape}
+
+
+
+
+\subsection{Pixel-Level Classification Results Under Different Labeling and Balancing Regimes (10 classes)}
+
+This subsection reports pixel-level classification performance under three labeling strategies:
+(i) \textit{crack\_regular\_rest},
+(ii) \textit{crack\_vs\_rest}, and
+(iii) a \textit{multi\_class} formulation.
+All models were evaluated using identical domain-aware LOGO cross-validation splits.
+For each labeling strategy, two sampling regimes were considered: a class-balanced configuration and the original naturally imbalanced distribution, resulting in six experimental configurations in total.
+
+\noindent
+Performance is reported as mean $\pm$ standard deviation across folds.
+Reported metrics include global measures (Accuracy, Balanced Accuracy and Macro-F1), CRACK-specific metrics (Precision, Recall, F1, ROC--AUC and PR--AUC), and total runtime per experiment.
+The evaluated classifiers include Logistic Regression (L1), Random Forest, XGBoost, a shallow Multi-Layer Perceptron (MLP), and PLS-DA.
+
+\subsubsection{Balanced Training Sets}
+
+Results obtained under balanced sampling are summarized in Table~\ref{tab:pixel_balanced_all_auc}.
+The table reports performance for both binary labeling schemes and for the multi-class configuration.
+
+\subsubsection{Unbalanced Training Sets}
+
+Results obtained on naturally imbalanced data are summarized in Table~\ref{tab:pixel_unbalanced_all_auc}.
+The same set of models and metrics are reported for direct comparison with the balanced regime.
+
+\FloatBarrier
+
+% =========================================================
+% PAGE 1 (LANDSCAPE): UNBALANCED - SINGLE TABLE
+% =========================================================
+\clearpage
+\begin{landscape}
+\thispagestyle{plain}
+
+\begin{table}[p]
+    \centering
+    \caption{Pixel-level classification metrics (\textbf{unbalanced} training set). Values are reported as mean $\pm$ standard deviation across folds.}
+    \label{tab:pixel_metrics_unbalanced_all}
+    \small
+    \renewcommand{\arraystretch}{1.25}
+    \setlength{\tabcolsep}{7pt}
+    \begin{adjustbox}{max width=1.5\textwidth}
+    \begin{tabular}{@{}llccccccc@{}}
+        \toprule
+        Label setup & Model &
+        Accuracy & Balanced Acc. & Precision (Cracked) & Recall (Cracked) & Macro-F1 & ROC--AUC (Cracked) & PR--AUC (Cracked) \\
+        \midrule
+
+        \multicolumn{9}{@{}l@{}}{\textbf{crack\_regular\_rest}} \\
+        & PLS-DA                & 0.5087 $\pm$ 0.0044 & 0.6879 $\pm$ 0.0239 & 0.8825 $\pm$ 0.1174 & 0.7537 $\pm$ 0.2385 & 0.5819 $\pm$ 0.0199 & 0.9977 $\pm$ 0.0049 & 0.8630 $\pm$ 0.1242 \\
+        & Logistic Regression (L1) & 0.8537 $\pm$ 0.0021 & 0.8683 $\pm$ 0.0075 & 0.9654 $\pm$ 0.0185 & 0.9663 $\pm$ 0.0748 & 0.8010 $\pm$ 0.0049 & 0.9993 $\pm$ 0.0021 & 0.9839 $\pm$ 0.0116 \\
+        & Random Forest         & 0.9175 $\pm$ 0.0056 & 0.9179 $\pm$ 0.0116 & 0.8942 $\pm$ 0.0644 & 0.9394 $\pm$ 0.0701 & 0.8904 $\pm$ 0.0106 & 0.9975 $\pm$ 0.0037 & 0.9622 $\pm$ 0.0495 \\
+        & XGBoost               & 0.9212 $\pm$ 0.0040 & 0.9162 $\pm$ 0.0094 & 0.9804 $\pm$ 0.0118 & 0.9493 $\pm$ 0.0894 & 0.8832 $\pm$ 0.0074 & 0.9992 $\pm$ 0.0017 & 0.9902 $\pm$ 0.0160 \\
+        & MLP (Small)           & 0.9175 $\pm$ 0.0059 & 0.9166 $\pm$ 0.0122 & 0.9530 $\pm$ 0.0272 & 0.9729 $\pm$ 0.0398 & 0.8759 $\pm$ 0.0176 & 0.9994 $\pm$ 0.0017 & 0.9911 $\pm$ 0.0122 \\
+        \addlinespace[4pt]
+
+        \multicolumn{9}{@{}l@{}}{\textbf{crack\_vs\_rest}} \\
+        & PLS-DA                & 0.5120 $\pm$ 0.0047 & 0.6940 $\pm$ 0.0189 & 0.8843 $\pm$ 0.1117 & 0.7623 $\pm$ 0.2303 & 0.5893 $\pm$ 0.0164 & 0.9979 $\pm$ 0.0045 & 0.8669 $\pm$ 0.1186 \\
+        & Logistic Regression (L1) & 0.8574 $\pm$ 0.0022 & 0.8704 $\pm$ 0.0076 & 0.9669 $\pm$ 0.0190 & 0.9651 $\pm$ 0.0759 & 0.8049 $\pm$ 0.0050 & 0.9993 $\pm$ 0.0022 & 0.9847 $\pm$ 0.0114 \\
+        & Random Forest         & 0.9147 $\pm$ 0.0060 & 0.9159 $\pm$ 0.0126 & 0.8871 $\pm$ 0.0701 & 0.9368 $\pm$ 0.0751 & 0.8857 $\pm$ 0.0116 & 0.9975 $\pm$ 0.0041 & 0.9610 $\pm$ 0.0535 \\
+        & XGBoost               & 0.9200 $\pm$ 0.0043 & 0.9154 $\pm$ 0.0098 & 0.9809 $\pm$ 0.0120 & 0.9508 $\pm$ 0.0888 & 0.8825 $\pm$ 0.0078 & 0.9992 $\pm$ 0.0018 & 0.9900 $\pm$ 0.0165 \\
+        & MLP (Small)           & 0.9163 $\pm$ 0.0062 & 0.9158 $\pm$ 0.0129 & 0.9521 $\pm$ 0.0282 & 0.9736 $\pm$ 0.0390 & 0.8741 $\pm$ 0.0188 & 0.9994 $\pm$ 0.0017 & 0.9912 $\pm$ 0.0122 \\
+        \addlinespace[4pt]
+
+        \multicolumn{9}{@{}l@{}}{\textbf{multi\_class}} \\
+        & PLS-DA                & 0.9670 $\pm$ 0.0211 & 0.9787 $\pm$ 0.0121 & 0.7204 $\pm$ 0.1749 & 0.9927 $\pm$ 0.0127 & 0.9013 $\pm$ 0.0709 & 0.9978 $\pm$ 0.0025 & 0.9677 $\pm$ 0.0372 \\
+        & Logistic Regression (L1) & 0.9972 $\pm$ 0.0031 & 0.9959 $\pm$ 0.0097 & 0.9675 $\pm$ 0.0225 & 0.9977 $\pm$ 0.0078 & 0.9920 $\pm$ 0.0085 & 0.9996 $\pm$ 0.0016 & 0.9971 $\pm$ 0.0079 \\
+        & Random Forest         & 0.9965 $\pm$ 0.0030 & 0.9940 $\pm$ 0.0120 & 0.9675 $\pm$ 0.0234 & 0.9969 $\pm$ 0.0090 & 0.9906 $\pm$ 0.0100 & 0.9994 $\pm$ 0.0026 & 0.9970 $\pm$ 0.0077 \\
+        & XGBoost               & 0.9978 $\pm$ 0.0021 & 0.9946 $\pm$ 0.0103 & 0.9812 $\pm$ 0.0149 & 0.9908 $\pm$ 0.0206 & 0.9923 $\pm$ 0.0074 & 0.9995 $\pm$ 0.0021 & 0.9977 $\pm$ 0.0069 \\
+        & MLP (Small)           & 0.9905 $\pm$ 0.0249 & 0.9890 $\pm$ 0.0224 & 0.9244 $\pm$ 0.1648 & 0.9866 $\pm$ 0.0259 & 0.9699 $\pm$ 0.0704 & 0.9965 $\pm$ 0.0083 & 0.9898 $\pm$ 0.0247 \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+% =========================================================
+% PAGE 2 (LANDSCAPE): BALANCED - SINGLE TABLE
+% =========================================================
+\clearpage
+\thispagestyle{plain}
+
+\begin{table}[p]
+    \centering
+    \caption{Pixel-level classification metrics (\textbf{balanced} training set). Values are reported as mean $\pm$ standard deviation across folds.}
+    \label{tab:pixel_metrics_balanced_all}
+    \small
+    \renewcommand{\arraystretch}{1.25}
+    \setlength{\tabcolsep}{7pt}
+    \begin{adjustbox}{max width=1.5\textwidth}
+    \begin{tabular}{@{}llccccccc@{}}
+        \toprule
+        Label setup & Model &
+        Accuracy & Balanced Acc. & Precision (Cracked) & Recall (Cracked) & Macro-F1 & ROC--AUC (Cracked) & PR--AUC (Cracked) \\
+        \midrule
+
+        \multicolumn{9}{@{}l@{}}{\textbf{crack\_regular\_rest}} \\
+        & PLS-DA                & 0.4771 $\pm$ 0.0088 & 0.7061 $\pm$ 0.0107 & 0.8433 $\pm$ 0.0910 & 0.9451 $\pm$ 0.1069 & 0.5875 $\pm$ 0.0090 & 0.9982 $\pm$ 0.0046 & 0.9500 $\pm$ 0.0899 \\
+        & Logistic Regression (L1) & 0.8629 $\pm$ 0.0033 & 0.8653 $\pm$ 0.0073 & 0.9865 $\pm$ 0.0067 & 0.9671 $\pm$ 0.0739 & 0.8097 $\pm$ 0.0054 & 0.9994 $\pm$ 0.0018 & 0.9874 $\pm$ 0.0090 \\
+        & Random Forest         & 0.9277 $\pm$ 0.0046 & 0.9199 $\pm$ 0.0110 & 0.9101 $\pm$ 0.0533 & 0.9194 $\pm$ 0.1124 & 0.9047 $\pm$ 0.0087 & 0.9975 $\pm$ 0.0035 & 0.9725 $\pm$ 0.0438 \\
+        & XGBoost               & 0.9242 $\pm$ 0.0026 & 0.9111 $\pm$ 0.0084 & 0.9932 $\pm$ 0.0042 & 0.9437 $\pm$ 0.0954 & 0.8839 $\pm$ 0.0067 & 0.9993 $\pm$ 0.0016 & 0.9919 $\pm$ 0.0175 \\
+        & MLP (Small)           & 0.9219 $\pm$ 0.0053 & 0.9140 $\pm$ 0.0125 & 0.9831 $\pm$ 0.0123 & 0.9832 $\pm$ 0.0223 & 0.8869 $\pm$ 0.0167 & 0.9982 $\pm$ 0.0057 & 0.9934 $\pm$ 0.0097 \\
+        \addlinespace[4pt]
+
+        \multicolumn{9}{@{}l@{}}{\textbf{crack\_vs\_rest}} \\
+        & PLS-DA                & 0.4782 $\pm$ 0.0090 & 0.7078 $\pm$ 0.0106 & 0.8445 $\pm$ 0.0904 & 0.9455 $\pm$ 0.1063 & 0.5889 $\pm$ 0.0093 & 0.9982 $\pm$ 0.0046 & 0.9507 $\pm$ 0.0886 \\
+        & Logistic Regression (L1) & 0.8642 $\pm$ 0.0032 & 0.8662 $\pm$ 0.0074 & 0.9866 $\pm$ 0.0067 & 0.9674 $\pm$ 0.0738 & 0.8109 $\pm$ 0.0055 & 0.9994 $\pm$ 0.0018 & 0.9876 $\pm$ 0.0089 \\
+        & Random Forest         & 0.9261 $\pm$ 0.0049 & 0.9191 $\pm$ 0.0113 & 0.9092 $\pm$ 0.0546 & 0.9192 $\pm$ 0.1128 & 0.9038 $\pm$ 0.0091 & 0.9974 $\pm$ 0.0036 & 0.9722 $\pm$ 0.0444 \\
+        & XGBoost               & 0.9238 $\pm$ 0.0027 & 0.9110 $\pm$ 0.0085 & 0.9931 $\pm$ 0.0042 & 0.9439 $\pm$ 0.0954 & 0.8836 $\pm$ 0.0068 & 0.9993 $\pm$ 0.0016 & 0.9919 $\pm$ 0.0176 \\
+        & MLP (Small)           & 0.9221 $\pm$ 0.0052 & 0.9143 $\pm$ 0.0126 & 0.9830 $\pm$ 0.0124 & 0.9833 $\pm$ 0.0222 & 0.8871 $\pm$ 0.0165 & 0.9982 $\pm$ 0.0057 & 0.9934 $\pm$ 0.0097 \\
+        \addlinespace[4pt]
+
+        \multicolumn{9}{@{}l@{}}{\textbf{multi\_class}} \\
+        & PLS-DA                & 0.9666 $\pm$ 0.0210 & 0.9786 $\pm$ 0.0120 & 0.7179 $\pm$ 0.1759 & 0.9926 $\pm$ 0.0129 & 0.9010 $\pm$ 0.0707 & 0.9978 $\pm$ 0.0025 & 0.9674 $\pm$ 0.0375 \\
+        & Logistic Regression (L1) & 0.9973 $\pm$ 0.0031 & 0.9960 $\pm$ 0.0097 & 0.9677 $\pm$ 0.0224 & 0.9977 $\pm$ 0.0078 & 0.9921 $\pm$ 0.0085 & 0.9996 $\pm$ 0.0016 & 0.9971 $\pm$ 0.0079 \\
+        & Random Forest         & 0.9966 $\pm$ 0.0030 & 0.9941 $\pm$ 0.0120 & 0.9676 $\pm$ 0.0233 & 0.9969 $\pm$ 0.0090 & 0.9907 $\pm$ 0.0100 & 0.9994 $\pm$ 0.0026 & 0.9970 $\pm$ 0.0077 \\
+        & XGBoost               & 0.9979 $\pm$ 0.0021 & 0.9947 $\pm$ 0.0103 & 0.9813 $\pm$ 0.0149 & 0.9908 $\pm$ 0.0206 & 0.9924 $\pm$ 0.0074 & 0.9995 $\pm$ 0.0021 & 0.9977 $\pm$ 0.0069 \\
+        & MLP (Small)           & 0.9906 $\pm$ 0.0249 & 0.9891 $\pm$ 0.0224 & 0.9246 $\pm$ 0.1647 & 0.9866 $\pm$ 0.0259 & 0.9700 $\pm$ 0.0704 & 0.9965 $\pm$ 0.0083 & 0.9898 $\pm$ 0.0247 \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+\end{landscape}
+
+
+
+% % ==========================================================
+% % Autoencoder-Based Pixel-Level Anomaly Detection
+% % ==========================================================
+% \subsection{Autoencoder-Based Pixel-Level Anomaly Detection}
+
+% In addition to supervised classifiers, pixel-level crack detection was evaluated using unsupervised reconstruction-based anomaly detection with autoencoders trained exclusively on non-cracked samples.
+% Three fully-connected architectures were examined: \textit{Autoencoder (64--32--16)}, \textit{Autoencoder (128--64--32)}, and \textit{Autoencoder (64--32--8)}.
+% All models were trained and evaluated using the same domain-aware LOGO cross-validation splits employed in the supervised experiments.
+
+% Anomaly scores were computed from reconstruction errors and converted to binary predictions using a percentile-based threshold estimated on the training folds.
+% Performance is reported as mean $\pm$ standard deviation across folds.
+% Reported metrics include Accuracy, Precision, Recall, F1, ROC--AUC and PR--AUC for the \textit{Cracked} class, together with aggregate confusion counts across folds and computational cost indicators.
+
+% \subsubsection{Comparison Between Autoencoder Architectures}
+
+% Quantitative results for all evaluated autoencoder variants are summarized in Table~\ref{tab:autoencoder_pixel_results}.
+% The comparison highlights the trade-off between detection performance, reconstruction separation between normal and anomalous pixels, and computational efficiency.
+
+% ==========================================================
+% Autoencoder-Based Pixel-Level Anomaly Detection
+% ==========================================================
+\subsection{Autoencoder-Based Pixel-Level Anomaly Detection}
+
+In addition to supervised classifiers, pixel-level crack detection was evaluated using reconstruction-based anomaly detection with autoencoders.
+The experiments were designed in a progressive manner.
+First, a binary formulation was considered, in which the autoencoder was trained exclusively on healthy (non-cracked) pixels and evaluated against cracked tissue.
+Subsequently, the setting was extended to a multi-class environment, in which background and nuisance categories (e.g., leaves, branches, plastic and calibration targets) were explicitly included during testing.
+
+Within the multi-class regime, two complementary training strategies were investigated.
+In the first, the autoencoder was trained solely on pixels belonging to the \textit{Cracked} class, such that crack signatures define the reconstruction manifold and all remaining classes are treated as anomalous.
+In the second strategy, the model was trained on all semantic classes except \textit{Cracked}, thereby enforcing accurate reconstruction of diverse non-crack appearances while promoting elevated reconstruction errors for crack pixels at inference time.
+
+Across all configurations, three fully-connected architectures were examined: \textit{Autoencoder (64--32--16)}, \textit{Autoencoder (128--64--32)}, and \textit{Autoencoder (64--32--8)}.
+All models were trained and evaluated using identical domain-aware LOGO cross-validation splits employed in the supervised experiments.
+
+Anomaly scores were computed from reconstruction errors and converted into binary predictions using a percentile-based threshold estimated on the training folds.
+Performance is reported as mean $\pm$ standard deviation across folds.
+Reported metrics include Accuracy, Precision, Recall, F1, ROC--AUC and PR--AUC for the \textit{Cracked} class, together with aggregate confusion counts across folds and computational cost indicators.
+
+
+% =========================================================
+% AUTOENCODER COMPARISON TABLE (LANDSCAPE)
+% =========================================================
+\clearpage
+\begin{landscape}
+\thispagestyle{plain}
+
+\begin{table}[p]
+    \centering
+    \caption{Pixel-level anomaly detection performance using autoencoders trained on non-cracked samples.
+    Values are reported as mean $\pm$ standard deviation across folds.
+    Metrics correspond to the \textit{Cracked} class.
+    Aggregate TP/FP/TN/FN counts are reported across all folds.
+    Reconstruction errors are averaged over test pixels.
+    }
+    \label{tab:autoencoder_pixel_results}
+    \small
+    \renewcommand{\arraystretch}{1.85}
+    \setlength{\tabcolsep}{7pt}
+    \begin{adjustbox}{width=1.18\textwidth,center}
+    \begin{tabular}{@{}lcccccccccc@{}}
+        \toprule
+        Architecture &
+        Accuracy &
+        Precision &
+        Recall &
+        F1 &
+        ROC--AUC &
+        PR--AUC &
+        Train Time [s] &
+        Infer Time [s] \\
+        \midrule
+
+        Autoencoder (64--32--16)
+        & 0.8969 $\pm$ 0.1646
+        & 0.8226 $\pm$ 0.1925
+        & 0.9971 $\pm$ 0.0016
+        & 0.9017 $\pm$ 0.1047
+        & 0.9814 $\pm$ 0.0327
+        & 0.9554 $\pm$ 0.0900
+        & 63.34 $\pm$ 2.80
+        & 0.043 $\pm$ 0.004 \\
+
+        Autoencoder (128--64--32)
+        & 0.8597 $\pm$ 0.1813
+        & 0.7544 $\pm$ 0.2308
+        & 0.9974 $\pm$ 0.0015
+        & 0.8628 $\pm$ 0.1270
+        & 0.9673 $\pm$ 0.0469
+        & 0.9253 $\pm$ 0.1190
+        & 60.90 $\pm$ 1.48
+        & 0.057 $\pm$ 0.001 \\
+
+        Autoencoder (64--32--8)
+        & 0.8923 $\pm$ 0.1648
+        & 0.8126 $\pm$ 0.1938
+        & 0.9978 $\pm$ 0.0013
+        & 0.8965 $\pm$ 0.1050
+        & 0.9799 $\pm$ 0.0334
+        & 0.9511 $\pm$ 0.0913
+        & 61.02 $\pm$ 1.46
+        & 0.041 $\pm$ 0.001 \\
+
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+
+
+\end{landscape}
+
+% =========================================================
+% AUTOENCODER (CRACK ONLY – MULTI-CLASS) COMPARISON TABLE
+% =========================================================
+\clearpage
+\begin{landscape}
+\thispagestyle{plain}
+
+\begin{table}[p]
+    \centering
+    \caption{Pixel-level anomaly detection performance using autoencoders trained exclusively on \textit{Cracked} pixels and evaluated in a multi-class setting against all remaining semantic categories.
+    Values are reported as mean across LOGO folds.
+    Metrics correspond to the \textit{Cracked} class.
+    }
+    \label{tab:autoencoder_pixel_results_crack_only_multiclass}
+    \small
+    \renewcommand{\arraystretch}{1.85}
+    \setlength{\tabcolsep}{7pt}
+    \begin{adjustbox}{width=1.18\textwidth,center}
+    \begin{tabular}{@{}lcccccccc@{}}
+        \toprule
+        Architecture &
+        Accuracy &
+        Precision &
+        Recall &
+        F1 &
+        ROC--AUC &
+        PR--AUC &
+        Train Time [s] &
+        Infer Time [s] \\
+        \midrule
+
+        Autoencoder (64--32--16)
+        & 0.9660
+        & 0.9995
+        & 0.9662
+        & 0.9826
+        & 0.9858
+        & 0.9999
+        & 26.96
+        & 0.148 \\
+
+        Autoencoder (128--64--32)
+        & 0.9861
+        & 0.9991
+        & 0.9869
+        & 0.9930
+        & 0.9846
+        & 0.9999
+        & 27.12
+        & 0.207 \\
+
+        Autoencoder (64--32--8)
+        & 0.9629
+        & 0.9994
+        & 0.9632
+        & 0.9809
+        & 0.9834
+        & 0.9999
+        & 26.20
+        & 0.155 \\
+
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+\end{landscape}
+
+
+% =========================================================
+% AUTOENCODER (NON-CRACK – MULTI-CLASS) COMPARISON TABLE
+% =========================================================
+\clearpage
+\begin{landscape}
+\thispagestyle{plain}
+
+\begin{table}[p]
+    \centering
+    \caption{Pixel-level anomaly detection performance using autoencoders trained on all semantic classes except \textit{Cracked} and evaluated in a multi-class setting including crack pixels.
+    Values are reported for the held-out test split.
+    Metrics correspond to the \textit{Cracked} class.}
+    \label{tab:autoencoder_pixel_results_noncrack_multiclass}
+    \small
+    \renewcommand{\arraystretch}{1.85}
+    \setlength{\tabcolsep}{7pt}
+    \begin{adjustbox}{width=1.18\textwidth,center}
+    \begin{tabular}{@{}lcccccccc@{}}
+        \toprule
+        Architecture &
+        Accuracy &
+        Precision &
+        Recall &
+        F1 &
+        ROC--AUC &
+        PR--AUC &
+        Train Time [s] &
+        Infer Time [s] \\
+        \midrule
+
+        Autoencoder (64--32--16)
+        & 0.9969
+        & 0.0096
+        & 0.1110
+        & 0.0177
+        & 0.4575
+        & 0.0083
+        & 1429.22
+        & 0.388 \\
+
+        Autoencoder (128--64--32)
+        & 0.9986
+        & 0.0118
+        & 0.0126
+        & 0.0122
+        & 0.4513
+        & 0.0084
+        & 999.73
+        & 0.255 \\
+
+        Autoencoder (64--32--8)
+        & 0.9984
+        & 0.0207
+        & 0.0316
+        & 0.0250
+        & 0.4542
+        & 0.0110
+        & 916.85
+        & 0.141 \\
+
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+\end{landscape}
+
+
+
+
+\subsection{Full-Image Inference: Early vs.\ Late Season Experiments}
+
+To evaluate the temporal robustness of the proposed full-image crack-detection pipeline, two independent optimization and evaluation scenarios were considered, corresponding to early-season and late-season acquisition periods.
+In both cases, post-processing and aggregation parameters were optimized on a calibration split using Optuna and subsequently assessed on an unseen test set.
+
+
+\noindent
+Each experiment employed identical inference logic, including pixel-level probability thresholding, morphological filtering, patch-level aggregation and global crack-percentage criteria.
+Performance was quantified on both calibration and test splits using a comprehensive set of metrics, encompassing accuracy-based measures, class-specific precision and recall, harmonic means (F1 and F2), specificity, negative predictive value, and the Matthews correlation coefficient, together with the underlying confusion matrices.
+
+\noindent
+The dataset composition for the two temporal scenarios is reported in Table~\ref{tab:full_image_dataset_composition}.
+Quantitative detection performance is summarized in Table~\ref{tab:full_image_early_late_metrics}, enabling a direct comparison between early- and late-season conditions and between calibration and test generalization behavior.
+
+
+
+% =========================================================
+% FULL-IMAGE DATASET COMPOSITION TABLE (PRETTY)
+% =========================================================
+\begin{table}[htbp]
+\centering
+\caption{Dataset composition for full-image crack-detection experiments under early- and late-season conditions.
+Row~1 was used for calibration, while Row~2 served as an independent test set.}
+\label{tab:full_image_dataset_composition}
+
+\small
+\renewcommand{\arraystretch}{1.2}
+\setlength{\tabcolsep}{8pt}
+
+\begin{tabular}{@{}lllcccc@{}}
+
+\toprule
+Row & Season & Split & Total & Unique & Pos & Neg \\
+\midrule
+Row 1 & Early & Calibration & 172 & 60 & 32 & 140 \\
+Row 1 & Late  & Calibration & 160 & 60 & 35 & 125 \\
+\addlinespace[4pt]
+Row 2 & Early & Test        & 60  & 60 & 32 & 28  \\
+Row 2 & Late  & Test        & 60  & 60 & 34 & 26  \\
+\bottomrule
+\end{tabular}
+
+\end{table}
+
+% =========================================================
+% FULL IMAGE EARLY vs LATE – METRICS TABLE
+% =========================================================
+\clearpage
+\begin{landscape}
+\thispagestyle{plain}
+
+\begin{table}[p]
+\centering
+\caption{Full-image crack detection performance for early- and late-season experiments.
+Metrics are reported separately for calibration and test splits.
+Confusion-matrix entries correspond to the number of grape clusters classified as cracked or healthy.
+All derived statistics refer to the \textit{Cracked} class.}
+\label{tab:full_image_early_late_metrics}
+
+\small
+\renewcommand{\arraystretch}{1.25}
+\setlength{\tabcolsep}{6pt}
+
+\begin{adjustbox}{width=1.22\textwidth,center}
+\begin{tabular}{@{}llccccccccccccc@{}}
+
+\toprule
+Season &
+Split &
+TP &
+FP &
+TN &
+FN &
+Acc &
+BalAcc &
+Prec &
+Rec &
+F1 &
+F2 &
+Spec &
+NPV &
+MCC \\
+\midrule
+
+Late & Calibration &
+34 & 5 & 120 & 1 &
+0.963 & 0.966 & 0.872 & 0.971 & 0.919 & 0.950 & 0.960 & 0.992 & 0.897 \\
+
+Late & Test &
+27 & 5 & 21 & 7 &
+0.800 & 0.801 & 0.844 & 0.794 & 0.818 & 0.804 & 0.808 & 0.750 & 0.598 \\
+
+\addlinespace[4pt]
+
+Early & Calibration &
+23 & 6 & 134 & 9 &
+0.913 & 0.838 & 0.793 & 0.719 & 0.754 & 0.732 & 0.957 & 0.937 & 0.703 \\
+
+Early & Test &
+19 & 3 & 25 & 13 &
+0.733 & 0.743 & 0.864 & 0.594 & 0.704 & 0.633 & 0.893 & 0.658 & 0.504 \\
+
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\end{landscape}
+
+
+
+% ------------------------------------------------------------
+\subsection{Wavelength selection (BFS) setup}
+Backward Feature Selection (BFS) was applied to the hyperspectral channels to evaluate
+full-image crack-detection performance as a function of the number of selected wavelengths.
+At each BFS step, the pipeline performance was recorded using the CRACK class metrics.
+
+\FloatBarrier
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.95\linewidth]{results/feature_selection/bfs_dual_metric.png}
+    \caption{BFS results: CRACK F1 and CRACK PR--AUC as a function of the number of selected wavelengths.}
+    \label{fig:bfs_dual_metric}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[t]{0.49\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{results/feature_selection/bfs_f1_thresholds.png}
+        \caption{CRACK F1 with threshold markers.}
+        \label{fig:bfs_f1_thresholds}
+    \end{subfigure}\hfill
+    \begin{subfigure}[t]{0.49\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{results/feature_selection/bfs_prauc_thresholds.png}
+        \caption{CRACK PR--AUC with threshold markers.}
+        \label{fig:bfs_prauc_thresholds}
+    \end{subfigure}
+    \caption{BFS performance curves with markers indicating the maximum score and the first wavelength counts where the score drops beyond 0.5\% and 1.0\% from the maximum.}
+    \label{fig:bfs_threshold_markers}
+\end{figure}
+
+\begin{table}[!htbp]
+\centering
+\caption{Summary of BFS wavelength-count thresholds for CRACK metrics.}
+\label{tab:bfs_thresholds_summary}
+\begin{tabular}{lcccccc}
+\toprule
+Metric & Max score & $n_{\max}$ & 0.5\% drop: $n$ & score & 1.0\% drop: $n$ & score \\
+\midrule
+CRACK PR--AUC & 0.9948 & 30  & 11  & 0.9878 & 9  & 0.9790 \\
+CRACK F1      & 0.9854 & 159 & 105 & 0.9800 & 88 & 0.9751 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\FloatBarrier
+
+
+\FloatBarrier
+
+\subsection{Full-image wavelength-selection results}
+
+Full-image crack-detection experiments were conducted for several wavelength subsets
+after complete spatial post-processing, including probability thresholding,
+morphological filtering, and blob-based aggregation. Performance was evaluated
+separately for early- and late-season acquisitions on an independent test set.
+
+\noindent
+Table~\ref{tab:full_image_wavelength_results} reports the obtained CRACK-class metrics
+for representative wavelength counts.
+
+\begin{table}[!htbp]
+\centering
+\caption{Full-image crack-detection performance for different wavelength subsets under early- and late-season conditions.}
+\label{tab:full_image_wavelength_results}
+\begin{tabular}{cccccccc}
+\toprule
+Season & \# Wavelengths & Accuracy & Bal. Acc. & Precision & Recall & F1 & MCC \\
+\midrule
+Early & 9 & 0.7833 & 0.7902 & 0.8800 & 0.6875 & 0.7719 & 0.5873 \\
+Late  & 9 & 0.8000 & 0.8054 & 0.8667 & 0.7647 & 0.8125 & 0.6054 \\
+\midrule
+Early & 11 & 0.7500 & 0.7567 & 0.8400 & 0.6562 & 0.7368 & 0.5195 \\
+Late  & 11 & 0.8167 & 0.8111 & 0.8286 & 0.8529 & 0.8406 & 0.6254 \\
+\midrule
+Early & 30 & \textbf{0.8167} & \textbf{0.8214} & \textbf{0.8889} & \textbf{0.7500} & \textbf{0.8136} & \textbf{0.6447} \\
+Late  & 30 & \textbf{0.8333} & \textbf{0.8348} & \textbf{0.8750} & 0.8235 & 0.8485 & \textbf{0.6652} \\
+\midrule
+Early & 159 & 0.8000 & 0.8036 & 0.8571 & \textbf{0.7500} & 0.8000 & 0.6071 \\
+Late  & 159 & \textbf{0.8333} & 0.8258 & 0.8333 & \textbf{0.8824} & \textbf{0.8571} & 0.6591 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\begin{table}[!htbp]
+\centering
+\caption{Model Generalization Analysis: Comparison between Calibration and Test MCC.}
+\label{tab:mcc_generalization}
+\begin{tabular}{ccccc}
+\toprule
+Season & \# Features & MCC Calibration & MCC Test & \textbf{Gap ($\Delta$)} \\
+\midrule
+Early & 9   & 0.7381 & 0.5873 & 0.1508 \\
+      & 30  & 0.7232 & \textbf{0.6447} & \textbf{0.0785} \\
+      & 159 & 0.6631 & 0.6071 & 0.0560 \\
+\midrule
+Late  & 9   & 0.8968 & 0.6054 & 0.2914 \\
+      & 30  & 0.8771 & \textbf{0.6652} & \textbf{0.2119} \\
+      & 159 & 0.8931 & 0.6591 & 0.2340 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\FloatBarrier

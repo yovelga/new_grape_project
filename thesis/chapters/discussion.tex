@@ -1,0 +1,34 @@
+\chapter{Discussion}
+
+\noindent
+The results of this study present a dual narrative. On one hand, the spectral signal of cracked grape tissue is fundamentally distinct from that of healthy tissue, enabling remarkably high classification accuracy at a granular, pixel level. An accuracy of 97\% with an AUC of 0.99 confirms the first hypothesis and establishes HSI as a technically viable tool for crack identification.
+
+However, the transition from a controlled, pixel-based analysis to a practical, whole-image application exposed a critical limitation. The "noisy" results from the whole-image classification underscore the challenge of semantic segmentation in complex agricultural scenes. The model's confusion of cracks with background elements highlights that a simple pixel-wise classifier is insufficient for field deployment. A more robust system would require a preliminary segmentation step.
+
+This challenge led to the most promising finding of the research: the value of analyzing mean spectral signatures over time. This approach effectively averages out pixel-level noise and reveals underlying physiological trends. The clear separation of irrigation treatments, especially in the 700-900 nm range, is highly significant. This spectral region is sensitive to changes in water content, cell structure, and chlorophyll concentration. The observed divergence strongly suggests that HSI is not just detecting damage but is monitoring the level of water stress in the grapes—a known precursor to cracking. This shifts the paradigm from simple detection to proactive early-warning monitoring. This finding directly supports the second and third hypotheses.
+
+% =====================================================================
+% CHAPTER: Conclusions and Future Work
+% =====================================================================
+\chapter{Conclusions and Future Work}
+
+\section{Conclusions}
+
+\noindent
+This research successfully demonstrated that:
+\begin{enumerate}
+    \item Hyperspectral imaging in the 484-933 nm range can differentiate between cracked and healthy grape tissue with extremely high accuracy (97\%) at the pixel level.
+    \item Direct application of pixel-level classifiers to entire field images is unreliable due to spectral confusion with background materials.
+    \item Monitoring the temporal evolution of a grape cluster's mean spectral signature, particularly in the 700-900 nm NIR region, is a robust and promising method for assessing physiological stress related to irrigation and providing early-warning insight related to cracking susceptibility.
+\end{enumerate}
+
+\section{Future Work}
+
+\noindent
+Based on these conclusions, several avenues for future research are recommended:
+\begin{itemize}
+    \item \textbf{Advanced Segmentation:} Develop a deep learning-based segmentation model (e.g., a U-Net or Mask R-CNN) to isolate grape clusters from the background before classification.
+    \item \textbf{Spatio-Spectral Models:} Explore 3D-Convolutional Neural Networks (3D-CNNs) that can simultaneously learn from both spatial and spectral information.
+    \item \textbf{Physiological Validation:} Conduct further studies to establish a direct quantitative link between the observed spectral trends and key physiological indicators of stress.
+    \item \textbf{In-Field System Development:} Work towards integrating these models into a real-time, in-field decision support system to help growers optimize irrigation and harvesting strategies.
+\end{itemize}

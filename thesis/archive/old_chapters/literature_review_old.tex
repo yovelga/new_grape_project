@@ -1,0 +1,250 @@
+% =====================================================================
+% CHAPTER 2: Literature Review
+% =====================================================================
+
+% ============================================================================
+% Literature Review — Chapter Structure
+% ============================================================================
+% This chapter establishes the scientific and practical context for grape cracking
+% detection and prediction, progressing from biological mechanisms to sensing and
+% computational approaches, and culminating in the identified research gap.
+%
+% ├─ Grape Cracking as an Agricultural and Physiological Problem
+% │  ├─ Definition and visual manifestation of fruit cracking
+% │  ├─ Phenological timing (veraison, late ripening stages)
+% │  ├─ Environmental and agronomic triggers
+% │  └─ Distinction between detection and prediction
+% │
+% ├─ Economic Impact and Practical Consequences
+% │  ├─ Yield losses and reduction in marketable produce
+% │  ├─ Quality degradation and shelf-life reduction
+% │  ├─ Financial implications for growers and supply chains
+% │  └─ Limitations of reactive management strategies
+% │
+% ├─ Physiological and Biomechanical Mechanisms of Grape Cracking
+% │  ├─ Berry water relations and turgor pressure dynamics
+% │  ├─ Cuticle structure, micro-cracks, and mechanical failure
+% │  ├─ Hormonal influences and agronomic interventions
+% │  └─ Cultivar-dependent susceptibility and variability
+% │
+% ├─ Precision Agriculture and Non-Destructive Sensing
+% │  ├─ Principles of precision agriculture and data-driven crop management
+% │  ├─ Role of proximal and remote sensing technologies
+% │  └─ Limitations of conventional physiological measurements
+% │
+% ├─ Hyperspectral Imaging for Agricultural Applications
+% │  ├─ Fundamentals of hyperspectral reflectance and spectral signatures
+% │  ├─ Advantages over RGB and multispectral imaging
+% │  ├─ VIS–NIR sensitivity to physiological and structural changes
+% │  └─ Applications in fruit quality assessment and defect detection
+% │
+% ├─ Machine Learning for Hyperspectral Data Analysis
+% │  ├─ Traditional machine learning approaches for HSI
+% │  ├─ Deep learning and non-linear models
+% │  ├─ Pixel-level versus image-level modeling paradigms
+% │  └─ Challenges: class imbalance, background clutter, and generalization
+% │
+% ├─ Related Work on Fruit Defect Detection and Prediction
+% │  ├─ HSI-based detection of visible fruit defects
+% │  ├─ Temporal and longitudinal spectral analysis
+% │  ├─ Early-stage and pre-symptomatic detection attempts
+% │  └─ Limitations of existing approaches under field conditions
+% │
+% └─ Research Gap and Study Positioning
+%    ├─ Summary of established knowledge
+%    ├─ Identified methodological and application gaps
+%    ├─ Lack of early, non-destructive crack prediction frameworks
+%    └─ Positioning of the present study within the literature
+%
+% ============================================================================
+
+
+
+\chapter{Literature Review}
+\section{Cracking in Grapes: Physiological Mechanisms, Cuticle Integrity, and Cultivar Susceptibility}
+
+Fruit cracking is one of the most economically damaging physiological disorders in table grapes
+(\textit{Vitis vinifera} L.), leading to substantial preharvest and postharvest losses.
+Although the visual symptom is the rupture of the berry skin, the underlying biological and
+mechanical processes are complex and involve interactions between tissue hydration, cuticle biomechanics,
+cell wall architecture, and cultivar-dependent structural traits. In grapes, as in other thin-skinned fruits,
+cracking results from the inability of the skin to maintain tensile integrity under conditions of rapid internal
+swelling or external mechanical stress \cite{Khadivi2014}. Understanding this process requires examining the
+physiology of berry softening, cuticle–epidermis structure, hormonal regulation, and the diverse susceptibility
+observed among cultivars such as ‘Scarlotta’.
+
+\subsection{Physiological Drivers of Cracking in Grapes}
+
+The onset of ripening (veraison) marks a critical transition in grape berry biomechanics.
+During this stage, berry softening occurs due to changes in cell wall composition, water relations,
+and turgor pressure. Softening reduces the elastic modulus of the skin and increases the likelihood
+of mechanical failure when exposed to external hydration or internal osmotic pressure.
+Chang et al. \cite{Chang2019} demonstrated that berry softening at veraison significantly decreases
+splitting resistance, linking rheological changes in the mesocarp and epidermis to the observed increase
+in cracking incidence. Their results show that the weakening of skin structure during this developmental
+window is a key physiological precursor to cracking events.
+
+Beyond softening, water uptake plays a central role. Even minor fluctuations in soil moisture or
+surface wetness can cause rapid increases in berry volume. When mesocarp expansion outpaces
+the extensibility of the skin, tensile stress accumulates in the cuticle and epidermal cell walls.
+As reviewed by Khadivi-Khub \cite{Khadivi2014}, this imbalance—driven by osmotic gradients,
+turgor dynamics, and altered permeability—forms a generalized mechanism for cracking across
+thin-skinned fruit species. However, grapes are particularly sensitive because cuticular deposition slows
+near maturity, while mesocarp growth continues. This mismatch in developmental timing reduces the
+elastic reserve of the skin and predisposes berries to micro-fissuring and eventual rupture.
+
+\subsection{Cuticle Structure, Microcracks, and Mechanical Failure}
+
+The grape berry cuticle functions as both a diffusion barrier and mechanical shell.
+Its composition—cutin, polysaccharides, and epicuticular waxes—determines the skin’s tensile strength,
+elasticity, and hydration behavior. Studies in sweet cherry and tomato have demonstrated that
+microcracks in the cuticle dramatically increase water permeability and serve as initiation sites for
+macroscopic cracking \cite{Peschel2005,Emmons1998}. Recent work now shows that grapes exhibit similar
+patterns. Chang and Keller \cite{Chang2021} revealed that the grape cuticle and epidermal cell walls play
+both overlapping and distinct roles in resisting cracking. Their microscopy studies indicate that
+microcracks can form days before visible splitting and propagate through weakened regions of the cuticle
+under mechanical stress or hydration events.
+
+Environmental conditions exacerbate these mechanical vulnerabilities. High humidity, rain, or dew
+hydration increases cuticular permeability and reduces its fracture toughness. Conversely, heat and
+drought can cause structural fatigue through repeated cycles of dehydration and rehydration.
+Because these microcracks do not manifest visually, early detection requires sensitive optical or
+spectral tools—highlighting the relevance of hyperspectral imaging (HSI) approaches.
+
+\subsection{Hormonal and Agronomic Influences on Cracking}
+
+Plant growth regulators, particularly gibberellins, are widely applied in table grape production to
+increase berry size, reduce compactness, and improve market quality. However, these treatments also
+modify skin biomechanics. Lichter et al. \cite{Lichter2014} investigated the effects of GA\textsubscript{3}
+on the seeded table grape ‘Zainy’ and found that while berry enlargement was achieved, the
+treatment altered skin structure and significantly affected cracking susceptibility.
+Their findings highlight the trade-off between agronomic optimization and physiological stability,
+emphasizing the need for cultivar-specific GA\textsubscript{3} protocols.
+
+Other hormones—most notably abscisic acid (ABA)—also shape berry softening and water transport.
+Castellarin et al. \cite{Castellarin2016} characterized the interplay between ABA metabolism, turgor loss,
+and cell wall modification during ripening. These hormonal signals regulate both mesocarp softness and
+cuticle extensibility, indirectly influencing cracking risk. Together, these works suggest that cracking is not
+only mechanically driven but is also hormonally modulated.
+
+\subsection{Cultivar Differences and Susceptibility to Cracking}
+
+Cracking susceptibility varies widely among grape cultivars, reflecting differences in cuticle thickness,
+cell wall architecture, berry firmness, water relations, and patterns of sugar accumulation.
+Chang and Keller \cite{Chang2021} demonstrated cultivar-dependent variation in skin biomechanical
+properties, showing that small differences in cuticle thickness or epidermal morphology can translate into
+large differences in cracking rates. Thin-cuticle cultivars or those with rapid late-season sugar accumulation
+tend to be more vulnerable.
+
+For ‘Scarlotta Seedless’, the cultivar investigated in the present study, several postharvest evaluations
+have documented sensitivity to temperature fluctuations and hydration-induced damage
+\cite{Scarlotta2024,Scarlotta2022}. While these works focus primarily on postharvest quality, they provide
+important evidence that the skin of Scarlotta berries is structurally fragile compared to other table grape
+varieties. Given the cultivar’s widespread commercial use, understanding and detecting early signs of
+cuticular stress is a significant applied challenge.
+
+\subsection{Skin Pathology as an Indicator of Structural Instability}
+
+Although not a cracking disorder per se, grape sour rot provides insight into skin structural failure.
+Hall et al. \cite{Hall2018} demonstrated that sour rot development is strongly associated with breaches
+in berry skin integrity, allowing entry of yeasts, acetic acid bacteria, and insects. These findings reinforce
+the broader concept that once the cuticle–epidermis barrier is compromised—whether by microcracks,
+overripening, or mechanical abrasion—the fruit becomes highly vulnerable to physiological and
+pathological deterioration. Thus, the onset of cracking represents a pivotal point of failure in grape
+berry biology.
+
+\subsection{Summary}
+
+Overall, the literature indicates that cracking in grapes arises from a convergence of mechanical,
+developmental, hormonal, and environmental processes. Berry softening, cuticular microcracking,
+hormone-mediated shifts in cell wall extensibility, and cultivar-specific anatomical traits all contribute
+to the phenomenon. Yet, despite extensive research on cracking mechanisms, few studies address the
+\textit{early detection} of pre-symptomatic microcracks or physiological stress using optical methods.
+This gap underscores the importance of hyperspectral imaging approaches aimed at identifying the
+subtle structural and biochemical changes that precede visible cracking.
+
+\section{Precision Agriculture}
+
+Precision agriculture (PA) has emerged as a data-driven management paradigm that seeks to optimize agricultural operations through the integration of sensing technologies, data analytics, and site-specific interventions. At its core, PA relies on systematic acquisition and analysis of large heterogeneous datasets to improve efficiency, productivity, and long-term sustainability in crop production \cite{mgendi2024unlocking}. Recent advances in the Internet of Things (IoT), Big Data infrastructures, and artificial intelligence (AI) have further accelerated the adoption of data-centric farming practices, enabling continuous environmental monitoring and facilitating sustainable resource management at multiple spatial and temporal scales \cite{AHMED2025100848}.
+
+The proliferation of smart sensor technologies—including proximal sensing devices, wireless sensor networks, and real-time monitoring platforms—has substantially expanded the types of agronomic variables that can be measured in situ. Such sensors now capture environmental, physiological, and operational parameters with unprecedented resolution, which supports precise and resource-efficient crop management \cite{soussi2024smart}. However, as the sensing density increases, the challenge shifts from mere data collection to effective integration and harmonization of heterogeneous data streams. Data integration has therefore become a critical layer in PA systems, acting as a bridge between raw sensor measurements and actionable agronomic knowledge \cite{santana2022data}.
+
+Managing these heterogeneous datasets—which often vary in granularity, modality, and update frequency—requires robust data engineering pipelines capable of processing information across various temporal and spatial dimensions. This complexity is further amplified by the need to deliver decision-ready outputs in formats that support real-time or near real-time analysis \cite{krisnawijaya2022data}. To address these challenges, modern PA increasingly incorporates advanced computational methods, including big data platforms, predictive modeling, and AI-driven analytics. These tools play a key role in transforming raw sensor data into predictive insights, allowing early detection of anomalies, improved planning, and automated decision-support workflows \cite{mgendi2024unlocking, AHMED2025100848}.
+
+Collectively, these developments illustrate a shift towards highly interconnected, analytics-driven agricultural systems, wherein sensor technologies, data integration frameworks, and intelligent algorithms collaboratively drive operational efficiency, environmental sustainability, and informed decision-making.
+
+\subsection{Computer Vision and AI in Agriculture}
+
+Computer vision (CV) has become a cornerstone technology in modern agriculture, driven by the rapid digital transformation of the sector and the growing need for automated, scalable, and data-driven crop management solutions. As global food demand increases and available farmland diminishes, CV systems—particularly those based on deep learning—provide the computational foundation required for precise, efficient, and reliable agricultural operations \cite{tian2020computer, patricio2018computer}. These systems enable machines to acquire, interpret, and analyze visual information, supporting tasks ranging from seed quality assessment and soil analysis to plant health monitoring, weed detection, livestock management, and yield estimation \cite{DHANYA2022211, cao2025review}. Over the last decade, convolutional neural networks (CNNs) have emerged as the dominant architecture for agricultural CV applications due to their strong feature extraction capabilities, scalability, and adaptability to diverse imaging conditions \cite{benos2021machine, attri2023review}. Recent advances such as generative adversarial networks (GANs), transfer learning, and vision transformers (ViT) further extend the potential of CV systems, enabling improved robustness under field conditions characterized by variable lighting, occlusion, and environmental noise \cite{DHANYA2022211, ghazal2024computer}.
+
+Despite these technological advancements, the effectiveness of CV models in agriculture is fundamentally dependent on the quality of the data used to train them. High-quality datasets must accurately represent the natural variability found in agricultural environments—including crop phenology, environmental dynamics, sensor noise, and geographical differences—to ensure generalization and prevent model bias. Poorly curated datasets, imbalanced class distributions, low-resolution imagery, or inconsistent labeling practices can lead to significant reductions in model performance, especially under real-world conditions where visual ambiguity is common \cite{tian2020computer, patricio2018computer}. Several studies highlight that annotation quality is often a major limiting factor in agricultural CV, as labeling requires domain expertise and is sensitive to human subjectivity. For example, plant disease severity, fruit defects, weed species boundaries, and growth-stage differentiation may be interpreted differently across annotators, leading to inconsistencies that degrade model accuracy and reliability \cite{benos2021machine, DHANYA2022211}. This challenge is amplified in pixel-level tasks such as segmentation, where precise delineation of plant organs or symptomatic tissue is crucial for downstream analytical accuracy.
+
+The reliance on high-quality annotations is particularly evident in deep learning models, which are strongly data-driven and require large, well-balanced labeled datasets to achieve stable convergence. In many agricultural applications, assembling such datasets is difficult due to seasonal variability, labor-intensive labeling, and the scarcity of annotated images for rare conditions such as early-stage infections or latent physiological defects \cite{attri2023review, ghazal2024computer}. To mitigate these constraints, recent research has explored synthetic data generation using GANs, semi-supervised learning, active learning, and weakly supervised labeling strategies. These approaches aim to reduce annotation costs while improving model robustness and are increasingly adopted in advanced CV pipelines for agriculture \cite{DHANYA2022211}. Additionally, improvements in sensor technologies—including hyperspectral, multispectral, and thermal imaging—offer richer feature representations that help compensate for noise or ambiguity in labeled datasets, strengthening both classification and segmentation performance \cite{tian2020computer}.
+
+Beyond data quality, successful deployment of CV systems in agriculture depends on their scalability, adaptability to diverse field conditions, and real-time operational performance. Advances in high-performance computing, especially the widespread availability of GPUs, have played a crucial role in enabling real-time inference and facilitating the training of large-scale deep learning models \cite{benos2021machine}. When integrated with IoT platforms and precision agriculture frameworks, CV systems can provide continuous monitoring, early detection of anomalies, and automated decision-support mechanisms, thereby enhancing both operational efficiency and long-term sustainability \cite{ghazal2024computer}. However, challenges remain, including computational costs, limited data interoperability, lack of standardized datasets, and difficulties in transferring models across crop types or geographic regions \cite{attri2023review, DHANYA2022211}.
+
+Overall, the literature demonstrates that while deep-learning-based CV systems have achieved remarkable progress across a wide range of agricultural applications, their true effectiveness in real-world environments hinges on the availability of high-quality, well-annotated datasets, robust model architectures, and reliable deployment pipelines. Continued innovation in data acquisition, labeling methodologies, and domain adaptation techniques will therefore be essential for advancing next-generation CV solutions capable of supporting smart, scalable, and fully automated agricultural systems.
+
+\subsection{Hyperspectral Imaging}
+
+The spectrum of light recorded by cameras varies significantly across different imaging technologies. An RGB camera records light reflected by an object using three bands of visible radiation: blue, green, and red (Benelli et al., 2020). Multispectral imaging typically includes between 3 to 15 distinct bands and has a spectral resolution greater than 10 nm. Alternatively, commercially available hyperspectral imaging (HSI) systems offer a more precise resolution (less than 5 nm) and encompass tens to hundreds of contiguous spectral bands, capturing a broader and more detailed spectrum (Mehta et al., 2018). It captures broad segments of the electromagnetic spectrum, from the ultraviolet (UV), around 200 nm, through the visible (VIS) light range from 380 nm to 800 nm, and extends into the near-infrared (NIR) up to 1700 nm. Additionally, it often includes the short-wave infrared (SWIR) from 970 nm to 2500 nm (Ball, 2007). This capability allows HSI to perform detailed material analysis, enabling detection of both surface and subsurface characteristics that are not visible through conventional imaging (Mehta et al., 2018).
+
+The VNIR spectrum, ranging from 400 to 1000 nm, is highly effective for assessing the health and composition of various materials. By providing detailed spectral data, this range facilitates the identification of variations in surface coatings and compositions, while the NIR and SWIR ranges offer deeper insights into the underlying chemical and physical structures (Zwinkels, 2015).
+
+\subsubsection{Hyperspectral imaging across the electromagnetic spectrum}
+The spectrum of light recorded by cameras varies significantly. An RGB camera records
+light using three bands of visible radiation. Multispectral imaging typically includes
+between 3 to 15 distinct bands. Alternatively, hyperspectral imaging (HSI) systems offer
+a more precise resolution (less than 5 nm) and encompass tens to hundreds of contiguous
+spectral bands. HSI captures broad segments of the electromagnetic spectrum, from the
+ultraviolet (UV), through the visible (VIS) and near-infrared (NIR), and often includes
+the short-wave infrared (SWIR). This capability allows HSI to perform detailed material
+analysis not visible through conventional imaging.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.85\textwidth]{Hyperspectral_imaging_across_the_electromagnetic.jpg}
+  \caption{Segments of the electromagnetic spectrum commonly used in hyperspectral imaging (Middleton Spectral Vision, n.d.).}
+  \label{fig:wavelength_regions}
+\end{figure}
+\FloatBarrier
+
+\subsubsection{Reflectance}
+
+Reflectance is defined as the ratio between the radiation reflected by a surface and the radiation received by that surface. The ratio is affected by the object's chemical properties, the micro-topography of its surface, and the angle of the light source. Reflectance is the primary value captured at each pixel for every wavelength in a hyperspectral image.
+
+\begin{figure}[h!]
+\centering
+ \includegraphics[width=0.45\textwidth]{reflectence_furmula.jpg}
+\caption{The formula for reflectance \cite{blackburn2007}.}
+\label{fig:reflectance_formula}
+\end{figure}
+
+\newpage
+\subsubsection{Spectral Signature}
+As a certain material is exposed to a light source, it reflects particular portions of electromagnetic energy according to its chemical composition. This reaction is called the spectral signature of a material. Analyzing spectral responses allows for the identification and characterization of different materials \cite{shaw2002}.
+
+\begin{figure}[h!]
+\centering
+ \includegraphics[width=0.7\textwidth]{Barley_Signature.jpg}
+\caption{Hyperspectral signature of barley grains with varying moisture content \cite{sun2020}.}
+\label{fig:barley_signature}
+\end{figure}
+
+\section{Hyperspectral Imaging in Agriculture}
+
+\subsection{Non-destructive Detection of Fruit Defects}
+... (Review of studies on detecting bruises, diseases, and ripeness in various fruits like pomegranates, tomatoes, etc., using HSI and other imaging modalities) ...
+
+\subsection{Machine Learning for Hyperspectral Data Analysis}
+... (Discussion of common ML algorithms used for HSI, including traditional methods like SVM, KNN, and advanced deep learning models like 1D/3D-CNNs) ...
+
+\subsection{Physiological Mechanisms of Grape Cracking}
+
+... (Summary of the biological and environmental factors leading to cracking) ...
+
+\section{Research Gap}
+
+% Removed from chapter heading - integrated as section subsection
+While hyperspectral imaging has been extensively applied to detect existing defects in agricultural products—including bruises, diseases, and quality parameters in fruits—its application for predicting a future physiological disorder like cracking based on temporal spectral trends represents a largely underexplored area. The research presented in this thesis addresses this gap by developing spectral methods to detect and predict cracking events in table grapes using hyperspectral imaging, combining early-stage damage detection with spectral efficiency through feature selection and temporal analysis.
+

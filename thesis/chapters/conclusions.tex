@@ -1,0 +1,217 @@
+\chapter{Conclusions and Future Work}
+\label{ch:conclusions}
+
+%% ================================================================
+%%  7.1  SUMMARY OF MAIN CONTRIBUTIONS
+%% ================================================================
+\section{Summary of Main Contributions}
+\label{sec:main_contributions}
+
+\noindent
+This research addressed a critical challenge in viticulture: the early detection of grape cracking under realistic field conditions using non-destructive hyperspectral imaging technology. The investigation yielded four principal contributions that advance both the scientific understanding of spectral crack detection and its practical feasibility for agricultural deployment.
+
+\noindent
+\textbf{First}, at the pixel level, this study demonstrated that visible--near-infrared (VIS--NIR) hyperspectral imaging in the 450--925\,nm range, combined with Standard Normal Variate (SNV) normalization and supervised machine learning, can distinguish cracked from healthy grape tissue with exceptional precision. An XGBoost classifier achieved approximately 97\,\% accuracy and an area under the ROC curve (AUC) of 0.99 on carefully labelled spectral signatures. This finding establishes a clear physical and algorithmic foundation: the spectral reflectance properties of cracked and healthy berry skin differ measurably and consistently within the VIS--NIR region, validating the use of hyperspectral sensing for crack-related tissue characterization.
+
+\noindent
+\textbf{Second}, recognizing that pixel-level performance alone is insufficient for practical deployment, this work developed and validated a full-image crack-detection pipeline that bridges the gap between controlled spectral classification and complex field-scene inference. By aggregating pixel-level outputs through spatial post-processing---including probability thresholding, morphological filtering, and patch-based decision rules---the pipeline achieved meaningful detection performance on independent test data under early- and late-stage acquisition conditions. On a held-out test row, the system attained F1\textsubscript{CRACK} of 0.704 (MCC = 0.504) for early-stage images, where cracking is minimal or incipient, and F1\textsubscript{CRACK} of 0.818 (MCC = 0.598) for late-stage images, where cracks are macroscopically visible. These results demonstrate that crack-related spectral signatures remain detectable even in the presence of complex background clutter, mixed pixels, and variable illumination, provided that spatial context is appropriately leveraged.
+
+\noindent
+\textbf{Third}, backward feature selection (BFS) experiments revealed that the 159-wavelength hyperspectral cube can be reduced to as few as 11 bands with minimal loss in crack-detection performance, and that a 30-wavelength subset can match or even exceed full-spectrum results on independent test data. Stability analysis across multiple random seeds identified four wavelengths---452.25, 548.55, 580.90, and 729.53\,nm---that were selected universally, corresponding to physiologically interpretable regions (chlorophyll Soret band, green reflectance trough, anthocyanin shoulder, and red-edge inflection). This finding provides a quantitative foundation for transitioning from costly, data-intensive hyperspectral line-scan cameras to compact, cost-effective multispectral sensors optimized for grape crack detection, thereby supporting a pathway toward scalable agricultural deployment.
+
+\noindent
+\textbf{Fourth}, a systematic comparison of supervised classification and unsupervised anomaly detection approaches exposed a critical asymmetry. Whereas supervised models trained on labelled cracked and healthy spectra generalized robustly, autoencoder-based anomaly detectors---when trained exclusively on non-crack tissue---failed catastrophically at the system level, achieving an MCC of $-0.058$ under early-stage conditions. This negative result clarifies the algorithmic requirements for field deployment: effective crack detection in grape clusters demands explicit representation of crack-class spectral signatures, rather than reliance on generic outlier-detection frameworks.
+
+\noindent
+Taken together, these contributions represent the first comprehensive demonstration of early-stage crack detection in table grapes using hyperspectral imaging under realistic vineyard conditions. The research establishes both the scientific feasibility and the practical constraints of spectral crack sensing, offering a foundation for future precision viticulture technologies.
+
+
+%% ================================================================
+%%  7.2  DIRECT ANSWER TO THE RESEARCH QUESTION
+%% ================================================================
+\section{Direct Answer to the Research Question}
+\label{sec:answer_to_research_question}
+
+\noindent
+The central research question posed in Chapter~1 was:
+
+\begin{quote}
+\textit{Can hyperspectral imaging detect spectral signatures of grape cracking at the time of measurement under field conditions, and if so, to what extent can detection be achieved during the early stages of crack development?}
+\end{quote}
+
+\noindent
+The answer is \textbf{yes, with important operational qualifications}.
+
+\noindent
+Hyperspectral imaging in the VIS--NIR range can reliably detect crack-related spectral signatures in grape berries at the time of measurement. At the pixel level, where individual spectra are drawn from well-defined tissue regions, the discrimination between cracked and healthy signatures is near-perfect. This establishes that cracking induces measurable and consistent changes in reflectance properties---most notably, depressed near-infrared reflectance and altered red-edge characteristics---that are attributable to turgor loss, cellular dehydration, cuticle disruption, and pigment degradation.
+
+\noindent
+However, the transition from pixel-level spectral classification to full-image field detection introduces substantial challenges. Mixed pixels, variable illumination geometry, and spectrally confounding background materials (leaves, woody tissue, plastic supports) all degrade performance when models are deployed on whole hyperspectral scenes. The solution developed in this work---spatial aggregation through morphological filtering and patch-based decision criteria---demonstrates that these challenges are surmountable, but not trivial. System-level performance is markedly lower than pixel-level benchmarks, yet it remains operationally meaningful.
+
+\noindent
+Regarding early-stage detection, the results are encouraging but tempered by realism. Early-stage acquisitions, corresponding to absent-to-minimal cracking (the first recorded small-crack stage for individual cluster identities), yielded test-set F1\textsubscript{CRACK} of 0.704 and MCC of 0.504. These values fall short of the late-stage benchmark (F1\textsubscript{CRACK} = 0.818, MCC = 0.598) yet confirm that crack-related physiological changes---including incipient turgor disruption and micro-fracturing---produce detectable spectral shifts before macroscopic splitting becomes visually obvious. Early-stage detection is therefore \textit{feasible}, but requires careful system design, robust spatial processing, and acceptance of higher false-negative rates relative to late-stage scenarios.
+
+\noindent
+In summary, hyperspectral imaging can detect grape cracking under field conditions, including at early developmental stages, provided that pixel-level classification is coupled with spatial aggregation strategies tailored to the operational constraints of vineyard imaging.
+
+
+%% ================================================================
+%%  7.3  VALIDATION OF RESEARCH HYPOTHESES
+%% ================================================================
+\section{Validation of Research Hypotheses}
+\label{sec:validation_of_hypotheses}
+
+\noindent
+The five research hypotheses stated in Chapter~3 were systematically evaluated against the experimental results reported in Chapter~5 and interpreted in Chapter~6. A concise summary follows.
+
+\begin{itemize}
+    \item \textbf{Hypothesis~1 (Spectral distinguishability): CONFIRMED.}  
+    Clear and statistically significant differences were observed between healthy and cracked grape tissue across the 450--925\,nm range. Mean reflectance, Cohen's $d$ separability scores, and Fisher discriminant ratios all confirmed strong spectral separation, with the most pronounced differences concentrated in the red-edge and NIR regions. This provides the physical basis for algorithmic discrimination.
+
+    \item \textbf{Hypothesis~2 (Pixel-level classification feasibility): CONFIRMED.}  
+    Supervised machine learning models, particularly XGBoost, achieved near-ceiling performance on pixel-level spectral classification under both balanced and unbalanced class regimes. Accuracy exceeded 97\,\%, and ROC--AUC reached 0.99, demonstrating that the spectral decision boundary is well-defined and learnable.
+
+    \item \textbf{Hypothesis~3 (Whole-image robustness): CONFIRMED.}  
+    When deployed on full hyperspectral scenes containing complex background content, the end-to-end detection pipeline retained meaningful precision and recall on an independent held-out test row. While performance degraded relative to pixel-level benchmarks, the system achieved operationally relevant F1 scores and MCC values, confirming that crack signatures can be distinguished from background clutter when spatial aggregation is applied.
+
+    \item \textbf{Hypothesis~4 (Early detection capability): PARTIALLY CONFIRMED.}  
+    Early-stage images, acquired when cracking was minimal or incipient, were classified above chance on the held-out test set, with F1\textsubscript{CRACK} = 0.704 and MCC = 0.504. These values are lower than late-stage performance but demonstrate that crack-related spectral changes are detectable before macroscopic symptoms become clearly visible. The hypothesis is therefore supported with the qualification that early-stage detection operates at reduced sensitivity compared to late-stage scenarios.
+
+    \item \textbf{Hypothesis~5 (Spectral efficiency): CONFIRMED.}  
+    Backward feature selection demonstrated that strong crack-detection performance can be maintained with drastically reduced wavelength subsets. An 11-band configuration matched the full 159-band spectrum within 0.5\,\% PR--AUC, and a 30-band subset exceeded the full-spectrum baseline on the independent test set. This confirms that hyperspectral redundancy can be exploited to support compact, cost-effective multispectral sensor designs.
+\end{itemize}
+
+\noindent
+In aggregate, the experimental evidence supports the core hypotheses of this research, with the notable caveat that early-stage detection---while feasible---requires acceptance of higher uncertainty relative to late-stage detection. The findings validate the proposed methodological framework and establish hyperspectral imaging as a viable tool for non-destructive grape crack assessment.
+
+
+%% ================================================================
+%%  7.4  PRACTICAL IMPLICATIONS AND APPLICATIONS
+%% ================================================================
+\section{Practical Implications and Applications}
+\label{sec:practical_implications}
+
+\noindent
+The findings of this research have direct implications for viticulture practitioners, sensor manufacturers, and the broader precision agriculture community.
+
+\noindent
+\textbf{For viticulture practitioners}, the demonstrated feasibility of early-stage crack detection opens a pathway toward non-destructive, proactive vineyard management. Current practice typically relies on visual inspection, which is labor-intensive, subjective, and occurs only after macroscopic damage is evident. By the time cracking is visually obvious, secondary infections such as sour rot may already be underway, reducing both yield and marketable quality. A hyperspectral-based early-warning system could enable growers to identify at-risk clusters days or weeks before visible splitting, facilitating targeted interventions such as protective sprays, adjusted irrigation schedules, or selective early harvest. The economic value of such interventions is substantial: grape cracking and associated rots account for losses exceeding 20\,\% of marketable yield in susceptible cultivars under favorable climatic conditions. Even modest reductions in loss rates would justify the deployment costs of spectral monitoring systems.
+
+\noindent
+\textbf{For sensor manufacturers and agricultural technology developers}, the wavelength-selection results provide concrete design specifications for next-generation crack-detection sensors. Rather than deploying full hyperspectral line-scan cameras---which are expensive, data-intensive, and require specialized handling---manufacturers can develop compact multispectral imagers incorporating the identified optimal bands (452, 548, 580, 729\,nm, supplemented by additional red-edge and NIR channels). Such sensors would be smaller, lighter, cheaper to produce, and capable of higher frame rates than research-grade hyperspectral systems, making them suitable for integration with robotic vineyard platforms, unmanned aerial vehicles (UAVs), or handheld assessment tools. The reduced data volume would also simplify real-time processing requirements, enabling on-device inference rather than cloud-based post-processing.
+
+\noindent
+\textbf{For precision agriculture more broadly}, this work exemplifies a generalizable strategy for translating laboratory-grade spectroscopic measurements into field-deployable sensing systems. The documented gap between pixel-level classification success and whole-image field performance is not unique to grape crack detection; it recurs across agricultural HSI applications targeting disease detection, nutrient stress, and fruit quality assessment. The spatial aggregation framework developed here---morphological filtering, patch-based decision rules, and Optuna-driven hyperparameter optimization---represents a reusable template for bridging that gap in other crops and other physiological disorders.
+
+\noindent
+\textbf{Scalability and deployment pathway}. Transitioning from the research prototype demonstrated here to operational vineyard deployment will require addressing several practical constraints. First, acquisition speed must increase: the push-broom line-scan configuration used in this study is effective for controlled field sampling but would require motorized translation stages or integration with vineyard rovers for systematic row-by-row coverage. Snapshot multispectral cameras offer a faster alternative, sacrificing spectral resolution for higher spatial throughput. Second, computational requirements for real-time inference must be minimized. The XGBoost classifier used here is computationally lightweight and amenable to embedded deployment, but the full post-processing pipeline (including morphological operations on megapixel-scale probability maps) may require GPU acceleration or edge-computing hardware. Third, environmental robustness must be validated: the models presented here were trained and tested under specific vineyard conditions (single cultivar, specific phenological stages, particular illumination and weather patterns). Generalization to other cultivars, regions, and growing conditions will require transfer learning, domain adaptation, or expanded training datasets.
+
+\noindent
+Nonetheless, the technical foundation established by this work supports a clear pathway: wavelength-optimized multispectral imaging, coupled with spatial aggregation and supervised classification, can deliver operationally useful crack detection under realistic field constraints. The next step is engineering translation: ruggedizing sensors, optimizing inference pipelines, and validating performance across diverse operational contexts.
+
+
+%% ================================================================
+%%  7.5  LIMITATIONS OF THE STUDY
+%% ================================================================
+\section{Limitations of the Study}
+\label{sec:limitations}
+
+\noindent
+The findings reported in this thesis must be interpreted within the context of several methodological and operational constraints.
+
+\noindent
+\textbf{First}, the study focused exclusively on a single table grape cultivar (`Scarlotta') grown under specific vineyard management practices in a defined climatic region. While this cultivar exhibits pronounced cracking susceptibility---making it an appropriate target for proof-of-concept work---the spectral signatures of cracking may differ in other grape varieties due to variations in skin pigmentation (anthocyanin content and distribution), cuticle thickness, berry size, and physiological response to water stress. Generalization of the trained models to red versus white grapes, table versus wine varieties, or cultivars grown under different soil, irrigation, or canopy-management regimes has not been validated. The extent to which the identified optimal wavelengths (452, 548, 580, 729\,nm) remain universally informative across cultivars is an open empirical question.
+
+\noindent
+\textbf{Second}, the temporal scope of data acquisition was constrained to specific phenological stages during the ripening period. No attempt was made to track individual clusters longitudinally from véraison through harvest, and consequently, the study does not model crack \textit{progression} over time. The early-stage and late-stage acquisition subsets used for evaluation reflect snapshots at different crack-severity levels, not temporal sequences from the same biological entity. This design choice---driven by logistical and labeling constraints---precludes direct modeling of crack development dynamics and limits the ability to make statements about \textit{forecasting} future cracking events.
+
+\noindent
+\textbf{Third}, the dataset size, while sufficient for demonstrating proof-of-concept, remains modest relative to the scale typical of modern deep-learning computer-vision applications. The whole-image evaluation involved 60 unique clusters per test row under each acquisition-stage condition, and pixel-level training utilized spectra sampled from a similarly limited biological sample. Larger datasets, drawn from multiple vineyards, seasons, and cultivars, would improve model robustness and enable more rigorous assessment of generalization.
+
+\noindent
+\textbf{Fourth}, the spatial resolution and field-of-view of the Specim~IQ hyperspectral camera (approximately 1.08\,mm per pixel at 1\,m working distance) introduce mixed-pixel effects at tissue boundaries and limit the detection of micro-cracks smaller than a few millimeters. Finer spatial resolution would improve early-stage sensitivity but at the cost of increased data volume and processing time. The trade-off between spatial resolution, spectral resolution, and acquisition speed remains a fundamental constraint in field HSI applications.
+
+\noindent
+\textbf{Fifth}, the full-image detection pipeline demonstrated here operates on post-processed hyperspectral cubes and requires iterative hyperparameter tuning (via Optuna on a calibration split). Real-time deployment in a moving vineyard platform would necessitate either pre-calibrated fixed thresholds (which may not generalize across rows or vineyard blocks) or adaptive threshold estimation, introducing additional algorithmic complexity.
+
+\noindent
+These limitations do not invalidate the core findings but rather define the boundary conditions within which the results hold. Future work extending the approach to additional cultivars, regions, and operational scenarios will clarify the extent to which the demonstrated performance generalizes.
+
+
+%% ================================================================
+%%  7.6  FUTURE RESEARCH DIRECTIONS
+%% ================================================================
+\section{Future Research Directions}
+\label{sec:future_work}
+
+\noindent
+The findings of this research open multiple avenues for follow-on investigation, spanning immediate technical validation, medium-term algorithmic development, and long-term integration into operational precision viticulture systems.
+
+\subsection{Short-Term Extensions: Validation and Robustness}
+
+\noindent
+The most immediate priority is to validate the spectral crack-detection framework across a broader range of grape cultivars and growing conditions. Repeating the pixel-level classification and full-image detection experiments on red versus white table grapes, wine grape varieties, and cultivars exhibiting varying degrees of crack susceptibility would clarify the extent to which the identified spectral signatures and optimal wavelengths generalize. Similarly, testing the approach across multiple vineyard sites---encompassing different soil types, irrigation regimes, canopy-management practices, and climatic conditions---would expose environmental factors that modulate reflectance properties and detection performance.
+
+\noindent
+A second short-term extension involves refining the spatial aggregation pipeline for real-time deployment. The current implementation relies on post-hoc hyperparameter tuning via Optuna on a calibration split. Developing adaptive thresholding strategies that adjust probability cutoffs, morphological kernel sizes, and patch-aggregation criteria based on per-image statistics (e.g., overall crack prevalence, illumination uniformity, background clutter density) would improve robustness when the system encounters vineyard blocks or acquisition conditions that differ from the calibration set. Additionally, exploring alternative spatial processing frameworks---such as superpixel segmentation, graph-based label propagation, or conditional random fields---may yield further performance gains.
+
+\noindent
+A third priority is to extend temporal coverage by acquiring hyperspectral data throughout the entire ripening trajectory, from véraison through late harvest, for longitudinally tracked individual grape clusters. Such data would enable analysis of crack \textit{progression} dynamics and could support models that predict the likelihood of future cracking based on current spectral measurements combined with environmental covariates (temperature, humidity, rainfall events). This would move the system from reactive \textit{detection} toward proactive \textit{forecasting}, substantially increasing its operational value.
+
+\subsection{Medium-Term Opportunities: Multi-Modal Integration and Transfer Learning}
+
+\noindent
+At the medium term, integrating hyperspectral imaging with complementary sensing modalities offers the potential to capture a richer representation of grape physiological state. Thermal infrared imaging, for example, measures canopy and berry surface temperature and can infer transpiration rates and water stress---physiological precursors to cracking. Combining VIS--NIR reflectance with thermal emissivity in a multi-modal classification framework could improve early-stage detection sensitivity by jointly modeling optical and thermal signatures of turgor loss.
+
+\noindent
+Similarly, high-resolution RGB-D cameras (combining color imaging with depth sensing) could provide detailed surface geometry, enabling detection of micro-topographic irregularities (surface roughening, incipient cuticle fractures) that precede full mechanical failure. Fusing spectral, thermal, and geometric features within a unified deep-learning architecture---such as a multi-stream convolutional neural network---represents a natural evolution of the supervised-classification approach demonstrated here.
+
+\noindent
+Transfer learning offers another promising direction. Rather than training separate models for each cultivar or vineyard, a base model trained on a diverse multi-cultivar dataset could be fine-tuned with a small number of target-specific samples. This would reduce the labeling burden when deploying the system in new vineyards and accelerate adoption by practitioners lacking the resources to collect large annotated datasets. Recent advances in self-supervised pre-training for hyperspectral imagery and few-shot learning frameworks could be leveraged to this end.
+
+\noindent
+Additionally, the wavelength-selection experiments conducted here identified a compact subset of informative bands. Follow-on work should validate these findings by physically constructing a custom multispectral sensor incorporating the optimal wavelengths and comparing its field performance directly against the full hyperspectral baseline. Such an applied-engineering validation step is essential before commercial sensor manufacturers will commit to production.
+
+\subsection{Long-Term Vision: Autonomous Systems and Decision Support}
+
+\noindent
+The ultimate long-term vision is a fully autonomous vineyard monitoring system that integrates crack detection with broader precision viticulture decision support. Such a system would combine:
+
+\begin{itemize}
+    \item Robotic ground platforms or UAVs equipped with multispectral cameras, traversing vineyard rows on scheduled or on-demand missions;
+    \item Real-time on-board inference using embedded classifiers (e.g., quantized XGBoost models or lightweight convolutional networks deployed on edge-computing hardware);
+    \item Spatial mapping and cluster-level georeferencing, enabling growers to visualize crack-risk zones overlaid on vineyard maps;
+    \item Integration with environmental sensor networks (weather stations, soil-moisture probes, sap-flow sensors) to model crack risk as a function of both berry physiology and environmental stress;
+    \item Automated alerts and treatment recommendations delivered to growers via mobile applications or farm-management software platforms.
+\end{itemize}
+
+\noindent
+Achieving this vision will require interdisciplinary collaboration among agricultural engineers, computer scientists, plant physiologists, and viticulture practitioners. Key technical challenges include: achieving sufficient acquisition speed to cover large vineyard areas within narrow weather windows; ensuring robustness to uncontrolled illumination (early morning, late afternoon, cloudy vs. sunny conditions); minimizing false-positive rates to avoid alert fatigue; and validating that early interventions triggered by spectral detection genuinely reduce losses relative to current practice.
+
+\noindent
+Beyond grapes, the spectral crack-detection framework developed here is potentially generalizable to other fruit crops exhibiting similar cracking disorders---cherries, tomatoes, pomegranates, apples, and citrus. Each crop presents distinct spectral and morphological characteristics, but the underlying physiological mechanisms (cuticle failure, turgor imbalance, cellular dehydration) are shared. Demonstrating transferability across crops would position hyperspectral crack sensing as a broadly applicable precision-horticulture technology.
+
+\noindent
+Finally, economic modeling remains an underexplored dimension. Quantifying the cost-benefit trade-off between sensor deployment costs (hardware, data management, operator training) and realized reductions in crop losses would inform adoption decisions by commercial growers and provide a basis for evaluating return on investment. Preliminary estimates suggest that even modest reductions in cracking-related losses (5--10\,\% yield recovery) would justify sensor costs in high-value table grape operations, but rigorous field trials with paired treated-versus-control vineyard blocks are needed to validate these projections.
+
+
+%% ================================================================
+%%  7.7  FINAL CONCLUDING STATEMENT
+%% ================================================================
+\section{Final Concluding Statement}
+\label{sec:final_statement}
+
+\noindent
+This thesis has demonstrated that hyperspectral imaging in the visible--near-infrared range, combined with machine learning and spatial aggregation strategies, can detect grape cracking under realistic field conditions---including at early developmental stages when intervention is most valuable. The work advances the state of knowledge in precision viticulture by establishing both the scientific foundation for spectral crack sensing and a practical framework for translating pixel-level classification accuracy into operationally useful system-level decisions.
+
+\noindent
+The significance of these findings extends beyond the specific application to table grapes. This research exemplifies the broader potential of proximal hyperspectral sensing to measure sub-visual physiological changes in plant tissue, bridging the gap between laboratory spectroscopy and field-deployable agricultural technology. By addressing the methodological challenges inherent in moving from controlled spectral measurements to complex natural scenes---mixed pixels, illumination variability, background clutter---the work contributes generalizable insights applicable to disease detection, stress monitoring, and quality assessment across diverse crops and horticultural systems.
+
+\noindent
+At the same time, the documented performance gaps between early-stage and late-stage detection, and between pixel-level and system-level inference, underscore the reality that agricultural sensing operates under constraints fundamentally different from those of controlled laboratory environments. Robust field deployment requires not only excellent algorithms but also careful attention to sensor design, spatial processing, and the integration of spectral information with agronomic context.
+
+\noindent
+Looking forward, the convergence of hyperspectral imaging, machine learning, and autonomous robotic platforms promises to transform viticulture from reactive damage management toward proactive, data-driven crop stewardship. The wavelength-optimized multispectral sensors validated here, the spatial aggregation pipelines demonstrated to handle field complexity, and the quantitative performance benchmarks established under realistic test conditions provide a foundation upon which next-generation precision viticulture systems can be built.
+
+\noindent
+Grape cracking represents a persistent economic challenge for the global viticulture industry, responsible for multi-million-dollar annual losses and constraining the expansion of susceptible but high-value cultivars. If the early-detection capabilities demonstrated in this research can be translated into operational monitoring systems, the potential impact---measured in reduced losses, improved fruit quality, and enhanced grower decision support---is substantial. This thesis takes a foundational step toward that goal, establishing that the spectral signatures of cracking are measurable, learnable, and actionable under field conditions. The path from research prototype to commercial deployment remains long, but the direction is clear and the destination, achievable.

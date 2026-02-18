@@ -1,0 +1,15 @@
+% --- Abstract ---
+\begin{abstract}
+\noindent % No indent for the first line
+Grape cracking is a severe physiological disorder that leads to significant economic losses in the viticulture industry by reducing marketable yield and increasing susceptibility to secondary infections like sour rot. 
+Early and non-destructive assessment is critical for implementing preventative measures. This research explores the feasibility of using hyperspectral imaging (HSI; VNIR 400--1000~nm), coupled with machine learning, to detect and identify crack-related spectral signatures at the time of measurement under field conditions, including both early- and late-stage acquisitions (initial/minimal vs.\ advanced cracking). Throughout the thesis, all spectral analyses are restricted to 450--925~nm with per-spectrum Standard Normal Variate (SNV) normalization.
+
+The study followed a multi-stage approach: initial identification, system-level field inference, and comparative analysis of spectral signatures. For the identification task, a pixel-level dataset was meticulously created by manually selecting and labeling pixels from healthy and cracked berries. An XGBoost classifier trained on these spectral signatures achieved outstanding performance, with an accuracy of approximately 97\% and an AUC of 0.99, demonstrating that a distinct spectral difference exists between intact and cracked grape tissue.
+
+However, applying this pixel-level model to whole-image segmentation proved challenging. The model produced noisy results, often misclassifying background elements such as plastic ties or dry twigs, which exhibited spectral signatures similar to those of decay associated with cracks.
+To address this gap between pixel-level signature discrimination and field-scene inference, the research developed a whole-image crack-detection pipeline. The approach aggregates pixel-level classifier outputs using spatial post-processing (thresholding, morphological filtering, and patch/blob-based decision rules) to obtain an image-level decision, and was evaluated separately under early- and late-stage acquisition conditions. System-level performance was reported with emphasis on the \textit{Cracked} class, using F1\textsubscript{CRACK} and MCC alongside precision and recall. On the held-out test row, the pipeline achieved F1\textsubscript{CRACK}=0.704 (MCC=0.504) under early-stage acquisition and F1\textsubscript{CRACK}=0.818 (MCC=0.598) under late-stage acquisition. In addition, wavelength-selection experiments quantify the extent to which crack-detection performance can be retained using reduced spectral-band subsets, supporting a pathway toward compact sensing configurations for field deployment.
+\end{abstract}
+\newpage
+
+
+% =====================================================================

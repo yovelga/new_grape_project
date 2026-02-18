@@ -1,0 +1,60 @@
+\chapter{Introduction}
+
+\section{The Problem of Fruit Cracking}
+Fruit cracking is a significant physiological disorder affecting a wide range of commercially important crops, including sweet cherries, tomatoes, pomegranates, and particularly table grapes (Vitis vinifera L.). The phenomenon is characterized by the rupture of the fruit's skin (cuticle and epidermis), exposing the internal flesh to the environment. These cracks render the fruit unmarketable and create entry points for pathogens, leading to rapid decay from secondary infections such as sour rot. Cracking typically occurs during the final stages of fruit ripening, a period when the fruit is most valuable. It is primarily caused by an imbalance between the turgor pressure within the fruit and the mechanical strength of its skin, a condition often exacerbated by environmental factors like rain, high humidity, and irrigation practices.
+
+\section{Economic Impact}
+\noindent
+The economic consequences of grape cracking are substantial. Direct losses can amount to up to 30\% of the marketable yield. For table grapes, this translates to an estimated financial loss of €625 per ton, culminating in a total industry loss of approximately €175 million annually, based on European market data (Table \ref{tab:economic_impact}). Beyond direct yield loss, cracking negatively impacts fruit appearance and quality, leading to price reductions of 20-50\% and a shortened shelf-life, further diminishing profitability for growers.
+
+\begin{table}[htbp]
+\centering
+\caption{Estimated financial losses from fruit cracking in major crops.\parencite{CrackSense2022}. }
+\label{tab:economic_impact}
+\begin{tabular}{lrrrrrr}
+\toprule
+% Using \makecell to create multi-line headers
+\textbf{Fruit} & \textbf{\makecell{Prod. \\ (K t)}} & \textbf{\makecell{Coverage \\ (K ha)}} & \textbf{\makecell{Price \\ (€/kg)}} & \textbf{\makecell{Loss \\ (\%)}} & \textbf{\makecell{Fin. Loss \\ (€/t)}} & \textbf{\makecell{Total loss \\ (M€)}} \\
+\midrule
+Table grapes & 280 & 7.0 & 2.5 & 25 & 625 & 175.0 \\
+Citrus & 2300 & 58.5 & 1.1 & 20 & 220 & 506.0 \\
+Pomegranate & 43 & 1.0 & 3.3 & 25 & 825 & 35.5 \\
+Sweet cherry & 560 & 37.3 & 2.0 & 20 & 400 & 224.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Research Motivation}
+\noindent
+Current methods for managing cracking risk are reactive and often insufficient. There is a critical need for a non-destructive, reliable method to detect early signs of cracking susceptibility before visible fissures appear. Hyperspectral imaging (HSI) has emerged as a powerful tool in precision agriculture for assessing plant health and fruit quality due to its ability to capture detailed spectral information beyond the visible range. This research aims to investigate the potential of HSI and machine learning to address the challenge of grape cracking.
+
+\noindent
+This thesis addresses two related but distinct analysis settings. \textit{Identification/detection} concerns recognising existing crack tissue based on its hyperspectral signature and can be naturally posed as a pixel-level classification problem when representative labels are available. \textit{Early-warning screening}, in contrast, targets pre-symptomatic field assessment under realistic vineyard conditions, where direct pixel-wise segmentation of complex scenes is often unstable: background clutter (e.g., leaves, wood, and artificial materials) and acquisition-dependent domain shifts (illumination, viewing geometry) can dominate individual pixel-level outputs and lead to unreliable image-level decisions. For this reason, the early-warning setting is approached through robust single-acquisition representations that aggregate information at the grape-cluster/image level. In particular, early-stage acquisitions are not a focal point for clear field identification because reliable field indicators are often not yet present, whereas late-stage acquisitions typically allow clearer field identification.
+
+\medskip
+\noindent
+\textbf{Terminology (Early vs.\ Late Acquisition).} In this thesis, \textit{detection/identification} refers to classification at the \textit{time of measurement} using hyperspectral signatures (e.g., pixel-level crack identification and whole-image inference under early- vs.\ late-stage conditions). Here, \textit{early} and \textit{late} denote \textit{acquisition-stage subsets relative to crack progression}: for a given grape/cluster identity, \textit{early} corresponds to the first acquisition at which cracking is absent or only minimal/incipient (i.e., the first time a small crack is recorded), whereas \textit{late} corresponds to acquisitions where cracking is advanced and macroscopically visible. These terms describe crack status at the time of measurement (and typically align with earlier- vs.\ later-season acquisition periods), not a future outcome.
+
+\subsection{Main Research Question}
+Can hyperspectral imaging and machine learning models be used to detect and identify cracking-related status at the time of measurement under field conditions, including both early- and late-stage acquisitions (initial/minimal vs.\ advanced cracking)?
+
+\section{Research Objectives and Hypotheses}
+
+\subsection{Research Objectives}
+\begin{enumerate}
+    \item \textbf{Identification:} To develop a high-accuracy classification model to differentiate between healthy and cracked grape tissue at the pixel level using their hyperspectral signatures.
+    \item \textbf{Whole-image screening:} To develop and evaluate an image-level crack-detection pipeline by combining pixel-level inference with spatial aggregation and post-processing, and to assess performance under early- and late-stage acquisition conditions (initial/minimal vs.\ advanced cracking).
+    \item \textbf{Wavelength selection:} To quantify the performance--complexity trade-off of reduced spectral-band subsets and identify stable candidate wavelengths to support compact sensing configurations.
+\end{enumerate}
+
+\subsection{Contributions}
+\noindent
+The main contributions of this thesis are as follows:
+
+\begin{itemize}[leftmargin=*]
+    \item A consistent VIS--NIR preprocessing protocol was established and applied throughout the study by restricting spectra to 450--925\,nm and using per-spectrum SNV normalization, enabling direct comparability across experiments.
+    \item A field-acquired hyperspectral dataset was curated at both pixel and whole-image levels, including manual pixel labeling and full-scene vineyard acquisitions, and was used to benchmark supervised classifiers under leave-one-group-out protocols and row-separated calibration/test evaluation, demonstrating reliable crack discrimination at the spectral-signature level (Chapter~\ref{ch:results}, Section~\ref{sec:pixel-level-classification}).
+    \item The limits of direct pixel-level segmentation in realistic vineyard scenes were analyzed by tracing error sources such as mixed pixels, illumination/BRDF effects, and spectrally confounding background materials, motivating a shift toward spatial aggregation (Chapter~\ref{ch:discussion}, Section~\ref{sec:pixel-level-failure-field}).
+    \item A whole-image crack-detection pipeline was developed by combining pixel-level inference with probability thresholding, morphological filtering, and patch/blob-based aggregation, with post-processing parameters optimized on calibration data and evaluated under early- vs.\ late-stage acquisition conditions (initial/minimal vs.\ advanced cracking; Chapter~\ref{ch:results}, Section~\ref{sec:full-image-early-late}).
+    \item Backward Feature Selection (BFS) was used to quantify the performance--complexity trade-off of wavelength reduction and to assess selection stability across random seeds, providing a basis for compact band subsets and sensor-design implications (Chapter~\ref{ch:results}, Sections~\ref{sec:bfs-setup} and~\ref{sec:bfs-stability}).
+\end{itemize}

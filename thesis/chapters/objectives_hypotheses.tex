@@ -1,0 +1,115 @@
+\chapter{Research Objectives and Hypotheses}
+
+\section{Research Objectives}
+
+\noindent
+The primary objective of this research is to develop and validate hyperspectral imaging (HSI) methods for crack-related \textit{detection/identification at the time of measurement} in table grapes ('Scarlotta' cultivar) under field conditions, spanning both early-stage (absent-to-minimal/incipient cracking) and late-stage (advanced, macroscopically visible cracking) acquisition conditions. The work bridges the gap between spectroscopic research on cracking mechanisms and practical, non-destructive agricultural screening by leveraging imaging, machine learning, and robust whole-image aggregation.
+
+% \section{Research Hypotheses}
+
+% The research is guided by the following six hypotheses, structured hierarchically from physical feasibility to algorithmic efficiency and early detection capabilities.
+
+% \subsubsection{Hypothesis 1: Spectral Distinguishability (Physical Basis)}
+% This hypothesis assesses whether a fundamental physical difference exists in the reflectance properties of the tissues.
+% \begin{itemize}
+%     \item \textbf{$H_0$:} There is no statistically significant difference in the spectral signatures between healthy tissues and cracked tissues of 'Scarlotta' grapes.
+%     \item \textbf{$H_1$:} Statistically significant differences exist in the spectral signatures of healthy versus cracked grape skins at specific wavelengths, providing the physical basis for algorithmic discrimination.
+% \end{itemize}
+
+% \subsubsection{Hypothesis 2: Pixel-Level Classification Feasibility}
+% This hypothesis evaluates the ability of machine learning algorithms to learn the spectral differences identified in Hypothesis 1 under controlled conditions.
+% \begin{itemize}
+%     \item \textbf{$H_0$:} A machine learning model trained on hyperspectral data cannot achieve classification performance (F1-score/Accuracy) significantly higher than a random classifier or baseline model at the pixel level.
+%     \item \textbf{$H_1$:} The proposed machine learning framework can successfully classify individual pixels as 'Cracked' or 'Healthy' with high accuracy, effectively learning the spectral decision boundary.
+% \end{itemize}
+
+% \subsubsection{Hypothesis 3: Whole-Image Detection and Robustness}
+% This hypothesis tests the model's performance in a realistic "whole-image" scenario, dealing with complex background noise (leaves, branches, plastic) that was not present in the clean pixel dataset.
+% \begin{itemize}
+%     \item \textbf{$H_0$:} The model fails to distinguish between the spectral signatures of cracks and complex background clutter (e.g., woody tissue, plastic) when applied to full hyperspectral scenes, resulting in a high False Positive Rate.
+%     \item \textbf{$H_1$:}The spectral signatures of cracks are sufficiently distinct from background clutter, allowing the model to effectively filter noise and detect cracks within the full image context with high precision
+% \end{itemize}
+
+
+% \subsubsection{Hypothesis 4: Early Detection Capability}
+% This hypothesis challenges the model using the whole-image architecture from Hypothesis 3 to detect cracks at their onset stage, before they are clearly visible.
+% \begin{itemize}
+%     \item \textbf{$H_0$:} The spectral changes associated with the early onset of cracking are too subtle to be detected by the algorithm, limiting the model's utility to late-stage damage only.
+%     \item \textbf{$H_1$:} The spectral model is sufficiently sensitive to detect physiological changes and micro-cracks at the early onset stage, enabling pre-symptomatic identification of at-risk clusters.
+% \end{itemize}
+
+% \subsubsection{Hypothesis 5: Spectral Efficiency and Operational Feasibility}
+% This hypothesis investigates whether the detection capabilities verified in Hypotheses 3 and 4 can be maintained using a significantly reduced subset of wavelengths (feature selection).
+% \begin{itemize}
+%     \item \textbf{$H_0$:} Reducing the number of spectral bands leads to a significant degradation in detection performance (either in robust whole-image scenarios or early-stage detection), implying that the full hyperspectral spectrum is required.
+%     \item \textbf{$H_1$:} A selected subset of informative wavelengths captures the core physiological markers of cracking, allowing for robust detection in both whole-image and early-stage scenarios using cost-effective multispectral sensors.
+% \end{itemize}
+
+\section{Research Hypotheses}
+
+\noindent
+The research is guided by the following hypotheses, structured hierarchically to reflect a progression from physical feasibility to algorithmic performance, robustness, early detection capability, and spectral efficiency.
+
+\subsubsection{Hypothesis 1: Spectral Distinguishability (Physical Basis)}
+\label{hyp:spectral_distinguishability}
+
+\noindent
+This hypothesis examines whether a fundamental physical difference exists in the spectral reflectance properties of healthy and cracked grape tissues.
+
+\begin{itemize}
+    \item \textbf{$H_0$:} There is no statistically significant difference in the spectral signatures of healthy and cracked tissues in 'Scarlotta' grapes.
+    \item \textbf{$H_1$:} Statistically significant differences exist in the spectral signatures of healthy versus cracked grape skins at specific wavelengths, providing a physical basis for subsequent algorithmic discrimination.
+\end{itemize}
+
+\subsubsection{Hypothesis 2: Pixel-Level Classification Feasibility}
+\label{hyp:pixel_level_feasibility}
+
+\noindent
+This hypothesis evaluates whether machine learning algorithms can effectively learn the spectral differences identified in Hypothesis~1 under controlled, pixel-level conditions.
+
+\begin{itemize}
+    \item \textbf{$H_0$:} A machine learning model trained on hyperspectral data cannot achieve classification performance, as measured by standard metrics (e.g., F1-score, precision/recall, or MCC), significantly higher than a random or baseline classifier at the pixel level.
+    \item \textbf{$H_1$:} The proposed machine learning framework can successfully classify individual pixels as \textit{Cracked} or \textit{Healthy} with high performance, effectively learning the underlying spectral decision boundary.
+\end{itemize}
+
+\subsubsection{Hypothesis 3: Whole-Image Detection and Robustness}
+\label{hyp:whole_image_robustness}
+
+\noindent
+This hypothesis assesses the robustness of the trained models when applied to realistic whole-image hyperspectral scenes containing complex background elements not present in the clean pixel dataset.
+
+\begin{itemize}
+    \item \textbf{$H_0$:} The model fails to distinguish between the spectral signatures of cracks and complex background clutter (e.g., leaves, woody tissue, or plastic), resulting in a high false positive rate when applied to full hyperspectral images.
+    \item \textbf{$H_1$:} The spectral signatures of cracks are sufficiently distinct from background clutter to allow the model to effectively suppress noise and detect cracks within full-image scenes with high precision.
+\end{itemize}
+
+\subsubsection{Hypothesis 4: Early Detection Capability}
+
+\noindent
+This hypothesis investigates the ability of the whole-image framework to detect cracking at its onset, prior to the appearance of visually observable symptoms.
+
+\begin{itemize}
+    \item \textbf{$H_0$:} The spectral changes associated with the early onset of cracking are too subtle to be reliably detected, limiting the model's applicability to late-stage damage.
+    \item \textbf{$H_1$:} The spectral model is sufficiently sensitive to detect early physiological changes and micro-cracks, enabling early-stage identification of clusters exhibiting crack-related spectral signatures at the time of measurement (even when macroscopic cracking is not yet clearly visible).
+\end{itemize}
+
+\subsubsection{Hypothesis 5: Spectral Efficiency and Operational Feasibility}
+
+\noindent
+This hypothesis examines whether the detection capabilities demonstrated in Hypotheses~3 and~4 can be preserved when using a reduced subset of informative spectral bands.
+
+\begin{itemize}
+    \item \textbf{$H_0$:} Reducing the number of spectral bands results in a significant degradation in detection performance, either in whole-image scenarios or during early-stage detection, implying that the full hyperspectral spectrum is required.
+    \item \textbf{$H_1$:} A carefully selected subset of informative wavelengths captures the key physiological markers of cracking, enabling robust detection in both whole-image and early-stage scenarios using cost-effective multispectral sensing configurations.
+\end{itemize}
+
+% \textcolor{red}{GAP - after mentioning shortly what is done about cracks, you want to explain what was not yet done or what is unknown! this is an important part- why is your work needed? what is the knowledge gap that this thesis needs to fill. After the gap, you can add a sort paragraph to connect and summarize your results. The introduction should include also what you found, but in a way that the reader wants to read the rest to understand how you did it exactly.
+% }
+% \section{Thesis Structure}
+
+% This thesis is organized as follows: Chapter 2 provides a comprehensive review of the relevant literature on grape cracking mechanisms and precision agriculture techniques. Chapter 3 details the materials and methods used for data collection, hyperspectral imaging, and analysis. Chapter 4 presents the results of the pixel-level and whole-image classification and temporal analysis. Chapter 5 discusses the interpretation and implications of these results in the context of early damage detection and practical deployment. Finally, Chapter 6 concludes the study and suggests directions for future research.
+
+\noindent
+This thesis is organized into several interconnected chapters. The \textit{Literature Review} chapter provides a comprehensive overview of grape cracking mechanisms and relevant precision agriculture techniques. The \textit{Materials and Methods} chapter describes the experimental design, data acquisition procedures, hyperspectral imaging systems, and modeling approaches used in this study. The \textit{Results} chapter presents the experimental findings, including pixel-level classification, whole-image crack detection, and wavelength selection experiments. The \textit{Discussion} chapter interprets these results in the context of early crack detection, physiological relevance, and practical deployment considerations. Finally, the \textit{Conclusions and Future Work} chapter summarizes the main contributions of the study and outlines directions for future research.
+
+% TODO: ADD APPENDIX WITH LINKS TO GIT AND MORE

@@ -1,0 +1,91 @@
+
+% =====================================================================
+% PREAMBLE
+% =====================================================================
+\documentclass[12pt, a4paper]{report} % Use 'report' for thesis structure
+\usepackage[utf8]{inputenc}
+\usepackage[backend=biber,style=apa]{biblatex}
+\DeclareLanguageMapping{english}{english-apa}
+\addbibresource{bibliography/references.bib}
+
+\usepackage{makecell} % Allows for line breaks inside table cells
+\usepackage{adjustbox}
+% --- Essential Packages ---
+\usepackage[T1]{fontenc}    % Font encoding for better character rendering
+\usepackage{lmodern}        % A good quality standard LaTeX font
+\usepackage{amsmath}        % For math environments
+\usepackage{amssymb}       % For \mathbb and additional math symbols
+\usepackage{graphicx}       % Required for inserting images
+\usepackage{booktabs}       % For professional-looking tables
+\usepackage[margin=1in]{geometry} % Set 1-inch margins
+\usepackage{setspace}       % To control line spacing
+\usepackage{float}          % For [H] float placement
+\onehalfspacing             % Set line spacing to 1.5 for readability
+\usepackage{enumitem}       % For customizing lists
+\usepackage{placeins}       % For \FloatBarrier command
+\usepackage{subcaption}
+% Graphics path no longer needed - all paths are explicit relative to thesis root
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usepackage{bookmark}
+\usepackage{hypcap}
+\usepackage{xcolor}
+\usepackage{pdflscape}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{ragged2e}
+
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
+
+
+\newcommand{\TODO}[1]{\textcolor{red}{\textbf{TODO: #1}}}
+
+
+
+
+
+% --- Hyperlinks and References ---
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=cyan,
+    pdftitle={Early Detection of Cracking in Grapes under Field Conditions},
+    pdfauthor={Yovel Gani},
+}
+
+
+
+% =====================================================================
+% DOCUMENT BODY
+% =====================================================================
+
+
+% --- Title Page Information ---
+\title{Early Detection of Cracking in Grapes under Field Conditions using Hyperspectral Imaging and Machine Learning}
+\author{By Yovel Gani\\[1ex]\textit{Supervised by:}\\Dr. Alon Sela, Prof. Victor Alchanatis, Prof. Irad Ben-Gal}
+\date{August 2026\\[1ex]A thesis submitted toward the degree of Master of Science (M.Sc.)}
+
+
+\begin{document}
+
+\maketitle
+
+\input{chapters/abstract}
+
+\tableofcontents
+\listoffigures
+\listoftables
+
+\input{chapters/introduction}
+\input{chapters/literature_review}
+\input{chapters/objectives_hypotheses}
+\input{chapters/materials_methods}
+\input{chapters/results_new}
+\input{chapters/discussions_new}
+\input{chapters/conclusions}
+
+\printbibliography
+
+\end{document}

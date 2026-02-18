@@ -1,0 +1,409 @@
+{
+  "dataset_info": {
+    "n_samples": 94166,
+    "n_healthy": 69618,
+    "n_cracked": 24548,
+    "n_wavelengths": 204,
+    "wavelength_range": "397.32-1003.58 nm"
+  },
+  "regional_statistics": [
+    {
+      "region": "VIS",
+      "wavelength_range": "400-700 nm",
+      "n_wavelengths": 103,
+      "healthy_mean": 0.21817579170175258,
+      "healthy_std": 0.127560763641163,
+      "healthy_median": 0.18609086250485435,
+      "cracked_mean": 0.1371390427327483,
+      "cracked_std": 0.07628347575168058,
+      "cracked_median": 0.12341487974271846
+    },
+    {
+      "region": "NIR",
+      "wavelength_range": "700-1000 nm",
+      "n_wavelengths": 98,
+      "healthy_mean": 0.6604005457960614,
+      "healthy_std": 0.11416865303563915,
+      "healthy_median": 0.6304122475000001,
+      "cracked_mean": 0.4502845673781118,
+      "cracked_std": 0.12107856820520434,
+      "cracked_median": 0.42523189969387754
+    }
+  ],
+  "top_separable_wavelengths": {
+    "fisher_score": [
+      {
+        "wavelength": 747.54,
+        "fisher_score": 3.6310542078041435
+      },
+      {
+        "wavelength": 744.53,
+        "fisher_score": 3.623452665789673
+      },
+      {
+        "wavelength": 750.54,
+        "fisher_score": 3.609904181204857
+      },
+      {
+        "wavelength": 741.53,
+        "fisher_score": 3.603902073650171
+      },
+      {
+        "wavelength": 756.56,
+        "fisher_score": 3.599577082104363
+      },
+      {
+        "wavelength": 753.55,
+        "fisher_score": 3.5818472826698913
+      },
+      {
+        "wavelength": 738.53,
+        "fisher_score": 3.576371498369458
+      },
+      {
+        "wavelength": 735.53,
+        "fisher_score": 3.5377377285681293
+      },
+      {
+        "wavelength": 759.56,
+        "fisher_score": 3.533881732131922
+      },
+      {
+        "wavelength": 732.53,
+        "fisher_score": 3.4404869078461804
+      },
+      {
+        "wavelength": 729.53,
+        "fisher_score": 3.3205909794768314
+      },
+      {
+        "wavelength": 762.57,
+        "fisher_score": 3.3039211958236403
+      },
+      {
+        "wavelength": 768.6,
+        "fisher_score": 3.272943502264903
+      },
+      {
+        "wavelength": 771.61,
+        "fisher_score": 3.249800917798007
+      },
+      {
+        "wavelength": 765.58,
+        "fisher_score": 3.239451684634969
+      },
+      {
+        "wavelength": 774.62,
+        "fisher_score": 3.185407270094415
+      },
+      {
+        "wavelength": 726.53,
+        "fisher_score": 3.1676521016112082
+      },
+      {
+        "wavelength": 777.64,
+        "fisher_score": 3.111350276335893
+      },
+      {
+        "wavelength": 780.65,
+        "fisher_score": 3.0510124278737014
+      },
+      {
+        "wavelength": 783.67,
+        "fisher_score": 2.9979584052394497
+      },
+      {
+        "wavelength": 723.53,
+        "fisher_score": 2.9812437080929026
+      },
+      {
+        "wavelength": 786.68,
+        "fisher_score": 2.953054233805406
+      },
+      {
+        "wavelength": 789.7,
+        "fisher_score": 2.9017337970767274
+      },
+      {
+        "wavelength": 792.72,
+        "fisher_score": 2.848703091551952
+      },
+      {
+        "wavelength": 795.74,
+        "fisher_score": 2.7895619370076714
+      },
+      {
+        "wavelength": 798.77,
+        "fisher_score": 2.7344593309444916
+      },
+      {
+        "wavelength": 720.54,
+        "fisher_score": 2.707260981613776
+      },
+      {
+        "wavelength": 801.79,
+        "fisher_score": 2.6824539328147083
+      },
+      {
+        "wavelength": 804.81,
+        "fisher_score": 2.6441028694894286
+      },
+      {
+        "wavelength": 807.84,
+        "fisher_score": 2.6026052791439773
+      }
+    ],
+    "cohens_d": [
+      {
+        "wavelength": 756.56,
+        "cohens_d": 2.6877396954812545
+      },
+      {
+        "wavelength": 759.56,
+        "cohens_d": 2.6743394528781366
+      },
+      {
+        "wavelength": 753.55,
+        "cohens_d": 2.664565190545111
+      },
+      {
+        "wavelength": 750.54,
+        "cohens_d": 2.6644082098709547
+      },
+      {
+        "wavelength": 747.54,
+        "cohens_d": 2.6597209551581744
+      },
+      {
+        "wavelength": 744.53,
+        "cohens_d": 2.642945477537303
+      },
+      {
+        "wavelength": 741.53,
+        "cohens_d": 2.619390729723712
+      },
+      {
+        "wavelength": 738.53,
+        "cohens_d": 2.5931221577306154
+      },
+      {
+        "wavelength": 771.61,
+        "cohens_d": 2.58880094036137
+      },
+      {
+        "wavelength": 768.6,
+        "cohens_d": 2.5850532311254844
+      },
+      {
+        "wavelength": 762.57,
+        "cohens_d": 2.577634989490161
+      },
+      {
+        "wavelength": 774.62,
+        "cohens_d": 2.5709490148880056
+      },
+      {
+        "wavelength": 735.53,
+        "cohens_d": 2.560415815975265
+      },
+      {
+        "wavelength": 765.58,
+        "cohens_d": 2.554887376012316
+      },
+      {
+        "wavelength": 777.64,
+        "cohens_d": 2.547003795285597
+      },
+      {
+        "wavelength": 780.65,
+        "cohens_d": 2.529097990504983
+      },
+      {
+        "wavelength": 783.67,
+        "cohens_d": 2.5136401268559947
+      },
+      {
+        "wavelength": 732.53,
+        "cohens_d": 2.504721474645262
+      },
+      {
+        "wavelength": 786.68,
+        "cohens_d": 2.5019768405922886
+      },
+      {
+        "wavelength": 789.7,
+        "cohens_d": 2.485604897323197
+      },
+      {
+        "wavelength": 792.72,
+        "cohens_d": 2.4673814287626143
+      },
+      {
+        "wavelength": 795.74,
+        "cohens_d": 2.4456623138724023
+      },
+      {
+        "wavelength": 729.53,
+        "cohens_d": 2.440944441259271
+      },
+      {
+        "wavelength": 798.77,
+        "cohens_d": 2.425124579875978
+      },
+      {
+        "wavelength": 801.79,
+        "cohens_d": 2.4049642972402103
+      },
+      {
+        "wavelength": 804.81,
+        "cohens_d": 2.392282231444625
+      },
+      {
+        "wavelength": 807.84,
+        "cohens_d": 2.3779097444939916
+      },
+      {
+        "wavelength": 726.53,
+        "cohens_d": 2.3662807123085967
+      },
+      {
+        "wavelength": 810.86,
+        "cohens_d": 2.3590978557388294
+      },
+      {
+        "wavelength": 813.89,
+        "cohens_d": 2.3333598397859867
+      }
+    ],
+    "abs_mean_diff": [
+      {
+        "wavelength": 726.53,
+        "abs_mean_diff": 0.37044796085596704
+      },
+      {
+        "wavelength": 729.53,
+        "abs_mean_diff": 0.3699729709673298
+      },
+      {
+        "wavelength": 723.53,
+        "abs_mean_diff": 0.3681910404285789
+      },
+      {
+        "wavelength": 732.53,
+        "abs_mean_diff": 0.3671009933562155
+      },
+      {
+        "wavelength": 735.53,
+        "abs_mean_diff": 0.3634348999791382
+      },
+      {
+        "wavelength": 720.54,
+        "abs_mean_diff": 0.36206825331859716
+      },
+      {
+        "wavelength": 738.53,
+        "abs_mean_diff": 0.35952241896873477
+      },
+      {
+        "wavelength": 741.53,
+        "abs_mean_diff": 0.35610786970550823
+      },
+      {
+        "wavelength": 717.54,
+        "abs_mean_diff": 0.3554188664532595
+      },
+      {
+        "wavelength": 744.53,
+        "abs_mean_diff": 0.35340880481191184
+      },
+      {
+        "wavelength": 747.54,
+        "abs_mean_diff": 0.3509072343575587
+      },
+      {
+        "wavelength": 750.54,
+        "abs_mean_diff": 0.34816698467333257
+      },
+      {
+        "wavelength": 714.55,
+        "abs_mean_diff": 0.3467931535058486
+      },
+      {
+        "wavelength": 753.55,
+        "abs_mean_diff": 0.34541387332463475
+      },
+      {
+        "wavelength": 756.56,
+        "abs_mean_diff": 0.3432283547402679
+      },
+      {
+        "wavelength": 759.56,
+        "abs_mean_diff": 0.34054097324760557
+      },
+      {
+        "wavelength": 762.57,
+        "abs_mean_diff": 0.3343396190370068
+      },
+      {
+        "wavelength": 711.56,
+        "abs_mean_diff": 0.3338403964671814
+      },
+      {
+        "wavelength": 765.58,
+        "abs_mean_diff": 0.33015118914724834
+      },
+      {
+        "wavelength": 768.6,
+        "abs_mean_diff": 0.3295931279522522
+      },
+      {
+        "wavelength": 771.61,
+        "abs_mean_diff": 0.32795342785691667
+      },
+      {
+        "wavelength": 774.62,
+        "abs_mean_diff": 0.3254478237834472
+      },
+      {
+        "wavelength": 777.64,
+        "abs_mean_diff": 0.3227386429183298
+      },
+      {
+        "wavelength": 780.65,
+        "abs_mean_diff": 0.3201007347541011
+      },
+      {
+        "wavelength": 783.67,
+        "abs_mean_diff": 0.31779906806992003
+      },
+      {
+        "wavelength": 708.57,
+        "abs_mean_diff": 0.3176561947439726
+      },
+      {
+        "wavelength": 786.68,
+        "abs_mean_diff": 0.31562968149249193
+      },
+      {
+        "wavelength": 789.7,
+        "abs_mean_diff": 0.31343766215082364
+      },
+      {
+        "wavelength": 792.72,
+        "abs_mean_diff": 0.31093953481150977
+      },
+      {
+        "wavelength": 795.74,
+        "abs_mean_diff": 0.3087987122956447
+      }
+    ]
+  },
+  "separability_summary": {
+    "mean_fisher_score": 0.9435529935744355,
+    "max_fisher_score": 3.6310542078041435,
+    "mean_cohens_d": 1.101384213727154,
+    "max_cohens_d": 2.6877396954812545,
+    "mean_abs_diff": 0.14221987163561603,
+    "max_abs_diff": 0.37044796085596704
+  }
+}

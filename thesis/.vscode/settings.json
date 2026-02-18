@@ -1,0 +1,41 @@
+{
+    "latex-workshop.latex.outDir": "%DIR%",
+    "latex-workshop.latex.recipes": [
+        {
+            "name": "pdflatex + biber + pdflatex×2",
+            "tools": ["pdflatex", "biber", "pdflatex", "pdflatex"]
+        },
+        {
+            "name": "pdflatex only",
+            "tools": ["pdflatex"]
+        }
+    ],
+    "latex-workshop.latex.tools": [
+        {
+            "name": "pdflatex",
+            "command": "pdflatex",
+            "args": [
+                "-synctex=1",
+                "-interaction=nonstopmode",
+                "-file-line-error",
+                "%DOC%"
+            ],
+            "env": {}
+        },
+        {
+            "name": "biber",
+            "command": "biber",
+            "args": ["%DOCFILE%"],
+            "env": {}
+        }
+    ],
+    "latex-workshop.latex.autoClean.run": "onBuilt",
+    "latex-workshop.latex.clean.fileTypes": [
+        "*.aux", "*.bbl", "*.blg", "*.idx", "*.ind", "*.lof",
+        "*.lot", "*.out", "*.toc", "*.acn", "*.acr", "*.alg",
+        "*.glg", "*.glo", "*.gls", "*.fls", "*.log", "*.fdb_latexmk",
+        "*.snm", "*.nav", "*.run.xml", "*.bcf"
+    ],
+    "latex-workshop.view.pdf.viewer": "tab",
+    "latex-workshop.latex.rootFile": "main.tex"
+}

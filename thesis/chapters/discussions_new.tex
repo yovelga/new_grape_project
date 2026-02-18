@@ -1,0 +1,414 @@
+\chapter{Discussion}
+\label{ch:discussion}
+
+%% ================================================================
+%%  1.  SUMMARY OF KEY FINDINGS
+%% ================================================================
+\section{Summary of Key Findings}
+
+This study set out to determine whether hyperspectral imaging in the visible--near-infrared (VIS--NIR) range can detect existing cracks in table grapes and, more ambitiously, identify crack-related spectral signatures even under early-stage acquisitions where macroscopic cracking is not yet clearly visible.
+The experimental programme yielded five principal results that, taken together, advance both the scientific understanding and the practical feasibility of spectral crack detection.
+\noindent
+In the discussion below, \textit{detection} refers to classification at the time of measurement. Throughout, \textit{early} and \textit{late} denote acquisition-stage subsets relative to crack progression at the time of measurement: \textit{early} corresponds to absent-to-minimal/incipient cracking (the first recorded small-crack stage for a given cluster identity), whereas \textit{late} corresponds to advanced cracking that is macroscopically visible. These terms are used for stratified evaluation and are not a forecast of future cracking.
+
+\noindent
+First, the spectral characterisation confirmed that healthy and cracked grape tissues produce markedly different reflectance signatures across the analyzed 450--925\,nm range.
+Healthy tissue exhibited mean VIS reflectance of 0.218 and mean NIR reflectance of 0.660, whereas cracked tissue dropped to 0.137 and 0.450, respectively (Table~\ref{tab:reflectance_stats}).
+The strongest separability was concentrated in the red-edge and NIR plateau, with Cohen's $d$ reaching 2.69 near 757\,nm and a peak Fisher score of 3.63 near 748\,nm (Table~\ref{tab:separability_scores}).
+This physical basis validates Hypothesis~1 and establishes that cracking alters the optical properties of berry skin in ways that are measurable with a portable hyperspectral sensor \cite{blackburn2007,zhang2022reflectance}.
+
+\noindent
+Second, pixel-level supervised classifiers achieved near-ceiling discrimination when trained and tested on manually labelled spectra under the multi-class formulation, with XGBoost reaching ROC--AUC of 1.00 and consistently strong cracked-class separability (Tables~\ref{tab:pixel_metrics_unbalanced}--\ref{tab:pixel_metrics_balanced}), thereby supporting Hypothesis~2.
+All five classifiers---including PLS-DA, Logistic Regression, SVM, Random Forest, and XGBoost---achieved extremely high performance under both balanced and unbalanced regimes in the multi-class setting (Tables~\ref{tab:pixel_metrics_unbalanced_all}--\ref{tab:pixel_metrics_balanced_all}).
+However, the binary and simplified labelling schemes (crack\_regular\_rest, crack\_vs\_rest) that conflate background classes with healthy tissue exhibited substantially lower balanced accuracy (approximately 87--92\,\%) and higher variance across LOGO folds, foreshadowing the challenges encountered at the whole-image level.
+
+\noindent
+Third, the transition from pixel-level to whole-image inference revealed a meaningful performance gap.
+Late-stage images, in which cracks are macroscopically visible, yielded a test-set F1\textsubscript{CRACK} of 0.818 and an MCC of 0.598, whereas the early-stage scenario---the more practically relevant one---achieved a test F1\textsubscript{CRACK} of 0.704 and an MCC of 0.504 (Table~\ref{tab:full_image_early_late_metrics}).
+These values represent a substantial degradation relative to the pixel-level ceiling, yet they also demonstrate that the full-image pipeline retains meaningful early-stage identification value under realistic vineyard conditions, supporting Hypothesis~3 and partially supporting Hypothesis~4.
+
+\noindent
+Fourth, Backward Feature Selection (BFS) showed that the 159-channel hyperspectral cube can be reduced to as few as 11 wavelengths with only 0.5\,\% loss in CRACK PR--AUC (from 0.9948 to 0.9878), and to 9 wavelengths within 1.0\,\% of the maximum (Table~\ref{tab:bfs_thresholds_summary}).
+Critically, the 30-wavelength subset matched or exceeded the full spectrum on the independent test set, achieving the highest early-stage test MCC of 0.6447 compared with 0.6071 for the full 159-channel cube (Table~\ref{tab:full_image_wavelength_results}).
+Stability analysis across five random seeds further identified four wavelengths---452.25, 548.55, 580.90, and 729.53\,nm---that were selected in every single repetition, confirming their physical importance and supporting Hypothesis~5.
+
+\noindent
+Fifth, the autoencoder-based anomaly-detection branch exposed an instructive asymmetry.
+Training on cracked pixels alone produced competitive pixel-level performance, with a cracked-class PR--AUC of 0.9999 (accuracy 0.966--0.986; Table~\ref{tab:autoencoder_pixel_results_crack_only_multiclass_balanced}), whereas training on all non-crack classes failed catastrophically, with near-zero recall and F1 for the cracked class (Table~\ref{tab:autoencoder_pixel_results_noncrack_multiclass_balanced}).
+At the whole-image level, the autoencoder pipeline achieved a test MCC of only $-0.058$ in the early-stage scenario, compared with 0.504 for the supervised classifier (Tables~\ref{tab:full_image_autoencoder_metrics} and~\ref{tab:full_image_early_late_metrics}).
+
+\noindent
+The sections that follow interpret these findings in the context of grape physiology, sensor design, and operational deployment.
+
+\subsection{Hypotheses Evaluation}
+
+\noindent
+For traceability, the five research hypotheses are evaluated here against the results reported in Chapter~\ref{ch:results}.
+
+\begin{itemize}
+	\item \textbf{Hypothesis~1 (Spectral distinguishability): Supported.} Clear and consistent separation between healthy and cracked tissue was observed in mean spectra and separability statistics (Figure~\ref{fig:mean_signatures}; Figure~\ref{fig:spectral_separability}; Tables~\ref{tab:reflectance_stats} and~\ref{tab:separability_scores}).
+
+	\item \textbf{Hypothesis~2 (Pixel-level classification feasibility): Supported.} Supervised models achieved near-ceiling discrimination under controlled pixel-level labeling, across both balanced and unbalanced regimes (Tables~\ref{tab:pixel_metrics_unbalanced}--\ref{tab:pixel_metrics_balanced} and~\ref{tab:pixel_metrics_unbalanced_all}--\ref{tab:pixel_metrics_balanced_all}).
+
+	\item \textbf{Hypothesis~3 (Whole-image robustness): Supported.} When deployed on full hyperspectral scenes that include complex background content, the end-to-end whole-image pipeline retained meaningful precision and MCC on an independent test row (Table~\ref{tab:full_image_early_late_metrics}; with dataset composition in Table~\ref{tab:full_image_dataset_composition}).
+
+	\item \textbf{Hypothesis~4 (Early detection capability): Partially supported.} Early-stage images (acquired before clearly visible macroscopic cracking) were classified above chance on the held-out test set, but with reduced performance relative to late-stage detection and non-trivial calibration-to-test gaps (Tables~\ref{tab:full_image_early_late_metrics} and~\ref{tab:mcc_generalization}).
+
+	\item \textbf{Hypothesis~5 (Spectral efficiency): Supported.} BFS demonstrated that strong crack-detection performance can be maintained with reduced wavelength subsets (Figure~\ref{fig:bfs_threshold_markers}; Table~\ref{tab:bfs_thresholds_summary}), and whole-image evaluation confirmed that reduced-band configurations can match or exceed the full-spectrum baseline on the independent test set (Table~\ref{tab:full_image_wavelength_results}). Stability analysis further identified a small core of universally selected wavelengths across seeds (Figure~\ref{fig:stability_11_popularity}).
+\end{itemize}
+
+
+%% ================================================================
+%%  2.  SPECTRAL AND PHYSIOLOGICAL INTERPRETATION
+%% ================================================================
+\section{Spectral and Physiological Interpretation}
+
+\subsection{VIS Region: Pigments and Skin Integrity}
+
+\noindent
+The lower mean reflectance of cracked tissue across the entire VIS range (400--700\,nm) likely reflects two complementary processes rooted in the biochemistry of berry skin.
+When the berry cuticle ruptures, the exposed sub-epidermal cells undergo rapid oxidative browning \cite{santos2023molecular}.
+The resulting accumulation of phenolic oxidation products---including quinones and melanoidins---broadens the absorption across the blue-green region, depressing overall VIS reflectance.
+Simultaneously, the anthocyanins concentrated in the outer mesocarp---which govern the characteristic red-to-black colouration of `Scarlotta'---become disordered once the cuticle barrier is breached \cite{Castellarin2016}; the loss of the smooth wax layer eliminates the specular component of reflectance and disturbs the internal scattering geometry that normally elevates green-band reflectance relative to the absorbing flanks of the chlorophyll and anthocyanin peaks \cite{blackburn2007}.
+
+\noindent
+The fact that the wavelength near 452\,nm emerged as one of the four universally stable features (Figure~\ref{fig:stability_11_popularity}) corroborates this interpretation: 452\,nm falls within the Soret absorption band of chlorophyll and at the short-wavelength edge of anthocyanin absorption \cite{blackburn2007}.
+When cracking disrupts the cuticle, enhanced oxidation and pigment leaching alter absorbance at this wavelength more consistently than at neighbouring bands, explaining why BFS repeatedly selects it regardless of the random seed.
+
+\noindent
+Similarly, the stability of the 548\,nm and 580\,nm features aligns with the green trough and the orange shoulder of anthocyanin reflectance, respectively.
+These regions are sensitive to anthocyanin concentration, cell-layer organisation, and skin integrity, making them natural indicators of cuticle disruption \cite{Castellarin2016,blackburn2007}.
+Previous work on sweet cherry cracking has reported analogous green-band sensitivity, which was attributed to changes in sub-cuticular scattering following micro-fracture development \cite{Peschel2005,xu2025overview}, supporting the generality of these spectral markers across thin-skinned fruit species.
+La~Spada et~al.\ \cite{plants13172400} further showed that cuticle thickness and quality in table grapes can be modulated by preharvest treatments, reinforcing the link between cuticle integrity and optical properties that underlies the VIS-range discriminability observed here.
+
+\subsection{NIR and Red-Edge Sensitivity to Water Stress}
+
+\noindent
+The most pronounced spectral differences between healthy and cracked tissue were observed in the NIR region, where Cohen's $d$ exceeded 2.5 near 757\,nm and the mean absolute reflectance difference reached 0.370 near 727\,nm (Table~\ref{tab:separability_scores}; Figure~\ref{fig:spectral_separability}).
+This large effect size reflects the dominant role of cellular water content and tissue structure in shaping NIR reflectance \cite{thenkabail2016hyperspectral,zhang2022reflectance}.
+In intact berries, the mesocarp acts as a powerful diffuse reflector: multiple internal scattering events at air--cell-wall interfaces elevate reflectance above 700\,nm, while liquid water in the symplast introduces broad absorption features centred around 760\,nm and 970\,nm \cite{wang2024frontiers}.
+Once cracking occurs, mesocarp cells lose turgor through rapid dehydration and juice leakage, collapsing the scattering interfaces and dramatically reducing NIR reflectance \cite{Chang2019}.
+
+\noindent
+The red-edge---the steep rise in reflectance between 680\,nm and 740\,nm---is particularly informative because it is jointly governed by chlorophyll absorption (which sets the short-wavelength foot) and internal scattering (which sets the shoulder) \cite{blackburn2007,thenkabail2016hyperspectral}.
+In cracked berries, both contributions are diminished: chlorophyll degrades in exposed tissue and the scattering plateau drops, causing the red-edge to shift toward shorter wavelengths and to flatten.
+The fourth stable wavelength at 729\,nm sits precisely on this inflection, where the slope and amplitude of the red-edge are most sensitive to simultaneous changes in pigment content and tissue water (Figure~\ref{fig:stability_30_spectrum}).
+
+\noindent
+These observations align with established water-stress physiology in grape berries.
+Chang and Keller \cite{Chang2019,Chang2021} demonstrated that turgor pressure dynamics and cuticle permeability modulate berry water relations during ripening, with micro-cracks forming days before macroscopic splitting.
+Yu et~al.\ \cite{YU20251506} recently showed that aquaporin-mediated water uptake plays a pivotal role in grape berry cracking, with the cracking-susceptible cultivar `Xiangfei' exhibiting significantly higher mesocarp water content than the resistant `Zuijinxiang' during the critical cracking period.
+The spectral changes detected in this study---particularly the depressed NIR plateau and blue-shifted red-edge---can therefore be understood as the optical fingerprint of the biomechanical failure pathway that culminates in visible cracking.
+This interpretation is consistent with the broader VIS--NIR sensing literature showing that pre-symptomatic stress in plant tissue manifests as altered internal scattering and pigment absorption before macroscopic symptoms appear \cite{liu2023sensors,Abade2025SpectrumToYield,mahlein2016plant}.
+
+
+%% ================================================================
+%%  3.  WHY PIXEL-LEVEL DETECTION WORKS IN CONTROLLED SETTINGS
+%%      BUT FAILS IN FIELD CONDITIONS
+%% ================================================================
+\section{Why Pixel-Level Detection Works in Controlled Settings but Fails in Field Conditions}
+\label{sec:pixel-level-failure-field}
+
+\noindent
+The near-perfect pixel-level accuracy reported in Chapter~\ref{ch:results} should be interpreted with caution, as it reflects favourable conditions that do not fully represent operational vineyard imaging.
+Under the multi-class labelling scheme, in which background categories (leaf, wood, soil, plastic) are explicitly modelled, the classifier benefits from a well-structured feature space in which each class occupies a distinct spectral region.
+The resulting decision boundaries are clean and generalise well across LOGO cross-validation folds drawn from different grape clusters, as evidenced by the low standard deviations across folds for XGBoost (accuracy $0.998 \pm 0.002$; Table~\ref{tab:pixel_metrics_unbalanced_all}).
+
+\noindent
+When the same classifiers are deployed on whole-image hyperspectral scenes, however, several confounding factors degrade performance.
+First, the spatial resolution of the Specim~IQ (approximately 1.08\,mm per pixel at 1\,m distance) \cite{behmann2018specim} means that many image pixels are \textit{mixed}: they straddle the boundary between berry and leaf, or between crack and intact skin.
+Mixed pixels produce hybrid spectral signatures that do not match any of the pure-class prototypes used during training, leading to ambiguous or erroneous class assignments \cite{bioucas2013hyperspectral}.
+Second, the illumination geometry in the field is highly variable.
+Although a white reference panel was included in every scene, the hemispherical reflectance from a curved berry surface differs from the Lambertian reference geometry, introducing shading gradients, bidirectional reflectance distribution function (BRDF) effects, and specular highlights that shift the apparent spectrum \cite{mishra2017close}.
+Third, the presence of thin surface films---water droplets, dust, spray residues---modifies reflectance in ways that are unaccounted for in the pixel-level training set.
+These field-specific artefacts are well documented in the close-range hyperspectral literature \cite{mishra2017close,RAM2024109037} and explain why laboratory-to-field performance degradation is a recurring challenge in agricultural HSI applications \cite{su16146064}.
+
+\noindent
+The binary and simplified labelling experiments (crack\_regular\_rest, crack\_vs\_rest) anticipated this problem.
+Under these formulations, the classifier must separate cracked tissue from a heterogeneous ``rest'' category that encompasses every non-crack pixel, including spectrally diverse background materials.
+The resulting balanced accuracy of approximately 87--92\,\% (Table~\ref{tab:pixel_metrics_unbalanced_all}) still represents good performance for a purely spectral (non-spatial) model, yet the higher variance across folds and the lower precision for the cracked class signal that the decision boundary is less stable when background diversity increases.
+Notably, PLS-DA suffered the most under these simplified schemes, achieving balanced accuracy of only 0.688--0.706 (Table~\ref{tab:pixel_metrics_unbalanced_all}), whereas tree-based methods (Random Forest, XGBoost) maintained balanced accuracy above 0.91, suggesting that non-linear classifiers are more resilient to spectral background heterogeneity.
+
+\noindent
+These observations lead to a clear methodological implication: pixel-level spectral classifiers, however accurate in controlled conditions, require an intermediate spatial processing stage---such as segmentation, morphological filtering, or patch-level aggregation---before they can be deployed reliably in uncontrolled vineyard imagery.
+This finding echoes the broader HSI literature, where spectral--spatial integration strategies have been shown to significantly improve classification robustness in scenes with complex backgrounds \cite{Chen2024MutationHSI,bioucas2013hyperspectral}.
+The full-image pipeline evaluated in this study incorporated exactly such steps, and while the resulting performance did not match the pixel-level ceiling, it demonstrates a viable pathway from laboratory accuracy to field applicability.
+
+
+%% ================================================================
+%%  4.  SPATIAL AGGREGATION AS A ROBUST STRATEGY
+%% ================================================================
+\section{Spatial Aggregation as a Robust Strategy for Early-Stage Crack Detection}
+
+\noindent
+One of the most practically significant findings of this study is that the full-image pipeline, which aggregates pixel-level classification outputs through morphological filtering and spatial thresholding, retains value even in the early-stage scenario.
+Early-stage images were acquired before any clearly discernible macroscopic cracking had occurred, yet the pipeline achieved a test F1\textsubscript{CRACK} of 0.704 (precision 0.864, recall 0.594) and an MCC of 0.504 (Table~\ref{tab:full_image_early_late_metrics}). Here, \textit{early} denotes the acquisition stage; the model output is a single-date classification at the time of measurement (not a statement about a future cracking event).
+While this performance falls short of the late-stage benchmark (F1\textsubscript{CRACK} 0.818, MCC 0.598; recall 0.794), it demonstrates that crack-related spectral signatures are measurable before advanced macroscopic symptoms manifest.
+
+\noindent
+This finding can be understood through the physiological lens developed in the preceding section.
+Cracking is not an instantaneous event but rather the terminal stage in a progressive sequence: beginning with cuticular micro-fracturing \cite{Peschel2005,Chang2021}, continuing through changes in water permeability and turgor dynamics \cite{Chang2019,YU20251506}, and culminating in macroscopic splitting \cite{Khadivi2014,santos2023molecular}.
+The spectral indicators of the intermediate stages should therefore be detectable before the final mechanical failure.
+The depressed NIR reflectance and altered red-edge slope observed in the pixel-level analysis (Figure~\ref{fig:mean_signatures}; Table~\ref{tab:reflectance_stats}) are precisely the optical signatures of the cellular-scale changes that precede visible cracking: loss of internal turgor, reduced scattering, and incipient pigment degradation.
+This interpretation aligns with recent findings by Dong et~al.\ \cite{DONG2025101166}, who demonstrated that hyperspectral imaging can detect apple bitter pit---another turgor-related physiological disorder---before visual symptoms emerge, and with Haghbin et~al.\ \cite{haghbin2023non}, who showed pre-symptomatic detection of grey mould in kiwifruit using VIS--NIR chemometrics.
+
+\noindent
+A direct, apples-to-apples numerical comparison to these prior studies is not meaningful here, because the tasks, evaluation units, and acquisition conditions differ substantially. Dong et~al.\ \cite{DONG2025101166} and Haghbin et~al.\ \cite{haghbin2023non} target different crops and disorders and typically operate on localized fruit- or leaf-level samples acquired under more controlled conditions, whereas the present work evaluates \emph{cluster-level} decisions in preharvest vineyard scenes with complex background clutter and a spatially separated Row~1\,$\rightarrow$\,Row~2 test split (Table~\ref{tab:full_image_dataset_composition}). As numerical context for the broader early-detection HSI literature (still not directly comparable), Ou et~al.\ \cite{ou2024hyperspectral} report 96.6\,\% accuracy for distinguishing healthy vs. 24\,h gray-mold-affected strawberry leaves using a fused-feature CNN model, and Zhang et~al.\ \cite{zhang2024early} report up to 98.61\,\% accuracy for early pear leaf anthracnose detection using multi-source feature fusion. In this more deployment-relevant setting, the baseline early-stage full-image pipeline achieved a test MCC of 0.504 (Table~\ref{tab:full_image_early_late_metrics}), and the best reduced-band configuration reached an early-stage test MCC of 0.6447 (Table~\ref{tab:full_image_wavelength_results}). Qualitatively, the agreement across studies is that VIS--NIR hyperspectral measurements capture measurable pre-symptomatic signatures of physiological disruption; however, the remaining performance gap relative to controlled-sample studies underscores that field-scale robustness and cross-domain generalization remain the limiting factors for operational early-warning systems.
+
+\noindent
+Spatial aggregation addresses a fundamental limitation of single-pixel classification.
+Individual pixel classifications are inherently noisy: a single mis-classified pixel in a cluster of several thousand has negligible practical consequence, but a cluster of false positives near a berry edge can generate a spurious crack flag.
+By aggregating pixel-level classifications into patch-level and then image-level statistics---and by requiring that the proportion of flagged crack pixels exceeds a calibrated threshold---the pipeline effectively smooths over pixel-level noise and yields a robust cluster-level score \cite{bioucas2013hyperspectral}.
+
+\noindent
+The experimental design exploited this insight by using Optuna to jointly optimise the probability threshold, morphological kernel sizes, and the global crack-percentage criterion on the calibration split.
+The resulting pipeline achieved substantially higher precision (0.864 on the early-stage test set) than a naive pixel-level approach would, precisely because the spatial aggregation enforces spatial coherence on the classification map.
+That the early-stage pipeline achieved higher precision (0.864) than recall (0.594) on the test split (Table~\ref{tab:full_image_early_late_metrics}) indicates a conservative decision boundary, which is appropriate for an early-warning system where false alarms carry higher operational costs than missed detections in the initial screening pass.
+This paradigm---pixel-level classification followed by spatially informed aggregation---constitutes the core operational strategy recommended by this study for field deployment and aligns with the broader consensus in agricultural HSI that spatial context is critical for robust classification \cite{Chen2024MutationHSI,RAM2024109037}.
+
+
+%% ================================================================
+%%  5.  FEATURE SELECTION AND SPECTRAL STABILITY
+%% ================================================================
+\section{Feature Selection and Spectral Stability}
+
+\subsection{Dimensionality Reduction via BFS}
+
+\noindent
+The BFS elimination sequence revealed a highly non-linear relationship between the number of retained wavelengths and detection performance (Figure~\ref{fig:bfs_dual_metric}).
+CRACK PR--AUC remained within 0.5\,\% of its maximum (0.9948) down to 11 wavelengths, and within 1.0\,\% down to 9 wavelengths (Table~\ref{tab:bfs_thresholds_summary}).
+These results indicate that the vast majority of the 159 usable channels carry redundant spectral information for the specific task of crack detection, and that the discriminative signal is concentrated in a small number of spectral regions.
+This high redundancy is a well-known property of contiguous hyperspectral data, where adjacent bands are often correlated at $r > 0.99$ \cite{bioucas2013hyperspectral,liu2022feature}.
+
+\noindent
+The practical implication is substantial.
+A full hyperspectral line-scan camera typically costs between \$30{,}000 and \$100{,}000, requires specialised data handling, and generates datasets measured in hundreds of gigabytes per field campaign \cite{BHARGAVA2024e33208}.
+A multispectral sensor configured with 9--30 narrowband filters can be manufactured for a fraction of this cost, operates at higher frame rates, and produces data volumes that are orders of magnitude smaller \cite{benelli2020hyperspectral}.
+The BFS results provide a quantitative justification for the transition from hyperspectral research prototype to multispectral operational sensor, echoing the band-reduction strategies that have proven effective in other agricultural HSI applications \cite{agriculture13051086,foods13233956,liu2022feature}.
+
+\noindent
+It is noteworthy that the CRACK F1 metric exhibited a different optimisation landscape from PR--AUC, with its maximum achieved only at 159 wavelengths and a more gradual decline as features were removed (Figure~\ref{fig:bfs_threshold_markers}).
+This discrepancy reflects the fact that F1 penalises both false positives and false negatives equally, and that finer spectral resolution helps to separate crack signatures from spectrally similar background materials.
+For early-warning applications in which sensitivity (recall) is prioritised over specificity, the PR--AUC-oriented subset is the more appropriate choice; for applications demanding high precision, a larger wavelength subset may be warranted.
+
+\subsection{Stability Across Random Seeds and Sensor Design Implications}
+
+\noindent
+The stability analysis across five random seeds exposed a methodologically important finding: the \textit{identity} of the selected wavelengths is moderately sensitive to the data partition, even when the \textit{number and performance} of the selected bands remain stable (Table~\ref{tab:bfs_stability_summary}).
+The best CRACK PR--AUC ranged from 0.812 to 0.998 across seeds, and the optimal number of features varied between 64 and 153, revealing substantial sensitivity to the calibration--validation partition.
+Mean pairwise Jaccard similarity was 0.493 for the top-30 subsets and 0.398 for the top-11 subsets (Tables~\ref{tab:jaccard_30}--\ref{tab:jaccard_11}), indicating that roughly half of the selected wavelengths change from one random split to another.
+
+\noindent
+This level of variability is not unexpected in wrapper-based feature selection on high-dimensional, correlated data \cite{liu2022feature}: when adjacent spectral channels are highly collinear, BFS can substitute one for another without measurable loss, producing different subsets that are functionally equivalent.
+Similar instability has been reported in filter-based hyperspectral band selection studies, where mutual-information and Fisher-score methods often yield non-unique solutions when inter-band correlation is high \cite{gu2012generalized,vergara2014review,ding2023mutual}.
+The key finding is that certain wavelengths resist this substitution entirely.
+The four universally stable wavelengths---452.25, 548.55, 580.90, and 729.53\,nm---were retained by every seed at both the 11-feature and 30-feature levels (Figures~\ref{fig:stability_11_popularity}--\ref{fig:stability_30_heatmap}).
+
+\noindent
+These four wavelengths anchor the sensor design recommendation of this study.
+Their spectral locations correspond to physiologically interpretable regions: the Soret band (452\,nm), the green reflectance trough (548\,nm), the anthocyanin shoulder (580\,nm), and the red-edge inflection (729\,nm), as discussed in Section~\ref{ch:discussion}.
+A multispectral sensor incorporating these four channels, supplemented by additional bands drawn from the broader intersection set (13 common wavelengths at the 30-feature level), would capture the essential information for crack detection while minimising hardware complexity.
+This approach is consistent with the emerging trend in precision agriculture toward application-specific multispectral sensors that target physiologically meaningful bands rather than employing full hyperspectral coverage \cite{RAM2024109037,benelli2020hyperspectral}.
+
+\noindent
+An important caveat is that this stability analysis was conducted on a single cultivar (`Scarlotta') in a single growing region (Lachish, Israel).
+Other cultivars with different anthocyanin profiles, cuticle thickness, or mesocarp water content may shift the optimal wavelength positions \cite{Chang2021,Khadivi2014}.
+Cross-cultivar validation experiments would be needed before recommending a fixed filter configuration for commercial deployment.
+
+
+%% ================================================================
+%%  6.  GENERALIZATION GAPS
+%% ================================================================
+\section{Generalization Gaps Between Calibration and Test Sets}
+
+\noindent
+Across every experimental configuration examined in this study, test-set performance was consistently lower than calibration-set performance, revealing a generalization gap that warrants careful interpretation (Table~\ref{tab:mcc_generalization}).
+The gap was particularly pronounced in the late-stage scenario, where the MCC dropped from 0.877--0.897 on the calibration split to 0.605--0.665 on the test split, representing a reduction of more than 20 percentage points.
+The early-stage gap was narrower in absolute terms (approximately 6--15 percentage points), but the baseline performance was also lower, meaning that the test-set MCC hovered between 0.587 and 0.645.
+
+\noindent
+Several factors contribute to this pattern.
+The most fundamental is the difference in data provenance between the calibration and test sets.
+By design, calibration images were drawn from Row~1 of the vineyard, while test images came from Row~2 (Table~\ref{tab:full_image_dataset_composition}).
+Although both rows belonged to the same experimental vineyard and experienced the same irrigation treatments, they differed in vine age uniformity, canopy architecture, and micro-environmental conditions such as wind exposure and shading.
+These factors introduce a spatial domain shift---a systematic difference in the joint distribution of spectral features and labels---that is invisible during cross-validation within a single row but manifests as a performance drop when the model is applied to a new spatial domain.
+Such spatial domain shifts are increasingly recognised as a major challenge in agricultural remote sensing, where models trained on one field or plot often degrade when transferred to another, even within the same farm \cite{RAM2024109037,c5ae649d7cf34cb7aaf3b08a25dbd79d}.
+Kaltenborn et~al.\ \cite{kaltenborn2025data} and Li et~al.\ \cite{li2023information} have emphasised that proper data splitting is essential to avoid information leakage in hyperspectral classification, and the row-based spatial split used in this study represents a conservative strategy that exposes rather than conceals the generalization challenge \cite{kaufman2012leakage}.
+
+\noindent
+The interaction between the number of retained wavelengths and the generalization gap adds nuance (Table~\ref{tab:mcc_generalization}).
+For the early-stage scenario, the 30-wavelength subset produced the highest test MCC (0.6447) and a moderate gap (0.0785), whereas the 9-wavelength configuration yielded a larger gap (0.1508) and the full 159-wavelength cube yielded a gap of 0.0560 but a lower absolute test MCC (0.6071).
+This non-monotonic pattern suggests that an intermediate level of spectral dimensionality strikes a balance between under-fitting (too few features to capture the signal) and over-fitting (too many features that encode row-specific noise).
+The 30-wavelength configuration may therefore represent a practically optimal compromise between signal retention and generalization stability, an observation consistent with well-known bias--variance trade-off principles \cite{menze2009comparison}.
+
+\noindent
+For the late-stage scenario, the generalization gaps were uniformly larger (0.21--0.29; Table~\ref{tab:mcc_generalization}), likely because the higher calibration MCC reflects over-optimisation of the post-processing thresholds on the more separable late-stage data.
+When these thresholds are applied to the test row, the mismatch between the calibration and test spectral distributions becomes more consequential.
+
+\noindent
+For future operational systems, these generalization gaps have direct implications.
+Models calibrated on one section of a vineyard---or one season---should not be deployed without adaptation to a new section or a new season.
+Transfer-learning strategies, domain-adaptation techniques, or ensemble approaches that incorporate data from multiple rows and time points could mitigate this limitation and are recommended as a priority for future research.
+
+
+%% ================================================================
+%%  7.  SUPERVISED CLASSIFICATION VS. ANOMALY DETECTION
+%% ================================================================
+\section{Supervised Classification versus Anomaly Detection}
+
+\noindent
+A deliberate objective of this study was to compare supervised and unsupervised approaches to crack detection, both at the pixel level and within the full-image pipeline.
+The comparison yielded a clear and instructive conclusion: supervised classifiers consistently outperformed autoencoder-based anomaly detection, and the margin of superiority widened as the task complexity increased.
+
+\noindent
+At the pixel level, the autoencoder trained exclusively on cracked pixels performed surprisingly well in the multi-class setting, achieving accuracy above 0.96 and PR--AUC of 0.9999 (Table~\ref{tab:autoencoder_pixel_results_crack_only_multiclass_balanced}).
+This success can be attributed to the narrow spectral manifold learned by the model: crack signatures occupy a well-defined region of the spectral space, and all other classes (leaf, wood, soil, plastic, healthy tissue) produce larger reconstruction errors precisely because they are spectrally dissimilar.
+This finding is consistent with the spectral separability analysis (Table~\ref{tab:separability_scores}), which showed that cracked tissue occupies a distinct low-reflectance region in both VIS and NIR, well separated from the other vineyard materials.
+
+\noindent
+The reverse configuration---training on all classes except cracked and flagging high reconstruction error as anomalous---failed almost completely, with cracked-class recall of 0.000 under balanced sampling and 0.011--0.111 under unbalanced sampling (Table~\ref{tab:autoencoder_pixel_results_noncrack_multiclass_balanced}).
+This failure is not incidental; it reflects a fundamental property of the spectral space.
+Because the non-crack classes span a much wider spectral range (from soil and plastic in the VIS to leaf and wood in the NIR), the autoencoder learns a reconstruction manifold that is broad enough to accommodate crack spectra as well.
+The reconstruction error for crack pixels is therefore no larger than for normal tissue, eliminating the anomaly-detection signal.
+This finding aligns with the theoretical analysis of anomaly detection in high-dimensional spaces: when the normal class is heterogeneous, the learned representation often generalises to anomalous samples that fall within the convex hull of the training manifold \cite{gewali2022machine}.
+
+\noindent
+At the whole-image level, the autoencoder-based pipeline achieved a test MCC of only $-0.058$ in the early-stage scenario (Table~\ref{tab:full_image_autoencoder_metrics}), indicating performance indistinguishable from---or slightly worse than---chance.
+Even in the late-stage scenario, where cracks are macroscopically visible, the autoencoder pipeline underperformed the supervised classifier by approximately 22 MCC points (0.375 vs.\ 0.598; cf.\ Tables~\ref{tab:full_image_autoencoder_metrics} and~\ref{tab:full_image_early_late_metrics}).
+The degradation from pixel to whole-image level was substantially more severe for the autoencoder than for the supervised model, because the autoencoder's pseudo-probability scores---derived from an exponential mapping of reconstruction errors (e.g., $p_{\mathrm{CRACK}}(x)=\exp(-e(x)/\tau)$)---are less calibrated than the true posterior probabilities produced by the supervised XGBoost classifier \cite{chen2016xgboost}.
+When these poorly calibrated scores are propagated through the same spatial post-processing pipeline, the resulting image-level decisions become unreliable.
+
+\noindent
+These results lead to a clear recommendation: for crack detection in table grapes, the supervised classification paradigm is strongly preferred.
+Anomaly detection approaches may remain relevant for applications in which labelled training data are genuinely unavailable, but in the context of this study---where SAM2-assisted annotation \cite{ravi2024sam2} made large-scale pixel-level labelling feasible---the investment in labelled data pays dividends in detection accuracy.
+
+\noindent
+An additional insight emerges from the asymmetry between the two autoencoder training strategies.
+The crack-trained autoencoder's success suggests that cracked tissue possesses a coherent, low-dimensional spectral signature that is well-separated from other vineyard materials.
+This property is itself a validation of the spectral distinguishability hypothesis (Hypothesis~1) and reinforces the argument that cracking induces a characteristic and physically interpretable spectral alteration.
+
+
+%% ================================================================
+%%  8.  PRACTICAL IMPLICATIONS FOR PRECISION VITICULTURE
+%% ================================================================
+\section{Practical Implications for Precision Viticulture}
+
+\noindent
+The results of this study translate into several actionable recommendations for the grape industry, situated within the broader context of precision agriculture and data-driven crop management \cite{mgendi2024unlocking,soussi2024smart}.
+
+\noindent
+The first and most immediate implication is that hyperspectral imaging, even in its current portable configuration (Specim~IQ; \cite{behmann2018specim}), can provide a practical early-warning screening signal for cracking susceptibility.
+A grower who images grape clusters during the early ripening period and processes each scene through the whole-image spatial aggregation pipeline described in this study can obtain a conservative warning signal weeks earlier than visual scouting alone.
+This lead time could be exploited to adjust irrigation scheduling---a well-established lever for managing berry turgor and cracking risk \cite{Chang2019,Khadivi2014}---apply targeted calcium or sorbitol-based spray treatments \cite{horticulturae11111320,plants13172400}, or advance the harvest of at-risk sections.
+The economic significance of such advance warning is considerable: cracking causes not only direct yield losses but also facilitates secondary fungal infection, particularly sour rot, which further reduces marketability \cite{Hall2018,OWOYEMI2024113013}.
+
+\noindent
+From an operational perspective, the most plausible near-term deployment workflow supported by the present data is \emph{non-destructive single-acquisition screening with conservative, calibrated warnings}. Concretely, each imaged cluster scene would be processed end-to-end with the same spectral model \emph{and} the spatial aggregation stage (morphological filtering and crack-percentage decision) that was tuned on the calibration split (Section~\ref{sec:pixel-level-failure-field}; Table~\ref{tab:full_image_early_late_metrics}). The output should be interpreted as a cluster-level screening score for that acquisition, recognizing that the whole-image pipeline is explicitly designed to suppress background-induced false positives that dominate field scenes. The data support two implementable refinements: (i) a reduced-band configuration can be used without sacrificing---and in the early-stage case even improving---independent Row~2 performance (Table~\ref{tab:full_image_wavelength_results}), and (ii) the BFS stability results provide a physically grounded starting point for a future multispectral device (452.25, 548.55, 580.90, 729.53\,nm; Figures~\ref{fig:stability_11_popularity}--\ref{fig:stability_30_heatmap}) that could make such screening cheaper and higher-throughput. By contrast, moving from this calibrated workflow to \emph{standalone} decision thresholds that generalize across rows, cultivars, and seasons remains future work, given the observed calibration-to-test generalization gaps (Table~\ref{tab:mcc_generalization}) and the current reliance on calibration-tuned post-processing.
+
+\noindent
+The second implication concerns sensor cost.
+The BFS analysis demonstrates that 9--30 carefully chosen wavelengths capture essentially the same information as the full 159-channel spectrum (Table~\ref{tab:bfs_thresholds_summary}).
+This finding opens the door to custom multispectral cameras---potentially mounted on unmanned aerial vehicles (UAVs) or tractor-mounted platforms---that combine high throughput with low per-unit cost \cite{benelli2020hyperspectral,RAM2024109037}.
+The four universally stable wavelengths identified by the stability analysis (452, 548, 580, 729\,nm) provide a concrete starting point for filter specification.
+This transition from hyperspectral to multispectral is an active frontier in precision agriculture, where application-specific band selection has been shown to yield cost-effective screening solutions without sacrificing performance \cite{agriculture13051086,c5ae649d7cf34cb7aaf3b08a25dbd79d}.
+The CrackSense project \cite{CrackSense2022}, a Horizon Europe initiative focused on real-time sensing and early warning of fruit cracking, shares this vision of scalable sensing for cracking management.
+
+\noindent
+The third implication relates to the full-image pipeline architecture.
+The study demonstrates that pixel-level classifiers, however accurate in isolation, require spatial post-processing (morphological filtering, patch aggregation, threshold optimisation) to translate spectral classification outputs into actionable vineyard-level decisions.
+This multi-stage architecture---pixel classification, spatial aggregation, and calibrated thresholding---constitutes a deployable decision-support system that can be embedded in existing vineyard management platforms \cite{krisnawijaya2022data,AHMED2025100848}.
+
+\noindent
+Finally, the observed sensitivity to water-related spectral features suggests that hyperspectral sensing could serve a dual purpose: screening cracking risk and simultaneously assessing vine water status.
+These two applications are physiologically linked through berry turgor and cuticle permeability \cite{Chang2019,YU20251506}, and a single imaging survey could inform both irrigation management and harvest-timing decisions.
+This synergy between cracking early-warning screening and water-status assessment represents a compelling value proposition for growers considering investment in spectral sensing infrastructure.
+
+
+%% ================================================================
+%%  9.  LIMITATIONS
+%% ================================================================
+\section{Limitations of the Study}
+
+\noindent
+Despite the breadth of the experimental programme, several limitations should be acknowledged because they constrain how the reported metrics should be interpreted and how the system could be deployed.
+
+\begin{itemize}
+	\item \textbf{Single cultivar, site, and season.} All experiments were conducted on a single cracking-susceptible cultivar (`Scarlotta Seedless') in one region and one growing season. The wavelength subsets and performance levels reported here may shift under different anthocyanin profiles, cuticle properties, and phenological timing \cite{Khadivi2014,Chang2021}. \emph{Implication:} results should be treated as cultivar- and site-conditional evidence; operational use would require re-validation (and potentially re-calibration) across cultivars and seasons.
+
+	\item \textbf{Observed spatial domain shift (Row~1\,$\rightarrow$\,Row~2) limits transfer.} The experimental design intentionally used a spatially separated test row, and the resulting calibration-to-test drops (Table~\ref{tab:mcc_generalization}) demonstrate that performance is sensitive to spatial domain shift even within a single vineyard. \emph{Implication:} a model tuned on one block/row should not be assumed to transfer unchanged to another; deployment should incorporate periodic re-calibration, multi-row training data, or explicit domain-adaptation strategies.
+
+	\item \textbf{Field illumination and scene complexity are a dominant error source.} Whole-image performance was substantially lower than pixel-level performance (Tables~\ref{tab:pixel_metrics_unbalanced}--\ref{tab:pixel_metrics_balanced} vs.~Table~\ref{tab:full_image_early_late_metrics}), consistent with uncontrolled illumination geometry, BRDF/specular effects on curved berries, and background clutter in vineyard scenes (Section~\ref{sec:pixel-level-failure-field}). \emph{Implication:} reported whole-image metrics already reflect these real-world factors, but robustness in new lighting/canopy conditions may require stricter acquisition protocols (e.g., standardized geometry, shading control) and/or improved radiometric and spectral--spatial normalization.
+
+	\item \textbf{Pixel-level labels are not perfectly objective.} Although SAM2-assisted annotation enabled scale \cite{ravi2024sam2}, boundaries between crack and intact tissue are ambiguous at the pixel scale (mixed pixels, sub-pixel fissures, and stain/shadow artefacts). This introduces label noise that can inflate or depress pixel-level metrics and can propagate into the full-image pipeline. \emph{Implication:} pixel-level ``near-ceiling'' results should be interpreted as conditional on the labeling protocol; future work should quantify inter-annotator consistency or use uncertainty-aware labels for boundary regions.
+
+	\item \textbf{Sensor spatial resolution imposes a detection floor.} The Specim~IQ resolution (approximately 1.08\,mm per pixel at 1\,m; \cite{behmann2018specim}) limits sensitivity to micro-fissures and increases mixed-pixel ambiguity at crack edges \cite{bioucas2013hyperspectral}. \emph{Implication:} early-stage cracking that is smaller than a few pixels may be missed even if a physiological signal exists; higher-resolution imaging, closer working distances, or patch-based spectral--spatial models are likely required for reliable micro-crack detection.
+
+	\item \textbf{Post-processing and threshold tuning were optimized on a small calibration set.} The whole-image decision depends on probability thresholds, morphological kernels, and crack-percentage criteria optimized via Optuna on Row~1 (Table~\ref{tab:full_image_dataset_composition}). The fact that these parameters did not eliminate the generalization gap (Table~\ref{tab:mcc_generalization}) indicates residual sensitivity to distribution shift. \emph{Implication:} in deployment, thresholds should be monitored for drift and re-tuned as conditions change; conservative operating points (higher precision, lower recall) may be preferable for early-warning screening.
+\end{itemize}
+
+
+%% ================================================================
+%%  10.  FUTURE RESEARCH DIRECTIONS
+%% ================================================================
+\section{Future Research Directions}
+
+\noindent
+The findings and limitations of this study suggest several concrete directions for future investigation, ordered by scientific priority and practical impact.
+
+\noindent
+The highest priority is multi-season validation.
+The models should be re-trained and tested on data from at least two additional growing seasons to assess cross-season generalization and to determine whether the calibration-to-test gap can be reduced through more diverse training data and improved calibration protocols.
+Given that environmental forcing, vine physiology, and cracking incidence vary inter-annually \cite{Khadivi2014,Chang2019}, robustness cannot be assumed from a single-season study.
+
+\noindent
+A second priority is cross-cultivar generalisation.
+Experiments on cultivars with contrasting skin properties---thin-cuticle varieties prone to cracking versus thick-cuticle varieties that are resistant---would reveal whether the four stable wavelengths have universal relevance or are cultivar-specific.
+Santos et~al.\ \cite{santos2023molecular} reviewed the molecular mechanisms underlying fruit cracking across species, and cross-cultivar spectral studies would establish whether common physiological pathways produce transferable spectral signatures.
+
+\noindent
+Third, the integration of spatial models deserves attention.
+The current pipeline treats each pixel independently and relies on post-hoc morphological filtering for spatial coherence.
+Convolutional or transformer-based architectures that jointly reason over spatial neighbourhoods and spectral channels \cite{Chen2024MutationHSI,DHANYA2022211} could learn to distinguish true crack boundaries from background edges, potentially eliminating the need for hand-tuned post-processing parameters and improving robustness under variable field conditions.
+
+\noindent
+Fourth, the complementary thermal data acquired during this study offer an opportunity for multi-modal fusion.
+A combined spectral-thermal model could exploit the distinct failure signatures captured by each modality: spectral changes in reflectance associated with pigment and water loss, and thermal anomalies associated with altered evaporative cooling at crack sites \cite{mahlein2016plant}.
+
+\noindent
+Fifth, the BFS-derived wavelength subsets should be validated using a physical multispectral sensor rather than by computationally subsetting the hyperspectral cube.
+A true hardware validation would account for differences in filter bandwidth, signal-to-noise ratio, and radiometric calibration that are abstracted away in a simulation-based feature selection \cite{benelli2020hyperspectral}.
+This validation step is essential before recommending the four-wavelength configuration for commercial sensor manufacturing.
+
+\noindent
+Sixth, the autoencoder-based anomaly detection framework could be revisited with more expressive generative models.
+Variational autoencoders with spectral-specific priors, normalizing flows, or diffusion-based models could provide sharper reconstruction boundaries and improved anomaly scoring, particularly in the non-crack training configuration that failed comprehensively in the present study.
+
+\noindent
+Finally, the operational deployment of the pipeline on UAV-mounted or tractor-mounted multispectral platforms should be piloted.
+Such a deployment would test the end-to-end system under realistic throughput, altitude, and illumination conditions, and would provide the evidence base needed for commercial adoption by the viticulture industry \cite{CrackSense2022,mgendi2024unlocking}.
+
+
+%% ================================================================
+%%  11.  CONCLUDING PERSPECTIVE
+%% ================================================================
+\section{Concluding Perspective}
+
+\noindent
+This study began with a straightforward question: can hyperspectral imaging detect grape cracking?
+The answer---emphatically supported at the pixel level and cautiously affirmed at the whole-image level---opens a broader vista.
+
+\noindent
+The spectral markers identified here are not arbitrary correlates; they reflect the physical and physiological processes that precede and accompany cuticle failure: pigment degradation \cite{Castellarin2016,blackburn2007}, water loss \cite{Chang2019,YU20251506}, altered scattering, and red-edge suppression \cite{thenkabail2016hyperspectral}.
+The fact that these markers are detectable before macroscopic cracking appears transforms the paradigm from reactive visual inspection to proactive, non-destructive early-warning detection---a shift with immediate consequences for vineyard management.
+
+\noindent
+The pathway from a 159-channel research camera to a compact multispectral sensor with fewer than a dozen filters is now quantitatively justified by the BFS and stability analyses (Tables~\ref{tab:bfs_thresholds_summary}--\ref{tab:jaccard_11}; Figures~\ref{fig:stability_11_popularity}--\ref{fig:stability_30_spectrum}).
+The four universally stable wavelengths provide a minimal spectral fingerprint that is both physiologically grounded and computationally robust, offering a bridge between laboratory science and vineyard operations.
+
+\noindent
+At the same time, the generalization gaps documented in this study (Table~\ref{tab:mcc_generalization}) serve as a necessary reminder that spectral models, like all empirical tools, require continued validation as cultivars, seasons, and management practices change \cite{RAM2024109037,su16146064}.
+The contribution of the present work lies not only in the specific models and wavelengths reported, but in the methodological framework---from pixel-level spectral analysis through spatially informed aggregation to stability-guided sensor design---that can be adapted and extended as new data become available.
+
+\noindent
+In the broader context of precision viticulture, this research demonstrates that early, non-destructive crop screening using spectral sensing is not merely a theoretical possibility but an operational strategy within reach \cite{mgendi2024unlocking,CrackSense2022}.
+Closing the remaining gaps---multi-season validation, cross-cultivar testing, multi-modal fusion, and hardware integration---will bring this strategy from the research vineyard to the commercial field.

@@ -1,0 +1,70 @@
+================================================================================
+RESULTS AND DISCUSSION: MODEL COMPARISON
+LDA vs XGBoost for Crack Detection in Grapes
+================================================================================
+
+3.X. Model Architecture Comparison
+
+To establish the optimal classification architecture for crack detection, we conducted a comprehensive comparison between Linear Discriminant Analysis (LDA) and XGBoost using all 204 hyperspectral features. The evaluation employed Leave-One-Group-Out (LOGO) cross-validation across 20 independent grape bunches to ensure robust generalization assessment while maintaining biological independence between training and validation sets.
+
+3.X.0. Selection of Primary Evaluation Metric
+
+Given the inherent class imbalance in our dataset—where crack instances constitute a minority class—we selected Precision-Recall Area Under the Curve (PR-AUC) as our primary comparison metric. This choice is methodologically superior to traditional F1-score or ROC-AUC for several critical reasons:
+
+First, PR-AUC provides a threshold-independent evaluation by computing the area under the precision-recall curve across ALL possible decision thresholds (Davis & Goadrich, 2006). Unlike F1-score, which evaluates performance at a single, arbitrary threshold (typically 0.5), PR-AUC assesses the model's capability to maintain the precision-recall trade-off across the entire operating range. This is crucial for agricultural applications where the optimal detection threshold may vary based on economic costs of false positives versus false negatives.
+
+Second, for imbalanced datasets, PR-AUC is demonstrably more informative than ROC-AUC (Saito & Rehmsmeier, 2015). ROC-AUC incorporates true negative rate in its calculation, which can create an optimistic bias when the negative class (non-crack samples) vastly outnumbers the positive class. A classifier that simply predicts 'no crack' for most samples can achieve high ROC-AUC purely from correctly identifying abundant negative instances. In contrast, PR-AUC focuses exclusively on precision (positive predictive value) and recall (sensitivity), making it immune to inflation from true negatives and thus providing a more conservative, realistic assessment of minority class detection capability.
+
+Third, PR-AUC directly reflects the practical utility for crack detection scenarios. Precision quantifies the proportion of crack predictions that are correct (minimizing unnecessary interventions), while recall measures the proportion of actual cracks successfully detected (minimizing missed defects). The PR-AUC thus summarizes the model's ability to achieve both goals simultaneously across all threshold configurations, providing stakeholders with a single, interpretable metric for comparing classification architectures.
+
+3.X.1. Overall Performance Comparison
+
+XGBoost demonstrated superior performance across all evaluation metrics. Our primary metric, Precision-Recall AUC (PR-AUC), specifically measures the model's ability to maintain the precision-recall trade-off across all possible decision thresholds—a crucial capability for imbalanced datasets where the CRACK class represents a minority. XGBoost achieved a PR-AUC of 0.934 ± 0.325, substantially outperforming LDA's 0.729 ± 0.325 (Table X). This represents a 28.2% relative improvement in threshold-independent crack detection capability.
+
+The F1-score, while useful as a single-point metric at the default threshold, showed XGBoost achieving 0.868 ± 0.136 compared to LDA's 0.586 ± 0.264. The ROC-AUC further confirmed XGBoost's superior discriminative power (AUC = 0.994) compared to LDA (AUC = 0.963). However, for imbalanced datasets, PR-AUC provides a more reliable assessment as it focuses exclusively on positive class performance without being inflated by the large number of true negatives that dominate ROC-AUC calculations.
+
+3.X.2. The Accuracy Paradox and Class Imbalance
+
+While both models exhibited high global accuracy (LDA: 0.921, XGBoost: 0.982), this metric proved misleading due to the inherent class imbalance in the dataset, where crack instances represent a minority class. The Matthews Correlation Coefficient (MCC), a more balanced metric for imbalanced datasets (Chicco & Jurman, 2020), revealed the true performance disparity: XGBoost (MCC = 0.975) significantly outperformed LDA (MCC = 0.892). This substantial difference underscores the "accuracy paradox" phenomenon, where high overall accuracy can mask poor minority class detection—a critical consideration in agricultural defect detection where rare but economically significant defects must be reliably identified.
+
+3.X.3. Linear vs. Non-Linear Feature Interactions
+
+The superior performance of XGBoost can be attributed to its capacity to model complex, non-linear relationships within the hyperspectral feature space. LDA, as a linear discriminant classifier, assumes that class boundaries can be adequately represented by linear decision surfaces—an assumption that appears insufficient for the biological complexity of grape crack detection. The spectral signatures associated with crack formation likely involve intricate interactions between multiple wavelength bands, reflecting the complex biochemical and structural changes in damaged tissue. XGBoost's ensemble of decision trees can effectively capture these non-linear feature interactions and higher-order dependencies, as evidenced by the feature importance analysis (Figure X), which revealed complex patterns of wavelength co-dependence that would be invisible to linear methods.
+
+3.X.4. Robustness and Generalization
+
+The consistency of XGBoost's performance across LOGO folds (F1 std: 0.136) compared to LDA (F1 std: 0.264) demonstrates superior generalization capability across diverse grape samples. The ROC curve analysis (Figure X) illustrates that XGBoost maintains high true positive rates while controlling false positive rates across various decision thresholds, indicating robust performance independent of specific operating points. This robustness is particularly crucial for practical deployment in precision viticulture, where the model must reliably perform across varying environmental conditions, grape varieties, and phenological stages.
+
+3.X.5. Implications for Feature Selection
+
+These findings establish XGBoost as the preferred classification architecture for subsequent feature selection experiments. The model's ability to handle class imbalance through sample weighting, combined with its capacity to exploit non-linear feature relationships, positions it as the optimal choice for identifying the minimal set of diagnostic wavelengths necessary for crack detection. Furthermore, XGBoost's inherent feature importance metrics provide valuable insights into spectral band relevance, which can guide the subsequent mRMR (Minimum Redundancy Maximum Relevance) feature selection process.
+
+================================================================================
+
+TABLE X: Comprehensive Performance Comparison
+--------------------------------------------------------------------------------
+Metric                              LDA                    XGBoost                Improvement    
+--------------------------------------------------------------------------------
+PR-AUC (CRACK Class) *PRIMARY*      0.729 ± 0.325      0.934 ± 0.104      +28.2%
+F1-Score (CRACK)                    0.586 ± 0.264      0.868 ± 0.136      +48.1%
+Precision (CRACK)                   0.493 ± 0.238      0.919 ± 0.093      +86.4%
+Recall (CRACK)                      0.770 ± 0.324      0.847 ± 0.193      +10.0%
+ROC-AUC (CRACK vs Others)           0.963 ± 0.059      0.994 ± 0.010      +3.2%
+MCC                                 0.892 ± 0.018      0.975 ± 0.014      +9.3%
+Accuracy (Global)                   0.921 ± 0.011      0.982 ± 0.011      +6.7%
+--------------------------------------------------------------------------------
+
+Note: Values represent mean ± standard deviation across LOGO cross-validation folds.
+Improvement percentages calculated as relative change from LDA baseline.
+*PRIMARY METRIC: PR-AUC (Precision-Recall AUC) for CRACK class provides threshold-
+independent evaluation ideal for imbalanced datasets. Unlike ROC-AUC, PR-AUC focuses
+on positive class performance and is not inflated by true negatives.
+MCC: Matthews Correlation Coefficient, balanced metric for imbalanced datasets.
+ROC-AUC: Area Under the ROC Curve, threshold-independent but can be optimistic.
+
+================================================================================
+REFERENCES
+================================================================================
+Chicco, D., & Jurman, G. (2020). The advantages of the Matthews correlation
+    coefficient (MCC) over F1 score and accuracy in binary classification
+    evaluation. BMC Genomics, 21(1), 1-13.

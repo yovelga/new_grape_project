@@ -1,0 +1,88 @@
+\newpage
+\usepackage[backend=biber,style=ieee]{biblatex}
+\addbibresource{references.bib}
+
+\appendix
+\chapter{Additional Charts} \label{app:extra}
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=\textwidth,height=0.95\textheight,keepaspectratio]{feature_frequency_heatmap_full.pdf}
+  \caption{Wavelength Sensitivity Analysis — full feature-frequency heatmap.}
+  \label{fig:heatmap_full}
+\end{figure}
+
+% ROC AUC vs k
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=\linewidth]{perf_vs_k__mean_roc_auc.png}
+  \caption{Performance (ROC AUC) vs.\ $k$ for LDA and Logistic Regression (SFS, LOGO). The curve saturates near $k \approx 10\text{--}12$.\textcolor{red}{WHY DOUBLE}?}
+  \label{fig:perf-vs-k-roc}
+\end{figure}
+
+% Marginal gain ROC AUC
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=\linewidth]{marginal_gain__mean_roc_auc.png}
+  \caption{Marginal gain ($\Delta$ ROC AUC) vs.\ $k$. Most of the improvement arrives with the first few wavelengths.}
+  \label{fig:marginal-gain-roc}
+\end{figure}
+
+% Cumulative delta ROC AUC
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=\linewidth]{cumulative_delta__mean_roc_auc.png}
+  \caption{Cumulative $\Delta$ ROC AUC relative to $k{=}1$. Gains plateau around $k \approx 10\text{--}12$.}
+  \label{fig:cum-delta-roc}
+\end{figure}
+
+
+
+\appendix
+\section{CNN Training Diagnostics}
+
+\subsection{Segmentation Input}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{cnn/segmentation/confusion_matrix.png}
+    \caption{Confusion Matrix — Segmentation Input}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{cnn/segmentation/training_history.png}
+    \caption{Training History — Segmentation Input}
+\end{figure}
+
+\subsection{BBOX Input}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{cnn/bbox/confusion_matrix.png}
+    \caption{Confusion Matrix — BBOX Input}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{cnn/bbox/training_history.png}
+    \caption{Training History — BBOX Input}
+\end{figure}
+
+\subsection{Enlarged Input}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{cnn/enlarge/confusion_matrix.png}
+    \caption{Confusion Matrix — Enlarged Input}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{cnn/enlarge/training_history.png}
+    \caption{Training History — Enlarged Input}
+\end{figure}
+
+
+
+
+
+
+
+
+
+\printbibliography
