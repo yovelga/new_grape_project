@@ -22,7 +22,7 @@ To support consistent comparisons across tasks, each set of results in this chap
     \item \textbf{BFS wavelength-selection reference.} BFS results are reported as \textbf{performance vs. number of selected wavelengths} relative to the \textbf{full-spectrum baseline} (159 wavelengths within 450--925\,nm). The performance trajectories are shown in Figure~\ref{fig:bfs_dual_metric} and Figure~\ref{fig:bfs_threshold_markers}, and the derived wavelength-count thresholds are summarized in Table~\ref{tab:bfs_thresholds_summary}. Whole-image test-set performance at representative wavelength counts (including the full-spectrum baseline at 159 wavelengths) is reported in Table~\ref{tab:full_image_wavelength_results}.
 \end{itemize}
 
-\section{Spectral Signature Characterization}
+\section{Spectral Separability and Informative Wavelengths}
 \label{sec:spectral-characterization}
 
 \noindent
@@ -42,6 +42,9 @@ The analysis focuses on class-level spectral trends and variability, without fit
 \end{figure}
 
 \FloatBarrier
+
+\noindent
+Cracked tissue shows lower reflectance than healthy tissue across the full VIS--NIR range, with the divergence most pronounced beyond 700\,nm.
 
 \noindent
 To provide a compact quantitative summary, reflectance values were aggregated over two broad spectral regions corresponding to the visible (VIS) and near-infrared (NIR) ranges.
@@ -66,6 +69,10 @@ To provide a compact quantitative summary, reflectance values were aggregated ov
 \end{table}
 
 \FloatBarrier
+
+\noindent
+Healthy tissue reflectance exceeds cracked tissue by 32\% in the NIR (0.660 vs.\ 0.450) and 37\% in the VIS (0.218 vs.\ 0.137). Cracked tissue also shows lower VIS standard deviation (0.076 vs.\ 0.128), indicating a more homogeneous spectral response.
+
 \newpage
 
 \subsection{Spectral Separability Across Wavelength Regions}
@@ -73,6 +80,9 @@ To provide a compact quantitative summary, reflectance values were aggregated ov
 \noindent
 This subsection quantifies the degree of spectral separation between healthy and cracked tissue across predefined wavelength regions.
 The goal is to identify spectral ranges exhibiting the strongest inter-class contrast, without invoking classification models.
+
+\noindent
+Two filter-based metrics are used. \textbf{Cohen's $d$}~\cite{cohen1988statistical} measures the standardised mean difference between classes, $d = |\mu_1 - \mu_2| / \sigma_{\mathrm{pooled}}$, thereby penalising high intra-class variance; by convention, $d \geq 0.8$ denotes a large effect and $d > 1.2$ a very large effect, indicating robust spectral discriminability~\cite{cohen1988statistical}. The \textbf{Fisher Score} (linear discriminant criterion) quantifies the ratio of inter-class variance to intra-class variance across each wavelength band, making it a standard criterion for discriminative band selection in hyperspectral analysis~\cite{duda2001pattern}; unlike the absolute mean difference, both metrics explicitly account for class spread, providing a more reliable indicator of learnable separation.
 
 \begin{figure}[htbp]
     \centering
@@ -124,39 +134,27 @@ To facilitate regional-level comparison, the wavelength-wise separability measur
 
 \medskip
 \noindent
-Figures~\ref{fig:spectral_separability} and \ref{fig:regional_summary}, together with Table~\ref{tab:separability_scores}, quantify wavelength-wise and regional separability between healthy and cracked tissue without invoking a classifier.
-The next section evaluates whether supervised learning models can exploit these measured differences to discriminate cracked pixels under the group-aware protocol.
-Binary and extended labeling results are reported in Tables~\ref{tab:pixel_metrics_unbalanced}--\ref{tab:pixel_metrics_balanced} and Tables~\ref{tab:pixel_metrics_unbalanced_all}--\ref{tab:pixel_metrics_balanced_all}.
+The NIR region yields substantially higher separability than the VIS range: mean Cohen's $d$ rises from 0.633 to 1.622, with peak values at 727--757\,nm ($d_{\max} = 2.688$; Fisher$_{\max} = 3.631$).
+
+\medskip
+\noindent
+The following sections evaluate whether supervised and unsupervised models can exploit these spectral differences for crack detection.
 
 
-\section{Pixel-Level Classification Performance}
+\section{Pixel-Level Binary Classification}
 \label{sec:pixel-level-classification}
 
 \noindent
-This section reports the performance of supervised pixel-level classification models trained on hyperspectral signatures.
-
-\subsection{Experimental Setup and Evaluation Protocol}
-
-\noindent
-Pixel-level classification performance was evaluated using a cross-validation framework designed to assess generalization across grape clusters.
-Standard classification metrics were computed for all experiments.
-For a compact summary of the evaluation units and split strategies used across all experiments (pixel-level, anomaly detection, and whole-image), see Table~\ref{tab:evaluation_units_splits}.
+This section reports pixel-level classification performance for distinguishing healthy from cracked tissue using supervised models.
+Evaluation uses the LOGO cross-validation protocol described in Section~\ref{subsec:evaluation_protocols}.
 
 \graphicspath{{results/Binary_Pixel_Level_Classification/}}
 
-% ==========================================================
-% Binary Pixel-Level Classification Results
-% ==========================================================
-\subsection{Binary Pixel-Level Classification Results}
-
 \noindent
-Binary pixel-level classification was evaluated for distinguishing healthy from cracked tissue.
-Performance was assessed using ranking-based metrics (ROC--AUC and, where reported, PR--AUC) together with class-specific Precision and Recall
-for the \textit{Cracked} class (positive class). Under class imbalance, PR--AUC\textsubscript{CRACK} is treated as the primary separability metric (see Section~\ref{subsec:evaluation_protocols}).
+PR--AUC\textsubscript{CRACK} is the primary metric; ROC--AUC, Precision, and Recall for the \textit{Cracked} class are reported as secondary metrics.
+Two sampling regimes were compared: the original imbalanced distribution and a class-balanced configuration.
 
-Two sampling regimes were considered: the original naturally imbalanced distribution and a class-balanced configuration.
-
-\subsubsection{Unbalanced vs.\ Balanced Training Sets}
+\subsection{Unbalanced vs.\ Balanced Training Sets}
 
 \noindent
 Results obtained under both sampling regimes are summarized jointly on the following landscape page.
@@ -165,10 +163,8 @@ while Table~\ref{tab:pixel_metrics_balanced} presents the corresponding results 
 The identical evaluation protocol and model set are used in both cases, enabling a direct comparison between regimes.
 
 \paragraph{Uncertainty and statistical comparisons.}
-Tables~\ref{tab:pixel_metrics_unbalanced} and \ref{tab:pixel_metrics_balanced} report mean $\pm$ standard deviation across cross-validation folds.
-These descriptive summaries indicate variability across folds, but they do not by themselves quantify uncertainty of \emph{differences} between models or sampling regimes.
-Accordingly, claims in this section are interpreted descriptively; no hypothesis tests or confidence intervals for model-to-model differences are reported.
-A stronger comparison would require retaining fold-wise metric values (or per-sample model outputs with fold/group identifiers) and applying a paired procedure (e.g., a paired bootstrap or permutation test over folds/groups).
+Tables~\ref{tab:pixel_metrics_unbalanced} and \ref{tab:pixel_metrics_balanced} report mean $\pm$ standard deviation across folds.
+These summaries indicate fold-level variability but do not quantify uncertainty of differences between models or regimes; all comparisons are therefore interpreted descriptively.
 
 \FloatBarrier
 % =========================================================
@@ -232,34 +228,37 @@ A stronger comparison would require retaining fold-wise metric values (or per-sa
 
 \end{landscape}
 
-
-
-
-\subsection{Pixel-Level Classification Results Under Different Labeling and Balancing Regimes (10 classes)}
+\medskip
+\noindent
+\textbf{Summary of binary classification performance.}
+All five models achieve PR--AUC\textsubscript{CRACK} $\geq 0.987$ and ROC--AUC $\geq 0.999$ under both sampling regimes.
 
 \noindent
-This subsection reports pixel-level classification performance under three labeling strategies:
-(i) \textit{crack\_regular\_rest},
-(ii) \textit{crack\_vs\_rest}, and
-(iii) a \textit{multi\_class} formulation.
-All models were evaluated using identical domain-aware LOGO cross-validation splits.
-For each labeling strategy, two sampling regimes were considered: a class-balanced configuration and the original naturally imbalanced distribution, resulting in six experimental configurations in total.
+\textbf{Balanced vs.\ unbalanced training.}
+Balanced training raises Cracked Recall for most models (e.g., PLS-DA: 0.968 $\to$ 0.993) at a marginal accuracy cost.
+
+\medskip
+\noindent
+The following section extends the classification to multi-class labeling strategies.
+
+
+\section{Pixel-Level Multi-Class Classification}
+\label{sec:pixel-multiclass}
 
 \noindent
-Performance is reported as mean $\pm$ standard deviation across folds.
-Reported metrics include global measures (Accuracy, Balanced Accuracy and Macro-F1), CRACK-specific metrics (Precision, Recall, F1, ROC--AUC and PR--AUC), and total runtime per experiment.
-The evaluated classifiers include Logistic Regression (L1), Random Forest, XGBoost, a shallow Multi-Layer Perceptron (MLP), and PLS-DA.
+This section extends binary crack detection to three labeling strategies:
+\textit{crack\_regular\_rest}, \textit{crack\_vs\_rest}, and a full \textit{multi\_class} formulation.
+PR--AUC\textsubscript{CRACK} remains the primary metric.
+For each strategy, balanced and unbalanced sampling regimes were evaluated, yielding six configurations.
+Fold-aggregated summaries are interpreted descriptively; no hypothesis tests are reported.
 
-\noindent
-As with the binary results above, these fold-aggregated summaries are used descriptively; no hypothesis tests or confidence intervals for differences between labeling/balancing regimes are reported.
-
-\subsubsection{Balanced Training Sets}
+\subsection{Balanced Training Sets}
 
 \noindent
 Results obtained under balanced sampling are summarized in Table~\ref{tab:pixel_metrics_balanced_all}.
 The table reports performance for both binary labeling schemes and for the multi-class configuration.
 
-\subsubsection{Unbalanced Training Sets}
+\subsection{Unbalanced Training Sets}
 
 \noindent
 Results obtained on naturally imbalanced data are summarized in Table~\ref{tab:pixel_metrics_unbalanced_all}.
@@ -366,60 +365,45 @@ The same set of models and metrics are reported for direct comparison with the b
 
 \medskip
 \noindent
-The supervised pixel-level results above (Tables~\ref{tab:pixel_metrics_unbalanced} and \ref{tab:pixel_metrics_balanced}, and the broader regimes in Tables~\ref{tab:pixel_metrics_unbalanced_all} and \ref{tab:pixel_metrics_balanced_all}) summarize discriminative performance when labeled training data are available.
-To complement this setting, the next subsection evaluates reconstruction-based anomaly detection with autoencoders, where crack detection is driven by reconstruction error rather than a direct discriminative classifier.
-Quantitative results for these anomaly-detection variants are summarized in Tables~\ref{tab:autoencoder_pixel_results}--\ref{tab:autoencoder_pixel_results_noncrack_multiclass_balanced}.
-
-
-
-% % ==========================================================
-% % Autoencoder-Based Pixel-Level Anomaly Detection
-% % ==========================================================
-% \subsection{Autoencoder-Based Pixel-Level Anomaly Detection}
-
-% In addition to supervised classifiers, pixel-level crack detection was evaluated using unsupervised reconstruction-based anomaly detection with autoencoders trained exclusively on non-cracked samples.
-% Three fully-connected architectures were examined: \textit{Autoencoder (64--32--16)}, \textit{Autoencoder (128--64--32)}, and \textit{Autoencoder (64--32--8)}.
-% All models were trained and evaluated using the same domain-aware LOGO cross-validation splits employed in the supervised experiments.
-
-% Anomaly scores were computed from reconstruction errors and converted to binary class labels using a percentile-based threshold estimated on the training folds.
-% Performance is reported as mean $\pm$ standard deviation across folds.
-% Reported metrics include Accuracy, Precision, Recall, F1, ROC--AUC and PR--AUC for the \textit{Cracked} class, together with aggregate confusion counts across folds and computational cost indicators.
-
-% \subsubsection{Comparison Between Autoencoder Architectures}
-
-% Quantitative results for all evaluated autoencoder variants are summarized in Table~\ref{tab:autoencoder_pixel_results}.
-% The comparison highlights the trade-off between detection performance, reconstruction separation between normal and anomalous pixels, and computational efficiency.
-
-% ==========================================================
-% Autoencoder-Based Pixel-Level Anomaly Detection
-% ==========================================================
-\subsection{Autoencoder-Based Pixel-Level Anomaly Detection}
+\textbf{Effect of labeling strategy.}
+The \textit{multi\_class} formulation achieves the highest PR--AUC\textsubscript{CRACK} across all models ($\geq 0.967$); the two binary schemes yield broadly comparable results for non-PLS-DA models ($\geq 0.863$).
 
 \noindent
-In addition to supervised classifiers, pixel-level crack detection was evaluated using reconstruction-based anomaly detection with autoencoders.
-The experiments were designed in a progressive manner.
-First, a binary formulation was considered, in which the autoencoder was trained exclusively on healthy (non-cracked) pixels and evaluated against cracked tissue.
-Subsequently, the setting was extended to a multi-class environment, in which background and nuisance categories (e.g., leaves, branches, plastic and calibration targets) were explicitly included during testing.
+\textbf{Balanced vs.\ unbalanced at the multi-class level.}
+Class balancing has negligible impact under the \textit{multi\_class} formulation (e.g., XGBoost PR--AUC\textsubscript{CRACK} $= 0.9977$ in both regimes); PLS-DA shows the highest fold variance under binary schemes ($0.8825 \pm 0.1174$ unbalanced).
 
-Within the multi-class regime, two complementary training strategies were investigated.
-In the first, the autoencoder was trained solely on pixels belonging to the \textit{Cracked} class, such that crack signatures define the reconstruction manifold and all remaining classes are treated as anomalous.
-In the second strategy, the model was trained on all semantic classes except \textit{Cracked}, thereby enforcing accurate reconstruction of diverse non-crack appearances while promoting elevated reconstruction errors for crack pixels at inference time.
+\medskip
+\noindent
+\textbf{PR--AUC\textsubscript{CRACK} $> 0.99$} is achieved by Logistic Regression, Random Forest, and XGBoost under the \textit{multi\_class} formulation in both regimes.
 
-Across all configurations, three fully-connected architectures were examined: \textit{Autoencoder (64--32--16)}, \textit{Autoencoder (128--64--32)}, and \textit{Autoencoder (64--32--8)}.
-All models were trained and evaluated using identical domain-aware LOGO cross-validation splits employed in the supervised experiments.
+\noindent
+The next section evaluates reconstruction-based anomaly detection using autoencoders.
 
-Anomaly scores were computed from reconstruction errors and converted into binary class labels using a percentile-based threshold estimated on the training folds.
-Performance is reported as mean $\pm$ standard deviation across folds.
-Reported metrics include overall Accuracy together with class-conditional metrics (Precision, Recall, F1, ROC--AUC and PR--AUC) for the \textit{Cracked} class (positive class), alongside aggregate confusion counts across folds and computational cost indicators.
-For each autoencoder formulation, two sampling regimes were considered: the original naturally imbalanced distribution and a class-balanced configuration.
-For a compact summary of the evaluation units and split strategies used across all experiments (including the LOGO variants used here), see Table~\ref{tab:evaluation_units_splits}.
 
+
+% ==========================================================
+% Autoencoder-Based Anomaly Detection
+% ==========================================================
+\section{Autoencoder-Based Anomaly Detection}
+\label{sec:anomaly-detection}
+
+\noindent
+Pixel-level crack detection was also evaluated using reconstruction-based anomaly detection.
+Three autoencoder architectures were examined: (64--32--16), (128--64--32), and (64--32--8).
+PR--AUC\textsubscript{CRACK} and ROC--AUC\textsubscript{CRACK} serve as the primary and secondary metrics, respectively.
+
+\noindent
+Three training formulations were evaluated:
+(i)~a binary one-class model trained on non-cracked pixels;
+(ii)~a multi-class model trained exclusively on cracked pixels, treating all other classes as anomalous;
+(iii)~a multi-class model trained on all classes except cracked, treating crack pixels as anomalous.
+Each formulation was evaluated under balanced and unbalanced sampling.
 
 % =========================================================
 % AUTOENCODER ONE-CLASS BINARY: UNBALANCED + BALANCED (SAME PAGE)
 % =========================================================
 \noindent
-Table~\ref{tab:autoencoder_pixel_results_balanced} summarizes the balanced-sampling performance of the one-class autoencoder trained on non-cracked samples; the key takeaway is that anomaly detection can separate cracked pixels in this controlled pixel-level setting, but these results should be interpreted as complementary to (not a replacement for) the supervised whole-image pipeline evaluated under field conditions.
+Tables~\ref{tab:autoencoder_pixel_results} and~\ref{tab:autoencoder_pixel_results_balanced} report the one-class binary results under unbalanced and balanced sampling, respectively.
 
 \clearpage
 \begin{landscape}
@@ -556,7 +540,7 @@ Table~\ref{tab:autoencoder_pixel_results_balanced} summarizes the balanced-sampl
 % AUTOENCODER CRACK-ONLY MULTI-CLASS: UNBALANCED + BALANCED (SAME PAGE)
 % =========================================================
 \noindent
-Tables~\ref{tab:autoencoder_pixel_results_crack_only_multiclass} and~\ref{tab:autoencoder_pixel_results_crack_only_multiclass_balanced} report the crack-only training variant; the key takeaway is that when the ``normal'' class is restricted to cracked spectra, reconstruction error becomes a strong discriminator against all other semantic classes.
+Tables~\ref{tab:autoencoder_pixel_results_crack_only_multiclass} and~\ref{tab:autoencoder_pixel_results_crack_only_multiclass_balanced} report the crack-only training variant under unbalanced and balanced sampling, respectively.
 
 \clearpage
 \begin{landscape}
@@ -693,7 +677,7 @@ Tables~\ref{tab:autoencoder_pixel_results_crack_only_multiclass} and~\ref{tab:au
 % AUTOENCODER NON-CRACK MULTI-CLASS: UNBALANCED + BALANCED (SAME PAGE)
 % =========================================================
 \noindent
-Table~\ref{tab:autoencoder_pixel_results_noncrack_multiclass} captures the failure mode of the non-crack-trained autoencoder in the multi-class setting: despite high overall accuracy, cracked-class recall and PR--AUC collapse, indicating that ``normal'' is too heterogeneous for reconstruction-error thresholding to reliably isolate cracks.
+Tables~\ref{tab:autoencoder_pixel_results_noncrack_multiclass} and~\ref{tab:autoencoder_pixel_results_noncrack_multiclass_balanced} report the non-crack training variant, where the autoencoder was trained on all classes except cracked.
 
 \clearpage
 \begin{landscape}
@@ -827,31 +811,26 @@ Table~\ref{tab:autoencoder_pixel_results_noncrack_multiclass} captures the failu
 
 \medskip
 \noindent
-The pixel-level anomaly detection experiments above quantify crack separability using reconstruction-error scores across several training formulations and sampling regimes (Tables~\ref{tab:autoencoder_pixel_results}--\ref{tab:autoencoder_pixel_results_noncrack_multiclass_balanced}).
-Since the deployment objective is detection at the grape-cluster level, the following subsection evaluates an end-to-end full-image inference pipeline that aggregates pixel-level outputs into patch- and image-level decisions.
-Dataset composition is reported in Table~\ref{tab:full_image_dataset_composition}, and early/late full-image performance is summarized in Table~\ref{tab:full_image_early_late_metrics}.
+Tables~\ref{tab:autoencoder_pixel_results}--\ref{tab:autoencoder_pixel_results_noncrack_multiclass_balanced} summarize pixel-level anomaly detection across all three training formulations and both sampling regimes.
+The crack-only multi-class formulation achieves the highest PR--AUC\textsubscript{CRACK} ($\approx 0.9999$ across all architectures). The binary one-class variant reaches PR--AUC of 0.925--0.970 with higher fold variance, while the non-crack multi-class formulation yields PR--AUC $\approx 0.008$--$0.011$ across all architectures.
+The next section evaluates whole-image crack detection by aggregating pixel-level outputs into image-level decisions.
 
 
 
 
-\subsection{Full-Image Inference: Early vs.\ Late Acquisition-Stage Experiments}
+\section{Whole-Image Crack Detection}
 \label{sec:full-image-early-late}
 
 \noindent
-To evaluate robustness across acquisition stages, two independent optimization and evaluation scenarios were considered, corresponding to \textit{early-stage} (initial onset / minimal cracking) and \textit{late-stage} (advanced, macroscopically visible cracking) acquisition subsets.
-In both cases, post-processing and aggregation parameters were optimized on a calibration split using Optuna and subsequently assessed on an unseen test set.
-For a compact summary of the evaluation units and split strategies used across all experiments (including the Row~1 calibration vs. Row~2 held-out test setup), see Table~\ref{tab:evaluation_units_splits}.
-The corresponding calibration-to-test performance gaps are quantified later in Table~\ref{tab:mcc_generalization}.
+Whole-image detection was evaluated under \textit{early-stage} (initial onset) and \textit{late-stage} (advanced cracking) acquisition conditions.
+The primary metric is \textbf{F1\textsubscript{CRACK}}, supported by Precision, Recall, and MCC; additional measures (F2, specificity, NPV) and confusion matrices are included for completeness.
+Post-processing parameters were optimized on a Row~1 calibration split and assessed on an independent Row~2 test set.
 
 \noindent
-Each experiment employed identical inference logic, including pixel-level probability thresholding, morphological filtering, patch-level aggregation and global crack-percentage criteria.
-In addition to the supervised pixel-level classifier, the same full-image pipeline was evaluated using an autoencoder-based anomaly detector (architecture 128--64--32, trained exclusively on \textit{Cracked} pixels).
-For the autoencoder, reconstruction errors (MSE) were converted to pseudo-probabilities using an exponential decay mapping, $p_{\mathrm{CRACK}}(x)=\exp(-e(x)/\tau)$, where $\tau$ is the stored training-derived threshold, after which the identical post-processing and aggregation logic was applied.
-Performance was quantified on both calibration and test splits using a comprehensive set of metrics. For system-level detection, the main performance indicator is \textbf{F1 (Cracked)}, supported by \textbf{Precision (Cracked)}, \textbf{Recall (Cracked)}, and \textbf{MCC}; accuracy is reported for completeness. Additional measures (F2, specificity, NPV) and the underlying confusion matrices are included to characterize error trade-offs.
+In addition to the supervised pixel-level classifier, the pipeline was evaluated using an autoencoder-based anomaly detector (128--64--32, trained on \textit{Cracked} pixels), with reconstruction errors converted to pseudo-probabilities via exponential decay mapping.
 
 \noindent
-The dataset composition for the two acquisition scenarios is reported in Table~\ref{tab:full_image_dataset_composition}.
-Quantitative detection performance is summarized in Table~\ref{tab:full_image_early_late_metrics}, enabling a direct comparison between early- and late-stage conditions and between calibration and test generalization behavior.
+Table~\ref{tab:full_image_dataset_composition} reports the dataset composition; Table~\ref{tab:full_image_early_late_metrics} summarizes detection performance.
 
 
 
@@ -948,6 +927,9 @@ Early & Test &
 
 \end{landscape}
 
+\medskip
+\noindent
+Under late-stage conditions the supervised pipeline achieves F1\textsubscript{CRACK} = 0.818 and MCC = 0.598 on the independent test set. Under early-stage conditions F1\textsubscript{CRACK} is 0.704 and MCC is 0.504.
 
 % =========================================================
 % FULL IMAGE AUTOENCODER – METRICS TABLE
@@ -1017,27 +999,27 @@ Early & Test &
 
 \medskip
 \noindent
-Full-image results in Table~\ref{tab:full_image_early_late_metrics} quantify system-level detection performance under early- and late-stage conditions using a fixed post-processing and aggregation pipeline, and Table~\ref{tab:full_image_autoencoder_metrics} reports the analogous evaluation when driven by autoencoder-based scores.
-The next experiment investigates the effect of spectral wavelength selection on this same end-to-end pipeline by applying Backward Feature Selection (BFS) and tracking CRACK metrics as a function of the number of retained wavelengths.
-The resulting performance trajectories are shown in Figures~\ref{fig:bfs_dual_metric} and \ref{fig:bfs_threshold_markers}.
+Table~\ref{tab:full_image_autoencoder_metrics} reports whole-image performance when driven by autoencoder-based scores.
+The autoencoder-based pipeline yields lower F1\textsubscript{CRACK} than the supervised classifier in all conditions (Late Test: 0.698 vs.\ 0.818; Early Test: 0.448 vs.\ 0.704); MCC under early-stage conditions is $-0.058$.
+The next section evaluates the effect of wavelength selection on this pipeline using Backward Feature Selection.
 
 
 % ------------------------------------------------------------
-\subsection{Wavelength selection (BFS) setup}
+\section{Wavelength Selection via Backward Feature Selection}
 \label{sec:bfs-setup}
 
 \noindent
-Backward Feature Selection (BFS) was applied to the hyperspectral channels to evaluate
-full-image crack-detection performance as a function of the number of selected wavelengths.
-At each BFS step, the pipeline performance was recorded using CRACK-class metrics, with \textbf{CRACK PR--AUC} treated as the primary objective (Section~\ref{subsec:wavelength_selection}).
-The \textbf{full-spectrum baseline} corresponds to \textbf{159 wavelengths} (450--925\,nm) and serves as the reference point for the performance curves and for the subset comparisons reported below.
+Backward Feature Selection (BFS) was applied to evaluate whole-image crack-detection performance as a function of the number of retained wavelengths.
+The primary objective is PR--AUC\textsubscript{CRACK}; the full-spectrum baseline corresponds to 159~wavelengths (450--925\,nm).
+
+\subsection{BFS Trajectories and Subset Selection}
 
 \FloatBarrier
 
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=0.95\linewidth]{figures/results/feature_selection/bfs_dual_metric.png}
-    \caption{Backward Feature Selection (BFS) trajectories for the full-image pipeline, plotted as CRACK-class PR--AUC (primary objective) and CRACK-class F1 versus the number of retained wavelengths ($n$, unitless count; full baseline $n{=}159$ over 450--925\,nm). Y-axis metrics are unitless in $[0,1]$. Takeaway: PR--AUC exhibits a broad near-optimal plateau, motivating reduced-band configurations.}
+    \caption{BFS trajectories for the whole-image pipeline: CRACK-class PR--AUC (primary objective) and CRACK-class F1 versus the number of retained wavelengths ($n$; full baseline $n{=}159$).}
     \label{fig:bfs_dual_metric}
 \end{figure}
 
@@ -1055,7 +1037,7 @@ The \textbf{full-spectrum baseline} corresponds to \textbf{159 wavelengths} (450
         \caption{CRACK-class PR--AUC (primary BFS objective) vs. number of wavelengths ($n$), with the same threshold markers.}
         \label{fig:bfs_prauc_thresholds}
     \end{subfigure}
-    \caption{BFS threshold-marker visualization on CRACK metrics, used to define representative reduced-band subset sizes. Markers indicate the maximum and the first $n$ where performance falls more than 0.5\% and 1.0\% below that maximum (unitless drop). Takeaway: these markers operationalize ``top-$n$'' selection without introducing an arbitrary $n$.}
+    \caption{BFS threshold-marker visualization on CRACK metrics. Markers indicate the maximum and the first $n$ where performance drops more than 0.5\% and 1.0\% below that maximum.}
     \label{fig:bfs_threshold_markers}
 \end{figure}
 
@@ -1074,11 +1056,9 @@ CRACK F1      & 0.9854 & 159 & 105 & 0.9800 & 88 & 0.9751 \\
 \end{table}
 
 \paragraph{Subset selection criteria.}
-\noindent
-Representative subset sizes were selected directly from the BFS performance trajectories using the same threshold-marker convention shown in Figure~\ref{fig:bfs_threshold_markers} and summarized in Table~\ref{tab:bfs_thresholds_summary}.
-Unless stated otherwise, subset choice is based on the \textbf{CRACK PR--AUC} curve (Figure~\ref{fig:bfs_prauc_thresholds}), while CRACK F1 (Figure~\ref{fig:bfs_f1_thresholds}) is plotted as a complementary, threshold-dependent operating-point summary.
-Specifically, the \textbf{top-30} subset corresponds to the wavelength count $n_{\max}$ that maximizes CRACK PR--AUC (here $n_{\max}{=}30$), and the \textbf{top-11} subset corresponds to the first wavelength count encountered when reducing features for which CRACK PR--AUC drops by more than 0.5\% from its maximum (i.e., falls below $0.995\times\mathrm{PR\mbox{--}AUC}_{\max}$; here $n{=}11$).
-For reference, the analogous 1.0\% drop threshold on CRACK PR--AUC corresponds to $n{=}9$ and is included as a more aggressive reduced-band setting in the end-to-end full-image evaluation (Table~\ref{tab:full_image_wavelength_results}).
+Subset sizes are derived from the BFS trajectories (Figure~\ref{fig:bfs_threshold_markers}; Table~\ref{tab:bfs_thresholds_summary}).
+The \textbf{top-30} subset maximizes PR--AUC\textsubscript{CRACK} ($n_{\max}{=}30$), while the \textbf{top-11} subset corresponds to the first count where PR--AUC\textsubscript{CRACK} drops by more than 0.5\% from its maximum ($n{=}11$).
+The analogous 1.0\% drop threshold yields $n{=}9$ (Table~\ref{tab:full_image_wavelength_results}).
 
 
 \FloatBarrier
@@ -1086,17 +1066,10 @@ For reference, the analogous 1.0\% drop threshold on CRACK PR--AUC corresponds t
 
 \FloatBarrier
 
-\subsection{Full-image wavelength-selection results}
+\subsection{End-to-End Wavelength-Selection Results}
 
 \noindent
-Full-image crack-detection experiments were conducted for several wavelength subsets
-after complete spatial post-processing, including probability thresholding,
-morphological filtering, and blob-based aggregation. Performance was evaluated
-separately for early- and late-stage acquisitions on an independent test set.
-
-\noindent
-Table~\ref{tab:full_image_wavelength_results} reports the obtained CRACK-class metrics
-for representative wavelength counts.
+Table~\ref{tab:full_image_wavelength_results} reports whole-image detection metrics for representative wavelength subsets, evaluated separately for early- and late-stage acquisitions on the held-out test set.
 
 \begin{table}[!htbp]
 \centering
@@ -1122,6 +1095,9 @@ Late  & 159 & \textbf{0.8333} & 0.8258 & 0.8333 & \textbf{0.8824} & \textbf{0.85
 \end{table}
 
 
+\noindent
+The top-30 wavelength subset (30 of 159 bands) matches or exceeds the full-spectrum baseline in both acquisition stages (Early F1\textsubscript{CRACK}: 0.8136 vs.\ 0.8000; Late F1\textsubscript{CRACK}: 0.8485 vs.\ 0.8571). The top-11 subset achieves F1\textsubscript{CRACK} $\geq 0.737$.
+
 \begin{table}[!htbp]
 \centering
 \caption{Model Generalization Analysis: Comparison between Calibration and Test MCC.}
@@ -1141,47 +1117,34 @@ Late  & 9   & 0.8968 & 0.6054 & 0.2914 \\
 \end{tabular}
 \end{table}
 
-\paragraph{Calibration-to-test generalization gap (primary result).}
-\noindent
-A consistent calibration-to-test generalization gap is observed across all evaluated wavelength subset sizes and in both acquisition-stage conditions.
-As summarized in Table~\ref{tab:mcc_generalization}, early-stage calibration MCC spans 0.663--0.738, while early-stage test MCC spans 0.587--0.645, corresponding to gaps of 0.056--0.151.
-For the late-stage scenario, calibration MCC spans 0.877--0.897, while test MCC spans 0.605--0.665, yielding larger gaps of 0.212--0.291.
-This indicates that performance on the calibration row (Row~1) can materially overestimate performance on the independent test row (Row~2), and that reduced-band conclusions should be anchored primarily in the held-out test results rather than calibration scores alone.
+\paragraph{Calibration-to-test generalization gap.}
+Table~\ref{tab:mcc_generalization} shows a consistent calibration-to-test gap across all wavelength subsets and both acquisition stages.
+Early-stage gaps range from 0.056 to 0.151; late-stage gaps are larger (0.212--0.291).
 
 \noindent
-\textbf{Note on uncertainty.} Table~\ref{tab:full_image_wavelength_results} (and the generalization gaps in Table~\ref{tab:mcc_generalization}) report point estimates on the held-out test set.
-Where the narrative compares the full-spectrum baseline (159 wavelengths) to reduced-band subsets (e.g., 30 or 9 wavelengths), the strength of these comparisons would be improved by confidence intervals for the metric \emph{differences}.
-A statistically appropriate approach would be a cluster-aware bootstrap over independent units (e.g., image/cluster-level samples), or a paired resampling procedure if per-sample outputs are retained.
-Such uncertainty quantification is not included here because the exported summary results provide aggregate scores without per-unit identifiers, preventing a reliable post-hoc resampling analysis.
+\textbf{Note on uncertainty.} Tables~\ref{tab:full_image_wavelength_results} and \ref{tab:mcc_generalization} report point estimates; confidence intervals for metric differences are not provided because the exported results lack per-unit identifiers for resampling.
 
 \FloatBarrier
 
 \medskip
 \noindent
-The wavelength-selection results above provide end-to-end test-set performance at representative subset sizes (Table~\ref{tab:full_image_wavelength_results}) and summarize calibration-to-test generalization gaps (Table~\ref{tab:mcc_generalization}), complementing the full BFS performance curves in Figure~\ref{fig:bfs_dual_metric}.
-To assess whether these outcomes are robust to random variation in the data partitioning and model initialization, the following stability analysis repeats the BFS elimination sequence under multiple seeds.
-Per-seed results are summarized in Table~\ref{tab:bfs_stability_summary}.
+The following subsection assesses whether BFS outcomes are robust to random variation by repeating the elimination sequence under multiple seeds.
 
 
 % ============================================================
 % FEATURE SELECTION STABILITY ANALYSIS
 % ============================================================
-\subsection{BFS Wavelength-Selection Stability Analysis}
+\subsection{Stability Analysis}
 \label{sec:bfs-stability}
 
 \noindent
-To assess the robustness of the Backward Feature Selection (BFS) procedure,
-the full elimination sequence was repeated five times using different random seeds.
-In each run, both the train/validation data split seed and the XGBoost model seed
-were set to the same value (seeds 1--5), so that every repetition uses a different
-data partition \emph{and} a different model initialisation.
-The objective metric was CRACK PR--AUC, and elimination proceeded from 159 down to 1 wavelength.
-For each repetition, the top-30 and top-11 surviving wavelengths were recorded.
-Here, ``top-30'' denotes the PR--AUC-maximizing point ($n_{\max}{=}30$), while ``top-11'' denotes the 0.5\% PR--AUC drop threshold (Table~\ref{tab:bfs_thresholds_summary}; Figure~\ref{fig:bfs_threshold_markers}).
+The BFS elimination sequence was repeated five times using seeds~1--5 for both the data split and the model initialization.
+The objective was PR--AUC\textsubscript{CRACK}, with elimination from 159 down to 1~wavelength.
+For each seed, the top-30 ($n_{\max}$) and top-11 (0.5\% drop) subsets were recorded.
 
-Table~\ref{tab:bfs_stability_summary} summarises the per-seed results.
-Best PR--AUC ranged from 0.812 to 0.998, and the optimal number of features
-varied between 64 and 153, revealing substantial sensitivity to the data partition.
+\noindent
+Table~\ref{tab:bfs_stability_summary} summarizes the per-seed results.
+Best PR--AUC ranged from 0.812 to 0.998, and the optimal wavelength count varied between 64 and 153.
 
 \begin{table}[!htbp]
 \centering
@@ -1250,9 +1213,10 @@ The top-30 subsets share 13 wavelengths across all five seeds (42\%), with a mea
 \noindent
 The top-11 subsets share 4 wavelengths across all five seeds (33\%), with a mean Jaccard of 0.398.
 Based on the per-seed wavelength export files (\url{experiments/feature\_selection/stability\_bfs\_prauc/varyingsplit/*/selected\_wavelengths\_at11.csv}),
-the cross-seed intersection at this setting comprises exactly four wavelengths (reported to two decimal places as stored in the exports):
+the cross-seed intersection at this setting comprises exactly four wavelengths:
 (452.25, 548.55, 580.90, and 729.53)\,nm.
 These same four wavelengths also appear in the 13-wavelength intersection of the top-30 subsets (validated from the corresponding \texttt{selected\_wavelengths\_at30.csv} files), indicating that they are consistently selected under both subset sizes.
+The recurrence of the same wavelengths across independent random seeds indicates that these bands correspond to stable spectral features of cracked tissue, a property that supports the future design of targeted narrow-band or multispectral sensors.
 
 \FloatBarrier
 
@@ -1281,7 +1245,7 @@ Figure~\ref{fig:stability_30_binning} further shows that the same dominant regio
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=0.55\linewidth]{figures/results/feature_selection/stability_varying_30wl_wavelength_stability_heatmap.png}
-    \caption{Stability heatmap for the top-30 BFS subsets across five varying-split seeds (objective: CRACK PR--AUC). The x-axis is wavelength binned at 5\,nm; each cell value (0--5) indicates how many seeds selected at least one wavelength within that bin (unitless count). Takeaway: selection concentrates in a limited set of repeatable spectral regions, but exact channel identities vary across splits.}
+    \caption{Stability heatmap for the top-30 BFS subsets across five seeds (objective: PR--AUC\textsubscript{CRACK}). Each cell indicates how many seeds selected a wavelength within that 5\,nm bin.}
     \label{fig:stability_30_heatmap}
 \end{figure}
 
@@ -1304,7 +1268,7 @@ corresponding to the most aggressive wavelength reduction evaluated
 (within 1\% of the maximum PR--AUC).
 
 \noindent
-For interpretability, Figure~\ref{fig:stability_11_binning} shows how apparent wavelength ``popularity'' changes with bin size, while Figure~\ref{fig:stability_11_heatmap} highlights which 5\,nm bins are consistently selected across seeds; the key takeaway is that only a small core set remains stable under this aggressive reduction.
+Figure~\ref{fig:stability_11_binning} shows wavelength selection frequency at different bin sizes, while Figure~\ref{fig:stability_11_heatmap} highlights which 5\,nm bins are consistently selected across seeds.
 
 \begin{figure}[!htbp]
     \centering
@@ -1323,7 +1287,7 @@ For interpretability, Figure~\ref{fig:stability_11_binning} shows how apparent w
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=0.55\linewidth]{figures/results/feature_selection/stability_varying_11wl_wavelength_stability_heatmap.png}
-    \caption{Stability heatmap for the top-11 BFS subsets across five varying-split seeds (objective: CRACK PR--AUC; 0.5\% drop setting). The x-axis is wavelength binned at 5\,nm; each cell value (0--5) indicates how many seeds selected a wavelength within that bin (unitless count). Takeaway: under aggressive reduction, only a small core of bins remains consistently selected across splits.}
+    \caption{Stability heatmap for the top-11 BFS subsets across five seeds (objective: PR--AUC\textsubscript{CRACK}; 0.5\% drop setting). Each cell indicates how many seeds selected a wavelength within that 5\,nm bin.}
     \label{fig:stability_11_heatmap}
 \end{figure}
 
