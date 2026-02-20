@@ -473,7 +473,7 @@ The calibration set (Row~1) was used for model training and for internal paramet
 \subsubsection{Training Data Definition}
 
 \noindent
-The whole-image pipeline used a pretrained pixel-level classifier. The pixel-level model was trained on spectral signatures (pixels) sampled from Late-stage images in vineyard Row~1 only. Early-stage records were excluded from pixel-level training.
+The whole-image pipeline used a pretrained multi-class pixel-level classifier. The pixel-level model was trained on spectral signatures (pixels) sampled from Late-stage images in vineyard Row~1 only. Early-stage records were excluded from pixel-level training.
 
 \medskip
 \noindent
@@ -547,7 +547,7 @@ consistency across experiments.
 % │
 % ├─ Anomaly Detection Framework (One-Class)
 % │
-% ├─ Dimensionality Reduction Strategy
+% ├─ Wavelength Selection via Backward Feature Selection (BFS)
 % │  ├─ For binary pixel-level models
 % │  └─ For multi-class pixel-level models
 % │
@@ -598,12 +598,13 @@ feature-selection experiments, and final held-out tests.
 \subsubsection{Quality Control and Outlier Handling}
 \label{subsubsec:qc_outliers}
 
+\medskip
 \noindent
 Hyperspectral datacubes were analyzed in normalized reflectance units, where
 spectral values are expected to lie within the physically valid range
 $[0,1]$. Due to field acquisition conditions and imperfect radiometric
-normalization, isolated violations of this range may occur and indicate
-technically corrupted measurements rather than biological variability.
+normalization, isolated violations of this range may occur.
+Isolated deviations from this range were retained and handled through the global SNV normalization procedure, which mitigates multiplicative and additive effects without discarding spectra.
 
 % \medskip
 % \noindent
@@ -698,7 +699,7 @@ hyperspectral imaging for reducing non-chemical variability without distorting d
 \label{subsec:cv_strategy}
 
 \noindent
-To assess generalization to unseen biological samples, Leave-One-Group-Out (LOGO)
+To assess generalization to unseen samples, Leave-One-Group-Out (LOGO)
 cross-validation was applied at the grape-cluster acquisition level. LOGO was selected
 due to the limited number of available hyperspectral images, which precluded a simple
 held-out test set while still requiring rigorous evaluation of cluster-level
@@ -776,7 +777,7 @@ Two classification settings were evaluated:
 \subsubsection{Feature Representation and Model Training}
 
 \noindent
-Each pixel was represented by its SNV-normalized reflectance vector across the 450--925\,nm spectral range (159 bands at $\sim$3\,nm spacing). No dimensionality reduction or feature selection was applied prior to classification; the full spectral signature was used as input to enable assessment of intrinsic separability without imposed constraints.
+Each pixel was represented by its SNV-normalized reflectance vector across the 450--925\,nm spectral range (159 bands at $\sim$3\,nm spacing). No wavelength selection or feature reduction was applied prior to classification; the full spectral signature was used as input to enable assessment of intrinsic separability without imposed constraints.
 
 \medskip
 \noindent
@@ -793,7 +794,7 @@ XGBoost was adopted as the baseline classifier for all primary comparisons due t
 
 \medskip
 \noindent
-Both balanced and unbalanced training regimes were investigated. Under the unbalanced regime, the natural class distribution was preserved. Under the balanced regime, all classes were undersampled to match the minority class count. For binary classification, majority-class samples were randomly undersampled. For multi-class settings, segment-proportional undersampling was applied: each class was capped at the \textit{Cracked} class count, with samples drawn proportionally from each segment (mask region) to preserve within-class diversity. Models were trained using default or lightly tuned hyperparameters; no extensive grid search was performed.
+Both balanced and unbalanced training regimes were investigated. Under the unbalanced regime, the natural class distribution was preserved. Under the balanced regime, all classes were undersampled to match the minority class count. For binary classification, majority-class samples were randomly undersampled. For multi-class settings, segment-proportional undersampling was applied: each class was capped at the \textit{Cracked} class count, with samples drawn proportionally from each segment (mask region) to preserve within-class diversity. Models were trained using default or lightly tuned hyperparameters; no extensive hyperparameter search was performed.
 
 \subsubsection{Cross-Validation Protocol}
 
@@ -803,7 +804,7 @@ Generalization was evaluated using the Leave-One-Group-Out (LOGO) protocol at th
 \subsubsection{Evaluation Metrics}
 
 \noindent
-Classification performance was assessed using the metrics and reporting conventions detailed in \S\ref{subsubsec:metrics_rationale}. The primary ranking metric was \textbf{PR--AUC} for the \textit{Cracked} class; supplementary metrics included Accuracy, Balanced Accuracy, Precision, Recall, F1, and ROC--AUC.
+Classification performance was assessed using the metrics and reporting conventions detailed in \S\ref{subsec:evaluation_protocols}. The primary ranking metric was \textbf{PR--AUC} for the \textit{Cracked} class; supplementary metrics included Accuracy, Balanced Accuracy, Precision, Recall, F1, and ROC--AUC.
 
 
 \subsection{Anomaly Detection Framework}
@@ -895,7 +896,7 @@ For full-image inference, the multi-class autoencoder variant trained on CRACK s
     p_{\mathrm{CRACK}}(x) = \frac{1}{1 + \exp\left(\frac{e(x) - \tau}{\alpha}\right)},
 \label{eq:ae_score_mapping}
 \end{equation}
-where $e(x)$ is the reconstruction error for spectrum $x$, $\tau$ is the training threshold (99th percentile of CRACK class errors), and $\alpha$ is a temperature parameter ($\approx 0.3\tau$) controlling transition sharpness. This mapping produces a smooth $S$-curve: low reconstruction errors (CRACK-like) map to high probability, while high errors (anomalous) map to low probability. Per-pixel scores were subsequently processed through standard post-processing and aggregation stages.
+where $e(x)$ is the reconstruction error for spectrum $x$, $\tau$ is the training threshold (99th percentile of CRACK class errors), and $\alpha$ is a temperature parameter ($\approx 0.3\tau$) controlling transition sharpness. The temperature parameter $\alpha$ was fixed and not optimized. This mapping produces a smooth $S$-curve: low reconstruction errors (CRACK-like) map to high probability, while high errors (anomalous) map to low probability. Per-pixel scores were subsequently processed through standard post-processing and aggregation stages.
 
 
 % \noindent
@@ -906,37 +907,15 @@ where $e(x)$ is the reconstruction error for spectrum $x$, $\tau$ is the trainin
 % to the dispersion of the training CRACK reconstruction errors. This parameter was
 % defined heuristically.
 
-\medskip
-\noindent
-
 \subsection{Whole-Image Detection and Aggregation Pipeline}
 \label{subsec:full_image_pipeline}
 
 \noindent
-\textit{How can spatial context stabilize noisy pixel-level predictions into reliable image-level decisions?}
+\textit{How can spatial context stabilize noisy pixel-level outputs into reliable image-level decisions?}
 
 \medskip
 \noindent
-Despite strong pixel-level discrimination under controlled labeling conditions, direct application of per-pixel classifiers to unsegmented field images produced spatially scattered predictions: background materials, illumination gradients, and mixed-pixel effects introduced isolated false positives that could not be resolved at the single-pixel level. These limitations motivated a shift toward spatial aggregation at the image level.
-
-\medskip
-\noindent
-Building upon the pixel-level classification outputs, a whole-image detection and
-localization pipeline was developed to enable robust crack identification in realistic
-vineyard scenes. Rather than introducing an additional image-level classifier, the
-pipeline aggregates pixel-level classification outputs into a system-level framework that enforces
-spatial coherence and suppresses isolated false positive responses.
-
-\medskip
-\noindent
-The pipeline operates on pixel-wise crack probability maps generated by the trained
-pixel-level classifiers and progressively aggregates them into region-level, patch-level,
-and image-level decisions, bridging the gap between noisy pixel-level outputs and
-biologically meaningful image-level interpretation.
-
-\medskip
-\noindent
-All pixel-level models---including the base classifiers, autoencoder variants, and wavelength-reduced model variants (\S\ref{subsec:dimensionality_reduction})---were fixed at their trained states. No retraining, tuning, or optimization of these models was performed at the whole-image level.
+The whole-image pipeline aggregates pixel-wise crack probability maps produced by the trained multi-class pixel-level classifier into image-level decisions. All upstream pixel-level models were fixed at their trained states and were not retrained or tuned at the image level.
 
 \subsubsection{Pipeline Architecture and Spatial Aggregation}
 
@@ -950,16 +929,15 @@ Figure~\ref{fig:whole_image_pipeline}, and consists of the following stages:
     under field conditions.
 
     \item \textbf{Pixel-Level Probability Map Generation:}
-    The trained pixel-level classifier produces a dense pixel-wise crack probability map
-    with values in the range $[0,1]$.
+    The trained multi-class pixel-level classifier produces a dense pixel-wise crack probability map
+    for the \textit{CRACK} class, with values in the range $[0,1]$.
 
     \item \textbf{Morphological Closing and Region Formation:}
     Spatially adjacent pixels with elevated crack probabilities are grouped into connected
     regions (BLOBs) using morphological closing operations, enforcing spatial coherence.
 
     \item \textbf{Blob Size Filtering:}
-    Small connected regions below a minimum size threshold are removed to suppress isolated
-    false positive detections.
+    Connected regions were filtered using minimum and maximum area constraints.
 
     \item \textbf{Patch-Based Division and Decision:}
     The image is divided into fixed-size patches. A patch is marked as crack-positive if
@@ -971,44 +949,50 @@ Figure~\ref{fig:whole_image_pipeline}, and consists of the following stages:
     crack-positive; otherwise, it is classified as \textit{Non-Cracked}.
 \end{itemize}
 
+
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.9\textwidth]{figures/materials_methods/pipeline/whole_image_pipeline.jpg}
-    \caption{Whole-image crack-detection pipeline applied to field-acquired cluster scenes (early and late settings) with row-partitioned evaluation (Row~1 calibration, Row~2 test). A pixel-level classifier produces a crack probability map ($[0,1]$), which is spatially aggregated via morphological closing and blob-size filtering; patch rules are then combined into a final image-level decision (Cracked vs.\\ Non-Cracked). Takeaway: spatial aggregation turns noisy pixel scores into a deployable cluster-level decision rule.}
-    \label{fig:whole_image_pipeline}
+  \caption{Whole-image crack-detection pipeline from pixel-level CRACK probabilities to image-level classification via spatial aggregation.}
 \end{figure}
+
 
 \subsubsection{Whole-Image Dataset and Evaluation Setup}
 
 \noindent
 Whole-image evaluation was conducted on the row-partitioned inference dataset described
-in Section~\ref{subsec:whole_image_dataset}. The aggregation pipeline was applied to
-patch-based representations extracted from the full images, enabling localized detection
-while preserving image-level context. Row~1 was used exclusively for calibration/tuning
-of whole-image inference parameters, while Row~2 was reserved as a held-out test set for
-final reporting. Exact sample counts and class balance (early/late) are reported in
+in Section~\ref{subsec:whole_image_dataset}, following the spatial partitioning and
+subset usage protocol defined therein (Row~1 calibration, Row~2 held-out test).
+Exact sample counts and class balance (early/late) are reported in
 Table~\ref{tab:dataset_statistics}.
 
 \subsubsection{Evaluation Across Disease Progression Stages}
 \label{subsec:early_late_evaluation}
 
 \noindent
-To assess robustness across different stages of crack development, whole-image performance
-was evaluated separately for early-stage and late-stage samples. Late-stage images
-contained clusters with clearly visible macroscopic cracking, whereas early-stage images
-corresponded to initial onset (absent-to-minimal/incipient cracking) based on expert monitoring records and visual inspection.
-This stratification was applied exclusively at the evaluation stage and did not affect
-model training or aggregation design.
+To assess robustness across different acquisition stages, whole-image performance
+was evaluated separately for early-stage and late-stage samples. These labels refer
+exclusively to the crack-progression state at the time of measurement, not to
+temporal forecasting. Late-stage images
+contained clusters with clearly visible cracks, whereas early-stage images
+corresponded to initial onset.
 
-\subsection{Dimensionality Reduction Strategy}
-\label{subsec:dimensionality_reduction}
+\subsection{Wavelength Selection}
+\label{subsec:wavelength_selection}
 
 \noindent
 \textit{How many wavelengths are needed to maintain crack-detection performance?}
 
 \medskip
 \noindent
-With the full detection pipeline established---from pixel-level classification through spatial aggregation---the final methodological question was whether the complete 159-band spectral representation was necessary, or whether a reduced wavelength set could preserve detection performance while simplifying future sensor requirements.
+This stage evaluates whether a reduced subset of wavelengths can maintain crack-detection
+performance while preserving physical interpretability for potential multispectral sensor design. BFS was applied exclusively at the pixel level; whole-image inference used
+pixel-level models trained on either the full or reduced spectral representation without
+additional wavelength adaptation at the image level.
+
+% \medskip
+% \noindent
+% With the full detection pipeline established---from pixel-level classification through spatial aggregation---the final methodological question was whether the complete 159-band spectral representation was necessary, or whether a reduced wavelength set could preserve detection performance while simplifying future sensor requirements. BFS was applied exclusively at the pixel level; whole-image inference used pixel-level models trained on either the full or reduced spectral representation without additional wavelength adaptation at the image level.
 
 \medskip
 \noindent
@@ -1022,7 +1006,7 @@ Pixels were preprocessed as described in \S\ref{subsec:global_preprocessing} (SN
 \subsubsection{Classification Model}
 
 \noindent
-XGBoost was used as the fixed classifier for all wavelength selection experiments, selected as the best-performing model from the preceding pixel-level classification work (\S\ref{subsec:pixel_level_framework}).
+XGBoost was used as the fixed classifier for all wavelength selection experiments, consistent with the baseline model adopted in the pixel-level classification framework (\S\ref{subsec:pixel_level_framework}).
 
 \subsubsection{Two Experimental Settings}
 
@@ -1034,18 +1018,29 @@ Wavelength selection was performed in two independent experiments:
 \end{itemize}
 
 \subsubsection{Train-Test Split Protocol}
-
-\noindent
-For each experimental setting, a single grouped 80/20 held-out split was constructed with group constraints to prevent leakage. For binary classification, the grouping was by grape cluster identity (\textit{CRACK} and \textit{REGULAR} samples). For multi-class classification, grouping was by cluster/segment identity for background classes. The 80\% training subset was used to re-train XGBoost at each BFS step, while the held-out 20\% test subset served as the invariant selection criterion throughout the elimination path.
+A single grouped 80/20 hold-out split was defined to prevent leakage, with grouping
+at the grape-cluster level in the binary setting and at the cluster level for
+background classes in the multi-class setting. At each BFS iteration, XGBoost was
+re-trained on the 80\% training partition, while the held-out 20\% test partition
+remained fixed and served as the invariant selection criterion.
 
 \subsubsection{Backward Feature Selection (BFS)}
 
 \noindent
-A deterministic wrapper method was applied, starting from the full set of 159 wavelengths and iteratively removing the least informative band at each step. At each removal step, the classifier was re-trained on the 80\% training subset and evaluated on the held-out 20\% test subset. The selection metric was PR--AUC for the \textit{Cracked} class. BFS provides a monotonic elimination path, identifying the minimal wavelength subset preserving near-baseline detection performance.
+A deterministic wrapper-based backward feature selection (BFS) procedure was applied,
+starting from the full set of 159 wavelengths and iteratively removing the least
+informative band at each step. At each iteration, XGBoost was re-trained on the 80\%
+training partition and evaluated on the fixed 20\% hold-out set, using PR--AUC--CRACK
+as the selection criterion. This procedure yielded a monotonic elimination path and
+identified the minimal wavelength subset that preserved near-baseline performance.
 
 \medskip
 \noindent
-\textbf{Takeaway.} BFS identified minimal wavelength subsets preserving near-baseline PR--AUC, informing practical multispectral sensor design for field deployment.
+To assess the stability of the selected wavelength subsets, the BFS procedure
+was repeated five times on the same fixed grouped 80/20 train--test split
+(split seed = 42), varying only the random seed supplied to XGBoost
+(model seeds 1--5). The data partition and grouping remained invariant
+across runs.
 
 % Implementation reference (grouped 80/20 BFS split + leakage assertions):
 % src/models/classification/pixel_level/feature_selection/run_bfs_80_20_grapeid.py
@@ -1055,264 +1050,32 @@ A deterministic wrapper method was applied, starting from the full set of 159 wa
 \subsection{Evaluation Protocols and Performance Metrics}
 \label{subsec:evaluation_protocols}
 
-\noindent
-Model performance was evaluated using task-specific protocols and metrics tailored
-to each stage of the analysis, reflecting the differing objectives and operational
-requirements of pixel-level classification, anomaly detection, and whole-image
-detection.
-
-\medskip
-\noindent
-Evaluation metrics were selected according to the objective of each experimental
-stage. Pixel-level and anomaly detection metrics are summarized in
-Table~\ref{tab:pixel_eval_metrics}, while system-level evaluation for whole-image
-detection is reported in Table~\ref{tab:whole_image_eval_metrics}.
-
-\subsubsection{Metrics Rationale}
-\label{subsubsec:metrics_rationale}
-
-\noindent
-This study spans multiple tasks with different operating assumptions (pixel-level detection under strong class imbalance, system-level whole-image decisions after spatial aggregation, and wavelength-selection optimization). Accordingly, a task-dependent \emph{primary} metric is defined for each setting, while additional metrics are reported to describe operating-point behavior and error trade-offs.
-
-\medskip
-\noindent
-\textbf{Pixel-level detection (binary and multi-class).}
-The pixel-level objective is to detect cracked tissue, which is typically the minority class. Therefore, the primary ranking metric is \textbf{PR--AUC for the \textit{Cracked} class} (computed with \textit{Cracked} as the positive class; one-vs-rest in multi-class settings). PR--AUC (average precision) is preferred under class imbalance because it focuses on precision--recall trade-offs and its baseline corresponds to the positive-class prevalence, making it more informative than ROC--AUC when negatives dominate. Threshold-dependent metrics (Precision/Recall and, where reported, F1) are included as complementary operating-point summaries.
-Unless explicitly subscripted (e.g., F1\textsubscript{CRACK}), reported \textbf{F1 refers to the weighted F1-score} (support-weighted over classes), matching the evaluation scripts used in the experiments.
-
-\medskip
-\noindent
-\textbf{Whole-image crack classification (spatial aggregation).}
-At the image level, performance is reported with explicit emphasis on the \textit{Cracked} class. The \emph{primary} summary metric is \textbf{F1\textsubscript{CRACK}}, supported by \textbf{Precision\textsubscript{CRACK}} and \textbf{Recall\textsubscript{CRACK}} to expose the false-positive/false-negative trade-off at the chosen operating point. \textbf{MCC} is reported as a complementary single-number summary that remains informative under class imbalance. Image-level accuracy is included for completeness, but it is not treated as the main indicator of crack-detection quality. \textbf{F2\textsubscript{CRACK}} is additionally reported when a recall-oriented operating point is of interest.
-
-\medskip
-\noindent
-\textbf{Backward Feature Selection (BFS) optimization.}
-For BFS, the objective metric is \textbf{CRACK PR--AUC} evaluated on a fixed grouped 80/20 hold-out split (Section~\ref{subsec:dimensionality_reduction}). CRACK F1 is additionally plotted to show how feature elimination affects threshold-dependent performance, but selection is driven by the PR--AUC criterion.
-
-\medskip
-\noindent
-\textbf{Reporting and threshold conventions.}
-For cross-validation experiments (pixel-level classification and LOGO anomaly detection), metrics are computed per held-out fold and summarized as mean $\pm$ standard deviation across folds. ROC--AUC and PR--AUC are computed from continuous scores/probabilities and do not require selecting a decision threshold.
-Metrics that require binary decisions (Precision/Recall/F1/F2/MCC) use the model's hard class labels under its standard decision rule; for the PLS-DA wrapper this corresponds to thresholding the continuous score at $t=0.5$. For one-class autoencoder experiments, the anomaly threshold is estimated on the training partition of each fold using a percentile of training reconstruction errors and then applied unchanged to the held-out fold. For whole-image experiments, post-processing parameters (including probability and aggregation thresholds) are calibrated on Row~1 only and then fixed for reporting on the held-out Row~2 test set.
-
-
-
-\subsubsection{Cross-Validation Strategy}
-
-\noindent
-Where cross-validation was used, the LOGO protocol described in \S\ref{subsec:cv_strategy} was applied.
-
-\subsubsection{Evaluation Units and Split Strategy}
-\label{subsubsec:eval_units_splits}
-
-\noindent
-Table~\ref{tab:evaluation_units_splits} provides a compact summary of the unit of
-analysis and the exact independence assumptions used across all reported
-experiments.
-
-% Implementation references for split logic (do not edit without updating this table):
-% Binary pixel-level LOGO (group = cluster_id extracted from hs_dir):
-%   src/preprocessing/spectral_preprocessing.py (extract_cluster_id, preprocess_pixel_level_dataset)
-%   src/models/classification/pixel_level/simple_classification_leave_one_out/comare_all_models_binary_13_01/compare_models.py
-% Domain-aware multi-class LOGO (LOGO on grape hs_dir + fixed non-grape holdout):
-%   src/models/classification/pixel_level/simple_classification_leave_one_out/comare_all_models_multi_class_16_01/compare_models_multi_class.py
-% CRACK-focused domain-aware CV (LOGO on CRACK hs_dir + fixed REGULAR/non-grape holdouts):
-%   src/models/classification/pixel_level/simple_classification_leave_one_out/comare_all_models_multi_class_16_01/unified_experiment_pipeline_acc.py
-% Autoencoder (LOGO):
-%   src/models/classification/pixel_level/simple_classification_leave_one_out/autoencoder_multiclass_30_01/autoencoder_anomaly_detection.py
-% Autoencoder (CRACK-only training, domain-aware):
-%   src/models/classification/pixel_level/simple_classification_leave_one_out/autoencoder_multiclass_30_01/autoencoder_train_crack_only.py
-% Autoencoder (single group-wise train/test split; no LOGO):
-%   src/models/classification/pixel_level/simple_classification_leave_one_out/autoencoder_multiclass_30_01/autoencoder_detect_crack_multiclass.py
-
-\begin{table}[!htbp]
-    \centering
-    \caption{Evaluation units and split strategy used across experiments. ``Independent test'' denotes the data that remain unseen during fitting/tuning for the corresponding protocol.}
-    \label{tab:evaluation_units_splits}
-    \small
-    \renewcommand{\arraystretch}{1.2}
-    \setlength{\tabcolsep}{6pt}
-    \begin{adjustbox}{width=\textwidth,center}
-    \begin{tabular}{p{4.2cm} p{2.0cm} p{7.2cm} p{3.2cm}}
-        \toprule
-        Experiment / task & Unit & Split strategy (group definition) & Independent test \\
-        \midrule
-        Binary pixel-level classification (2 classes) & Pixel spectrum & LOGO cross-validation with group $=$ \texttt{cluster\_id} extracted from \texttt{hs\_dir} (three levels up in the path). All pixels from a held-out cluster are evaluated together. & Held-out LOGO fold (one cluster group) \\
-
-        Multi-class pixel-level classification (domain-aware LOGO) & Pixel spectrum & LOGO applied to grape samples with group $=$ \texttt{hs\_dir} (image-level identifier), combined with a fixed 80/20 grouped hold-out split for non-grape/background samples (by \texttt{hs\_dir}, with fallback to \texttt{mask\_path} if required). Each fold tests one held-out grape image plus the fixed non-grape hold-out set. & Per fold: held-out grape \texttt{hs\_dir} $+$ fixed non-grape hold-out \\
-
-        CRACK-focused domain-aware CV (unified pipeline) & Pixel spectrum & LOGO applied to CRACK samples only with group $=$ CRACK \texttt{hs\_dir}; REGULAR samples use a fixed 80/20 grouped split (by \texttt{mask\_path}); non-grape samples use a fixed 80/20 grouped split. The same fixed REGULAR/non-grape hold-out portions are reused across folds. & Per fold: held-out CRACK \texttt{hs\_dir} $+$ fixed REGULAR/non-grape hold-out \\
-
-        Autoencoder anomaly detection (one-class; LOGO) & Pixel spectrum & LOGO cross-validation with group $=$ \texttt{cluster\_id} extracted from \texttt{hs\_dir}. Scaling and threshold selection are computed from training partitions only. & Held-out LOGO fold (one cluster group) \\
-
-        Autoencoder anomaly detection (train on all except CRACK; single split) & Pixel spectrum & Single group-wise train/test split without LOGO: unique groups (\texttt{cluster\_id} extracted from \texttt{hs\_dir}) are split 80/20 into train/test groups. The autoencoder is trained on non-CRACK samples from training groups; evaluation is reported on held-out test groups. & Held-out 20\% of groups (cluster\_id) \\
-
-        Whole-image crack detection (spatial aggregation) & Patch; image (cluster acquisition) & Row-partitioned evaluation: Row~1 CSVs are used for calibration/tuning of post-processing parameters; Row~2 CSVs are held out for final testing. Early- and late-stage scenarios are evaluated separately. & Held-out Row~2 (early and late, separately) \\
-
-        \bottomrule
-    \end{tabular}
-    \end{adjustbox}
-\end{table}
-
-\subsubsection{Pixel-Level Classification Metrics}
-
-\noindent
-For binary pixel-level classification, performance was evaluated using both ranking-based
-metrics (ROC--AUC and PR--AUC with \textit{Cracked} as the positive class) and operating-point
-metrics (Precision/Recall and F1). Under class imbalance, PR--AUC\textsubscript{CRACK} is treated
-as the primary summary of separability, while Precision/Recall\textsubscript{CRACK} describe the
-trade-off at the operating point used by the classifier.
-
-\medskip
-\noindent
-Additional metrics, including precision, recall, and ROC-AUC, were reported as
-supporting indicators to facilitate comprehensive performance analysis.
-
-\medskip
-\noindent
-For multi-class pixel-level classification, Macro-F1 and per-class F1-scores were
-used as primary metrics to ensure balanced evaluation across all classes, with
-particular attention to the \textit{Cracked} class. Confusion matrices were used
-to analyze class-specific error patterns and background-related confusions.
-
-\subsubsection{Anomaly Detection Evaluation}
-
-\noindent
-For anomaly detection experiments, model performance was evaluated using ROC-AUC
-and PR-AUC, reflecting the ranking-based nature of one-class detection and the
-absence of a fixed decision threshold. These metrics quantify the ability of the
-model to distinguish anomalous (cracked) spectra from normal (healthy) spectral
-behavior across a range of operating points.
-
-\subsubsection{Whole-Image and Patch-Based Evaluation}
-
-\noindent
-Whole-image detection performance was evaluated at the patch and image levels,
-reflecting the system-level objective of identifying cracked grape clusters under
-realistic field conditions.
-
-Given the higher cost associated with missed detections, recall-oriented metrics
-were emphasized. In particular, Recall and the F2-score for the \textit{Cracked}
-class (F2\textsubscript{CRACK}) were used as primary evaluation criteria, assigning
-greater weight to recall than precision.
-
-Precision and false positive rates were reported as complementary metrics to
-characterize trade-offs and system behavior. Quantitative evaluation was supported
-by qualitative visual inspection of detection overlays to analyze spatial
-consistency, typical failure modes, and false positive patterns.
-
-
-\begin{table}[htbp]
-\centering
-\caption{Evaluation metrics for pixel-level and anomaly detection experiments}
-\label{tab:pixel_eval_metrics}
-\begin{tabular}{p{3.5cm} p{5.2cm} p{4.5cm}}
-\hline
-\textbf{Task} & \textbf{Primary Metrics} & \textbf{Secondary Metrics} \\
-\hline
-
-Binary pixel-level classification &
-PR--AUC\textsubscript{CRACK}, Recall\textsubscript{CRACK} &
-Precision\textsubscript{CRACK}, F1 (weighted unless specified), ROC--AUC \\
-
-\hline
-
-Multi-class pixel-level classification &
-Macro-F1, F1\textsubscript{CRACK} &
-Per-class Precision/Recall, Confusion Matrix \\
-
-\hline
-
-Anomaly detection (one-class) &
-ROC-AUC, PR-AUC &
-Recall@Fixed-FPR, Precision@Top-K \\
-
-\hline
-\end{tabular}
-\end{table}
+Model training and model-selection procedures were evaluated using
+PR--AUC\textsubscript{CRACK} as the primary ranking metric across all
+pixel-level classification, anomaly detection, and wavelength-selection
+experiments, reflecting the strong class imbalance at the pixel level.
+Whole-image crack detection was evaluated using
+F1\textsubscript{CRACK} as the primary system-level metric.
+Unless explicitly subscripted, reported F1 refers to the weighted F1-score.
 
 \subsection{Reproducibility and Implementation Details}
-\label{subsec:reproducibility}
 
-\noindent
-This section summarizes the concrete implementation and execution details needed to rerun the experiments and reproduce the reported results. Where the project does not explicitly record a detail (e.g., exact CPU/GPU model), it is marked as \TODO{...} rather than inferred.
-
-\subsubsection{Software Environment}
-
-\noindent
-All experiments were executed in a dedicated Python virtual environment located at \texttt{.venv}. The environment was created with \textbf{Python 3.11.9} (as recorded in \texttt{.venv/pyvenv.cfg}). Dependency versions were pinned in \texttt{requirements.txt}; core libraries used throughout the pipelines include:\newline
-\texttt{numpy==2.2.3}, \texttt{pandas==2.2.3}, \texttt{scikit-learn==1.6.1}, \texttt{xgboost==2.1.4}, and \texttt{torch==2.5.1+cu121}.
+All experiments were executed in Python using fixed random seeds
+(default seed = 42) to ensure deterministic data splits and model
+training. Cross-validation partitions and held-out test sets were
+kept invariant across runs. Experiment outputs were stored in
+timestamped directories together with configuration files and
+cross-validation manifests to enable exact reruns of the reported
+pipelines.
 
 \medskip
 \noindent
-The codebase is developed and executed on Windows (paths and helper scripts use Windows conventions). \TODO{Record exact Windows version/build used for final runs (e.g., from system info) and archive it alongside experiment outputs.}
+For wavelength selection (BFS) stability analysis, the primary BFS run employed
+model seed = 42 and split seed = 42. Five additional repetitions used the same
+split seed (42) but varied model seeds (1--5), allowing quantification of
+wavelength selection robustness with respect to XGBoost training randomness
+alone, independent of data splitting variability.
 
-\subsubsection{Randomness and Seed Strategy}
-
-\noindent
-Randomness is controlled explicitly in the main training and evaluation scripts. A project-wide default seed of \textbf{42} is used in multiple pipelines.
-For the one-class autoencoder experiments, the scripts define a \texttt{set\_seed()} helper that sets seeds for \texttt{random}, \texttt{numpy}, and \texttt{torch} (and, when CUDA is available, \texttt{torch.cuda.manual\_seed\_all}), and enforces deterministic cuDNN behavior by setting \texttt{torch.backends.cudnn.deterministic=True} and \texttt{torch.backends.cudnn.benchmark=False}. In cross-validation settings, some runs additionally use fold-index offsets (e.g., \texttt{seed = 42 + fold\_idx}) to ensure controlled but distinct fold-specific randomness.
-
-\medskip
-\noindent
-For dataset construction steps that include sampling (e.g., selecting a bounded number of negative samples for full-image datasets), the seed is passed as an explicit \texttt{random\_seed} argument with default \texttt{42}.
-
-\subsubsection{Outputs, Artifacts, and Result Storage}
-
-\noindent
-Experiment artifacts are written to the top-level \texttt{experiments/} directory using timestamped subfolders.
-For example, the unified pixel-level comparison pipeline creates an \texttt{experiments/unified\_experiment\_.../} folder and stores the exact run configuration in \texttt{experiment\_config.json}, cross-validation manifests (\texttt{cv\_split\_manifest\_*.json}), and consolidated reports exported to \texttt{.xlsx/.csv/.md}.
-Similarly, autoencoder experiments store fold-level and summary outputs (e.g., \texttt{all\_fold\_results.csv} and \texttt{summary\_results.csv}) under timestamped \texttt{experiments/autoencoder\_.../} directories.
-
-\medskip
-\noindent
-\TODO{For long-term reproducibility, archive each experiment folder together with the exact input dataset CSV(s) used, or their immutable hashes/versions.}
-
-\subsubsection{How to Rerun Core Pipelines}
-
-\noindent
-Two helper scripts are provided to ensure the correct environment is used:
-\begin{itemize}
-    \item \texttt{activate\_venv.bat} activates \texttt{.venv} and opens a new \texttt{cmd} session.
-    \item \texttt{run\_with\_venv.bat} runs a given Python command using \texttt{.venv\\Scripts\\python.exe}.
-\end{itemize}
-
-\noindent
-Representative entry points used in this thesis include:
-\begin{itemize}
-    \item Unified pixel-level experiment pipeline (exports consolidated reports):\\
-    \url{src/models/classification/pixel\_level/simple\_classification\_leave\_one\_out/comare\_all\_models\_multi\_class\_16\_01/unified\_experiment\_pipeline\_acc.py}.
-    \item One-class autoencoder anomaly detection (LOGO and thresholding per fold):\\
-    \url{src/models/classification/pixel\_level/simple\_classification\_leave\_one\_out/autoencoder\_multiclass\_30\_01/autoencoder\_anomaly\_detection.py}.
-    \item Full-image dataset builder (creates Row~1/Row~2 CSVs; random seed controls sampling):\\
-    \url{src/datasets/full\_image/builders/build\_full\_image\_datasets.py}.
-\end{itemize}
-
-\noindent
-The full-image inference application is a self-contained subproject under
-\url{src/models/classification/full\_image/inference\_to\_see\_results\_of\_models/} and includes a reproducibility-focused smoke test (\texttt{scripts/smoke\_test.py}) that reports the configured \texttt{RANDOM\_SEED} and device.
-
-\medskip
-\noindent
-\TODO{Record the exact hardware used for final model training/inference (CPU model, RAM, GPU model/VRAM). For GPU runs, capture the device name printed by the scripts (e.g., \texttt{torch.cuda.get\_device\_name(0)}) and store it in the corresponding experiment folder.}
-
-\begin{table}[htbp]
-\centering
-\caption{Evaluation metrics for whole-image and patch-based detection}
-\label{tab:whole_image_eval_metrics}
-\begin{tabular}{p{5.5cm} p{4.5cm} p{4.5cm}}
-\hline
-\textbf{Task} & \textbf{Primary Metrics} & \textbf{Secondary Metrics} \\
-\hline
-
-System-level detection of cracked grape clusters &
-F1\textsubscript{CRACK}, Precision\textsubscript{CRACK}, Recall\textsubscript{CRACK} &
-MCC, Image-level Accuracy, F2\textsubscript{CRACK}, False Positive Rate \\
-
-\hline
-\end{tabular}
-\end{table}
 
 
 % Modeling and Evaluation Methodology
@@ -1323,7 +1086,7 @@ MCC, Image-level Accuracy, F2\textsubscript{CRACK}, False Positive Rate \\
 % │  ├─ Binary Pixel-Level Classification
 % │  └─ Multi-Class Pixel-Level Classification
 % ├─ Anomaly Detection Framework (One-Class)
-% ├─ Dimensionality Reduction Strategy
+% ├─ Wavelength Selection via Backward Feature Selection (BFS)
 % │  ├─ For binary pixel-level models
 % │  └─ For multi-class pixel-level models
 % ├─ Whole-Image Detection and Aggregation Pipeline

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.1) (preloaded format=pdflatex 2026.2.11)  19 FEB 2026 00:35
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.1) (preloaded format=pdflatex 2026.2.11)  20 FEB 2026 14:22
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1035,25 +1035,25 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 
 {C:/Users/yovel/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ec.enc}] (chapters/abstract.tex
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <12> on input line 10.
+(Font)              <12> on input line 14.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 10.
+(Font)              <8> on input line 14.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 10.
+(Font)              <6> on input line 14.
 
 pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.11 \end{abstract}
+l.15 \end{abstract}
                     [1]) (main.toc
 pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.31 ...Spectral Signatures}{22}{subsection.2.5.1}
+l.31 ...Spectral Signatures}{21}{subsection.2.5.1}
                                                   % [1
 
 ] [2]
-Overfull \hbox (0.88983pt too wide) in paragraph at lines 132--132
+Overfull \hbox (0.88983pt too wide) in paragraph at lines 122--122
  [][] [][][]\T1/lmr/m/n/12 Pixel-Level Clas-si-fi-ca-tion Re-sults Un-der Dif-fer-ent La-bel-ing and Bal- 
  []
 
@@ -1061,66 +1061,61 @@ Overfull \hbox (0.88983pt too wide) in paragraph at lines 132--132
 \tf@toc=\write5
 \openout5 = `main.toc'.
 
- [4] (main.lof
-Overfull \hbox (6.64676pt too wide) in paragraph at lines 13--13
- [][] [][][]\T1/lmr/m/n/12 Whole-image crack-detection pipeline ap-plied to field-acquired clus-ter scenes 
- []
+ [4] (main.lof [5
 
-[5
-
-{C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-rm.enc}{C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathit.enc}] [6{C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathsy.enc}])
+{C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathsy.enc}{C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathit.enc}])
 \tf@lof=\write6
 \openout6 = `main.lof'.
 
- [7] (main.lot [8
+ [6{C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-rm.enc}] (main.lot
+Overfull \hbox (3.25699pt too wide) in paragraph at lines 20--20
+ \T1/lmr/m/n/12 Precision/Recall/F1/ROC--AUC/PR--AUC cor-re-spond to the \T1/lmr/m/it/12 Cracked \T1/lmr/m/n/12 class 
+ []
+
+[7
 
 ]
-Overfull \hbox (3.25699pt too wide) in paragraph at lines 23--23
+Overfull \hbox (3.25699pt too wide) in paragraph at lines 21--21
  \T1/lmr/m/n/12 Precision/Recall/F1/ROC--AUC/PR--AUC cor-re-spond to the \T1/lmr/m/it/12 Cracked \T1/lmr/m/n/12 class 
  []
 
 
-Overfull \hbox (3.25699pt too wide) in paragraph at lines 24--24
- \T1/lmr/m/n/12 Precision/Recall/F1/ROC--AUC/PR--AUC cor-re-spond to the \T1/lmr/m/it/12 Cracked \T1/lmr/m/n/12 class 
- []
-
-
-Overfull \hbox (7.68231pt too wide) in paragraph at lines 26--26
+Overfull \hbox (7.68231pt too wide) in paragraph at lines 23--23
  \T1/lmr/m/n/12 LOGO folds. Ac-cu-racy is re-ported over-all, while Precision/Recall/F1/ROC-- 
  []
 
 
-Overfull \hbox (3.87521pt too wide) in paragraph at lines 29--29
+Overfull \hbox (3.87521pt too wide) in paragraph at lines 26--26
  [][] [][][]\T1/lmr/m/n/12 Dataset com-po-si-tion for full-image crack-detection ex-per-i-ments un-der early- 
  []
 
-[9])
+[8])
 \tf@lot=\write7
 \openout7 = `main.lot'.
 
- (chapters/introduction.tex [10]
+ (chapters/introduction.tex [9]
 Chapter 1.
 LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 8.
 (C:\Users\yovel\AppData\Local\Programs\MiKTeX\tex/latex/lm\ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-) [11
+) [10
 
-{C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ts1.enc}] [12]
+{C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ts1.enc}] [11]
 Overfull \hbox (18.5997pt too wide) in paragraph at lines 46--47
 \T1/lmr/m/n/12 pipeline by com-bin-ing pixel-level in-fer-ence with spa-tial ag-gre-ga-tion and post-processing,
  []
 
-[13]) (chapters/literature_review.tex [14]
+[12]) (chapters/literature_review.tex [13]
 Chapter 2.
-[15
+[14
 
-] [16] [17] [18] [19] [20] [21]
-<figures/literature/reflectence_furmula.jpg, id=666, 156.366pt x 40.077pt>
+] [15] [16] [17] [18] [19] [20]
+<figures/literature/reflectence_furmula.jpg, id=649, 156.366pt x 40.077pt>
 File: figures/literature/reflectence_furmula.jpg Graphic file (type jpg)
 <use figures/literature/reflectence_furmula.jpg>
 Package pdftex.def Info: figures/literature/reflectence_furmula.jpg  used on input line 259.
 (pdftex.def)             Requested size: 203.83417pt x 52.245pt.
-<figures/literature/Barley_Signature.jpg, id=671, 226.665pt x 198.414pt>
+<figures/literature/Barley_Signature.jpg, id=654, 226.665pt x 198.414pt>
 File: figures/literature/Barley_Signature.jpg Graphic file (type jpg)
 <use figures/literature/Barley_Signature.jpg>
 Package pdftex.def Info: figures/literature/Barley_Signature.jpg  used on input line 273.
@@ -1130,23 +1125,23 @@ Overfull \hbox (9.56598pt too wide) in paragraph at lines 278--278
 []\T1/lmr/bx/n/14.4 Spectral Imag-ing Modal-i-ties and the Elec-tro-mag-netic Spec-
  []
 
-[22 <./figures/literature/reflectence_furmula.jpg>]
-<figures/literature/Hyperspectral_imaging_across_the_electromagnetic.jpg, id=688, 383.688pt x 109.719pt>
+[21 <./figures/literature/reflectence_furmula.jpg>]
+<figures/literature/Hyperspectral_imaging_across_the_electromagnetic.jpg, id=671, 383.688pt x 109.719pt>
 File: figures/literature/Hyperspectral_imaging_across_the_electromagnetic.jpg Graphic file (type jpg)
 <use figures/literature/Hyperspectral_imaging_across_the_electromagnetic.jpg>
 Package pdftex.def Info: figures/literature/Hyperspectral_imaging_across_the_electromagnetic.jpg  used on input line 293.
 (pdftex.def)             Requested size: 385.02547pt x 110.10878pt.
- [23 <./figures/literature/Barley_Signature.jpg> <./figures/literature/Hyperspectral_imaging_across_the_electromagnetic.jpg>]
+ [22 <./figures/literature/Barley_Signature.jpg> <./figures/literature/Hyperspectral_imaging_across_the_electromagnetic.jpg>]
 Overfull \hbox (22.88353pt too wide) in paragraph at lines 308--308
 []\T1/lmr/bx/n/14.4 VIS--NIR Sen-si-tiv-ity to Phys-i-o-log-i-cal and Struc-tural Changes 
  []
 
-[24] [25]
+[23] [24]
 Overfull \hbox (3.17577pt too wide) in paragraph at lines 344--346
 \T1/lmr/m/n/12 plex-ity while pre-serv-ing per-for-mance. Com-pet-i-tive adap-tive reweighted sam-pling (CARS),
  []
 
-[26] [27]
+[25] [26]
 Overfull \hbox (2.04788pt too wide) in paragraph at lines 381--383
 \T1/lmr/m/n/12 Field-deployable hy-per-spec-tral learn-ing sys-tems must cope with sev-eral in-ter-act-ing sources
  []
@@ -1156,56 +1151,56 @@ Overfull \hbox (16.64384pt too wide) in paragraph at lines 388--388
 []\T1/lmr/bx/n/17.28 Related Work on Fruit De-fect De-tec-tion and Early-
  []
 
-[28]
+[27]
 Overfull \hbox (5.0806pt too wide) in paragraph at lines 404--414
 \T1/lmr/m/n/12 Numerous stud-ies demon-strate the ef-fec-tive-ness of clas-si-cal hy-per-spec-tral anal-y-sis pipelines
  []
 
-[29] [30] [31] [32]
+[28] [29] [30] [31]
 Overfull \hbox (17.70615pt too wide) in paragraph at lines 597--597
 []\T1/lmr/bx/n/14.4 Lack of Early, Non-Destructive Crack Early-Warning Frame-
  []
 
-) (chapters/objectives_hypotheses.tex [33] [34]
+) (chapters/objectives_hypotheses.tex [32] [33]
 Chapter 3.
-[35
+[34
 
-] [36]) (chapters/materials_methods.tex [37]
+] [35]) (chapters/materials_methods.tex [36]
 Chapter 4.
-<figures/materials_methods/study_area/vineyard_map.png, id=853, 406.6392pt x 440.3652pt>
+<figures/materials_methods/study_area/vineyard_map.png, id=836, 406.6392pt x 440.3652pt>
 File: figures/materials_methods/study_area/vineyard_map.png Graphic file (type png)
 <use figures/materials_methods/study_area/vineyard_map.png>
 Package pdftex.def Info: figures/materials_methods/study_area/vineyard_map.png  used on input line 18.
 (pdftex.def)             Requested size: 271.7835pt x 294.33089pt.
-[38
+[37
 
-] [39 <./figures/materials_methods/study_area/vineyard_map.png>]
-<figures/materials_methods/equipment/VICTOR_AND_ALON_WITH_SPECIM_IQ.jpeg, id=865, 1927.2pt x 1084.05pt>
+] [38 <./figures/materials_methods/study_area/vineyard_map.png>]
+<figures/materials_methods/equipment/VICTOR_AND_ALON_WITH_SPECIM_IQ.jpeg, id=848, 1927.2pt x 1084.05pt>
 File: figures/materials_methods/equipment/VICTOR_AND_ALON_WITH_SPECIM_IQ.jpeg Graphic file (type jpg)
 <use figures/materials_methods/equipment/VICTOR_AND_ALON_WITH_SPECIM_IQ.jpeg>
 Package pdftex.def Info: figures/materials_methods/equipment/VICTOR_AND_ALON_WITH_SPECIM_IQ.jpeg  used on input line 80.
 (pdftex.def)             Requested size: 217.42265pt x 122.28946pt.
-<figures/materials_methods/equipment/taking_picture_with_hsi.jpg, id=866, 347.04657pt x 191.9672pt>
+<figures/materials_methods/equipment/taking_picture_with_hsi.jpg, id=849, 347.04657pt x 191.9672pt>
 File: figures/materials_methods/equipment/taking_picture_with_hsi.jpg Graphic file (type jpg)
 <use figures/materials_methods/equipment/taking_picture_with_hsi.jpg>
 Package pdftex.def Info: figures/materials_methods/equipment/taking_picture_with_hsi.jpg  used on input line 86.
 (pdftex.def)             Requested size: 217.42265pt x 120.26918pt.
- [40 <./figures/materials_methods/equipment/VICTOR_AND_ALON_WITH_SPECIM_IQ.jpeg> <./figures/materials_methods/equipment/taking_picture_with_hsi.jpg>]
+ [39 <./figures/materials_methods/equipment/VICTOR_AND_ALON_WITH_SPECIM_IQ.jpeg> <./figures/materials_methods/equipment/taking_picture_with_hsi.jpg>]
 Overfull \hbox (26.36984pt too wide) in paragraph at lines 99--100
 []\T1/lmr/bx/n/12 Radiometric Cal-i-bra-tion: \T1/lmr/m/n/12 A spec-trally flat, dif-fuse white ref-er-ence panel (Spectralon$[]$,
  []
 
-<figures/materials_methods/equipment/yovel_with_thermal_camera.jpg, id=876, 278.54062pt x 209.28188pt>
+<figures/materials_methods/equipment/yovel_with_thermal_camera.jpg, id=859, 278.54062pt x 209.28188pt>
 File: figures/materials_methods/equipment/yovel_with_thermal_camera.jpg Graphic file (type jpg)
 <use figures/materials_methods/equipment/yovel_with_thermal_camera.jpg>
 Package pdftex.def Info: figures/materials_methods/equipment/yovel_with_thermal_camera.jpg  used on input line 125.
 (pdftex.def)             Requested size: 217.42265pt x 163.36372pt.
-<figures/materials_methods/equipment/thermal_image_with_decay_and_cracksjpg.jpg, id=877, 278.03876pt x 195.73125pt>
+<figures/materials_methods/equipment/thermal_image_with_decay_and_cracksjpg.jpg, id=860, 278.03876pt x 195.73125pt>
 File: figures/materials_methods/equipment/thermal_image_with_decay_and_cracksjpg.jpg Graphic file (type jpg)
 <use figures/materials_methods/equipment/thermal_image_with_decay_and_cracksjpg.jpg>
 Package pdftex.def Info: figures/materials_methods/equipment/thermal_image_with_decay_and_cracksjpg.jpg  used on input line 131.
 (pdftex.def)             Requested size: 217.42265pt x 153.06099pt.
-[41] [42 <./figures/materials_methods/equipment/yovel_with_thermal_camera.jpg> <./figures/materials_methods/equipment/thermal_image_with_decay_and_cracksjpg.jpg>] [43]
+[40] [41 <./figures/materials_methods/equipment/yovel_with_thermal_camera.jpg> <./figures/materials_methods/equipment/thermal_image_with_decay_and_cracksjpg.jpg>] [42]
 chapters/materials_methods.tex:236: LaTeX Error: There's no line here to end.
 
 See the LaTeX manual or LaTeX Companion for explanation.
@@ -1396,7 +1391,7 @@ Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
 or  <return>  to continue without it.
 
-[44]
+[43]
 chapters/materials_methods.tex:329: Undefined control sequence.
 l.329 Binary         & \num
                            {94166}    & 80 segments across 19 hyperspectral ...
@@ -1415,13 +1410,13 @@ misspelled it (e.g., `\hobx'), type `I' and the correct
 spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
-[45]
-<figures/materials_methods/gui/gui_sam2_pointer_with_numbers.png, id=914, 1541.76pt x 1027.84pt>
+[44]
+<figures/materials_methods/gui/gui_sam2_pointer_with_numbers.png, id=897, 1541.76pt x 1027.84pt>
 File: figures/materials_methods/gui/gui_sam2_pointer_with_numbers.png Graphic file (type png)
 <use figures/materials_methods/gui/gui_sam2_pointer_with_numbers.png>
 Package pdftex.def Info: figures/materials_methods/gui/gui_sam2_pointer_with_numbers.png  used on input line 394.
 (pdftex.def)             Requested size: 452.9679pt x 301.97118pt.
- [46 <./figures/materials_methods/gui/gui_sam2_pointer_with_numbers.png (PNG copy)>]
+ [45 <./figures/materials_methods/gui/gui_sam2_pointer_with_numbers.png (PNG copy)>]
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
@@ -1430,323 +1425,67 @@ Overfull \hbox (1.6544pt too wide) in paragraph at lines 455--455
 []\T1/lmr/bx/n/14.4 Whole-Image Dataset Con-struc-tion and Ex-per-i-men-tal De-
  []
 
-[47] [48] [49] [50]
-Overfull \hbox (16.1053pt too wide) in paragraph at lines 727--727
+[46] [47] [48]
+Overfull \hbox (8.89587pt too wide) in paragraph at lines 701--711
+\T1/lmr/m/n/12 To as-sess gen-er-al-iza-tion to un-seen sam-ples, Leave-One-Group-Out (LOGO) cross-validation
+ []
+
+[49]
+Overfull \hbox (16.1053pt too wide) in paragraph at lines 728--728
 []\T1/lmr/bx/n/14.4 Spectral Dis-crim-inabil-ity and In-for-ma-tive Wave-length Anal-
  []
 
 
-Overfull \hbox (0.97408pt too wide) in paragraph at lines 737--742
+Overfull \hbox (0.97408pt too wide) in paragraph at lines 738--743
 \T1/lmr/m/n/12 Separability was quan-ti-fied di-rectly from the pixel-level spec-tra us-ing three model-agnostic
  []
 
-[51] [52] [53] [54]
-Overfull \hbox (7.82425pt too wide) in paragraph at lines 938--940
-\T1/lmr/m/n/12 All pixel-level models---including the base clas-si-fiers, au-toen-coder vari-ants, and wavelength-
- []
+[50] [51] [52] [53]
 
-[55{C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathex.enc}]
-Overfull \hbox (6.1262pt too wide) in paragraph at lines 964--967
+LaTeX Warning: Reference `fig:whole_image_pipeline' on page 54 undefined on input line 924.
+
+
+Overfull \hbox (6.1262pt too wide) in paragraph at lines 942--945
 []\T1/lmr/bx/n/12 Patch-Based Di-vi-sion and De-ci-sion: \T1/lmr/m/n/12 The im-age is di-vided into fixed-size patches.
  []
 
-<figures/materials_methods/pipeline/whole_image_pipeline.jpg, id=1015, 1027.84pt x 561.09625pt>
+[54{C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathex.enc}]
+<figures/materials_methods/pipeline/whole_image_pipeline.jpg, id=996, 1027.84pt x 561.09625pt>
 File: figures/materials_methods/pipeline/whole_image_pipeline.jpg Graphic file (type jpg)
 <use figures/materials_methods/pipeline/whole_image_pipeline.jpg>
-Package pdftex.def Info: figures/materials_methods/pipeline/whole_image_pipeline.jpg  used on input line 976.
+Package pdftex.def Info: figures/materials_methods/pipeline/whole_image_pipeline.jpg  used on input line 955.
 (pdftex.def)             Requested size: 407.66833pt x 222.5424pt.
-[56] [57 <./figures/materials_methods/pipeline/whole_image_pipeline.jpg>] [58] [59]
-Underfull \hbox (badness 2035) in paragraph at lines 1141--1141
-[]|\T1/lmr/m/n/10.95 Pixel spec-
+ [55 <./figures/materials_methods/pipeline/whole_image_pipeline.jpg>]
+Overfull \hbox (2.0814pt too wide) in paragraph at lines 987--992
+\T1/lmr/m/n/12 This stage eval-u-ates whether a re-duced sub-set of wave-lengths can main-tain crack-detection
  []
 
-LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 1141.
-(C:\Users\yovel\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmtt.fd
-File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-)
-Underfull \hbox (badness 4779) in paragraph at lines 1141--1141
-[]|\T1/lmr/m/n/10.95 LOGO cross-validation with group $\OT1/lmr/m/n/10.95 =$
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1141--1142
-[]|\T1/lmr/m/n/10.95 Held-out LOGO
- []
-
-
-Underfull \hbox (badness 4927) in paragraph at lines 1141--1142
-\T1/lmr/m/n/10.95 fold (one clus-ter
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1143--1143
-[]|\T1/lmr/m/n/10.95 Multi-class pixel-level
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1143--1143
-\T1/lmr/m/n/10.95 clas-si-fi-ca-tion (domain-
- []
-
-
-Underfull \hbox (badness 2035) in paragraph at lines 1143--1143
-[]|\T1/lmr/m/n/10.95 Pixel spec-
- []
-
-
-Underfull \hbox (badness 1117) in paragraph at lines 1143--1143
-\OT1/lmr/m/n/10.95 =$ \T1/lmtt/m/n/10.95 hs_dir \T1/lmr/m/n/10.95 (image-level iden-ti-fier), com-
- []
-
-
-Underfull \hbox (badness 1735) in paragraph at lines 1143--1143
-\T1/lmr/m/n/10.95 split for non-grape/background sam-ples
- []
-
-
-Underfull \hbox (badness 6063) in paragraph at lines 1143--1144
-[]|\T1/lmr/m/n/10.95 Per fold: held-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1145--1145
-[]|\T1/lmr/m/n/10.95 CRACK-focused
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1145--1145
-\T1/lmr/m/n/10.95 domain-aware CV
- []
-
-
-Underfull \hbox (badness 2035) in paragraph at lines 1145--1145
-[]|\T1/lmr/m/n/10.95 Pixel spec-
- []
-
-
-Underfull \hbox (badness 6063) in paragraph at lines 1145--1146
-[]|\T1/lmr/m/n/10.95 Per fold: held-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1145--1146
-\T1/lmr/m/n/10.95 out CRACK
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1145--1146
-\T1/lmtt/m/n/10.95 hs_dir $\OT1/lmr/m/n/10.95 +$ \T1/lmr/m/n/10.95 fixed
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1145--1146
-\T1/lmr/m/n/10.95 REGULAR/non-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1147--1147
-[]|\T1/lmr/m/n/10.95 Autoencoder anomaly
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1147--1147
-\T1/lmr/m/n/10.95 de-tec-tion (one-class;
- []
-
-
-Underfull \hbox (badness 2035) in paragraph at lines 1147--1147
-[]|\T1/lmr/m/n/10.95 Pixel spec-
- []
-
-
-Underfull \hbox (badness 4779) in paragraph at lines 1147--1147
-[]|\T1/lmr/m/n/10.95 LOGO cross-validation with group $\OT1/lmr/m/n/10.95 =$
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1147--1148
-[]|\T1/lmr/m/n/10.95 Held-out LOGO
- []
-
-
-Underfull \hbox (badness 4927) in paragraph at lines 1147--1148
-\T1/lmr/m/n/10.95 fold (one clus-ter
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1149--1149
-[]|\T1/lmr/m/n/10.95 Autoencoder anomaly
- []
-
-
-Underfull \hbox (badness 1748) in paragraph at lines 1149--1149
-\T1/lmr/m/n/10.95 de-tec-tion (train on all
- []
-
-
-Underfull \hbox (badness 2970) in paragraph at lines 1149--1149
-\T1/lmr/m/n/10.95 ex-cept CRACK; sin-gle
- []
-
-
-Underfull \hbox (badness 2035) in paragraph at lines 1149--1149
-[]|\T1/lmr/m/n/10.95 Pixel spec-
- []
-
-
-Underfull \hbox (badness 1616) in paragraph at lines 1149--1149
-[]|\T1/lmr/m/n/10.95 Single group-wise train/test split with-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1149--1150
-[]|\T1/lmr/m/n/10.95 Held-out 20%
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1149--1150
-\T1/lmr/m/n/10.95 of groups (clus-
- []
-
-
-Underfull \hbox (badness 2229) in paragraph at lines 1151--1151
-[]|\T1/lmr/m/n/10.95 Whole-image crack de-
- []
-
-
-Underfull \hbox (badness 1577) in paragraph at lines 1151--1151
-[]|\T1/lmr/m/n/10.95 Patch; im-
- []
-
-
-Underfull \hbox (badness 7595) in paragraph at lines 1151--1152
-[]|\T1/lmr/m/n/10.95 Held-out Row 2
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1151--1152
-\T1/lmr/m/n/10.95 (early and late,
- []
-
-[60]
-Underfull \hbox (badness 10000) in paragraph at lines 1215--1215
-[]|\T1/lmr/m/n/12 Binary pixel-level
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1216--1216
-[]|\T1/lmr/m/n/12 PR--AUC$[]$,
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1217--1218
-[]|\T1/lmr/m/n/12 Precision$[]$, F1
- []
-
-
-Underfull \hbox (badness 2020) in paragraph at lines 1217--1218
-\T1/lmr/m/n/12 (weighted un-less spec-i-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1221--1221
-[]|\T1/lmr/m/n/12 Multi-class pixel-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1223--1224
-[]|\T1/lmr/m/n/12 Per-class Pre-ci-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1223--1224
-\T1/lmr/m/n/12 sion/Recall, Con-fu-sion
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1229--1230
-[]|\T1/lmr/m/n/12 Recall@Fixed-FPR,
- []
-
-
-Overfull \hbox (28.2083pt too wide) in paragraph at lines 1243--1246
-\T1/lmtt/m/n/12 .venv\T1/lmr/m/n/12 . The en-vi-ron-ment was cre-ated with \T1/lmr/bx/n/12 Python 3.11.9 \T1/lmr/m/n/12 (as recorded in \T1/lmtt/m/n/12 .venv/pyvenv.cfg\T1/lmr/m/n/12 ).
- []
-
-
-Overfull \hbox (65.67603pt too wide) in paragraph at lines 1243--1246
-\T1/lmtt/m/n/12 numpy==2.2.3\T1/lmr/m/n/12 , \T1/lmtt/m/n/12 pandas==2.2.3\T1/lmr/m/n/12 , \T1/lmtt/m/n/12 scikit-learn==1.6.1\T1/lmr/m/n/12 , \T1/lmtt/m/n/12 xgboost==2.1.4\T1/lmr/m/n/12 , and \T1/lmtt/m/n/12 torch==2.5.1+cu121\T1/lmr/m/n/12 . 
- []
-
-[61]
-Overfull \hbox (67.4431pt too wide) in paragraph at lines 1263--1267
-\T1/lmr/m/n/12 ments store fold-level and sum-mary out-puts (e.g., \T1/lmtt/m/n/12 all_fold_results.csv \T1/lmr/m/n/12 and \T1/lmtt/m/n/12 summary_results.csv\T1/lmr/m/n/12 )
- []
-
-[62]
-Overfull \hbox (0.18535pt too wide) in paragraph at lines 1269--1271
-\T1/lmr/bx/n/12 with the ex-act in-put dataset CSV(s) used, or their im-mutable hashes/versions.[] 
- []
-
-
-Overfull \hbox (16.52415pt too wide) in paragraph at lines 1284--1286
-[][]$\T1/lmr/m/n/12 src / models / classi^^\cation / pixel _ level / simple _ classi^^\cation _ leave _ one _ out / comare _
- []
-
-
-Overfull \hbox (42.63518pt too wide) in paragraph at lines 1286--1288
-[][]$\T1/lmr/m/n/12 src / models / classi^^\cation / pixel _ level / simple _ classi^^\cation _ leave _ one _ out / autoencoder _
- []
-
-
-Overfull \hbox (36.10823pt too wide) in paragraph at lines 1292--1295
-\T1/lmr/m/n/12 classi^^\cation / full _ image / inference _ to _ see _ results _ of _ models/$[][] and in-cludes a reproducibility-
- []
-
-LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 1298.
-
-Underfull \hbox (badness 10000) in paragraph at lines 1309--1309
-[]|\T1/lmr/m/n/12 System-level de-tec-tion of
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1310--1310
-[]|\T1/lmr/m/n/12 F1$[]$,
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1310--1310
-\T1/lmr/m/n/12 Precision$[]$,
- []
-
-
-Underfull \hbox (badness 4378) in paragraph at lines 1311--1312
-[]|\T1/lmr/m/n/12 MCC, Image-level Ac-
- []
-
-) (chapters/results_new.tex [63] [64]
+[56]) (chapters/results_new.tex [57]
 Chapter 5.
-[65
+[58
 
 ]
-<figures/results/spectral_signatures/spectral_signatures_mean_std.png, id=1107, 1001.9031pt x 496.0131pt>
+<figures/results/spectral_signatures/spectral_signatures_mean_std.png, id=1035, 1001.9031pt x 496.0131pt>
 File: figures/results/spectral_signatures/spectral_signatures_mean_std.png Graphic file (type png)
 <use figures/results/spectral_signatures/spectral_signatures_mean_std.png>
 Package pdftex.def Info: figures/results/spectral_signatures/spectral_signatures_mean_std.png  used on input line 39.
 (pdftex.def)             Requested size: 452.9679pt x 224.25586pt.
- [66 <./figures/results/spectral_signatures/spectral_signatures_mean_std.png>]
-<figures/results/spectral_signatures/separability_metrics.png, id=1113, 999.2532pt x 864.831pt>
+ [59 <./figures/results/spectral_signatures/spectral_signatures_mean_std.png>]
+<figures/results/spectral_signatures/separability_metrics.png, id=1042, 999.2532pt x 864.831pt>
 File: figures/results/spectral_signatures/separability_metrics.png Graphic file (type png)
 <use figures/results/spectral_signatures/separability_metrics.png>
 Package pdftex.def Info: figures/results/spectral_signatures/separability_metrics.png  used on input line 79.
 (pdftex.def)             Requested size: 452.9679pt x 392.02074pt.
-<figures/results/spectral_signatures/regional_comparison.png, id=1114, 1000.9395pt x 422.5386pt>
+<figures/results/spectral_signatures/regional_comparison.png, id=1043, 1000.9395pt x 422.5386pt>
 File: figures/results/spectral_signatures/regional_comparison.png Graphic file (type png)
 <use figures/results/spectral_signatures/regional_comparison.png>
 Package pdftex.def Info: figures/results/spectral_signatures/regional_comparison.png  used on input line 118.
 (pdftex.def)             Requested size: 452.9679pt x 191.21733pt.
- [67] [68 <./figures/results/spectral_signatures/separability_metrics.png> <./figures/results/spectral_signatures/regional_comparison.png>] [69] [70]
+ [60] [61 <./figures/results/spectral_signatures/separability_metrics.png> <./figures/results/spectral_signatures/regional_comparison.png>]
+
+LaTeX Warning: Reference `tab:evaluation_units_splits' on page 62 undefined on input line 143.
+
+[62] [63]
 Overfull \hbox (17.62482pt too wide) in paragraph at lines 184--205
 []$[]$ 
  []
@@ -1756,22 +1495,25 @@ Overfull \hbox (17.62482pt too wide) in paragraph at lines 211--232
 []$[]$ 
  []
 
-[71
+[64
 
 
-] [72
+] [65
 
-] [73] [74]
+] [66] [67]
 Overfull \hbox (40.65778pt too wide) in paragraph at lines 398--403
 \T1/lmr/m/n/12 In ad-di-tion to su-per-vised clas-si-fiers, pixel-level crack de-tec-tion was eval-u-ated us-ing reconstruction-
  []
 
-[75
+
+LaTeX Warning: Reference `tab:evaluation_units_splits' on page 68 undefined on input line 415.
+
+[68
 
 
 
 
-] [76]
+] [69]
 Overfull \hbox (17.62482pt too wide) in paragraph at lines 431--488
 []$[]$ 
  []
@@ -1781,10 +1523,10 @@ Overfull \hbox (17.62482pt too wide) in paragraph at lines 494--551
 []$[]$ 
  []
 
-[77
+[70
 
 
-] [78
+] [71
 
 ]
 Overfull \hbox (17.62482pt too wide) in paragraph at lines 568--625
@@ -1796,10 +1538,10 @@ Overfull \hbox (17.62482pt too wide) in paragraph at lines 631--688
 []$[]$ 
  []
 
-[79
+[72
 
 
-] [80
+] [73
 
 ]
 Overfull \hbox (17.62482pt too wide) in paragraph at lines 705--762
@@ -1811,28 +1553,32 @@ Overfull \hbox (17.62482pt too wide) in paragraph at lines 768--825
 []$[]$ 
  []
 
-[81
+[74
 
 
 ]
+
+LaTeX Warning: Reference `tab:evaluation_units_splits' on page 75 undefined on input line 843.
+
+
 Overfull \hbox (7.07658pt too wide) in paragraph at lines 846--851
 \T1/lmr/m/n/12 Each ex-per-i-ment em-ployed iden-ti-cal in-fer-ence logic, in-clud-ing pixel-level prob-a-bil-ity thresh-
  []
 
-[82
+[75
 
-] [83] [84] [85]
-<figures/results/feature_selection/bfs_dual_metric.png, id=1241, 855.4359pt x 422.7795pt>
+] [76] [77] [78]
+<figures/results/feature_selection/bfs_dual_metric.png, id=1167, 855.4359pt x 422.7795pt>
 File: figures/results/feature_selection/bfs_dual_metric.png Graphic file (type png)
 <use figures/results/feature_selection/bfs_dual_metric.png>
 Package pdftex.def Info: figures/results/feature_selection/bfs_dual_metric.png  used on input line 1039.
 (pdftex.def)             Requested size: 430.31812pt x 212.67944pt.
-<figures/results/feature_selection/bfs_f1_thresholds.png, id=1242, 853.7496pt x 495.0495pt>
+<figures/results/feature_selection/bfs_f1_thresholds.png, id=1168, 853.7496pt x 495.0495pt>
 File: figures/results/feature_selection/bfs_f1_thresholds.png Graphic file (type png)
 <use figures/results/feature_selection/bfs_f1_thresholds.png>
 Package pdftex.def Info: figures/results/feature_selection/bfs_f1_thresholds.png  used on input line 1048.
 (pdftex.def)             Requested size: 221.95676pt x 128.70227pt.
-<figures/results/feature_selection/bfs_prauc_thresholds.png, id=1243, 855.4359pt x 495.0495pt>
+<figures/results/feature_selection/bfs_prauc_thresholds.png, id=1169, 855.4359pt x 495.0495pt>
 File: figures/results/feature_selection/bfs_prauc_thresholds.png Graphic file (type png)
 <use figures/results/feature_selection/bfs_prauc_thresholds.png>
 Package pdftex.def Info: figures/results/feature_selection/bfs_prauc_thresholds.png  used on input line 1054.
@@ -1842,7 +1588,7 @@ Overfull \hbox (2.90428pt too wide) in paragraph at lines 1066--1074
  [][] 
  []
 
-[86
+[79
 
 
 
@@ -1859,95 +1605,99 @@ Overfull \hbox (1.64142pt too wide) in paragraph at lines 1145--1150
  []\T1/lmr/bx/n/12 Calibration-to-test gen-er-al-iza-tion gap (pri-mary re-sult).[] \T1/lmr/m/n/12 A con-sis-tent calibration-
  []
 
-[87 <./figures/results/feature_selection/bfs_f1_thresholds.png> <./figures/results/feature_selection/bfs_prauc_thresholds.png>] [88] [89] [90]
-<figures/results/feature_selection/stability_varying_30wl_wavelength_popularity_overview.png, id=1297, 957.8184pt x 618.1494pt>
+[80 <./figures/results/feature_selection/bfs_f1_thresholds.png> <./figures/results/feature_selection/bfs_prauc_thresholds.png>] [81] [82]
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 1255.
+ (C:\Users\yovel\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmtt.fd
+File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+) [83]
+<figures/results/feature_selection/stability_varying_30wl_wavelength_popularity_overview.png, id=1223, 957.8184pt x 618.1494pt>
 File: figures/results/feature_selection/stability_varying_30wl_wavelength_popularity_overview.png Graphic file (type png)
 <use figures/results/feature_selection/stability_varying_30wl_wavelength_popularity_overview.png>
 Package pdftex.def Info: figures/results/feature_selection/stability_varying_30wl_wavelength_popularity_overview.png  used on input line 1269.
 (pdftex.def)             Requested size: 430.31812pt x 277.71191pt.
-<figures/results/feature_selection/stability_varying_30wl_wavelength_binning_comparison.png, id=1298, 1150.0566pt x 853.2678pt>
+<figures/results/feature_selection/stability_varying_30wl_wavelength_binning_comparison.png, id=1224, 1150.0566pt x 853.2678pt>
 File: figures/results/feature_selection/stability_varying_30wl_wavelength_binning_comparison.png Graphic file (type png)
 <use figures/results/feature_selection/stability_varying_30wl_wavelength_binning_comparison.png>
 Package pdftex.def Info: figures/results/feature_selection/stability_varying_30wl_wavelength_binning_comparison.png  used on input line 1276.
 (pdftex.def)             Requested size: 430.31812pt x 319.27158pt.
-<figures/results/feature_selection/stability_varying_30wl_wavelength_stability_heatmap.png, id=1299, 435.5472pt x 923.6106pt>
+<figures/results/feature_selection/stability_varying_30wl_wavelength_stability_heatmap.png, id=1225, 435.5472pt x 923.6106pt>
 File: figures/results/feature_selection/stability_varying_30wl_wavelength_stability_heatmap.png Graphic file (type png)
 <use figures/results/feature_selection/stability_varying_30wl_wavelength_stability_heatmap.png>
 Package pdftex.def Info: figures/results/feature_selection/stability_varying_30wl_wavelength_stability_heatmap.png  used on input line 1283.
 (pdftex.def)             Requested size: 249.13371pt x 528.3238pt.
-<figures/results/feature_selection/stability_varying_30wl_wavelength_frequency_spectrum.png, id=1300, 1149.093pt x 426.393pt>
+<figures/results/feature_selection/stability_varying_30wl_wavelength_frequency_spectrum.png, id=1226, 1149.093pt x 426.393pt>
 File: figures/results/feature_selection/stability_varying_30wl_wavelength_frequency_spectrum.png Graphic file (type png)
 <use figures/results/feature_selection/stability_varying_30wl_wavelength_frequency_spectrum.png>
 Package pdftex.def Info: figures/results/feature_selection/stability_varying_30wl_wavelength_frequency_spectrum.png  used on input line 1290.
 (pdftex.def)             Requested size: 430.31812pt x 159.67577pt.
- [91 <./figures/results/feature_selection/stability_varying_30wl_wavelength_popularity_overview.png>] [92 <./figures/results/feature_selection/stability_varying_30wl_wavelength_binning_comparison.png>] [93 <./figures/results/feature_selection/stability_varying_30wl_wavelength_stability_heatmap.png>]
-<figures/results/feature_selection/stability_varying_11wl_wavelength_popularity_overview.png, id=1321, 957.8184pt x 618.1494pt>
+ [84 <./figures/results/feature_selection/stability_varying_30wl_wavelength_popularity_overview.png>] [85 <./figures/results/feature_selection/stability_varying_30wl_wavelength_binning_comparison.png>] [86 <./figures/results/feature_selection/stability_varying_30wl_wavelength_stability_heatmap.png>]
+<figures/results/feature_selection/stability_varying_11wl_wavelength_popularity_overview.png, id=1248, 957.8184pt x 618.1494pt>
 File: figures/results/feature_selection/stability_varying_11wl_wavelength_popularity_overview.png Graphic file (type png)
 <use figures/results/feature_selection/stability_varying_11wl_wavelength_popularity_overview.png>
 Package pdftex.def Info: figures/results/feature_selection/stability_varying_11wl_wavelength_popularity_overview.png  used on input line 1311.
 (pdftex.def)             Requested size: 430.31812pt x 277.71191pt.
-<figures/results/feature_selection/stability_varying_11wl_wavelength_binning_comparison.png, id=1322, 1151.0202pt x 853.2678pt>
+<figures/results/feature_selection/stability_varying_11wl_wavelength_binning_comparison.png, id=1249, 1151.0202pt x 853.2678pt>
 File: figures/results/feature_selection/stability_varying_11wl_wavelength_binning_comparison.png Graphic file (type png)
 <use figures/results/feature_selection/stability_varying_11wl_wavelength_binning_comparison.png>
 Package pdftex.def Info: figures/results/feature_selection/stability_varying_11wl_wavelength_binning_comparison.png  used on input line 1318.
 (pdftex.def)             Requested size: 430.31812pt x 318.99815pt.
- [94 <./figures/results/feature_selection/stability_varying_30wl_wavelength_frequency_spectrum.png> <./figures/results/feature_selection/stability_varying_11wl_wavelength_popularity_overview.png>]
-<figures/results/feature_selection/stability_varying_11wl_wavelength_stability_heatmap.png, id=1330, 427.5975pt x 570.933pt>
+ [87 <./figures/results/feature_selection/stability_varying_30wl_wavelength_frequency_spectrum.png> <./figures/results/feature_selection/stability_varying_11wl_wavelength_popularity_overview.png>]
+<figures/results/feature_selection/stability_varying_11wl_wavelength_stability_heatmap.png, id=1257, 427.5975pt x 570.933pt>
 File: figures/results/feature_selection/stability_varying_11wl_wavelength_stability_heatmap.png Graphic file (type png)
 <use figures/results/feature_selection/stability_varying_11wl_wavelength_stability_heatmap.png>
 Package pdftex.def Info: figures/results/feature_selection/stability_varying_11wl_wavelength_stability_heatmap.png  used on input line 1325.
 (pdftex.def)             Requested size: 249.13371pt x 332.63979pt.
-<figures/results/feature_selection/stability_varying_11wl_wavelength_frequency_spectrum.png, id=1331, 1149.093pt x 426.393pt>
+<figures/results/feature_selection/stability_varying_11wl_wavelength_frequency_spectrum.png, id=1258, 1149.093pt x 426.393pt>
 File: figures/results/feature_selection/stability_varying_11wl_wavelength_frequency_spectrum.png Graphic file (type png)
 <use figures/results/feature_selection/stability_varying_11wl_wavelength_frequency_spectrum.png>
 Package pdftex.def Info: figures/results/feature_selection/stability_varying_11wl_wavelength_frequency_spectrum.png  used on input line 1332.
 (pdftex.def)             Requested size: 430.31812pt x 159.67577pt.
- [95 <./figures/results/feature_selection/stability_varying_11wl_wavelength_binning_comparison.png>] [96 <./figures/results/feature_selection/stability_varying_11wl_wavelength_stability_heatmap.png> <./figures/results/feature_selection/stability_varying_11wl_wavelength_frequency_spectrum.png>]) (chapters/discussions_new.tex
+ [88 <./figures/results/feature_selection/stability_varying_11wl_wavelength_binning_comparison.png>] [89 <./figures/results/feature_selection/stability_varying_11wl_wavelength_stability_heatmap.png> <./figures/results/feature_selection/stability_varying_11wl_wavelength_frequency_spectrum.png>]) (chapters/discussions_new.tex
 Chapter 6.
-[97
+[90
 
-] [98]
+] [91]
 Overfull \hbox (3.39793pt too wide) in paragraph at lines 57--58
 \T1/lmr/m/n/12 sub-sets (Fig-ure [][]5.5[][]; Ta-ble [][]5.16[][]), and whole-image eval-u-a-tion con-firmed that reduced-
  []
 
-[99] [100] [101] [102] [103] [104] [105]
+[92] [93] [94] [95] [96] [97] [98]
 Overfull \hbox (14.44998pt too wide) in paragraph at lines 222--222
 []\T1/lmr/bx/n/17.28 Generalization Gaps Be-tween Cal-i-bra-tion and Test
  []
 
-[106] [107] [108] [109] [110] [111] [112]) (chapters/conclusions.tex [113]
+[99] [100] [101] [102] [103] [104] [105]) (chapters/conclusions.tex [106]
 Chapter 7.
-[114
+[107
 
-] [115] [116] [117]
+] [108] [109] [110]
 Overfull \hbox (6.46312pt too wide) in paragraph at lines 100--102
 \T1/lmr/bx/n/12 For sen-sor man-u-fac-tur-ers and agri-cul-tural tech-nol-ogy de-vel-op-ers\T1/lmr/m/n/12 , the wavelength-
  []
 
-[118] [119] [120] [121]
+[111] [112] [113] [114]
 Overfull \hbox (2.47429pt too wide) in paragraph at lines 183--184
 []\T1/lmr/m/n/12 Spatial map-ping and cluster-level geo-ref-er-enc-ing, en-abling grow-ers to vi-su-al-ize crack-
  []
 
-[122]) [123] [124]
+[115]) [116] [117]
 Overfull \hbox (12.94675pt too wide) in paragraph at lines 90--90
 [][]\T1/lmr/m/n/12 Behmann, J., Ace-bron, K., Emin, D., Ben-nertz, S., Mat-sub-ara, S., Thomas, S., Bohnenkamp,
  []
 
-[125
+[118
 
-] [126]
+] [119]
 Overfull \hbox (1.80667pt too wide) in paragraph at lines 90--90
 [][]\T1/lmr/m/n/12 Haghbin, N., Bakhshipour, A., Zareiforoush, H., & Mou-sane-jad, S. (2023). Non-destructive
  []
 
-[127]
+[120]
 Overfull \hbox (0.80736pt too wide) in paragraph at lines 90--90
 [][]\T1/lmr/m/n/12 Karantzi, A. D., Kafkale-tou, M., Tsaniklidis, G., Bai, J., Christopou-los, M. V., Fanourakis,
  []
 
-[128] [129] [130] [131] [132] (main.aux)
+[121] [122] [123] [124] [125] (main.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-01-19>
@@ -1966,17 +1716,17 @@ Package logreq Info: Writing requests to 'main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 34701 strings out of 467866
- 677625 string characters out of 5418325
- 1588052 words of memory out of 5000000
- 62532 multiletter control sequences out of 15000+600000
- 721956 words of font info for 105 fonts, out of 8000000 for 9000
+ 34667 strings out of 467866
+ 677181 string characters out of 5418325
+ 1585094 words of memory out of 5000000
+ 62522 multiletter control sequences out of 15000+600000
+ 714053 words of font info for 101 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  86i,15n,131p,2126b,5183s stack positions out of 10000i,1000n,20000p,200000b,200000s
-<C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx10.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx12.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx8.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbxi10.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmex10.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi10.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi12.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi8.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr10.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr12.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr17.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr8.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri10.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri12.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy10.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy8.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtk10.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtt10.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtt12.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on main.pdf (134 pages, 10162169 bytes).
+<C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx10.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx12.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmex10.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi10.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi12.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi8.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr10.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr12.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr17.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr8.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri10.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri12.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy10.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy8.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtt12.pfb><C:/Users/yovel/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
+Output written on main.pdf (127 pages, 10032271 bytes).
 PDF statistics:
- 2321 PDF objects out of 2487 (max. 8388607)
- 474 named destinations out of 1000 (max. 500000)
+ 2228 PDF objects out of 2487 (max. 8388607)
+ 454 named destinations out of 1000 (max. 500000)
  1037 words of extra memory for PDF output out of 10000 (max. 10000000)
 

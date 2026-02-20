@@ -4,9 +4,9 @@
 \section{Overview of Experimental Results}
 
 \noindent
-This chapter presents the quantitative results obtained from the experimental evaluation of hyperspectral-based crack detection and early-warning screening methods. The results are organized to follow the logical progression of the experimental pipeline, beginning with spectral characterization and continuing through pixel-level and whole-image modeling, followed by wavelength-selection analyses.
+This chapter presents the quantitative results obtained from the experimental evaluation of hyperspectral-based crack detection and early-warning screening methods. The results are organized to follow the logical progression of the experimental pipeline, beginning with spectral characterization and continuing through pixel-level then to whole-image modeling, followed by wavelength-selection analyses.
 
-Only empirical findings are reported in this chapter, without interpretation or comparison to prior studies.
+
 
 \subsection{Baselines}
 \label{subsec:results_baselines}
@@ -152,7 +152,7 @@ For a compact summary of the evaluation units and split strategies used across a
 \noindent
 Binary pixel-level classification was evaluated for distinguishing healthy from cracked tissue.
 Performance was assessed using ranking-based metrics (ROC--AUC and, where reported, PR--AUC) together with class-specific Precision and Recall
-for the \textit{Cracked} class (positive class). Under class imbalance, PR--AUC\textsubscript{CRACK} is treated as the primary separability metric (see Section~\ref{subsubsec:metrics_rationale}).
+for the \textit{Cracked} class (positive class). Under class imbalance, PR--AUC\textsubscript{CRACK} is treated as the primary separability metric (see Section~\ref{subsec:evaluation_protocols}).
 
 Two sampling regimes were considered: the original naturally imbalanced distribution and a class-balanced configuration.
 
@@ -1018,7 +1018,7 @@ Early & Test &
 \medskip
 \noindent
 Full-image results in Table~\ref{tab:full_image_early_late_metrics} quantify system-level detection performance under early- and late-stage conditions using a fixed post-processing and aggregation pipeline, and Table~\ref{tab:full_image_autoencoder_metrics} reports the analogous evaluation when driven by autoencoder-based scores.
-The next experiment investigates the effect of spectral dimensionality reduction on this same end-to-end pipeline by applying Backward Feature Selection (BFS) and tracking CRACK metrics as a function of the number of retained wavelengths.
+The next experiment investigates the effect of spectral wavelength selection on this same end-to-end pipeline by applying Backward Feature Selection (BFS) and tracking CRACK metrics as a function of the number of retained wavelengths.
 The resulting performance trajectories are shown in Figures~\ref{fig:bfs_dual_metric} and \ref{fig:bfs_threshold_markers}.
 
 
@@ -1029,7 +1029,7 @@ The resulting performance trajectories are shown in Figures~\ref{fig:bfs_dual_me
 \noindent
 Backward Feature Selection (BFS) was applied to the hyperspectral channels to evaluate
 full-image crack-detection performance as a function of the number of selected wavelengths.
-At each BFS step, the pipeline performance was recorded using CRACK-class metrics, with \textbf{CRACK PR--AUC} treated as the primary objective (Section~\ref{subsec:dimensionality_reduction}).
+At each BFS step, the pipeline performance was recorded using CRACK-class metrics, with \textbf{CRACK PR--AUC} treated as the primary objective (Section~\ref{subsec:wavelength_selection}).
 The \textbf{full-spectrum baseline} corresponds to \textbf{159 wavelengths} (450--925\,nm) and serves as the reference point for the performance curves and for the subset comparisons reported below.
 
 \FloatBarrier
@@ -1300,7 +1300,7 @@ Figure~\ref{fig:stability_30_binning} further shows that the same dominant regio
 \noindent
 The same analysis was repeated for the top-11 wavelength subsets
 (Figures~\ref{fig:stability_11_popularity}--\ref{fig:stability_11_spectrum}),
-corresponding to the most aggressive dimensionality reduction evaluated
+corresponding to the most aggressive wavelength reduction evaluated
 (within 1\% of the maximum PR--AUC).
 
 \noindent
