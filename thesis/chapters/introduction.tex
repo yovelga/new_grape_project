@@ -33,7 +33,15 @@ This thesis addresses two related but distinct analysis settings. \textit{Identi
 
 \medskip
 \noindent
-\textbf{Terminology (Early vs.\ Late Acquisition).} In this thesis, \textit{detection/identification} refers to classification at the \textit{time of measurement} using hyperspectral signatures (e.g., pixel-level crack identification and whole-image inference under early- vs.\ late-stage conditions). Here, \textit{early} and \textit{late} denote \textit{acquisition-stage subsets relative to crack progression}: for a given grape/cluster identity, \textit{early} corresponds to the first acquisition at which cracking is absent or only minimal/incipient (i.e., the first time a small crack is recorded), whereas \textit{late} corresponds to acquisitions where cracking is advanced and macroscopically visible. These terms describe crack status at the time of measurement (and typically align with earlier- vs.\ later-season acquisition periods), not a future outcome.
+\textbf{Terminology (Early vs.\ Late Acquisition).} In this thesis, \textit{detection/identification} refers to classification at the time of measurement using hyperspectral signatures. The terms \textit{early-stage} and \textit{late-stage} denote acquisition-stage subsets relative to crack progression within the same cluster, as defined by vineyard monitoring records:
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Late-stage:} Images acquired after the first recorded cracking event, representing an advanced cracking condition.
+    \item \textbf{Early-stage:} The earliest available image associated with the onset of cracking for the same cluster, representing the initial observable stage.
+\end{itemize}
+
+\noindent
+Both stages involve detection of crack-related spectral signatures at the time of measurement. These terms describe crack status at the time of acquisition, not a future outcome or pre-symptomatic prediction.
 
 \subsection{Main Research Question}
 Can hyperspectral imaging and machine learning models be used to detect and identify cracking-related status at the time of measurement under field conditions, including both early- and late-stage acquisitions (initial/minimal vs.\ advanced cracking)?
