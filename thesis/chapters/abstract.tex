@@ -1,19 +1,19 @@
 % --- Abstract ---
 \begin{abstract}
-\noindent % No indent for the first line
-Grape cracking is a severe physiological disorder that leads to significant economic losses in the viticulture industry by reducing marketable yield and increasing susceptibility to secondary infections like sour rot. 
-Early and non-destructive assessment is critical for implementing preventative measures. This research explores the feasibility of using hyperspectral imaging (HSI; VNIR 400--1000~nm), coupled with machine learning, to detect and identify crack-related spectral signatures at the time of measurement under field conditions, including both early- and late-stage acquisitions (initial/minimal vs.\ advanced cracking). Throughout the thesis, all spectral analyses are restricted to 450--925~nm with per-spectrum Standard Normal Variate (SNV) normalization.
+
+\noindent
+Grape cracking is a severe physiological disorder that leads to substantial economic losses in table-grape production by reducing marketable yield and increasing susceptibility to secondary infections such as sour rot. Early, non-destructive detection is therefore critical for enabling timely management interventions. This study investigates the feasibility of hyperspectral imaging (HSI; VNIR 400--1000~nm) combined with machine learning for crack detection under field conditions, considering both early- and late-stage acquisitions (initial/minimal vs.\ advanced cracking). All spectral analyses were restricted to 450--925~nm and employed per-spectrum Standard Normal Variate (SNV) normalization.
 
 \medskip
 \noindent
-The study followed a multi-stage approach: initial identification, system-level field inference, and comparative analysis of spectral signatures. For the identification task, a pixel-level dataset was meticulously created by manually selecting and labeling pixels from healthy and cracked berries. An XGBoost classifier trained on these spectral signatures achieved outstanding performance, with an accuracy of approximately 97\% and an AUC of 0.99, demonstrating that a distinct spectral difference exists between intact and cracked grape tissue.
+A multi-stage analytical framework was developed, including pixel-level classification, whole-image crack detection, and wavelength selection. Pixel-level spectral signatures of healthy and cracked berries were manually annotated and used to train an XGBoost classifier, achieving high discrimination performance (accuracy $\approx$ 97\%, AUC $\approx$ 0.99) and confirming the existence of a distinct spectral separation between tissue states.
 
 \medskip
 \noindent
-However, applying this pixel-level model to whole-image segmentation proved challenging. The model produced noisy results, often misclassifying background elements such as plastic ties or dry twigs, which exhibited spectral signatures similar to those of decay associated with cracks.
-To address this gap between pixel-level signature discrimination and field-scene inference, the research developed a whole-image crack-detection pipeline. The approach aggregates pixel-level classifier outputs using spatial post-processing (thresholding, morphological filtering, and patch/blob-based decision rules) to obtain an image-level decision, and was evaluated separately under early- and late-stage acquisition conditions. System-level performance was reported with emphasis on the \textit{Cracked} class, using F1\textsubscript{CRACK} and MCC alongside precision and recall. On the held-out test row, the pipeline achieved F1\textsubscript{CRACK}=0.704 (MCC=0.504) under early-stage acquisition and F1\textsubscript{CRACK}=0.818 (MCC=0.598) under late-stage acquisition. In addition, wavelength-selection experiments quantify the extent to which crack-detection performance can be retained using reduced spectral-band subsets, supporting a pathway toward compact sensing configurations for field deployment.
+Direct application of pixel-level predictions to field scenes resulted in background-induced misclassification. To address this limitation, a whole-image crack-detection pipeline was developed, aggregating pixel-level CRACK probabilities using spatial post-processing (thresholding, morphological filtering, and patch/blob-based decision rules). The system was evaluated using a spatially disjoint row-based calibration--test split and reported with emphasis on the Cracked class. On the held-out test row, the pipeline achieved F1\textsubscript{CRACK} = 0.704 under early-stage acquisition and F1\textsubscript{CRACK} = 0.818 under late-stage acquisition.
+
+\medskip
+\noindent
+Wavelength selection experiments demonstrated that comparable detection performance can be retained using reduced spectral-band subsets, indicating the potential for compact sensing configurations suitable for field deployment. Overall, the results establish the feasibility of HSI-based crack detection under realistic vineyard conditions and provide a methodological foundation for operational, non-destructive monitoring tools.
+
 \end{abstract}
-\newpage
-
-
-% =====================================================================

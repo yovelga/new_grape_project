@@ -6,8 +6,8 @@
 \noindent
 This chapter reports quantitative results following the experimental pipeline described in Section~\ref{sec:modeling_evaluation}: spectral characterization, pixel-level classification, whole-image detection, and wavelength-selection analysis.
 
-\noindent
-\textbf{Presentation note:} The main text presents mean values truncated to two decimal places for clarity. Full cross-validation statistics (mean $\pm$ standard deviation, fold-level data) are provided in Appendix~\ref{app:cv_statistics}.
+% \noindent
+% \textbf{Presentation note:} The main text presents mean values truncated to two decimal places for clarity. Full cross-validation statistics (mean $\pm$ standard deviation, fold-level data) are provided in Appendix~\ref{app:cv_statistics}.
 
 \subsection{Baselines}
 \label{subsec:results_baselines}
@@ -18,7 +18,7 @@ Each set of results is reported relative to the explicit baseline defined below:
 \begin{itemize}
 
 \item \textbf{Pixel-level classification baseline.}
-The baseline model is \textbf{XGBoost} trained on the \textbf{full SNV-normalized hyperspectral signature} (450--925\,nm, 159 bands). Binary-task performance is reported in the XGBoost rows of Table~\ref{tab:pixel_metrics_unbalanced}. Results for extended labeling and balancing regimes appear in Table~\ref{tab:pixel_metrics_unbalanced_all}, with balanced-training baselines provided in Appendix~\ref{app:balanced_results}.
+The baseline model is \textbf{XGBoost} trained on the \textbf{full SNV-normalized hyperspectral signature} (450--925\,nm, 159 bands; see Section~\ref{subsec:global_preprocessing}). Binary-task performance is reported in the XGBoost rows of Table~\ref{tab:pixel_metrics_unbalanced}. Results for extended labeling and balancing regimes appear in Table~\ref{tab:pixel_metrics_unbalanced_all}, with balanced-training baselines provided in Appendix~\ref{app:balanced_results}.
 
 \item \textbf{Whole-image crack-detection baseline.}
 Whole-image detection was evaluated using the aggregation pipeline described in Section~\ref{subsec:full_image_pipeline}, applied to pixel-level probability maps from the full-spectrum model without wavelength selection. Early/late calibration and held-out test performance are summarized in Table~\ref{tab:full_image_early_late_metrics}, with dataset composition reported in Table~\ref{tab:full_image_dataset_composition}.
@@ -75,7 +75,7 @@ Separation is substantially higher in the NIR, with peak discriminability at 727
 \label{sec:pixel-level-classification}
 
 \noindent
-Supervised pixel-level classification addresses \hyperref[hyp:pixel_level_feasibility]{Hypothesis~2}, following the LOGO cross-validation protocol in Section~\ref{sec:modeling_evaluation}. PR--AUC\textsubscript{CRACK} is the primary metric.
+Supervised pixel-level classification addresses \hyperref[hyp:pixel_level_feasibility]{Hypothesis~2}, following the LOGO cross-validation protocol described in Section~\ref{subsec:cv_strategy}. PR--AUC\textsubscript{CRACK} is the primary metric.
 
 \graphicspath{{results/Binary_Pixel_Level_Classification/}}
 
@@ -89,7 +89,7 @@ Supervised pixel-level classification addresses \hyperref[hyp:pixel_level_feasib
 
 
 \noindent
-Table~\ref{tab:pixel_metrics_unbalanced} reports performance across LOGO folds (unbalanced class distribution). Balanced-training results are in Appendix~\ref{app:balanced_results}.
+Table~\ref{tab:pixel_metrics_unbalanced} reports performance across LOGO folds (Section~\ref{subsec:cv_strategy}; unbalanced class distribution). Balanced-training results are in Appendix~\ref{app:balanced_results}.
 
 \medskip
 
@@ -279,7 +279,7 @@ Overall, autoencoder-based formulations yielded lower PR--AUC\textsubscript{CRAC
 \label{sec:full-image-early-late}
 
 \noindent
-Using the protocol described in Section~\ref{subsec:full_image_pipeline}, whole-image detection was assessed under early- and late-stage conditions, addressing \hyperref[hyp:whole_image_robustness]{Hypothesis~3}. The primary metric is \textbf{F1\textsubscript{CRACK}}. Dataset composition is in Table~\ref{tab:full_image_dataset_composition}; supervised and autoencoder results are in Tables~\ref{tab:full_image_early_late_metrics} and~\ref{tab:full_image_autoencoder_metrics}, respectively.
+Using the protocol described in Section~\ref{subsec:full_image_pipeline}, whole-image detection was assessed under early- and late-stage conditions, addressing \hyperref[hyp:whole_image_robustness]{Hypothesis~3}. The primary metric is \textbf{F1\textsubscript{CRACK}}. The baseline for whole-image comparison is the full-spectrum XGBoost aggregation pipeline (159 bands, 450--925\,nm) without wavelength selection, as defined in Section~\ref{subsec:results_baselines}. Dataset composition is in Table~\ref{tab:full_image_dataset_composition}; supervised and autoencoder results are in Tables~\ref{tab:full_image_early_late_metrics} and~\ref{tab:full_image_autoencoder_metrics}, respectively.
 
 
 
@@ -548,7 +548,8 @@ The top-30 subset achieves F1\textsubscript{CRACK} = 0.8136 (Early) and 0.8485 (
 
 \FloatBarrier
 
-
+\subsection{BFS Wavelength-Selection Stability Analysis}
+\label{sec:bfs-stability}
 
 \noindent
 Cross-seed wavelength overlap statistics are reported in Appendix~\ref{app:wavelength_details}.
