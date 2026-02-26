@@ -1,77 +1,84 @@
 \chapter{Materials and Methods}
+\label{ch:materials_methods}
 
+\noindent
+This chapter details the experimental design, data acquisition procedures, and computational methodologies employed to detect grape cracking using hyperspectral imaging under field conditions. To address the research objectives, the methodology is organized into three progressive phases:
+
+\begin{enumerate}
+    \item \textbf{Data Acquisition:} Describes the commercial vineyard experimental setup, the multi-modal sensor suite (HSI, RGB, and Thermal), and the field collection protocols.
+    \item \textbf{Dataset Construction:} Details the formulation of the pixel-level and whole-image datasets, including the use of an interactive annotation pipeline powered by foundation vision models (SAM2) for precise spectral extraction.
+    \item \textbf{Modeling and Evaluation Framework:} Outlines the end-to-end analytical pipeline, progressing from global spectral preprocessing and baseline pixel-level classification to robust whole-image spatial aggregation and strategic wavelength selection.
+\end{enumerate}
+
+\medskip
 % -----------------------------
 % DATA ACQUISITION
 % -----------------------------
+\clearpage
 \section{Data Acquisition}
 
 \subsection{Study Area and Experimental Design}
 
 \noindent
-The study was conducted in the Lachish region of Israel, an area characterized by a semi-arid climate with a hot, dry summer and a mild winter. These conditions make the region a central hub for grape cultivation (viticulture) in Israel. The experiment was conducted in a commercial table grape vineyard (\textit{Vitis vinifera} L., cv. `Scarlotta'), in collaboration with the ``Tali Grapes'' brand. The vineyard was grafted onto 1103 Paulsen rootstock and was planted in 2018.
-
-\noindent
-Figure~\ref{fig:vineyard_map} summarizes the block structure and irrigation assignment used throughout the study, clarifying the spatial provenance of the samples used later for row-based calibration and testing.
+The study was conducted in the Lachish region of Israel, a semi-arid area characterized by hot, dry summers and mild winters, making it a central hub for Israeli viticulture. Figure~\ref{fig:lachish_landscape} shows a view of the Lachish vineyard environment. The experiment took place in a commercial table grape vineyard (\textit{Vitis vinifera} L., cv. `Scarlotta'), operated in collaboration with the ``Tali Grapes'' brand. The vineyard was planted in 2018 and grafted onto 1103 Paulsen rootstock.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\textwidth]{figures/materials_methods/study_area/vineyard_map.png}
-    \caption{Map of the experimental vineyard showing the five randomized blocks (A–E) and the four irrigation regimes applied within each block.}
-    \label{fig:vineyard_map}
+    \includegraphics[width=0.6\textwidth]{figures/materials_methods/study_area/lachish_vineyard_row_2.png}
+    \caption{A general view of the Lachish vineyard (Row~2) illustrating the semi-arid landscape and vine rows.}
+    \label{fig:lachish_landscape}
 \end{figure}
 
 \medskip
 \noindent
-The experimental design followed a Randomized Complete Block Design (RCBD), including
-five replicates (Blocks A--E). Within each block, four different irrigation regimes were
-tested, resulting in a total of 20 experimental plots ($5~\text{blocks} \times 4~\text{treatments}$).
+The experimental layout followed a Randomized Complete Block Design (RCBD) comprising five replicates (Blocks A--E). Within each block, four distinct irrigation regimes were applied, yielding a total of 20 experimental plots ($5~\text{blocks} \times 4~\text{treatments}$). The two panels in Figure~\ref{fig:vineyard_example} summarize the block structure and irrigation assignment and provide an example of a tagged grape cluster used for repeated imaging; together they establish the spatial provenance for the row-based calibration and testing sets used later in this study.
 
 \medskip
 \noindent
-Each experimental plot consisted of three consecutive rows of nine vines each
-(27 vines per plot). To minimize edge effects and water spillover between irrigation
-regimes, only vines from the middle row of each plot were selected for measurement.
-From each middle row, 12 representative grape clusters were tagged, yielding a total
-sample size of 240 clusters ($20~\text{plots} \times 12~\text{clusters}$).
+Each experimental plot consisted of three consecutive rows of nine vines. To minimize edge effects and water spillover between treatments, only vines from the middle row of each plot were monitored. From these middle rows, 12 representative grape clusters were tagged per plot, resulting in a total sample size of 240 monitored clusters. To ensure accurate repeated imaging throughout the season, these target clusters were marked with durable, color-coded tags indicating their specific irrigation regime, and their vine locations were georeferenced using a GPS module.
 
 \medskip
 \noindent
-The four irrigation regimes tested were:
+The four irrigation regimes, initiated on April 29, 2024, and applied via drip irrigation, were:
 \begin{itemize}
     \item \textbf{High Irrigation (Blue):} 796 mm of water throughout the season.
     \item \textbf{Low Irrigation (White):} 376 mm of water throughout the season.
-    \item \textbf{Reducing Irrigation (Red):} A transition from high to low irrigation
-    (total 532 mm), beginning at the post-veraison stage.
-    \item \textbf{Increasing Irrigation (Yellow):} A transition from low to high irrigation
-    (total 645 mm), beginning at the post-veraison stage.
+    \item \textbf{Reducing Irrigation (Red):} Transition from high to low irrigation (total 532 mm), commencing post-veraison.
+    \item \textbf{Increasing Irrigation (Yellow):} Transition from low to high irrigation (total 645 mm), commencing post-veraison.
 \end{itemize}
 
 \medskip
 \noindent
-Irrigation commenced on April 29, 2024, and was applied daily or every other day via
-a drip irrigation system.
+The experimental campaign ran continuously until late September 2024. Alongside the imaging procedures detailed below, weekly physiological and yield measurements---including stem water potential, stomatal conductance, and soil moisture---were collected to provide agronomic context for the spectral analyses.
 
-\medskip
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/materials_methods/study_area/vineyard_map.png}
+        \caption{Map of the experimental vineyard showing the five randomized blocks (A–E) and the four irrigation regimes applied within each block.}
+        \label{fig:vineyard_map}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/materials_methods/study_area/grape_with_plastic_tag.png}
+        \caption{Tagged grape cluster used for tracking and repeated imaging; tags indicate the specific irrigation regime.}
+        \label{fig:grape_tag}
+    \end{subfigure}
+    \caption{(a) Vineyard map with randomized blocks and irrigation treatments; (b) example of a plastic-tagged grape cluster.}
+    \label{fig:vineyard_example}
+\end{figure}
+
+\subsection{Multi-Modal Imaging Systems}
+
 \noindent
-The experiment continued until the end of September 2024. Physiological and yield
-measurements—including stem water potential, stomatal conductance, fruit properties,
-and percentage of healthy clusters—were performed weekly. Physiological data were
-collected using a Scholander Pressure Bomb and a Porometer, and soil moisture was
-measured using Soil Moisture Sensors.
-
-
-
-\subsection{Imaging Systems}
-
-\noindent
-To study grape cracking in a comprehensive way, a multi-modal imaging setup was used. The system combined three imaging sensors placed at the same location, each capturing different types of information from a different part of the electromagnetic spectrum. Together, these sensors provided complementary spectral, spatial, and thermal data, allowing a more complete analysis of grape berry condition and cracking development. All images were collected from a fixed distance of approximately 1 m from the grape clusters to ensure consistent scale and alignment across all measurements.
+A multi-modal sensor suite was deployed to capture complementary spectral, spatial, and thermal data. The three imaging systems were co-located and operated from a fixed working distance of approximately 1~m from the target grape clusters, ensuring consistent scale across all modalities.
 
 \subsubsection{Hyperspectral Imaging System (HSI)}
 \noindent
-Hyperspectral data were collected using the \textbf{Specim IQ} (Specim, Spectral Imaging Ltd., Oulu, Finland), a portable snapshot hyperspectral camera designed for field applications. The camera operates in the Visible and Near-Infrared (VNIR) spectral range (400--1000~nm) and produces 3D datacubes of size 512~$\times$~512~$\times$~204 for each snapshot.
-
-\noindent
-Figure~\ref{fig:hsi_setup} documents the practical acquisition setup under vineyard conditions; this field configuration is important context for the later performance gap between pixel-level and whole-image inference under background clutter and illumination variability.
+Hyperspectral data were acquired using the \textbf{Specim IQ} (Specim, Spectral Imaging Ltd., Oulu, Finland), a portable snapshot camera operating in the Visible and Near-Infrared (VNIR) range (400--1000~nm). Figure~\ref{fig:hsi_setup} illustrates the field deployment of the system, highlighting the complex background and illumination conditions inherent to vineyard acquisition.
 
 \begin{figure}[htbp]
     \centering
@@ -90,33 +97,19 @@ Figure~\ref{fig:hsi_setup} documents the practical acquisition setup under viney
     \label{fig:hsi_setup}
 \end{figure}
 
-
-
- 
 \begin{itemize}
-    \item \textbf{Spectral Resolution:} The system captures 204 contiguous spectral bands with a Full Width at Half Maximum (FWHM) of 7~nm and a spectral sampling rate of approximately 3~nm. The high spectral fidelity is ensured by a signal-to-noise ratio (SNR) of $>400\!:\!1$.
-    \item \textbf{Spatial Resolution:} The sensor has a resolution of $512 \times 512$~pixels. With a $31^\circ \times 31^\circ$ Field of View (FOV), at a 1~m working distance, the camera covers a physical area of approximately $0.55~\text{m} \times 0.55~\text{m}$. This configuration yields a theoretical spatial resolution of approximately \textbf{1.08~mm/pixel}, sufficient for resolving individual berries and larger cracks.
-    \item \textbf{Radiometric Calibration:} A spectrally flat, diffuse white reference panel (Spectralon\textsuperscript{\textregistered}, $\approx99\%$ reflectance) was included in every captured scene. This allowed subsequent normalization of raw radiance data into relative reflectance values, accounting for varying natural illumination conditions in the vineyard.
+    \item \textbf{Spectral Resolution:} The sensor captures 204 contiguous bands with a Full Width at Half Maximum (FWHM) of 7~nm and a spectral sampling interval of $\approx$3~nm. High signal fidelity is maintained by a signal-to-noise ratio (SNR) of $>400\!:\!1$.
+    \item \textbf{Spatial Resolution:} The camera features a $512 \times 512$ pixel sensor. With a $31^\circ \times 31^\circ$ Field of View (FOV), the 1~m working distance provides a physical coverage of $\approx 0.55 \times 0.55$~m, yielding a theoretical spatial resolution of \textbf{1.08~mm/pixel}---sufficient for resolving individual berries and macroscopic cracks.
+    \item \textbf{Radiometric Calibration:} A spectrally flat, diffuse white reference panel (Spectralon\textsuperscript{\textregistered}, $\approx99\%$ reflectance) was placed within every scene to enable accurate conversion of raw radiance to relative reflectance, compensating for dynamic ambient illumination.
 \end{itemize}
 
 \subsubsection{RGB Imaging System}
 \noindent
-To provide high-resolution visual context and capture fine surface textures that might be missed by the lower spatial resolution of the HSI system, a high-end digital camera was used.
-
-\begin{itemize}
-    \item \textbf{Camera \& Sensor:} \textbf{Canon EOS R5}, equipped with a 45-megapixel full-frame ($36 \times 24$~mm) CMOS sensor, producing 14-bit RAW images with a resolution of $8192 \times 4608$~pixels.
-    \item \textbf{Optics:} The camera was fitted with a \textbf{35~mm} prime lens, providing a wide Field of View of $54.4^\circ$ (horizontal)~$\times$~$37.8^\circ$ (vertical) and sufficient depth of field to keep the entire cluster in focus.
-    \item \textbf{Spatial Resolution:} At the 1~m working distance, this system achieved an extremely high theoretical spatial resolution of approximately \textbf{0.13~mm/pixel}. This level of detail is critical for detecting micro-cracks (hairline fissures) and minute alterations in the berry skin cuticle before they become visible to the naked eye or the HSI sensor.
-\end{itemize}
+High-resolution visual RGB Imaging System , a \textbf{Canon EOS R5} digital camera was utilized. Equipped with a 45-megapixel full-frame CMOS sensor ($8192 \times 4608$ pixels) and a \textbf{35~mm} prime lens, the system provided a wide FOV ($54.4^\circ \times 37.8^\circ$). At the standard 1~m working distance, this configuration achieved an extreme spatial resolution of approximately \textbf{0.13~mm/pixel}. This fine resolution is essential for identifying hairline fissures and cuticular alterations prior to their visibility in the HSI data.
 
 \subsubsection{Thermal Imaging System}
 \noindent
-Canopy and grape cluster temperatures, which are widely used as indirect indicators of
-plant water status, stomatal conductance, and transpirational cooling dynamics, were
-monitored using a high-definition thermal imaging system.
-
-\noindent
-Figure~\ref{fig:thermal_setup} illustrates the thermal modality acquired alongside Theramal Camera (FLIR T1020).
+Surface temperatures of the canopy and clusters were monitored using a \textbf{FLIR T1020} (Teledyne FLIR LLC, USA) high-definition thermal camera (Figure~\ref{fig:thermal_setup}). This uncooled microbolometer operates in the Long-Wave Infrared (LWIR) range ($7.5$--$14~\mu$m) with a resolution of $1024 \times 768$ pixels. Equipped with a \textbf{34~mm} lens and boasting a high thermal sensitivity (NETD $<20$~mK at $30^\circ$C), the system achieved a spatial resolution of \textbf{0.81~mm/pixel} at 1~m. This allowed for precise extraction of berry surface temperatures, minimizing mixed-pixel effects from surrounding foliage.
 
 \begin{figure}[htbp]
     \centering
@@ -137,158 +130,115 @@ Figure~\ref{fig:thermal_setup} illustrates the thermal modality acquired alongsi
 
 \FloatBarrier
 
-
-
-\begin{itemize}
-    \item \textbf{Camera:} \textbf{FLIR T1020} (Teledyne FLIR LLC, Wilsonville, OR, USA), a high-performance uncooled microbolometer specifically designed for precision research.
-    \item \textbf{Sensor \& Optics:} The camera has a thermal resolution of $1024 \times 768$~pixels with a 17~$\mu$m pixel pitch, operating in the Long-Wave Infrared (LWIR) spectral range ($7.5$--$14~\mu$m). It was equipped with a standard \textbf{34~mm} lens (adjustable focus including autofocus), providing a FOV of $45^\circ$~(H)~$\times$~$34^\circ$~(V).
-    \item \textbf{Performance:} The system boasts a high thermal sensitivity (Noise Equivalent Temperature Difference, NETD) of $<20$~mK ($<0.02^\circ$C) at $30^\circ$C, enabling the detection of subtle temperature gradients across the grape cluster.
-    \item \textbf{Spatial Resolution:} At the 1~m working distance, the theoretical thermal spatial resolution was approximately \textbf{0.81~mm/pixel}, allowing for accurate temperature extraction from individual berries while minimizing mixed-pixel effects from the surrounding air or leaves.
-\end{itemize}
-
 \medskip
 \noindent
-Due to the high dimensionality of the acquired data, individual hyperspectral images were substantially larger than the corresponding RGB and thermal images. On average, a single hyperspectral datacube occupied approximately \textbf{200~MB}, compared to approximately \textbf{11~MB} for a high-resolution RGB image and \textbf{2.5~MB} for a thermal image. In total, the imaging campaign resulted in a dataset of approximately \textbf{575~GB} of raw data, highlighting the computational and storage challenges associated with multi-modal hyperspectral analysis.
-
-
-% \medskip
-% \noindent
-% The experimental campaign comprised two complementary components: (i) an imaging-based
-% study focused on hyperspectral and RGB data for crack detection and early-warning screening, and
-% (ii) a parallel physiological monitoring framework using conventional plant and soil
-% sensors. The present work addresses the imaging component, while the physiological
-% measurements provide contextual support and form the basis for future integrative
-% analyses.
-
+The combined multi-modal imaging campaign generated a substantial data footprint. On average, a single HSI datacube required $\approx 200$~MB, compared to 11~MB for RGB and 2.5~MB for thermal images. The entire season's dataset exceeded \textbf{575~GB}, necessitating robust computational infrastructure for downstream processing.
 
 \subsection{Data Collection Protocol}
 
 \noindent
-Data collection was conducted during concentrated field days, typically once a week (Mondays or Thursdays), throughout the growing season from June to the end of September. To ensure consistent lighting conditions, field operations were strictly scheduled between 08:00 and 17:00.
+Data collection was conducted on dedicated field days, typically once per week from June through late September. To manage the different operational requirements of the sensors and to leverage specific environmental conditions, a structured diurnal sampling strategy was implemented:
 
-\subsubsection{Daily Schedule and Logistics}
-\noindent
-Each collection day began at 05:30 at the Volcani Institute with equipment organization and verification. Departure to the vineyard in Lachish occurred at approximately 06:00. Upon arrival at 07:00--08:00, the imaging systems were mounted on their respective tripods and calibrated.
-
-\subsubsection{Sampling Strategy}
-\noindent
-Due to significant differences in acquisition time between modalities, a split sampling strategy was employed:
 \begin{itemize}
-    \item \textbf{RGB Imaging:} All 240 marked grape clusters (12 clusters $\times$ 20 plots) were imaged first during each field day to capture them under relatively uniform early-morning lighting.
-    \item \textbf{Hyperspectral Imaging (HSI):} Due to the complex acquisition process---which required re-positioning the camera and white reference panel for each cluster, followed by a dedicated spectral focusing procedure---each HSI scan took approximately 2-3 minutes. Consequently, only a subset of 120 clusters was imaged per session. These clusters were selected to represent a balanced cross-section of the experimental blocks, ensuring full dataset coverage over alternating sessions. HSI acquisition typically commenced around 10:00 AM when sunlight was more stable and intense.
-    \item \textbf{Thermal Imaging:} Thermal image acquisition was purposely scheduled for later in the day (starting around 12:00 PM), after RGB imaging was complete. This timing leverages the high ambient temperatures typical of midday in the semi-arid Negev region to maximize thermal contrast on the berry surface. Specifically, cracked or decaying areas, often characterized by exposed moist tissue or conversely by localized dehydration, exhibit different thermal signatures compared to healthy, intact skin due to variations in evaporative cooling rates. Capturing images during peak heat enhances these temperature differentials, improving the detectability of such defects.
+    \item \textbf{Early Morning (RGB):} Image acquisition commenced between 07:00 and 08:00. All 240 target clusters were imaged first using the RGB system to capture baseline visual conditions under relatively uniform, soft morning lighting.
+    \item \textbf{Mid-Morning (HSI):} Hyperspectral acquisition began at approximately 10:00 when solar illumination was more intense and stable. Because the HSI setup required manual re-positioning, white reference placement, and dedicated spectral focusing for each shot, a single scan took 2--3 minutes. Consequently, a representative subset of 120 clusters was imaged per session, alternating coverage across field days to encompass the entire experimental layout.
+    \item \textbf{Midday (Thermal):} Thermal imaging was purposely scheduled for peak heat hours (starting around 12:00). Utilizing the high ambient temperatures of the semi-arid Negev region maximizes thermal contrast on the berry surface. Cracked or decaying tissues---characterized by exposed moisture or altered transpirational cooling---exhibit distinct thermal signatures compared to intact skin, making them significantly more detectable under peak thermal load.
 \end{itemize}
-
-\subsubsection{Field Procedure}
-\noindent
-To ensure accurate re-imaging, a consistent labeling system was implemented. Target clusters were marked with laminated, color-coded tags attached via plastic cable ties. The tags featured a numeric identifier (1--60), which was repeated across treatments but distinguished by the specific color assigned to each irrigation regime. This design allowed for unambiguous identification and durability against humidity. Furthermore, vine locations were georeferenced using a GPS module integrated into the thermal camera.
 
 \medskip
 \noindent
-Although only the RGB and HSI datasets were analyzed in the present study, all imaging systems were spatially co-aligned and temporally synchronized during field acquisition to facilitate potential future analyses.
-
+All imaging systems were spatially co-aligned to the target clusters during acquisition. While this thesis focuses primarily on the analysis of the RGB and HSI datasets, the temporal and spatial synchronization of all three modalities provides a foundation for future integrative multi-sensor fusion.
 % -----------------------------
 % PREPROCESSING
 % -----------------------------
 
-% ============================================================
-% ULTRA-CONCISE VERSION: Even Shorter
-% ============================================================
+\clearpage
+\section{Dataset Construction and Partitioning}
+\label{sec:dataset_construction}
 
-% Table 4.1a: Pixel-Level
+\noindent
+Transforming raw hyperspectral datacubes into machine-learning-ready datasets required precise spatial annotation and rigorous partitioning. The dataset construction was divided into two levels: an extracted pixel-level dataset for spectral characterization and baseline modeling, and a whole-image dataset for evaluating spatial aggregation under field conditions.
+
+\subsection{Interactive Pixel-Level Annotation via SAM2}
+\label{subsec:dataset_pixel}
+
+\noindent
+To enable accurate extraction of spectral signatures for both the binary (\textit{Cracked} vs. \textit{Healthy}) and multi-class problem formulations, a custom graphical user interface (GUI) was developed in Python. This tool integrated data visualization, interactive annotation, and automated segmentation into a single streamlined platform (Figure~\ref{fig:gui_sam2_pixelpicker}).
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=1\linewidth]{figures/materials_methods/gui/gui_sam2_pointer_with_numbers.png}
+    \caption{Graphical user interface of the HSI--RGB annotation tool. (1) Hyperspectral image visualized as an RGB composite with a SAM2-generated segmentation overlay, (2) wavelength-selectable grayscale HSI band, and (3) high-resolution RGB image of the same cluster. (4) Spectral signature extracted from a pixel within the segmented region, and (5) autoencoder reconstruction of the signature.}
+    \label{fig:gui_sam2_pixelpicker}
+\end{figure}
+\FloatBarrier
+
+\medskip
+\noindent
+The annotation workflow leveraged foundation vision models to overcome the low spatial resolution of the HSI data. The procedure operated as follows:
+\begin{enumerate}
+    \item \textbf{Interactive Seeding:} The user selected a seed pixel on a target object (e.g., a cracked berry, intact tissue, leaf, or background element) using either the high-resolution RGB image or the HSI composite.
+    \item \textbf{SAM2 Segmentation:} The seed pixel served as a point prompt for the \textbf{Segment Anything Model 2 (SAM2)} \cite{ravi2024sam2}. SAM2 generated a precise binary mask of the object on the RGB image, which was subsequently spatially aligned and projected onto the hyperspectral datacube.
+    \item \textbf{Spectral Extraction:} The tool extracted the 204-band spectral vectors for all pixels within the projected mask. The user assigned a definitive class label to the region, and the grouped signatures were stored along with their parent cluster ID and acquisition date.
+\end{enumerate}
+
+\medskip
+\noindent
+This process was initially used to build a binary dataset containing strictly healthy and cracked grape tissues. It was subsequently expanded to build a comprehensive 10-class multi-class dataset, incorporating diverse vineyard background elements (e.g., leaves, branches, soil, plastic covers, and metallic tripod parts) to train robust classifiers capable of rejecting non-grape clutter. The definitions and distributions of these classes are summarized in Table~\ref{tab:multiclass_pixel_distribution}.
+
 \begin{table}[htbp]
 \centering
-\caption{Pixel-level datasets.}
-\label{tab:dataset_pixel_ultra}
 \small
-\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{2cm} 
-                              >{\raggedright\arraybackslash}p{2cm} 
-                              >{\raggedright\arraybackslash}X 
-                              >{\raggedright\arraybackslash}p{3cm} 
-                              >{\centering\arraybackslash}p{0.7cm}}
+\setlength{\tabcolsep}{6pt}
+\begin{tabularx}{\linewidth}{@{} l r X @{}}
 \toprule
-\textbf{Dataset} & \textbf{Labels} & \textbf{Purpose} & \textbf{Method} & \textbf{H.} \\
+\textbf{Class} & \textbf{Pixels} & \textbf{Description} \\
 \midrule
-
-\textbf{Binary} & 
-Healthy; Cracked & 
-Spectral differences: intact vs damaged & 
-\newline RGB Pixel →
-\newline SAM2 →
-\newline HS segment extract & 
-H1, H2 \\
-
-\cmidrule(lr){1-5}
-
-\textbf{Multi-Class (10)} & 
-\newline Cracked
-\newline Healthy
-\newline Leaf
-\newline Background 
-\newline and more... & 
-Spectral signatures: all materials & 
-\newline RGB Pixel →
-\newline SAM2 →
-\newline HS segment extract & 
-H3 \\
-
-\bottomrule
-\end{tabularx}
-\end{table}
-
-
-% Table 4.1b: Whole-Image
-\begin{table}[htbp]
-\centering
-\caption{Whole-image datasets.}
-\label{tab:dataset_image_ultra}
-\small
-\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{2cm} 
-                              >{\raggedright\arraybackslash}p{2cm} 
-                              >{\raggedright\arraybackslash}X 
-                              >{\raggedright\arraybackslash}p{3cm} 
-                              >{\centering\arraybackslash}p{0.7cm}}
-\toprule
-\textbf{Dataset} & \textbf{Acquisition Stage} & \textbf{Purpose} & \textbf{Method} & \textbf{H.} \\
-\midrule
-
-\textbf{Late-Stage} & 
-Advanced cracking & 
-Detection under visible crack conditions & 
-\newline Binary label & 
-H3 \\
-
-\cmidrule(lr){1-5}
-
-\textbf{Early-Stage} & 
-Initial onset & 
-Detection at early crack-development stage & 
-\newline Binary label &
-H4 \\
-
+BACKGROUND       & 378{,}194 & Soil, ground, and mixed non-object pixels. \\
+WHITE\_REFERENCE & 270{,}159 & Calibration panel pixels. \\
+TRIPOD          & 137{,}494 & Camera tripod and imaging setup components. \\
+LEAF            & 120{,}552 & Green vine foliage. \\
+BRANCH           & 78{,}654 & Woody vine structures (stem, cane). \\
+REGULAR          & 69{,}618 & Intact grape tissue without visible defects. \\
+PLASTIC          & 66{,}185 & Artificial vineyard elements (covers, ties). \\
+BURNT\_PIXEL      & 36{,}676 & Saturated or overexposed pixels. \\
+CRACK            & 24{,}548 & Grape tissue exhibiting visible cracking symptoms. \\
+IRON              & 6{,}961 & Metallic elements (wires, stakes). \\
 \bottomrule
 \end{tabularx}
 
-\vspace{0.15em}
-\footnotesize
-\textit{Note:} Early/late refer to acquisition-stage subsets at different crack-progression levels (time of measurement). HSI+RGB pairs. Pixel: segment→label→extract. Image: direct labeling.
+
+\caption{Multi-class pixel-level dataset: exported pixels by class.}
+\label{tab:multiclass_pixel_distribution}
 \end{table}
 
+\clearpage
+\subsection{Whole-Image Dataset Formulation}
+\label{subsec:whole_image_dataset}
 
+\noindent
+While pixel-level data are essential for training core spectral classifiers, operational evaluation requires inference on full spatial scenes. The whole-image dataset is structured at the \emph{(grape\_id, week\_date)} level, with each record corresponding to a complete hyperspectral datacube of a cluster.
 
-\subsection{Dataset Statistics}
-\label{sec:dataset_statistics}
+\medskip
+\noindent
+To rigorously evaluate the system's early-warning capabilities, the whole-image dataset was stratified into two distinct acquisition conditions based on the progression of the disorder at the time of measurement:
+\begin{itemize}
+    \item \textbf{Early-stage:} The earliest available image associated with the onset of cracking for the same cluster, representing the initial observable stage.
+    \item \textbf{Late-stage:} Images acquired after the first recorded cracking event, representing an advanced cracking condition.
+\end{itemize}
 
-% Dataset statistics were computed on 2026-02-13 using: scripts/analysis/compute_dataset_statistics.py
-% Sources (exact files):
-% - src/preprocessing/dataset_builder_grapes/detection/raw_exported_data/all_origin_signatures_results.csv
-% - src/preprocessing/dataset_builder_grapes/detection/raw_exported_data/all_origin_signatures_results_multiclass_2026-01-16.csv
-% - src/models/classification/full_image/inference_to_see_results_of_models_feature_selection/data/val_row1_early copy.csv
-% - src/models/classification/full_image/inference_to_see_results_of_models_feature_selection/data/val_row1_late.csv
-% - src/models/classification/full_image/inference_to_see_results_of_models_feature_selection/data/test_row2_early copy.csv
-% - src/models/classification/full_image/inference_to_see_results_of_models_feature_selection/data/test_row2_late.csv
-% - data/raw/HSI_tags.csv
-% - data/processed/irrigation_color_descriptions.csv
+\medskip
+\noindent
+The exact sample distributions for these stages are detailed in Table~\ref{tab:dataset_statistics}. The spatial partitioning of these images to simulate a realistic early-warning scenario and prevent information leakage is detailed in Section~\ref{subsec:leakage_control}.
+\begin{figure}[htbp]
+    \centering
+    \fbox{\begin{minipage}{0.96\linewidth}
+    \centering
+    Row split $\rightarrow$ Train pixel-level model on pixels from Late-stage (Row~1) $\rightarrow$ Tune full-image aggregation hyperparameters on Row~1 (separately for Early/Late) $\rightarrow$ Freeze parameters $\rightarrow$ Inference on held-out evaluation set (Row~2) $\rightarrow$ Stage-specific reporting (Early/Late)
+    \end{minipage}}
+    \caption{Protocol overview for the row-based split, training and calibration on Row~1 Late-stage data, held-out evaluation on Row~2, and post-inference reporting stratified by acquisition stage.}
+    \label{fig:whole_image_protocol_overview}
+\end{figure}
 
 \begin{table}[htbp]
     \centering
@@ -300,7 +250,7 @@ H4 \\
         & & & \textbf{(CRACK)} & \textbf{(REGULAR)} \\
         \midrule
         Pixel-Level Binary & Exported labeled pixels & 94{,}166 & 24{,}548  & 69{,}618  \\
-        Pixel-Level Multi-Class & Exported labeled pixels & 1{,}189{,}041 & 24{,}548 & 69{,}618 \\
+        Pixel-Level Multi-Class & Exported labeled pixels & 1{,}189{,}041 & 24{,}548 & 69{,}618$^*$ \\
         \midrule
         Whole-Image Early & Row~1 calibration  & 172 & 32 & 140 \\
         Whole-Image Early & Row~2 test  & 60 & 32 & 28 \\
@@ -309,204 +259,12 @@ H4 \\
         Whole-Image Late & Row~2 test  & 60 & 34 & 26 \\
         \bottomrule
     \end{tabular}
-    \caption{Exact dataset statistics used in the experiments. For whole-image inference, Row~1 is used for calibration/tuning and Row~2 for held-out testing.}
+    \caption{Exact dataset statistics used in the experiments. $^*$Note: The negative class in the multi-class pixel dataset also includes the background classes detailed in Table~\ref{tab:multiclass_pixel_distribution}.}
     \label{tab:dataset_statistics}
 \end{table}
 
 \FloatBarrier
 
-
-\noindent\textbf{Pixel-level exports.}
-
-\begin{table}[h]
-\centering
-\small
-\setlength{\tabcolsep}{6pt}
-\begin{tabular}{@{} l r l @{}}
-\toprule
-\textbf{Dataset} & \textbf{Labeled Pixels} & \textbf{Source} \\
-\midrule
-Binary         & \num{94166}    & 80 segments across 19 hyperspectral images \\
-Multi-class    & \num{1189041}  & 227 segments across 54 hyperspectral images \\
-\bottomrule
-\end{tabular}
-\caption{Pixel-level exports: dataset composition.}
-\label{tab:pixel_exports}
-\end{table}
-
-\smallskip
-\noindent\textit{Multi-class exported pixels by class.}
-
-\begin{table}[htbp]
-\centering
-\small
-\setlength{\tabcolsep}{6pt}
-\begin{tabularx}{\linewidth}{@{} l r X @{}}
-\toprule
-\textbf{Class} & \textbf{Pixels} & \textbf{Description} \\
-\midrule
-BACKGROUND       & 378{,}194 & background pixels (e.g., soil and mixed background). \\
-WHITE\_REFERENCE & 270{,}159 & White reference panel pixels. \\
-TRIPOD          & 137{,}494 & Tripod and imaging setup components. \\
-LEAF            & 120{,}552 & Vine foliage. \\
-BRANCH           & 78{,}654 & Woody vine structures. \\
-REGULAR          & 69{,}618 & Intact grape tissue without visible defects. \\
-PLASTIC          & 66{,}185 & Artificial vineyard elements. \\
-BURNT\_PIXEL      & 36{,}676 & Saturated or corrupted pixels. \\
-CRACK            & 24{,}548 & Grape tissue exhibiting visible cracking symptoms. \\
-IRON              & 6{,}961 & Metallic elements. \\
-\bottomrule
-\end{tabularx}
-\caption{Multi-class pixel-level dataset: exported pixels by class.}
-\label{tab:multiclass_pixel_distribution}
-\end{table}
-
-\FloatBarrier
-\medskip
-\newpage
-
-% \subsection{Data Management and Pre-processing}
-% \noindent
-% Given the large volume and multi-modal nature of the data collected throughout the season, a robust and automated data management pipeline was essential. Custom Python scripts were developed to orchestrate the organization, validation, and preprocessing of the raw imagery.
-
-% \noindent
-% The pipeline operated in several stages:
-% \begin{itemize}
-%     \item \textbf{Automated Organization:} Scripts parsed acquisition timestamps and file metadata to automatically sort thousands of raw images into a structured directory hierarchy, organized by acquisition date, sensor type (RGB, Thermal, HSI), and unique cluster ID.
-%     \item \textbf{Metadata Verification (HSI):} For the hyperspectral data, a dedicated verification script scanned the XML metadata files associated with each datacube. This ensured that every acquired image was correctly tagged with its corresponding cluster ID in the field, and generated detailed CSV reports mapping successful acquisitions versus missing data points across all dates.
-%     \item \textbf{Quality Assurance:} Following automated sorting, a rigorous manual inspection was conducted. Images were reviewed to confirm proper focus, appropriate lighting, and for the HSI data, the presence of a valid white reference panel within the frame for subsequent radiometric calibration. Only complete, verified, and correctly labeled image sets were advanced to the downstream analysis and labeling stages.
-% \end{itemize}
-
-
-
-\subsection{Pixel-Level Dataset Preparation}
-\label{sec:dataset_pixel}
-
-\noindent
-To enable efficient creation of the pixel-level dataset—required to test spectral differences between healthy and cracked grape tissues (\hyperref[hyp:spectral_distinguishability]{Hypothesis~1}) and to assess pixel-level classification feasibility using machine learning (\hyperref[hyp:pixel_level_feasibility]{Hypothesis~2})—a custom graphical user interface (GUI) was developed in Python. The tool integrates data visualization, interactive annotation, and model inference in a single platform (see Figure~\ref{fig:gui_sam2_pixelpicker}). The dataset generation workflow proceeded as follows:
-
-
-
-\vspace{1\baselineskip}
-\FloatBarrier
-\begin{figure}[!htbp]
-    \centering
-    \includegraphics[width=1\linewidth]{figures/materials_methods/gui/gui_sam2_pointer_with_numbers.png}
-    \caption{Graphical user interface of the HSI – RGB annotation tool. (1) Hyperspectral image visualized as an RGB composite with a SAM2-generated segmentation overlay, (2) wavelength-selectable grayscale HSI band with the same SAM2 segmentation mask, and (3) RGB image of the same grape cluster captured on the same day using a Canon EOS R5. (4) Spectral signature extracted from a single pixel within the SAM2-segmented region, and (5) autoencoder reconstruction of the same spectral signature, discussed later in this work.}
-    \label{fig:gui_sam2_pixelpicker}
-\end{figure}
-\FloatBarrier
-
-\newpage
-
-
-\begin{enumerate}
-    \item \textbf{Image Loading and Visualization:} The tool displayed the hyperspectral datacube alongside corresponding RGB images (HSI camera and Canon EOS R5). A slider enabled interactive exploration of all 204 spectral bands (400--1000 nm).
-    \item \textbf{Interactive Pixel Sampling:} The user selected a seed pixel by clicking anywhere on a target object in either the RGB or HSI image. For the binary dataset, berries exhibiting clear cracked or healthy states were selected.
-    \item \textbf{SAM2 Segmentation on RGB:} The seed pixel was passed to \textbf{Segment Anything Model 2 (SAM2)}~\cite{ravi2024sam2} as a point prompt. SAM2 operated on the RGB image to generate a binary segmentation mask of the selected object. This mask was then spatially aligned and applied to the corresponding hyperspectral datacube to identify the same region.
-    \item \textbf{HSI Data Extraction and Labeling:} The tool extracted spectral signatures from the hyperspectral datacube for all pixels within the segmented region. The user assigned a class label (e.g., `Cracked' or `Regular' for binary classification) to the object, and the annotated spectral data were stored.
-\end{enumerate}
-
-\medskip
-\noindent
-The final exported binary pixel-level dataset used in this work contains 94{,}166 labeled pixels (24{,}548 CRACK; 69{,}618 REGULAR), as summarized in Table~\ref{tab:dataset_statistics}.
-
-\subsection{Expansion to Multi-Class Dataset}
-\noindent
-The binary pixel-level dataset contained two classes: healthy grape tissue and cracked grape tissue. A multi-class pixel-level dataset was constructed to include additional classes representing non-grape objects present in vineyard scenes. This dataset was designed for training multi-class classifiers and whole-image semantic segmentation models, as specified in \hyperref[hyp:whole_image_robustness]{Hypothesis~3}.
-
-\medskip
-\noindent
-The same annotation workflow was applied to acquire spectral samples from background objects. Seed pixels were selected on target objects (leaves, branches, soil, artificial materials, imaging equipment) in the RGB or HSI images. SAM2 segmented each selected object on the RGB image, and the resulting mask was applied to the hyperspectral datacube. Spectral signatures were extracted for all pixels within each segmented region. Each region was assigned a class label, and the labeled spectral samples were stored.
-
-\medskip
-\noindent
-The multi-class dataset comprised ten classes:
-
-\begin{table}[h]
-\centering
-\small
-\setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{0.9}
-\begin{tabular}{@{} l l @{}}
-\toprule
-\textbf{Class} & \textbf{Description} \\
-\midrule
-CRACK & Grape tissue with visible surface cracks \\
-REGULAR & Intact grape tissue \\
-LEAF & Green vine foliage \\
-BRANCH & Woody vine structures (stem, cane) \\
-BACKGROUND & Soil, ground, and mixed non-object pixels \\
-PLASTIC & Plastic vineyard elements (covers, ties) \\
-TRIPOD & Camera tripod components \\
-WHITE\_REFERENCE & Calibration panel pixels \\
-BURNT\_PIXEL & Saturated or overexposed pixels \\
-IRON & Metal objects (wires, stakes) \\
-\bottomrule
-\end{tabular}
-\caption{Multi-class dataset: class definitions.}
-\label{tab:multiclass_definitions}
-\end{table}
-
-\noindent
-The class distribution and dataset size are reported in Table~\ref{tab:multiclass_pixel_distribution}. The multi-class dataset was exported as labeled spectral samples and used for training supervised multi-class classification models.
-
-
-\subsection{Whole-Image Dataset Construction and Experimental Design}
-\label{subsec:whole_image_dataset}
-
-\subsubsection{Dataset Composition}
-
-\noindent
-The whole-image dataset is defined at the \emph{(grape\_id, week\_date)} level, where each record corresponds to a single hyperspectral image of a grape cluster. Sample counts and class distributions for all experimental subsets are reported in Table~\ref{tab:dataset_statistics}.
-
-\subsubsection{Spatial Partitioning}
-
-\noindent
-A row-based spatial partitioning scheme was applied to ensure physically disjoint datasets. All records acquired from vineyard Row~1 were assigned to the calibration set, while records from Row~2 were reserved as a held-out evaluation set. The two rows are spatially separated within the experimental vineyard, minimizing spatial autocorrelation and preventing information leakage between sets.
-
-\subsubsection{Subset Usage Protocol}
-
-\noindent
-The calibration set (Row~1) was used for model training and for internal parameter calibration of the whole-image inference procedure. The held-out test set (Row~2) was used exclusively for final performance evaluation and was not involved in model training, parameter tuning, or threshold selection.
-
-\subsubsection{Training Data Definition}
-
-\noindent
-The whole-image pipeline used a pretrained multi-class pixel-level classifier. The pixel-level model was trained on spectral signatures (pixels) sampled from Late-stage images in vineyard Row~1 only. Early-stage records were excluded from pixel-level training.
-
-\medskip
-\noindent
-Whole-image hyperparameter tuning was performed using Row~1 only. Tuned parameters included the spatial aggregation and post-processing settings used to convert pixel-level scores into image-level outputs (e.g., patch aggregation thresholds, crack-pixel criteria, and blob filtering parameters such as minimum/maximum region area).
-
-\subsubsection{Inference on the Held-out Evaluation Set}
-
-\noindent
-After training and calibration, the finalized model and inference parameters were applied to the held-out evaluation set (Row~2) without modification.
-
-\subsubsection{Post-Inference Acquisition-Stage Stratification}
-
-\noindent
-Following inference, outputs were stratified by acquisition stage for reporting. Stage labels were assigned according to vineyard monitoring records:
-
-\begin{enumerate}
-    \item \textbf{Late-stage:} Images acquired after the first recorded cracking event, representing an advanced cracking condition.
-    \item \textbf{Early-stage:} The earliest available image associated with the onset of cracking for the same cluster, representing the initial observable stage.
-\end{enumerate}
-
-\medskip
-\noindent
-Both Early-stage and Late-stage results were generated using the same trained pixel-level model. Whole-image inference parameters were tuned separately for Early-stage and Late-stage using Row~1 and then applied to the corresponding stage-specific records in the held-out evaluation set (Row~2).
-
-\begin{figure}[htbp]
-    \centering
-    \fbox{\begin{minipage}{0.96\linewidth}
-    \centering
-    Row split $\rightarrow$ Train pixel-level model on pixels from Late-stage (Row~1) $\rightarrow$ Tune full-image aggregation hyperparameters on Row~1 (separately for Early/Late) $\rightarrow$ Freeze parameters $\rightarrow$ Inference on held-out evaluation set (Row~2) $\rightarrow$ Stage-specific reporting (Early/Late)
-    \end{minipage}}
-    \caption{Protocol overview for the row-based split, training and calibration on Row~1 Late-stage data, held-out evaluation on Row~2, and post-inference reporting stratified by acquisition stage.}
-    \label{fig:whole_image_protocol_overview}
-\end{figure}
 
 
 % -----------------------------
@@ -516,397 +274,70 @@ Both Early-stage and Late-stage results were generated using the same trained pi
 \label{sec:modeling_evaluation}
 
 \noindent
-This section describes the modeling framework and evaluation protocols employed to
-analyze hyperspectral data for grape crack detection and early-warning screening. The methodology
-is structured to progressively assess spectral discriminability, define appropriate
-problem formulations, and evaluate model generalization from pixel-level classification
-to whole-image detection, while maintaining reproducibility and methodological
-consistency across experiments.
-
-
-
-
-% ============================================================================
-% Modeling and Evaluation Methodology — Chapter Structure
-% ============================================================================
-% This chapter describes the complete methodological pipeline used in this study,
-% from spectral preprocessing through pixel-level modeling and whole-image evaluation.
-%
-% ├─ Global Spectral Preprocessing
-% │  ├─ Spectral range selection
-% │  ├─ Quality control and outlier handling
-% │  └─ Per-spectrum normalization
-% │
-% ├─ Spectral Discriminability and Informative Wavelength Analysis
-% │  └─ Feature selection as a derived outcome
-% │     (Fisher Score, Mutual Information, Random Forest importance)
-% │
-% ├─ Pixel-Level Classification Framework
-% │  ├─ Binary Pixel-Level Classification
-% │  └─ Multi-Class Pixel-Level Classification
-% │
-% ├─ Anomaly Detection Framework (One-Class)
-% │
-% ├─ Wavelength Selection via Backward Feature Selection (BFS)
-% │  ├─ For binary pixel-level models
-% │  └─ For multi-class pixel-level models
-% │
-% ├─ Whole-Image Detection and Aggregation Pipeline
-% │  ├─ Spatial aggregation and region-level scoring
-% │  ├─ Patch-based decision logic
-% │  └─ Evaluation across early and late disease stages
-% │
-% └─ Evaluation Protocols
-%    ├─ Leave-One-Group-Out (LOGO) cross-validation
-%    └─ Performance metrics per experimental stage
-%
-% ============================================================================
-
+This section outlines the computational frameworks used to analyze the hyperspectral data, progressing from fundamental spectral preprocessing to robust pixel-level classification and anomaly detection.
 
 \subsection{Global Spectral Preprocessing}
 \label{subsec:global_preprocessing}
 
 \noindent
-All hyperspectral data were subjected to a unified and fixed preprocessing
-pipeline prior to any modeling or evaluation. This preprocessing was applied
-consistently across all datasets, models, and experimental settings to ensure
-methodological uniformity, reproducibility, and fair comparability between
-experiments ~\cite{thenkabail2016hyperspectral}.
+To ensure methodological uniformity and prevent information leakage \cite{thenkabail2016hyperspectral}, all hyperspectral datacubes were subjected to a strictly fixed preprocessing pipeline prior to any model training or evaluation.
 
-\subsubsection{Spectral Range Selection}
+\begin{itemize}
+    \item \textbf{Spectral Range Restriction:} Raw signatures were cropped to the 450--925\,nm range (159 contiguous bands). This step discarded extreme wavelengths (400--450\,nm and 925--1000\,nm) known to exhibit low signal-to-noise ratios and reflectance artifacts under outdoor field conditions \cite{behmann2018specim}.
+    \item \textbf{Per-Spectrum Normalization:} Each remaining spectral vector was independently normalized using the \textit{Standard Normal Variate} (SNV) transformation. By mean-centering and scaling each pixel exclusively by its own standard deviation, SNV mitigates illumination variability and scattering effects without relying on dataset-level statistics. This strictly per-pixel approach intrinsically prevents data leakage between training and testing partitions \cite{mishra2017close, kaltenborn2025data}.
+\end{itemize}
+
+\subsection{Data Partitioning and Leakage Prevention Strategies}
+\label{subsec:leakage_control}
 
 \noindent
-To avoid the inclusion of spectral regions characterized by consistently low
-signal-to-noise ratios, the raw spectral signatures were restricted to a
-predefined wavelength range of 450--925 nm. Preliminary analysis of the data
-revealed high variance at the spectral extremities (400--450 nm and 925--1000 nm).
-This observation aligns with previous performance evaluations of the Specim IQ
-camera; notably, Behmann et al. \cite{behmann2018specim} reported increased noise
-levels in the 400--450 nm range and significant reflectance artifacts in the
-near-infrared region (specifically above 925 nm) under outdoor conditions.
-Consequently, this effective operating range was selected once and retained
-throughout the study to avoid experiment-specific preprocessing decisions and
-to ensure consistency across all analyses \cite{bioucas2013hyperspectral}.
+A foundational principle of this study was the strict prevention of spatial and spectral information leakage. Because hyperspectral vineyard data exhibit strong spatial autocorrelation, improper data splitting would artificially inflate model performance. To ensure robust evaluation, distinct leakage prevention strategies were enforced at both the pixel and whole-image levels.
+
+\subsubsection{Pixel-Level Leakage Prevention: Leave-One-Group-Out (LOGO)}
+\noindent
+At the pixel level, contiguous pixels extracted from the same grape cluster share highly correlated spectral signatures. To prevent leakage, every extracted pixel was rigidly associated with its parent \emph{cluster ID} and \emph{acquisition date} (as defined in \S\ref{subsec:dataset_pixel}). This metadata was used to enforce a \textbf{Leave-One-Group-Out (LOGO)} cross-validation strategy. Under this protocol, all pixels originating from the same physical cluster were strictly assigned to either the training set or the test set in their entirety. For the multi-class formulation, a domain-aware LOGO variant was implemented: grape-containing acquisitions were folded using standard LOGO, while non-grape background samples (e.g., soil, leaves) were allocated to a fixed 80/20 hold-out split to prevent semantic leakage.
+
+\subsubsection{Whole-Image Leakage Prevention: Spatial Row Partitioning}
+\noindent
+At the whole-image level, evaluating the early-warning framework required simulating a realistic deployment scenario on unseen vines. To prevent spatial autocorrelation between adjacent vines, a strict geographical partitioning scheme was enforced. All hyperspectral records acquired from vineyard \textbf{Row 1} were designated exclusively as the calibration and training set, while records from \textbf{Row 2} served as the held-out evaluation (test) set. Because the two rows are physically disjoint (separated by distance and foliage), this row-based split robustly evaluates the model's ability to generalize to entirely new regions of the vineyard.
 
 \medskip
 \noindent
-This wavelength window was treated as a
-\emph{global} design choice rather than a tunable hyperparameter: it was fixed
-prior to model development and kept identical for all cross-validation folds,
-feature-selection experiments, and final held-out tests.
-
-\subsubsection{Quality Control and Outlier Handling}
-\label{subsubsec:qc_outliers}
-
-\medskip
-\noindent
-Hyperspectral datacubes were analyzed in normalized reflectance units, where
-spectral values are expected to lie within the physically valid range
-$[0,1]$. Due to field acquisition conditions and imperfect radiometric
-normalization, isolated violations of this range may occur.
-Isolated deviations from this range were retained and handled through the global SNV normalization procedure, which mitigates multiplicative and additive effects without discarding spectra.
-
-% \medskip
-% \noindent
-% Outlier detection was performed using a robust multivariate statistical
-% approach based on the Mahalanobis distance, computed within each spectral
-% class separately. The Minimum Covariance Determinant (MCD)
-% estimator~\cite{rousseeuw1999fast} was employed to obtain a robust estimate
-% of the multivariate location and scatter matrix, thereby reducing the
-% influence of the very outliers targeted for removal.
-
-% \medskip
-% \noindent
-% For each class, the MCD estimator was fitted to a random subsample of up to
-% 20{,}000 spectra (support fraction~$= 0.8$) to ensure computational
-% tractability. The squared Mahalanobis distance~$d^2_i$ was then computed for
-% every pixel spectrum~$\mathbf{x}_i$ within the class:
-% \[
-% d^2_i \;=\; (\mathbf{x}_i - \hat{\boldsymbol{\mu}})^\top \,
-%             \hat{\boldsymbol{\Sigma}}^{-1} \,
-%             (\mathbf{x}_i - \hat{\boldsymbol{\mu}})
-% \]
-% where $\hat{\boldsymbol{\mu}}$ and $\hat{\boldsymbol{\Sigma}}$ denote the
-% robust location and covariance estimates, respectively.
-
-
-
-% \medskip
-% \noindent
-% Spectra exceeding the $(1 - p)$-th percentile of the per-class distance
-% distribution were flagged as outliers. The outlier fraction~$p$ was treated as
-% a configurable parameter. In the final experiments reported in this thesis,
-% outlier removal was not applied ($p = 0$), because the classification models
-% employed --- gradient-boosted decision trees (XGBoost) --- are inherently
-% robust to moderate spectral noise and isolated anomalous
-% pixels~\cite{thenkabail2016hyperspectral}. Retaining all extracted spectra
-% ensured maximal representation of rare physiological variability, including
-% early-stage stress signatures.
-
-% \medskip
-% \noindent
-% Since $p = 0$ in the reported experiments, no data-dependent filtering was applied that
-% could couple training and evaluation partitions.
-
-% \medskip
-% \noindent
-% All outlier flags were computed and stored alongside the spectral data to
-% enable transparent post-hoc analysis and reproducibility of alternative
-% exclusion criteria.
-
-% \medskip
-% \noindent
-% Preliminary experiments with robust Mahalanobis-based outlier detection (MCD) did not yield consistent improvements and were therefore not included in the final
-
-\subsubsection{Per-Spectrum Normalization}
-
-\noindent
-Following quality control, each remaining spectral vector was normalized independently using
- \textit{Standard Normal Variate} (SNV) on a per-pixel basis. In this transformation,
-each spectrum was mean-centered and scaled by its standard deviation to reduce additive
-and multiplicative effects associated with illumination variability, surface geometry,
-and scattering, while preserving relative spectral shape. SNV is widely used in close-range
-hyperspectral imaging for reducing non-chemical variability without distorting discriminative spectral features
- \cite{barnes1989snv,mishra2017close,spath2024separating}.
-
-% \medskip
-% \noindent
-% Per-spectrum normalization was deliberately selected to avoid reliance on
-% dataset-level statistics and to eliminate the risk of information leakage between
-% training and evaluation sets, particularly under cross-validation schemes such
-% as Leave-One-Group-Out (LOGO). Information leakage during preprocessing has been
-% identified as a critical issue in hyperspectral image classification, leading to
-% over-optimistic performance estimates when not properly controlled
-% \cite{li2023information,kaltenborn2025data}.
-
-% \medskip
-% \noindent
-% Concretely, for each spectrum $\mathbf{x} \in \mathbb{R}^B$, SNV computes
-% $\tilde{\mathbf{x}} = (\mathbf{x}-\mu(\mathbf{x}))/(\sigma(\mathbf{x})+\epsilon)$
-% using only that spectrum's own mean and standard deviation. No statistics were
-% estimated across samples, dates, grape clusters, or folds; therefore, SNV does
-% not introduce train--test coupling under LOGO or under the row-based whole-image
-% split.
-
-% \medskip
-% \noindent
-% Any additional transformation that requires learned parameters (e.g., global
-% standardization, or supervised feature selection) was fit exclusively on the
-% training partition of the relevant protocol and then applied to the
-% corresponding held-out data without refitting.
-
-\subsection{Cross-Validation and Data Partitioning Strategy}
-\label{subsec:cv_strategy}
-
-\noindent
-To assess generalization to unseen samples, Leave-One-Group-Out (LOGO)
-cross-validation was applied at the grape-cluster acquisition level. LOGO was selected
-due to the limited number of available hyperspectral images, which precluded a simple
-held-out test set while still requiring rigorous evaluation of cluster-level
-generalization. All pixels extracted from the same hyperspectral image (corresponding
-to a unique grape cluster) were assigned exclusively to either the training set or the
-test set within each fold. This grouping strategy ensured that evaluation was performed
-on spectral signatures from previously unseen clusters, preventing spatial or spectral
-leakage between partitions.
-
-\medskip
-\noindent
-For multi-class settings with explicit background/distractor classes, a domain-aware
-variant was used: LOGO folds were defined over grape-containing acquisitions, while
-non-grape background samples were assigned to a fixed grouped holdout split (80/20) to
-prevent leakage across semantically distinct domains.
-
-\medskip
-\noindent
-Across all reported protocols, leakage prevention was enforced by design: the
-wavelength restriction (450--925\,nm) is fixed globally, SNV is computed
-independently per spectrum, and any data-dependent operation that requires
-fitting parameters or selecting features is carried out using only the training
-partition of the relevant protocol (or Row~1 for whole-image calibration) and
-then applied to held-out groups (or Row~2) without adaptation.
-
-\subsection{Spectral Discriminability and Informative Wavelength Analysis}
-\label{subsec:spectral_discriminability}
-
-\noindent
-Prior to model development, a wavelength-wise separability assessment was conducted
-to verify that cracked and healthy grape tissues exhibit distinguishable spectral
-signatures and to localize the spectral regions contributing to class contrast across
-the VIS--NIR range.
-
-\medskip
-\noindent
-Separability was quantified directly from the pixel-level spectra using three
-model-agnostic metrics computed at each wavelength: absolute mean difference
-$|\Delta\mu|$, Cohen's $d$ effect size, and a Fisher-style discriminant ratio. These
-measures capture both effect magnitude and variance-normalized class separation.
-
-\medskip
-\noindent
-The analysis was used solely to characterize the spectral distribution of
-cracked--healthy contrast and to support interpretation of the spectral-signature
-trends reported in the Results. No wavelength subset was selected based on these
-metrics.
-
+Crucially, to simulate a true early-warning application, the underlying pixel-level models used in the whole-image pipeline were trained \textit{exclusively} on pixels extracted from \textbf{Late-stage} images in Row 1. Early-stage records were entirely hidden from the pixel-level training phase. The whole-image aggregation hyperparameters were tuned strictly on Row 1, frozen, and then applied blindly to the Row 2 held-out set.
 \subsection{Pixel-Level Classification Framework}
 \label{subsec:pixel_level_framework}
 
 \noindent
-\textit{Can cracked and healthy grape tissues be spectrally distinguished at the individual pixel level?}
+Supervised classification was applied at the pixel level to discriminate between cracked tissue, healthy tissue, and background elements based solely on their SNV-normalized spectral signatures (159 bands).
 
 \medskip
 \noindent
-Pixel-level classification was performed to evaluate whether spectral signatures of individual pixels could discriminate cracked grape tissue from healthy tissue and background materials. Each pixel was treated as an independent observation represented by its SNV-normalized reflectance spectrum.
-
-\subsubsection{Problem Formulation and Class Definitions}
-
-\noindent
-Two classification settings were evaluated:
-
-\begin{itemize}[leftmargin=*,nosep]
-    \item \textbf{Binary classification:} Pixels were assigned to one of two classes---\textit{Healthy} (negative class, $y{=}0$) or \textit{Cracked} (positive class, $y{=}1$)---based on visual assessment of the corresponding berry tissue during manual annotation.
-    
-    \item \textbf{Multi-class classification:} The binary formulation was extended to include explicit background classes representing non-berry materials commonly present in vineyard scenes (leaves, branches, soil, and artificial supports). Three multi-class evaluation modes were investigated:
-    \begin{itemize}[leftmargin=1.5em,nosep]
-        \item \textit{CRACK VS REST}: Binary formulation treating \textit{Cracked} as positive.
-        \item \textit{3-CLASSES}: Grouping samples into \textit{Healthy}, \textit{Cracked}, and \textit{not-grape}.
-        \item \textit{FULL MULTI-CLASS}: Preserving all 10 original class labels.
-    \end{itemize}
+\textbf{Problem Formulations:} The classification was evaluated under two primary settings:
+\begin{itemize}
+    \item \textbf{Binary:} Classifying pixels strictly as \textit{Healthy} ($y=0$) or \textit{Cracked} ($y=1$).
+    \item \textbf{Multi-class:} Classifying pixels into the full 10-class taxonomy (incorporating background elements) to test robustness against vineyard clutter.
 \end{itemize}
 
-\subsubsection{Feature Representation and Model Training}
-
-\noindent
-Each pixel was represented by its SNV-normalized reflectance vector across the 450--925\,nm spectral range (159 bands at $\sim$3\,nm spacing). No wavelength selection or feature reduction was applied prior to classification; the full spectral signature was used as input to enable assessment of intrinsic separability without imposed constraints.
-
 \medskip
 \noindent
-The following supervised learning algorithms were evaluated:
-\begin{itemize}[leftmargin=1.5em,nosep]
-    \item Partial Least Squares Discriminant Analysis (PLS-DA)
-    \item Logistic Regression with L1 regularization
-    \item Support Vector Machine with RBF kernel (SVM-RBF)
-    \item Random Forest
-    \item Gradient-boosted decision trees (XGBoost, used as baseline)
-    \item Shallow multi-layer perceptron (MLP)
-\end{itemize}
-XGBoost was adopted as the baseline classifier for all primary comparisons due to its robustness to high-dimensional correlated features.
+\textbf{Algorithm Selection and Training:} Six algorithms were evaluated: Partial Least Squares Discriminant Analysis (PLS-DA), L1-regularized Logistic Regression, Support Vector Machine (RBF kernel), Random Forest, a shallow Multi-Layer Perceptron (MLP), and \textbf{XGBoost} (Gradient-boosted decision trees). XGBoost was ultimately adopted as the baseline model across all primary comparisons due to its robust handling of high-dimensional, correlated spectral features. Models were evaluated under both naturally unbalanced and strictly balanced training regimes (achieved via segment-proportional undersampling to preserve within-class diversity).
 
-\medskip
-\noindent
-Both balanced and unbalanced training regimes were investigated. Under the unbalanced regime, the natural class distribution was preserved. Under the balanced regime, all classes were undersampled to match the minority class count. For binary classification, majority-class samples were randomly undersampled. For multi-class settings, segment-proportional undersampling was applied: each class was capped at the \textit{Cracked} class count, with samples drawn proportionally from each segment (mask region) to preserve within-class diversity. Models were trained using default or lightly tuned hyperparameters; no extensive hyperparameter search was performed.
-
-\subsubsection{Cross-Validation Protocol}
-
-\noindent
-Generalization was evaluated using the Leave-One-Group-Out (LOGO) protocol at the grape-cluster acquisition level, as described in \S\ref{subsec:cv_strategy}. For the multi-class formulation, the domain-aware variant was applied.
-
-\subsubsection{Evaluation Metrics}
-
-\noindent
-Classification performance was assessed using the metrics and reporting conventions detailed in \S\ref{subsec:evaluation_protocols}. The primary ranking metric was \textbf{PR--AUC} for the \textit{Cracked} class; supplementary metrics included Accuracy, Balanced Accuracy, Precision, Recall, F1, and ROC--AUC.
-
-
-\subsection{Anomaly Detection Framework}
+\subsection{Autoencoder-Based Anomaly Detection}
 \label{subsec:anomaly_detection}
 
 \noindent
-\textit{Can crack damage be detected as a spectral anomaly without explicit class labels?}
-
-\subsubsection{One-Class Formulation}
-
-\noindent
-An anomaly detection framework was implemented at the pixel level using a one-class learning paradigm. Models were trained exclusively on spectral signatures designated as \textit{normal}, and unseen samples were flagged as anomalous based on deviation from this learned distribution.
-
-\subsubsection{Definition of Normality per Variant}
-
-\noindent
-Three experimental configurations were evaluated, each defining normality differently:
-
-\begin{itemize}[leftmargin=1.5em,nosep]
-    \item \textbf{Binary one-class:} Normal class comprised Healthy/Regular pixels; anomalies were Cracked pixels.
-    \item \textbf{Multi-class (all except Cracked):} Normal class comprised all nine non-\textit{Cracked} classes; anomalies were \textit{Cracked} pixels.
-    \item \textbf{Multi-class (Cracked only):} Normal class comprised \textit{Cracked} pixels exclusively; anomalies were all other classes.
-\end{itemize}
-
-\subsubsection{Data Partitioning and Leakage Control}
-
-\noindent
-Cross-validation strategies were adapted to each variant's data structure:
-
-\begin{itemize}[leftmargin=1.5em,nosep]
-    \item \textbf{Binary one-class:} Leave-One-Group-Out (LOGO) at the grape-cluster acquisition level (\S\ref{subsec:cv_strategy}).
-    \item \textbf{Multi-class (all except Cracked):} Single grouped train/test split (80/20) stratified by acquisition.
-    \item \textbf{Multi-class (Cracked only):} Domain-aware cross-validation combining LOGO over \textit{Cracked}-containing acquisitions with a fixed grouped 80/20 split for non-\textit{Cracked} samples to prevent segment leakage.
-\end{itemize}
-
-\noindent
-For binary one-class IsolationForest (contamination $=0.05$) was applied to remove outliers from the training normal set prior to autoencoder fitting.
-
-\subsubsection{Spectral Preprocessing}
-
-\noindent
-Pixels were preprocessed as described in \S\ref{subsec:global_preprocessing} (SNV normalization, 450--925\,nm range, 159 bands).
-
-\subsubsection{Autoencoder Architecture and Training}
-
-\noindent
-All anomaly detection experiments employed a fully connected autoencoder with symmetric encoder--decoder structure. The encoder applied ReLU activations, BatchNorm, and dropout ($p=0.2$) in the first two layers. Several bottleneck sizes were evaluated.
+To explore whether crack damage could be identified without explicit positive labels, a one-class anomaly detection framework was implemented using a fully connected, symmetric autoencoder.
 
 \medskip
 \noindent
-Let $x \in \mathbb{R}^D$ denote a preprocessed spectrum and $\hat{x}$ its reconstruction. Training minimized $\mathrm{MSE}(x,\hat{x})$, with hyperparameters listed in Table~\ref{tab:autoencoder_training}.
-
-\begin{table}[h]
-\centering
-\small
-\begin{tabular}{@{} l l @{}}
-\toprule
-\textbf{Parameter} & \textbf{Value} \\
-\midrule
-Optimizer & Adam \\
-Learning rate & $10^{-3}$ \\
-Weight decay & $10^{-5}$ \\
-LR scheduler & ReduceLROnPlateau (patience=5, factor=0.5) \\
-Early stopping & patience=15 \\
-Max epochs & 100 \\
-Batch size & 256 \\
-\bottomrule
-\end{tabular}
-\caption{Autoencoder training hyperparameters.}
-\label{tab:autoencoder_training}
-\end{table}
-
-\subsubsection{Anomaly Scoring and Thresholding}
-
-\noindent
-The anomaly score was defined as the per-sample reconstruction mean squared error:
+The autoencoder (optimized via Adam, MSE loss) was trained exclusively on a designated ``normal'' class (e.g., healthy pixels). During inference, the anomaly score for a given spectrum $x$ was defined as its reconstruction error, $e(x) = \frac{1}{D}\lVert x-\hat{x} \rVert_2^2$. An operating threshold $\tau$ was established at the $99^{\mathrm{th}}$ percentile of the training errors. For integration into the whole-image pipeline, reconstruction errors were mapped to probability-like crack scores via a sigmoid function:
 \begin{equation}
-    e(x) = \frac{1}{D}\,\lVert x-\hat{x} \rVert_2^2.
-\end{equation}
-
-\noindent
-For each fold or split, an operating threshold $\tau$ was computed as the $99^{\mathrm{th}}$ percentile of reconstruction errors on the training partition of the normal class. A sample was classified as anomalous if $e(x) > \tau$.
-
-\subsubsection{Integration into Whole-Image Inference}
-
-\noindent
-For full-image inference, the multi-class autoencoder variant trained on CRACK samples only was selected and exported. This model was integrated into the full-image inference pipeline, transforming reconstruction errors into probability-like crack scores via sigmoid mapping:
-\begin{equation}
-    p_{\mathrm{CRACK}}(x) = \frac{1}{1 + \exp\left(\frac{e(x) - \tau}{\alpha}\right)},
+    p_{\mathrm{CRACK}}(x) = \frac{1}{1 + \exp\left(\frac{e(x) - \tau}{\alpha}\right)}
 \label{eq:ae_score_mapping}
 \end{equation}
-where $e(x)$ is the reconstruction error for spectrum $x$, $\tau$ is the training threshold (99th percentile of CRACK class errors), and $\alpha$ is a temperature parameter ($\approx 0.3\tau$) controlling transition sharpness. The temperature parameter $\alpha$ was fixed and not optimized. This mapping produces a smooth $S$-curve: low reconstruction errors (CRACK-like) map to high probability, while high errors (anomalous) map to low probability. Per-pixel scores were subsequently processed through standard post-processing and aggregation stages.
+where $\alpha \approx 0.3\tau$ served as a temperature parameter controlling the sharpness of the transition.
 
-
-% \noindent
-% The temperature parameter $\alpha$ controls the sharpness of the sigmoid transition
-% around the reconstruction threshold $\tau$. Smaller values of $\alpha$ yield a steeper,
-% near-binary transition, whereas larger values produce a smoother mapping.
-% In this study, $\alpha$ was set to $0.3\tau$, providing a transition scale proportional
-% to the dispersion of the training CRACK reconstruction errors. This parameter was
-% defined heuristically.
-
+\clearpage
 \subsection{Whole-Image Detection and Aggregation Pipeline}
 \label{subsec:full_image_pipeline}
 
@@ -923,31 +354,13 @@ The whole-image pipeline aggregates pixel-wise crack probability maps produced b
 The whole-image aggregation pipeline follows a sequential process, illustrated in
 Figure~\ref{fig:whole_image_protocol_overview}, and consists of the following stages:
 
-\begin{itemize}
-    \item \textbf{Input Hyperspectral Image:}
-    Each input consists of a full hyperspectral datacube ($H \times W \times B$) acquired
-    under field conditions.
-
-    \item \textbf{Pixel-Level Probability Map Generation:}
-    The trained multi-class pixel-level classifier produces a dense pixel-wise crack probability map
-    for the \textit{CRACK} class, with values in the range $[0,1]$.
-
-    \item \textbf{Morphological Closing and Region Formation:}
-    Spatially adjacent pixels with elevated crack probabilities are grouped into connected
-    regions (BLOBs) using morphological closing operations, enforcing spatial coherence.
-
-    \item \textbf{Blob Size Filtering:}
-    Connected regions were filtered using minimum and maximum area constraints.
-
-    \item \textbf{Patch-Based Division and Decision:}
-    The image is divided into fixed-size patches. A patch is marked as crack-positive if
-    the proportion of crack-related pixels within the patch exceeds a predefined threshold.
-
-    \item \textbf{Image-Level Decision:}
-    The final image-level decision is obtained by aggregating patch-level outcomes. An
-    image is classified as \textit{Cracked} if at least one patch is identified as
-    crack-positive; otherwise, it is classified as \textit{Non-Cracked}.
-\end{itemize}
+\begin{enumerate}
+    \item \textbf{Probability Map Generation:} The trained multi-class XGBoost model processes the full input datacube ($H \times W \times 159$), producing a dense crack probability map $P_{\mathrm{CRACK}} \in [0,1]^{H \times W}$.
+    \item \textbf{Morphological Integration:} To enforce spatial coherence, adjacent pixels with elevated crack probabilities are connected using morphological closing operations. This bridges tiny gaps in hairline micro-cracks and suppresses isolated noisy pixels, forming continuous regions of interest (BLOBs).
+    \item \textbf{Geometric Filtering:} The resulting connected components are filtered based on area constraints. BLOBs smaller than a defined minimum area are discarded as noise, while structurally valid regions are retained.
+    \item \textbf{Patch-Based Decision Logic:} The filtered probability map is divided into fixed-size spatial patches. A patch is classified as crack-positive if the density of crack-related pixels within its boundaries exceeds a calibrated threshold.
+    \item \textbf{Global Image-Level Inference:} The final image-level decision employs a dual-condition logic to maximize noise rejection. The entire cluster is flagged as \textit{Cracked} only if both of the following conditions are met simultaneously: (1) at least one spatial patch satisfies the crack-positive criteria, \textbf{and} (2) the global proportion of crack-related pixels across the entire image exceeds a predefined overall density threshold. If either condition is not met, the image is classified as \textit{Non-Cracked}.
+\end{enumerate}
 
 
 \begin{figure}[htbp]
@@ -957,25 +370,33 @@ Figure~\ref{fig:whole_image_protocol_overview}, and consists of the following st
 \end{figure}
 
 
-\subsubsection{Whole-Image Dataset and Evaluation Setup}
+% \subsection{Whole-Image Detection and Spatial Aggregation Pipeline}
+% \label{subsec:full_image_pipeline}
 
+% \noindent
+% \textit{How can spatial context stabilize noisy pixel-level outputs into reliable image-level decisions?}
+
+% \medskip
+% \noindent
+% While the pixel-level classifier is highly sensitive to spectral alterations, applying it directly to a full hyperspectral scene often yields isolated false positives due to background clutter or sensor noise. The whole-image pipeline addresses this by aggregating pixel-wise crack probabilities into robust, spatially coherent image-level decisions. All upstream pixel-level models were fixed at their trained states and were not retrained during this stage.
+
+% \subsubsection{Spatial Aggregation Algorithm}
+% \noindent
+% The transformation from pixel probabilities to a final image diagnosis follows a sequential spatial aggregation algorithm:
+
+% \begin{enumerate}
+%     \item \textbf{Probability Map Generation:} The trained multi-class XGBoost model processes the full input datacube ($H \times W \times 159$), producing a dense crack probability map $P_{\mathrm{CRACK}} \in [0,1]^{H \times W}$.
+%     \item \textbf{Morphological Integration:} To enforce spatial coherence, adjacent pixels with elevated crack probabilities are connected using morphological closing operations. This bridges tiny gaps in hairline micro-cracks and suppresses isolated noisy pixels, forming continuous regions of interest (BLOBs).
+%     \item \textbf{Geometric Filtering:} The resulting connected components are filtered based on area constraints. BLOBs smaller than a defined minimum area are discarded as noise, while structurally valid regions are retained.
+%     \item \textbf{Patch-Based Decision Logic:} The filtered probability map is divided into fixed-size spatial patches. A patch is classified as crack-positive if the density of crack-related pixels within its boundaries exceeds a calibrated threshold.
+%     \item \textbf{Global Image-Level Inference:} The final severity decision is aggregated globally. The entire cluster is flagged as \textit{Cracked} if at least one patch satisfies the positive criteria, ensuring a highly sensitive yet noise-resistant early-warning trigger.
+% \end{enumerate}
+
+\FloatBarrier
+\subsubsection{Calibration and Evaluation Stratification}
 \noindent
-Whole-image evaluation was conducted on the row-partitioned inference dataset described
-in Section~\ref{subsec:whole_image_dataset}, following the spatial partitioning and
-subset usage protocol defined therein (Row~1 calibration, Row~2 held-out test).
-Exact sample counts and class balance (early/late) are reported in
-Table~\ref{tab:dataset_statistics}.
-
-\subsubsection{Evaluation Across Disease Progression Stages}
-\label{subsec:early_late_evaluation}
-
-\noindent
-To assess robustness across different acquisition stages, whole-image performance
-was evaluated separately for early-stage and late-stage samples. These labels refer
-exclusively to the crack-progression state at the time of measurement, not to
-temporal forecasting. Late-stage images
-contained clusters with clearly visible cracks, whereas early-stage images
-corresponded to initial onset.
+The spatial hyperparameters for the aggregation stages (e.g., morphological kernel sizes, minimum BLOB area, and patch density thresholds) were optimized exclusively on the \textbf{Row 1} dataset using the \textbf{Optuna} hyperparameter optimization framework. By automating the search space exploration on the calibration set, this approach avoids manual tuning bias. Finally, to evaluate robust generalization across the timeline of the disorder, the frozen parameters were applied blindly to the \textbf{Row 2} held-out set and stratified by disease progression (\textbf{Early-stage} vs. \textbf{Late-stage}), directly addressing \hyperref[hyp:whole_image_robustness]{Hypothesis~3} and \hyperref[hyp:early_detection]{Hypothesis~4}.
+\FloatBarrier
 
 \subsection{Wavelength Selection}
 \label{subsec:wavelength_selection}
@@ -998,6 +419,7 @@ additional wavelength adaptation at the image level.
 \noindent
 Wavelength selection was evaluated separately for binary (\textit{Cracked} vs.\ \textit{Healthy}) and multi-class (with background classes) settings, as formulated in \S\ref{subsec:pixel_level_framework}.
 
+\clearpage
 \subsubsection{Spectral Preprocessing}
 
 \noindent
@@ -1037,16 +459,16 @@ identified the minimal wavelength subset that preserved near-baseline performanc
 \medskip
 \noindent
 To assess the stability of the selected wavelength subsets, the BFS procedure
-was repeated five times on the same fixed grouped 80/20 train--test split
-(split seed = 42), varying only the random seed supplied to XGBoost
-(model seeds 1--5). The data partition and grouping remained invariant
-across runs.
+was repeated five times. The random seed supplied to the XGBoost model
+was kept fixed, while the seed controlling the grouped 80/20 train--test
+data partition was varied (split seeds 1--5). This approach evaluates the
+robustness of the wavelength selection process against variations in the data splitting.
 
 % Implementation reference (grouped 80/20 BFS split + leakage assertions):
 % src/models/classification/pixel_level/feature_selection/run_bfs_80_20_grapeid.py
 % src/models/classification/pixel_level/feature_selection/run_bfs_prauc_stability_5runs.py
 
-
+\clearpage
 \subsection{Evaluation Protocols and Performance Metrics}
 \label{subsec:evaluation_protocols}
 
@@ -1058,23 +480,10 @@ Whole-image crack detection was evaluated using
 F1\textsubscript{CRACK} as the primary system-level metric.
 Unless explicitly subscripted, reported F1 refers to the weighted F1-score.
 
+
 \subsection{Reproducibility and Implementation Details}
 
-All experiments were executed in Python using fixed random seeds
-(default seed = 42) to ensure deterministic data splits and model
-training. Cross-validation partitions and held-out test sets were
-kept invariant across runs. Experiment outputs were stored in
-timestamped directories together with configuration files and
-cross-validation manifests to enable exact reruns of the reported
-pipelines.
-
-\medskip
-\noindent
-For wavelength selection (BFS) stability analysis, the primary BFS run employed
-model seed = 42 and split seed = 42. Five additional repetitions used the same
-split seed (42) but varied model seeds (1--5), allowing quantification of
-wavelength selection robustness with respect to XGBoost training randomness
-alone, independent of data splitting variability.
+All experiments were executed in Python using fixed random seeds (default seed = 42) to ensure deterministic data splits and model training. Cross-validation partitions and held-out test sets were kept invariant across runs. Experiment outputs were stored in timestamped directories together with configuration files and cross-validation manifests to enable exact reruns of the reported pipelines.
 
 
 
