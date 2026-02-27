@@ -1,65 +1,65 @@
-% =====================================================================
+﻿% =====================================================================
 % CHAPTER 2: Literature Review
 % =====================================================================
 
 % ==========================================================================
-% Literature Review — Chapter Structure
+% Literature Review -- Chapter Structure
 % ==========================================================================
 % This chapter establishes the scientific and practical context for grape cracking
 % detection and early-warning screening, progressing from biological mechanisms to sensing and
 % computational approaches, and culminating in the identified research gap.
 %
-% ├─ Grape Cracking as an Agricultural and Physiological Problem
-% │  ├─ Definition and visual manifestation of fruit cracking
-% │  ├─ Phenological timing (veraison, late ripening stages)
-% │  ├─ Environmental and agronomic triggers
-% │  └─ Distinction between detection and early-warning screening
-% │
-% ├─ Economic Impact and Practical Consequences
-% │  ├─ Yield losses and reduction in marketable produce
-% │  ├─ Quality degradation and shelf-life reduction
-% │  ├─ Financial implications for growers and supply chains
-% │  └─ Limitations of reactive management strategies
-% │
-% ├─ Physiological and Biomechanical Mechanisms of Grape Cracking
-% │  ├─ Berry water relations and turgor pressure dynamics
-% │  ├─ Cuticle structure, micro-cracks, and mechanical failure
-% │  ├─ Hormonal influences and agronomic interventions
-% │  ├─ Cultivar-dependent susceptibility and variability
-% │  ├─ Skin pathology as an indicator of structural instability
-% │  └─ Summary
-% │
-% ├─ Precision Agriculture and Non-Destructive Sensing
-% │  ├─ Principles of precision agriculture and data-driven crop management
-% │  ├─ Role of proximal and remote sensing technologies
-% │  ├─ Limitations of conventional physiological measurements
-% │  └─ Computer Vision and AI in Agriculture
-% │
-% ├─ Hyperspectral Imaging for Agricultural Applications
-% │  ├─ Fundamentals of hyperspectral reflectance and spectral signatures
-% │  ├─ Advantages over RGB and multispectral imaging
-% │  ├─ VIS–NIR sensitivity to physiological and structural changes
-% │  └─ Applications in fruit quality assessment and defect detection
-% │     % Keep existing subsubsections like "Reflectance" / "Spectral Signature" if present,
-% │     % but nest them under the most appropriate subsection above.
-% │
-% ├─ Machine Learning for Hyperspectral Data Analysis
-% │  ├─ Traditional machine learning approaches for HSI
-% │  ├─ Deep learning and non-linear models
-% │  ├─ Pixel-level versus image-level modeling paradigms
-% │  └─ Challenges: class imbalance, background clutter, and generalization
-% │
-% ├─ Related Work on Fruit Defect Detection and Early-Stage Detection
-% │  ├─ HSI-based detection of visible fruit defects
-% │  ├─ Wavelength selection and spectral redundancy reduction
-% │  ├─ Early-stage and pre-symptomatic detection attempts
-% │  └─ Limitations of existing approaches under field conditions
-% │
-% └─ Research Gap and Study Positioning
-%    ├─ Summary of established knowledge
-%    ├─ Identified methodological and application gaps
-%    ├─ Lack of early, non-destructive crack early-warning frameworks
-%    └─ Positioning of the present study within the literature
+% |--- Grape Cracking as an Agricultural and Physiological Problem
+% |  |--- Definition and visual manifestation of fruit cracking
+% |  |--- Phenological timing (veraison, late ripening stages)
+% |  |--- Environmental and agronomic triggers
+% |  +--- Distinction between detection and early-warning screening
+% |
+% |--- Economic Impact and Practical Consequences
+% |  |--- Yield losses and reduction in marketable produce
+% |  |--- Quality degradation and shelf-life reduction
+% |  |--- Financial implications for growers and supply chains
+% |  +--- Limitations of reactive management strategies
+% |
+% |--- Physiological and Biomechanical Mechanisms of Grape Cracking
+% |  |--- Berry water relations and turgor pressure dynamics
+% |  |--- Cuticle structure, micro-cracks, and mechanical failure
+% |  |--- Hormonal influences and agronomic interventions
+% |  |--- Cultivar-dependent susceptibility and variability
+% |  |--- Skin pathology as an indicator of structural instability
+% |  +--- Summary
+% |
+% |--- Precision Agriculture and Non-Destructive Sensing
+% |  |--- Principles of precision agriculture and data-driven crop management
+% |  |--- Role of proximal and remote sensing technologies
+% |  |--- Limitations of conventional physiological measurements
+% |  +--- Computer Vision and AI in Agriculture
+% |
+% |--- Hyperspectral Imaging for Agricultural Applications
+% |  |--- Fundamentals of hyperspectral reflectance and spectral signatures
+% |  |--- Advantages over RGB and multispectral imaging
+% |  |--- VIS--NIR sensitivity to physiological and structural changes
+% |  +--- Applications in fruit quality assessment and defect detection
+% |     % Keep existing subsubsections like "Reflectance" / "Spectral Signature" if present,
+% |     % but nest them under the most appropriate subsection above.
+% |
+% |--- Machine Learning for Hyperspectral Data Analysis
+% |  |--- Traditional machine learning approaches for HSI
+% |  |--- Deep learning and non-linear models
+% |  |--- Pixel-level versus image-level modeling paradigms
+% |  +--- Challenges: class imbalance, background clutter, and generalization
+% |
+% |--- Related Work on Fruit Defect Detection and Early-Stage Detection
+% |  |--- HSI-based detection of visible fruit defects
+% |  |--- Wavelength selection and spectral redundancy reduction
+% |  |--- Early-stage and pre-symptomatic detection attempts
+% |  +--- Limitations of existing approaches under field conditions
+% |
+% +--- Research Gap and Study Positioning
+%    |--- Summary of established knowledge
+%    |--- Identified methodological and application gaps
+%    |--- Lack of early, non-destructive crack early-warning frameworks
+%    +--- Positioning of the present study within the literature
 %
 % ============================================================================
 
@@ -95,7 +95,7 @@ This chapter establishes the theoretical and technological foundation for the no
 % \subsection{Environmental and agronomic triggers}
 
 % \noindent
-% Environmental and agronomic factors play a central role in modulating grape berry development and triggering physiological disorders during ripening, particularly under conditions of altered water availability and tissue hydration. Variations in water uptake driven by aquaporin activity have been shown to directly influence internal berry pressure and cracking susceptibility \parencite{YU20251506}, while changes in cuticle structure and integrity during ripening modulate the berry’s mechanical resistance to environmental stress \parencite{plants13172400}. In parallel, agronomic practices affecting calcium transport and availability after veraison further influence fruit firmness and skin stability, thereby impacting the berry’s response to environmental stressors during late ripening stages \parencite{horticulturae11111320}.
+% Environmental and agronomic factors play a central role in modulating grape berry development and triggering physiological disorders during ripening, particularly under conditions of altered water availability and tissue hydration. Variations in water uptake driven by aquaporin activity have been shown to directly influence internal berry pressure and cracking susceptibility \parencite{YU20251506}, while changes in cuticle structure and integrity during ripening modulate the berry's mechanical resistance to environmental stress \parencite{plants13172400}. In parallel, agronomic practices affecting calcium transport and availability after veraison further influence fruit firmness and skin stability, thereby impacting the berry's response to environmental stressors during late ripening stages \parencite{horticulturae11111320}.
 
 
 
@@ -136,8 +136,8 @@ This chapter establishes the theoretical and technological foundation for the no
 % Beyond softening, water uptake plays a central role. Even minor fluctuations in soil moisture or
 % surface wetness can cause rapid increases in berry volume. When mesocarp expansion outpaces
 % the extensibility of the skin, tensile stress accumulates in the cuticle and epidermal cell walls.
-% As reviewed by Khadivi-Khub \cite{Khadivi2014}, this imbalance—driven by osmotic gradients,
-% turgor dynamics, and altered permeability—forms a generalized mechanism for cracking across
+% As reviewed by Khadivi-Khub \cite{Khadivi2014}, this imbalance--driven by osmotic gradients,
+% turgor dynamics, and altered permeability--forms a generalized mechanism for cracking across
 % thin-skinned fruit species. However, grapes are particularly sensitive because cuticular deposition slows
 % near maturity, while mesocarp growth continues. This mismatch in developmental timing reduces the
 % elastic reserve of the skin and predisposes berries to micro-fissuring and eventual rupture.
@@ -146,7 +146,7 @@ This chapter establishes the theoretical and technological foundation for the no
 
 % \noindent
 % The grape berry cuticle functions as both a diffusion barrier and mechanical shell.
-% Its composition—cutin, polysaccharides, and epicuticular waxes—determines the skin’s tensile strength,
+% Its composition--cutin, polysaccharides, and epicuticular waxes--determines the skin's tensile strength,
 % elasticity, and hydration behavior. Studies in sweet cherry and tomato have demonstrated that
 % microcracks in the cuticle dramatically increase water permeability and serve as initiation sites for
 % macroscopic cracking \cite{Peschel2005,Emmons1998}. Recent work now shows that grapes exhibit similar
@@ -161,7 +161,7 @@ This chapter establishes the theoretical and technological foundation for the no
 % hydration increases cuticular permeability and reduces its fracture toughness. Conversely, heat and
 % drought can cause structural fatigue through repeated cycles of dehydration and rehydration.
 % Because these microcracks do not manifest visually, early detection requires sensitive optical or
-% spectral tools—highlighting the relevance of hyperspectral imaging (HSI) approaches.
+% spectral tools--highlighting the relevance of hyperspectral imaging (HSI) approaches.
 
 % \subsection{Hormonal influences and agronomic interventions}
 
@@ -169,14 +169,14 @@ This chapter establishes the theoretical and technological foundation for the no
 % Plant growth regulators, particularly gibberellins, are widely applied in table grape production to
 % increase berry size, reduce compactness, and improve market quality. However, these treatments also
 % modify skin biomechanics. Lichter et al. \cite{Lichter2014} investigated the effects of GA\textsubscript{3}
-% on the seeded table grape ‘Zainy’ and found that while berry enlargement was achieved, the
+% on the seeded table grape 'Zainy' and found that while berry enlargement was achieved, the
 % treatment altered skin structure and significantly affected cracking susceptibility.
 % Their findings highlight the trade-off between agronomic optimization and physiological stability,
 % emphasizing the need for cultivar-specific GA\textsubscript{3} protocols.
 
 % \medskip
 % \noindent
-% Other hormones—most notably abscisic acid (ABA)—also shape berry softening and water transport.
+% Other hormones--most notably abscisic acid (ABA)--also shape berry softening and water transport.
 % Castellarin et al. \cite{Castellarin2016} characterized the interplay between ABA metabolism, turgor loss,
 % and cell wall modification during ripening. These hormonal signals regulate both mesocarp softness and
 % cuticle extensibility, indirectly influencing cracking risk. Together, these works suggest that cracking is not
@@ -196,11 +196,11 @@ This chapter establishes the theoretical and technological foundation for the no
 
 % \medskip
 % \noindent
-% For ‘Scarlotta Seedless’, the cultivar investigated in the present study, several postharvest evaluations
+% For 'Scarlotta Seedless', the cultivar investigated in the present study, several postharvest evaluations
 % have documented sensitivity to temperature fluctuations and hydration-induced damage
 % \cite{Scarlotta2024,Scarlotta2022}. While these works focus primarily on postharvest quality, they provide
 % important evidence that the skin of Scarlotta berries is structurally fragile compared to other table grape
-% varieties. Given the cultivar’s widespread commercial use, understanding and detecting early signs of
+% varieties. Given the cultivar's widespread commercial use, understanding and detecting early signs of
 % cuticular stress is a significant applied challenge.
 
 % \subsection{Skin pathology as an indicator of structural instability}
@@ -209,8 +209,8 @@ This chapter establishes the theoretical and technological foundation for the no
 % Although not a cracking disorder per se, grape sour rot provides insight into skin structural failure.
 % Hall et al. \cite{Hall2018} demonstrated that sour rot development is strongly associated with breaches
 % in berry skin integrity, allowing entry of yeasts, acetic acid bacteria, and insects. These findings reinforce
-% the broader concept that once the cuticle–epidermis barrier is compromised—whether by microcracks,
-% overripening, or mechanical abrasion—the fruit becomes highly vulnerable to physiological and
+% the broader concept that once the cuticle--epidermis barrier is compromised--whether by microcracks,
+% overripening, or mechanical abrasion--the fruit becomes highly vulnerable to physiological and
 % pathological deterioration. Thus, the onset of cracking represents a pivotal point of failure in grape
 % berry biology.
 
@@ -295,6 +295,13 @@ When exposed to light, different materials absorb and reflect specific wavelengt
 
 \begin{figure}[htbp]
 \centering
+\includegraphics[width=0.7\textwidth]{figures/literature/Barley_Signature.jpg}
+\caption{Spectral signatures of barley samples with varying moisture content, illustrating how physiological changes produce wavelength-specific shifts in reflectance \cite{shaw2002}.}
+\label{fig:barley_signature}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
  \includegraphics[width=0.7\textwidth]{figures/literature/HSI_cube.png}
 \caption{Hyperspectral Imaging (HSI) data cube illustrating the spectral signature of a pixel.}
 \label{fig:hsi_cube}
@@ -302,7 +309,7 @@ When exposed to light, different materials absorb and reflect specific wavelengt
 
 \medskip
 \noindent
-In agricultural applications, the visible and near-infrared (VIS--NIR) spectrum is particularly valuable. As shown in Figure~\ref{fig:wavelength_regions}, this range (typically 400--1000 nm) spans both the visible region—which correlates strongly with plant pigments like chlorophyll—and the NIR region, which is highly sensitive to water content and internal cellular structure \cite{ball2007field, Zwinkels2015, zhang2022reflectance, wang2024frontiers}. 
+In agricultural applications, the visible and near-infrared (VIS--NIR) spectrum is particularly valuable. As shown in Figure~\ref{fig:wavelength_regions}, this range (typically 400--1000 nm) spans both the visible region--which correlates strongly with plant pigments like chlorophyll--and the NIR region, which is highly sensitive to water content and internal cellular structure \cite{ball2007field, Zwinkels2015, zhang2022reflectance, wang2024frontiers}. 
 
 \begin{figure}[htbp]
   \centering
@@ -560,8 +567,8 @@ By combining the rich spectral data of HSI with advanced machine learning techni
 % Despite this extensive body of work, the integration of hyperspectral imaging with
 % physiological knowledge of cracking remains limited. In particular, while HSI has proven
 % effective for detecting existing defects, its use for providing early-warning insight into
-% a physiological disorder such as grape berry cracking—based on early spectral trends
-% under realistic field acquisition variability—remains largely unexplored.
+% a physiological disorder such as grape berry cracking--based on early spectral trends
+% under realistic field acquisition variability--remains largely unexplored.
 
 % \subsection{Identified Methodological and Application Gaps}
 % \label{subsec:gap_methods}
@@ -600,7 +607,7 @@ By combining the rich spectral data of HSI with advanced machine learning techni
 % Although grape cracking has been extensively studied from a physiological and
 % mechanistic standpoint, few studies have attempted to detect cracking at an
 % early stage using optical sensing techniques. In particular, the detection of pre-symptomatic
-% microcracks or latent physiological stress—prior to visible skin rupture—remains largely
+% microcracks or latent physiological stress--prior to visible skin rupture--remains largely
 % unaddressed in the literature.
 
 % \medskip

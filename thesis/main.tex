@@ -1,9 +1,17 @@
-
+﻿
 % =====================================================================
 % PREAMBLE
 % =====================================================================
 \documentclass[12pt, a4paper]{report} % Use 'report' for thesis structure
+
+% --- Font encoding and PDF text extraction (must come first) ---
+\usepackage{cmap}               % Fix copy-paste from PDF (must be before fontenc)
+\input{glyphtounicode}          % Map glyph names to Unicode for PDF extraction
+\pdfgentounicode=1              % Enable Unicode character map generation
+\usepackage[T1]{fontenc}        % Font encoding for better character rendering
+\usepackage{lmodern}            % High-quality scalable Latin Modern fonts
 \usepackage[utf8]{inputenc}
+
 \usepackage[backend=biber,style=apa]{biblatex}
 \DeclareLanguageMapping{english}{english-apa}
 \addbibresource{bibliography/references.bib}
@@ -11,8 +19,6 @@
 \usepackage{makecell} % Allows for line breaks inside table cells
 \usepackage{adjustbox}
 % --- Essential Packages ---
-\usepackage[T1]{fontenc}    % Font encoding for better character rendering
-\usepackage{lmodern}        % A good quality standard LaTeX font
 \usepackage{amsmath}        % For math environments
 \usepackage{amssymb}       % For \mathbb and additional math symbols
 \usepackage{graphicx}       % Required for inserting images
@@ -79,13 +85,14 @@
 \listoffigures
 \listoftables
 
-% \input{chapters/introduction}
-% \input{chapters/literature_review}
-% \input{chapters/objectives_hypotheses}
-% \input{chapters/materials_methods}
+\input{chapters/introduction}
+\input{chapters/literature_review}
+\input{chapters/objectives_hypotheses}
+\input{chapters/materials_methods}
 \input{chapters/results_new}
 % \input{chapters/discussions_new}
 % \input{chapters/conclusions}
+\input{chapters/Discussion&conclusions}
 
 \appendix
 \input{chapters/appendix_results}

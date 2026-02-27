@@ -1,4 +1,4 @@
-\chapter{Materials and Methods}
+﻿\chapter{Materials and Methods}
 \label{ch:materials_methods}
 
 \noindent
@@ -57,7 +57,7 @@ The experimental campaign ran continuously until late September 2024. Alongside 
     \begin{subfigure}[t]{0.48\textwidth}
         \centering
         \includegraphics[width=\textwidth]{figures/materials_methods/study_area/vineyard_map.png}
-        \caption{Map of the experimental vineyard showing the five randomized blocks (A–E) and the four irrigation regimes applied within each block.}
+        \caption{Map of the experimental vineyard showing the five randomized blocks (A--E) and the four irrigation regimes applied within each block.}
         \label{fig:vineyard_map}
     \end{subfigure}
     \hfill
@@ -294,6 +294,7 @@ To ensure methodological uniformity and prevent information leakage \cite{thenka
 A foundational principle of this study was the strict prevention of spatial and spectral information leakage. Because hyperspectral vineyard data exhibit strong spatial autocorrelation, improper data splitting would artificially inflate model performance. To ensure robust evaluation, distinct leakage prevention strategies were enforced at both the pixel and whole-image levels.
 
 \subsubsection{Pixel-Level Leakage Prevention: Leave-One-Group-Out (LOGO)}
+\label{subsec:cv_strategy}
 \noindent
 At the pixel level, contiguous pixels extracted from the same grape cluster share highly correlated spectral signatures. To prevent leakage, every extracted pixel was rigidly associated with its parent \emph{cluster ID} and \emph{acquisition date} (as defined in \S\ref{subsec:dataset_pixel}). This metadata was used to enforce a \textbf{Leave-One-Group-Out (LOGO)} cross-validation strategy. Under this protocol, all pixels originating from the same physical cluster were strictly assigned to either the training set or the test set in their entirety. For the multi-class formulation, a domain-aware LOGO variant was implemented: grape-containing acquisitions were folded using standard LOGO, while non-grape background samples (e.g., soil, leaves) were allocated to a fixed 80/20 hold-out split to prevent semantic leakage.
 
@@ -488,18 +489,18 @@ All experiments were executed in Python using fixed random seeds (default seed =
 
 
 % Modeling and Evaluation Methodology
-% ├─ Global Spectral Preprocessing
-% ├─ Spectral Discriminability and Informative Wavelength Analysis
-% │  └─ Feature selection as a derived outcome
-% ├─ Pixel-Level Classification Framework
-% │  ├─ Binary Pixel-Level Classification
-% │  └─ Multi-Class Pixel-Level Classification
-% ├─ Anomaly Detection Framework (One-Class)
-% ├─ Wavelength Selection via Backward Feature Selection (BFS)
-% │  ├─ For binary pixel-level models
-% │  └─ For multi-class pixel-level models
-% ├─ Whole-Image Detection and Aggregation Pipeline
-% ├─ Evaluation Protocols
-% │  ├─ Leave-One-Group-Out (LOGO) cross-validation
-% │  └─ Performance Metrics
+% |--- Global Spectral Preprocessing
+% |--- Spectral Discriminability and Informative Wavelength Analysis
+% |  +--- Feature selection as a derived outcome
+% |--- Pixel-Level Classification Framework
+% |  |--- Binary Pixel-Level Classification
+% |  +--- Multi-Class Pixel-Level Classification
+% |--- Anomaly Detection Framework (One-Class)
+% |--- Wavelength Selection via Backward Feature Selection (BFS)
+% |  |--- For binary pixel-level models
+% |  +--- For multi-class pixel-level models
+% |--- Whole-Image Detection and Aggregation Pipeline
+% |--- Evaluation Protocols
+% |  |--- Leave-One-Group-Out (LOGO) cross-validation
+% |  +--- Performance Metrics
 
