@@ -1,3 +1,5 @@
+from pathlib import Path
+_PROJECT_ROOT = Path(__file__).resolve().parents[3]
 import sys
 from dotenv import load_dotenv
 from PyQt5.QtWidgets import (
@@ -52,7 +54,7 @@ import sys, os, json, pathlib
 import re
 
 
-# load_dotenv(dotenv_path=r"C:\Users\yovel\Desktop\Grape_Project\.env")
+# load_dotenv(dotenv_path=str(_PROJECT_ROOT / r".env"))
 load_dotenv()
 
 # Correctly set the project root (one level up from current working directory)

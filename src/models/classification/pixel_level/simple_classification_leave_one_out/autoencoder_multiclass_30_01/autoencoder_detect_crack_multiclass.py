@@ -48,6 +48,8 @@ Labels:
 Author: Thesis experiment - Multiclass Autoencoder for Crack Detection
 Date: 2026-01-30
 """
+from pathlib import Path
+_PROJECT_ROOT = Path(__file__).resolve().parents[6]
 
 import os
 import random
@@ -946,9 +948,9 @@ def main():
     # =========================================================================
     # Configuration
     # =========================================================================
-    CSV_PATH = Path(r"C:\Users\yovel\Desktop\Grape_Project\src\preprocessing\dataset_builder_grapes\detection\raw_exported_data\all_origin_signatures_results_multiclass_2026-01-16.csv")
+    CSV_PATH = Path(str(_PROJECT_ROOT / r"src/preprocessing/dataset_builder_grapes/detection/raw_exported_data/all_origin_signatures_results_multiclass_2026-01-16.csv"))
     
-    EXPERIMENTS_BASE = Path(r"C:\Users\yovel\Desktop\Grape_Project\experiments")
+    EXPERIMENTS_BASE = Path(str(_PROJECT_ROOT / r"experiments"))
     env_name = os.environ.get('EXPERIMENT_NAME')
     if env_name and len(env_name.strip()) > 0:
         safe_name = env_name.strip().replace(' ', '_')

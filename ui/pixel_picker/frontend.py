@@ -1,3 +1,5 @@
+from pathlib import Path
+_PROJECT_ROOT = Path(__file__).resolve().parents[2]
 import sys
 from dotenv import load_dotenv
 from PyQt5.QtWidgets import (
@@ -178,7 +180,7 @@ class HSI_RGB_Viewer(QMainWindow):
         # Now call setup_ui
         self.setup_ui()
         # Load initial images from the specified folder
-        initial_folder = r"C:\Users\yovel\Desktop\Grape_Project\data\raw\1_13\25.09.24"
+        initial_folder = str(_PROJECT_ROOT / r"data/raw/1_13/25.09.24")
         self.rgb_image, self.rgb_image_path = load_rgb_image_from_folder(initial_folder)
         self.hsi_image = load_hsi_image_from_folder(initial_folder)
         self.canon_rgb_image = load_canon_rgb_image(initial_folder)
@@ -979,7 +981,7 @@ class HSI_RGB_Viewer(QMainWindow):
 
             # Save to per-class folder
             class_folder = segment_class.upper()
-            BASE_RESULTS = r"C:\Users\yovel\Desktop\Grape_Project\ui\pixel_picker\sam2_results"
+            BASE_RESULTS = str(_PROJECT_ROOT / r"ui/pixel_picker/sam2_results")
             MASK_DIR = os.path.join(BASE_RESULTS, class_folder)
             JSON_DIR = os.path.join(BASE_RESULTS, class_folder)
             os.makedirs(JSON_DIR, exist_ok=True)
@@ -1166,7 +1168,7 @@ class HSI_RGB_Viewer(QMainWindow):
 
         # Save to per-class folder
         class_folder = segment_class.upper()
-        BASE_RESULTS = r"C:\Users\yovel\Desktop\Grape_Project\pixel_picker\sam2_results"
+        BASE_RESULTS = str(_PROJECT_ROOT / r"pixel_picker/sam2_results")
         MASK_DIR = os.path.join(BASE_RESULTS, class_folder)
         JSON_DIR = os.path.join(BASE_RESULTS, class_folder)
         os.makedirs(JSON_DIR, exist_ok=True)

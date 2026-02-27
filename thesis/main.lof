@@ -1,28 +1,15 @@
 \addvspace {10\p@ }
+\contentsline {figure}{\numberline {1.1}{\ignorespaces Mean spectral signatures ($\pm $ standard deviation) for healthy and cracked tissue across the VIS--NIR range.}}{9}{figure.1.1}%
+\contentsline {figure}{\numberline {1.2}{\ignorespaces Wavelength-wise spectral separability metrics between healthy and cracked tissue, including absolute mean difference, Cohen's $d$, and Fisher score.}}{10}{figure.1.2}%
+\contentsline {figure}{\numberline {1.3}{\ignorespaces BFS trajectories for the whole-image pipeline: CRACK-class PR--AUC (primary objective) and CRACK-class F1 versus the number of retained wavelengths ($n$; full baseline $n{=}159$).}}{18}{figure.1.3}%
+\contentsline {figure}{\numberline {1.4}{\ignorespaces BFS threshold-marker visualization on CRACK metrics. Markers indicate the maximum and the first $n$ where performance drops more than 0.5\% and 1.0\% below that maximum.}}{19}{figure.1.4}%
+\contentsline {figure}{\numberline {1.5}{\ignorespaces Distribution and popularity of the top-30 selected wavelengths across five varying-split seeds.}}{21}{figure.1.5}%
+\contentsline {figure}{\numberline {1.6}{\ignorespaces Wavelength popularity at different bin sizes (1, 5, 10, 20\,nm) for the top-30 subsets.}}{22}{figure.1.6}%
+\contentsline {figure}{\numberline {1.7}{\ignorespaces Stability heatmap for the top-30 BFS subsets across five seeds (objective: PR--AUC\textsubscript {CRACK}). Each cell indicates how many seeds selected a wavelength within that 5\,nm bin.}}{23}{figure.1.7}%
+\contentsline {figure}{\numberline {1.8}{\ignorespaces Wavelength selection frequency along the spectrum (2\,nm sliding window) for the top-30 subsets.}}{24}{figure.1.8}%
+\contentsline {figure}{\numberline {1.9}{\ignorespaces Distribution and popularity of the top-11 selected wavelengths across five varying-split seeds.}}{25}{figure.1.9}%
+\contentsline {figure}{\numberline {1.10}{\ignorespaces Wavelength popularity at different bin sizes (1, 5, 10, 20\,nm) for the top-11 subsets.}}{26}{figure.1.10}%
+\contentsline {figure}{\numberline {1.11}{\ignorespaces Stability heatmap for the top-11 BFS subsets across five seeds (objective: PR--AUC\textsubscript {CRACK}; 0.5\% drop setting). Each cell indicates how many seeds selected a wavelength within that 5\,nm bin.}}{27}{figure.1.11}%
+\contentsline {figure}{\numberline {1.12}{\ignorespaces Wavelength selection frequency along the spectrum (2\,nm sliding window) for the top-11 subsets.}}{28}{figure.1.12}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {2.1}{\ignorespaces The formula for reflectance \blx@tocontentsinit {0}\cite {blackburn2007}.}}{17}{figure.2.1}%
-\contentsline {figure}{\numberline {2.2}{\ignorespaces Hyperspectral Imaging (HSI) data cube illustrating the spectral signature of a pixel.}}{18}{figure.2.2}%
-\contentsline {figure}{\numberline {2.3}{\ignorespaces Segments of the electromagnetic spectrum commonly used in hyperspectral imaging (Middleton Spectral Vision, n.d.).}}{18}{figure.2.3}%
-\addvspace {10\p@ }
-\addvspace {10\p@ }
-\contentsline {figure}{\numberline {4.1}{\ignorespaces Map of the experimental vineyard showing the five randomized blocks (A–E) and the four irrigation regimes applied within each block.}}{26}{figure.4.1}%
-\contentsline {figure}{\numberline {4.2}{\ignorespaces Hyperspectral imaging setup and data acquisition using the Specim IQ system under vineyard conditions.}}{27}{figure.4.2}%
-\contentsline {figure}{\numberline {4.3}{\ignorespaces Thermal imaging system and example thermal data acquired from grape clusters under vineyard conditions.}}{29}{figure.4.3}%
-\contentsline {figure}{\numberline {4.4}{\ignorespaces Graphical user interface of the HSI – RGB annotation tool. (1) Hyperspectral image visualized as an RGB composite with a SAM2-generated segmentation overlay, (2) wavelength-selectable grayscale HSI band with the same SAM2 segmentation mask, and (3) RGB image of the same grape cluster captured on the same day using a Canon EOS R5. (4) Spectral signature extracted from a single pixel within the SAM2-segmented region, and (5) autoencoder reconstruction of the same spectral signature, discussed later in this work.}}{33}{figure.4.4}%
-\contentsline {figure}{\numberline {4.5}{\ignorespaces Protocol overview for the row-based split, training and calibration on Row~1 Late-stage data, held-out evaluation on Row~2, and post-inference reporting stratified by acquisition stage.}}{36}{figure.4.5}%
-\contentsline {figure}{\numberline {4.6}{\ignorespaces Whole-image crack-detection pipeline from pixel-level CRACK probabilities to image-level classification via spatial aggregation.}}{43}{figure.4.6}%
-\addvspace {10\p@ }
-\contentsline {figure}{\numberline {5.1}{\ignorespaces Mean spectral signatures ($\pm $ standard deviation) for healthy and cracked tissue across the VIS--NIR range.}}{47}{figure.5.1}%
-\contentsline {figure}{\numberline {5.2}{\ignorespaces Wavelength-wise spectral separability metrics between healthy and cracked tissue, including absolute mean difference, Cohen's $d$, and Fisher score.}}{48}{figure.5.2}%
-\contentsline {figure}{\numberline {5.3}{\ignorespaces BFS trajectories for the whole-image pipeline: CRACK-class PR--AUC (primary objective) and CRACK-class F1 versus the number of retained wavelengths ($n$; full baseline $n{=}159$).}}{56}{figure.5.3}%
-\contentsline {figure}{\numberline {5.4}{\ignorespaces BFS threshold-marker visualization on CRACK metrics. Markers indicate the maximum and the first $n$ where performance drops more than 0.5\% and 1.0\% below that maximum.}}{57}{figure.5.4}%
-\contentsline {figure}{\numberline {5.5}{\ignorespaces Distribution and popularity of the top-30 selected wavelengths across five varying-split seeds.}}{59}{figure.5.5}%
-\contentsline {figure}{\numberline {5.6}{\ignorespaces Wavelength popularity at different bin sizes (1, 5, 10, 20\,nm) for the top-30 subsets.}}{60}{figure.5.6}%
-\contentsline {figure}{\numberline {5.7}{\ignorespaces Stability heatmap for the top-30 BFS subsets across five seeds (objective: PR--AUC\textsubscript {CRACK}). Each cell indicates how many seeds selected a wavelength within that 5\,nm bin.}}{61}{figure.5.7}%
-\contentsline {figure}{\numberline {5.8}{\ignorespaces Wavelength selection frequency along the spectrum (2\,nm sliding window) for the top-30 subsets.}}{62}{figure.5.8}%
-\contentsline {figure}{\numberline {5.9}{\ignorespaces Distribution and popularity of the top-11 selected wavelengths across five varying-split seeds.}}{63}{figure.5.9}%
-\contentsline {figure}{\numberline {5.10}{\ignorespaces Wavelength popularity at different bin sizes (1, 5, 10, 20\,nm) for the top-11 subsets.}}{64}{figure.5.10}%
-\contentsline {figure}{\numberline {5.11}{\ignorespaces Stability heatmap for the top-11 BFS subsets across five seeds (objective: PR--AUC\textsubscript {CRACK}; 0.5\% drop setting). Each cell indicates how many seeds selected a wavelength within that 5\,nm bin.}}{65}{figure.5.11}%
-\contentsline {figure}{\numberline {5.12}{\ignorespaces Wavelength selection frequency along the spectrum (2\,nm sliding window) for the top-11 subsets.}}{66}{figure.5.12}%
-\addvspace {10\p@ }
-\contentsline {figure}{\numberline {A.1}{\ignorespaces Regional mean reflectance ($\pm $1 SD) and absolute mean class difference for the VIS and NIR ranges.}}{69}{figure.A.1}%
+\contentsline {figure}{\numberline {A.1}{\ignorespaces Regional mean reflectance ($\pm $1 SD) and absolute mean class difference for the VIS and NIR ranges.}}{31}{figure.A.1}%

@@ -27,6 +27,8 @@ mRMR Algorithm:
 Dependencies:
 - numpy, pandas, scikit-learn, imblearn, matplotlib, seaborn, joblib, tqdm
 """
+from pathlib import Path
+_PROJECT_ROOT = Path(__file__).resolve().parents[6]
 
 import os
 import time
@@ -63,8 +65,8 @@ warnings.filterwarnings('ignore')
 # ============================================================================
 
 # Paths
-DATA_PATH = r"C:\Users\yovel\Desktop\Grape_Project\src\preprocessing\dataset_builder_grapes\detection\dataset\cleaned_0.001\all_classes_cleaned_2025-11-01.csv"
-RESULTS_FOLDER = r"C:\Users\yovel\Desktop\Grape_Project\results\mrmr_feature_selection_crack_f1"
+DATA_PATH = str(_PROJECT_ROOT / r"src/preprocessing/dataset_builder_grapes/detection/dataset/cleaned_0.001/all_classes_cleaned_2025-11-01.csv")
+RESULTS_FOLDER = str(_PROJECT_ROOT / r"results/mrmr_feature_selection_crack_f1")
 
 # Wavelengths mapping (from wavelengths.py)
 WAVELENGTHS = {

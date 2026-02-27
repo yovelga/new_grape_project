@@ -1,3 +1,5 @@
+from pathlib import Path
+_PROJECT_ROOT = Path(__file__).resolve().parents[5]
 import os, sys, csv, logging, time
 from datetime import datetime
 from typing import Optional, Tuple, List, Dict
@@ -42,7 +44,7 @@ CLUSTER_CRACK_RATIO_THR_CANDIDATES = [0.02, 0.05, 0.10, 0.15, 0.20]  # threshold
 METRICS_OUTPUT_CSV = "late_detection_hparam_metrics.csv"
 
 # ===== Dataset Runner config =====
-DEFAULT_LATE_DETECTION_CSV = r"C:\Users\yovel\Desktop\Grape_Project\src\preprocessing\prepare_dataset\hole_image\late_detection\late_detection_dataset.csv"
+DEFAULT_LATE_DETECTION_CSV = str(_PROJECT_ROOT / r"src/preprocessing/prepare_dataset/hole_image/late_detection/late_detection_dataset.csv")
 DATASET_RESULTS_CSV = "late_detection_ui_results.csv"
 DATASET_METRICS_CSV = "late_detection_ui_metrics.csv"
 
@@ -97,12 +99,12 @@ if os.environ.get("HSI_DEBUG") == "1": logger.setLevel(logging.DEBUG)
 
 # ===== Config =====
 AVAILABLE_MODELS = {
-    "NEW LDA Multi-class": r"C:\Users\yovel\Desktop\Grape_Project\src\models\classification\full_image\Train\LDA\lda_model_multi_class.joblib",
-    "LDA F1-Optimized (CRACK)": r"C:\Users\yovel\Desktop\Grape_Project\src\models\classification\full_image\infernce_with_new_model_with_sam2_with_F1\lda_model_multi_class_f1_score.joblib",
-    "OLD LDA  [1=CRACK, 0=regular]": r"C:\Users\yovel\Desktop\Grape_Project\src\models\classification\pixel_level\simple_classification_leave_one_out\comare_all_models\models\LDA_Balanced.pkl",
+    "NEW LDA Multi-class": str(_PROJECT_ROOT / r"src/models/classification/full_image/Train/LDA/lda_model_multi_class.joblib"),
+    "LDA F1-Optimized (CRACK)": str(_PROJECT_ROOT / r"src/models/classification/full_image/infernce_with_new_model_with_sam2_with_F1/lda_model_multi_class_f1_score.joblib"),
+    "OLD LDA  [1=CRACK, 0=regular]": str(_PROJECT_ROOT / r"src/models/classification/pixel_level/simple_classification_leave_one_out/comare_all_models/models/LDA_Balanced.pkl"),
 }
 DEFAULT_LDA_PATH = list(AVAILABLE_MODELS.values())[0]
-DEFAULT_SEARCH_FOLDER = r"C:\Users\yovel\Desktop\Grape_Project\data\raw"
+DEFAULT_SEARCH_FOLDER = str(_PROJECT_ROOT / r"data/raw")
 GRID_COLOR_BUCKETS = [(50, (0, 0, 180)), (40, (0, 30, 200)), (30, (0, 120, 255)), (20, (0, 200, 255))]
 
 # ===== Dynamic palette generation =====

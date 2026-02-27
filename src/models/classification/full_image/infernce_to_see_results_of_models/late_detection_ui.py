@@ -8,6 +8,8 @@ of late detection results with 4-panel layout:
 3. HSI Patch Grid (grid-based visualization)
 4. RGB Image (Canon/standard RGB)
 """
+from pathlib import Path
+_PROJECT_ROOT = Path(__file__).resolve().parents[5]
 
 import os
 import sys
@@ -71,36 +73,36 @@ logger = logging.getLogger("HSI.Patch.UI")
 
 # ===== Config =====
 AVAILABLE_MODELS = {
-    "NEW LDA Multi-class": r"C:\Users\yovel\Desktop\Grape_Project\src\models\classification\full_image\Train\LDA\lda_model_multi_class.joblib",
-    "LDA F1-Optimized (CRACK)": r"C:\Users\yovel\Desktop\Grape_Project\src\models\classification\full_image\infernce_with_new_model_with_sam2_with_F1\lda_model_multi_class_f1_score.joblib",
-    "OLD LDA [1=CRACK, 0=regular]": r"C:\Users\yovel\Desktop\Grape_Project\src\models\classification\pixel_level\simple_classification_leave_one_out\comare_all_models\models\LDA_Balanced.pkl",
-    "XGBoost Row1 Final": r"C:\Users\yovel\Desktop\Grape_Project\src\models\classification\full_image\infernce_with_new_model_with_sam2_with_F1_XGBOOST\xgboost_row1_final.joblib",
+    "NEW LDA Multi-class": str(_PROJECT_ROOT / r"src/models/classification/full_image/Train/LDA/lda_model_multi_class.joblib"),
+    "LDA F1-Optimized (CRACK)": str(_PROJECT_ROOT / r"src/models/classification/full_image/infernce_with_new_model_with_sam2_with_F1/lda_model_multi_class_f1_score.joblib"),
+    "OLD LDA [1=CRACK, 0=regular]": str(_PROJECT_ROOT / r"src/models/classification/pixel_level/simple_classification_leave_one_out/comare_all_models/models/LDA_Balanced.pkl"),
+    "XGBoost Row1 Final": str(_PROJECT_ROOT / r"src/models/classification/full_image/infernce_with_new_model_with_sam2_with_F1_XGBOOST/xgboost_row1_final.joblib"),
     # Binary Balanced Models (use SNV + wavelength filtering preprocessing)
-    "Binary: Logistic Regression (L1) Balanced": r"C:\Users\yovel\Desktop\Grape_Project\experiments\pixel_level_classifier_2_classes\models\Logistic_Regression_(L1)_Balanced.pkl",
-    "Binary: PLS-DA Balanced": r"C:\Users\yovel\Desktop\Grape_Project\experiments\pixel_level_classifier_2_classes\models\PLS-DA_Balanced.pkl",
-    "Binary: Random Forest Balanced": r"C:\Users\yovel\Desktop\Grape_Project\experiments\pixel_level_classifier_2_classes\models\Random_Forest_Balanced.pkl",
-    "Binary: SVM (RBF) Balanced": r"C:\Users\yovel\Desktop\Grape_Project\experiments\pixel_level_classifier_2_classes\models\SVM_(RBF)_Balanced.pkl",
-    "Binary: XGBoost Balanced": r"C:\Users\yovel\Desktop\Grape_Project\experiments\pixel_level_classifier_2_classes\models\XGBoost_Balanced.pkl",
+    "Binary: Logistic Regression (L1) Balanced": str(_PROJECT_ROOT / r"experiments/pixel_level_classifier_2_classes/models/Logistic_Regression_(L1)_Balanced.pkl"),
+    "Binary: PLS-DA Balanced": str(_PROJECT_ROOT / r"experiments/pixel_level_classifier_2_classes/models/PLS-DA_Balanced.pkl"),
+    "Binary: Random Forest Balanced": str(_PROJECT_ROOT / r"experiments/pixel_level_classifier_2_classes/models/Random_Forest_Balanced.pkl"),
+    "Binary: SVM (RBF) Balanced": str(_PROJECT_ROOT / r"experiments/pixel_level_classifier_2_classes/models/SVM_(RBF)_Balanced.pkl"),
+    "Binary: XGBoost Balanced": str(_PROJECT_ROOT / r"experiments/pixel_level_classifier_2_classes/models/XGBoost_Balanced.pkl"),
 
     # === 3-Class Models (maxpixel experiment) ===
-    "[3Class] Logistic Regression (L1)": r"C:\Users\yovel\Desktop\Grape_Project\experiments\pixel_level_classifier_compare_multiclass_vs_3class_maxpixel_per_class_like_crack\models\3class\Logistic_Regression_(L1)_Balanced.pkl",
-    "[3Class] Random Forest": r"C:\Users\yovel\Desktop\Grape_Project\experiments\pixel_level_classifier_compare_multiclass_vs_3class_maxpixel_per_class_like_crack\models\3class\Random_Forest_Balanced.pkl",
-    "[3Class] SVM (RBF)": r"C:\Users\yovel\Desktop\Grape_Project\experiments\pixel_level_classifier_compare_multiclass_vs_3class_maxpixel_per_class_like_crack\models\3class\SVM_(RBF)_Balanced.pkl",
-    "[3Class] XGBoost": r"C:\Users\yovel\Desktop\Grape_Project\experiments\pixel_level_classifier_compare_multiclass_vs_3class_maxpixel_per_class_like_crack\models\3class\XGBoost_Balanced.pkl",
+    "[3Class] Logistic Regression (L1)": str(_PROJECT_ROOT / r"experiments/pixel_level_classifier_compare_multiclass_vs_3class_maxpixel_per_class_like_crack/models/3class/Logistic_Regression_(L1)_Balanced.pkl"),
+    "[3Class] Random Forest": str(_PROJECT_ROOT / r"experiments/pixel_level_classifier_compare_multiclass_vs_3class_maxpixel_per_class_like_crack/models/3class/Random_Forest_Balanced.pkl"),
+    "[3Class] SVM (RBF)": str(_PROJECT_ROOT / r"experiments/pixel_level_classifier_compare_multiclass_vs_3class_maxpixel_per_class_like_crack/models/3class/SVM_(RBF)_Balanced.pkl"),
+    "[3Class] XGBoost": str(_PROJECT_ROOT / r"experiments/pixel_level_classifier_compare_multiclass_vs_3class_maxpixel_per_class_like_crack/models/3class/XGBoost_Balanced.pkl"),
     # === Multi-Class Models (maxpixel experiment) ===
-    "[MultiClass] Logistic Regression (L1)": r"C:\Users\yovel\Desktop\Grape_Project\experiments\pixel_level_classifier_compare_multiclass_vs_3class_maxpixel_per_class_like_crack\models\multiclass\Logistic_Regression_(L1)_Balanced.pkl",
-    "[MultiClass] Random Forest": r"C:\Users\yovel\Desktop\Grape_Project\experiments\pixel_level_classifier_compare_multiclass_vs_3class_maxpixel_per_class_like_crack\models\multiclass\Random_Forest_Balanced.pkl",
-    "[MultiClass] SVM (RBF)": r"C:\Users\yovel\Desktop\Grape_Project\experiments\pixel_level_classifier_compare_multiclass_vs_3class_maxpixel_per_class_like_crack\models\multiclass\SVM_(RBF)_Balanced.pkl",
-    "[MultiClass] XGBoost": r"C:\Users\yovel\Desktop\Grape_Project\experiments\pixel_level_classifier_compare_multiclass_vs_3class_maxpixel_per_class_like_crack\models\multiclass\XGBoost_Balanced.pkl",
+    "[MultiClass] Logistic Regression (L1)": str(_PROJECT_ROOT / r"experiments/pixel_level_classifier_compare_multiclass_vs_3class_maxpixel_per_class_like_crack/models/multiclass/Logistic_Regression_(L1)_Balanced.pkl"),
+    "[MultiClass] Random Forest": str(_PROJECT_ROOT / r"experiments/pixel_level_classifier_compare_multiclass_vs_3class_maxpixel_per_class_like_crack/models/multiclass/Random_Forest_Balanced.pkl"),
+    "[MultiClass] SVM (RBF)": str(_PROJECT_ROOT / r"experiments/pixel_level_classifier_compare_multiclass_vs_3class_maxpixel_per_class_like_crack/models/multiclass/SVM_(RBF)_Balanced.pkl"),
+    "[MultiClass] XGBoost": str(_PROJECT_ROOT / r"experiments/pixel_level_classifier_compare_multiclass_vs_3class_maxpixel_per_class_like_crack/models/multiclass/XGBoost_Balanced.pkl"),
 }
-DEFAULT_SEARCH_FOLDER = r"C:\Users\yovel\Desktop\Grape_Project\data\raw"
-# DEFAULT_DATASET_CSV = r"C:\Users\yovel\Desktop\Grape_Project\src\preprocessing\prepare_dataset_for_full_image_classification\hole_image\late_detection_test\dataset_csvs\row1_only_cracked.csv"
-# DEFAULT_DATASET_CSV = r"C:\Users\yovel\Desktop\Grape_Project\src\preprocessing\prepare_dataset_for_full_image_classification\hole_image\late_detection_test\dataset_csvs\row1_all_weeks.csv"
-DEFAULT_DATASET_CSV = r"C:\Users\yovel\Desktop\Grape_Project\src\preprocessing\prepare_dataset_for_full_image_classification\hole_image\generate_test_row_1\dataset_csvs\row1_clean_pre_august_plus_tagged_cracks.csv"
-# DEFAULT_DATASET_CSV = r"C:\Users\yovel\Desktop\Grape_Project\src\preprocessing\prepare_dataset_for_full_image_classification\hole_image\late_detection\late_detection_dataset.csv"
-# DEFAULT_DATASET_CSV = r"C:\Users\yovel\Desktop\Grape_Project\src\preprocessing\prepare_dataset_for_full_image_classification\hole_image\first_date_dataset\early_detection_dataset.csv"
-# DEFAULT_DATASET_CSV = r"C:\Users\yovel\Desktop\Grape_Project\src\preprocessing\prepare_dataset_for_full_image_classification\hole_image\early_detection\early_detection_dataset.csv"
-RESULTS_FOLDER = r"C:\Users\yovel\Desktop\Grape_Project\src\models\classification\full_image\infernce_with_new_model\Results"
+DEFAULT_SEARCH_FOLDER = str(_PROJECT_ROOT / r"data/raw")
+# DEFAULT_DATASET_CSV = str(_PROJECT_ROOT / r"src/preprocessing/prepare_dataset_for_full_image_classification/hole_image/late_detection_test/dataset_csvs/row1_only_cracked.csv")
+# DEFAULT_DATASET_CSV = str(_PROJECT_ROOT / r"src/preprocessing/prepare_dataset_for_full_image_classification/hole_image/late_detection_test/dataset_csvs/row1_all_weeks.csv")
+DEFAULT_DATASET_CSV = str(_PROJECT_ROOT / r"src/preprocessing/prepare_dataset_for_full_image_classification/hole_image/generate_test_row_1/dataset_csvs/row1_clean_pre_august_plus_tagged_cracks.csv")
+# DEFAULT_DATASET_CSV = str(_PROJECT_ROOT / r"src/preprocessing/prepare_dataset_for_full_image_classification/hole_image/late_detection/late_detection_dataset.csv")
+# DEFAULT_DATASET_CSV = str(_PROJECT_ROOT / r"src/preprocessing/prepare_dataset_for_full_image_classification/hole_image/first_date_dataset/early_detection_dataset.csv")
+# DEFAULT_DATASET_CSV = str(_PROJECT_ROOT / r"src/preprocessing/prepare_dataset_for_full_image_classification/hole_image/early_detection/early_detection_dataset.csv")
+RESULTS_FOLDER = str(_PROJECT_ROOT / r"src/models/classification/full_image/infernce_with_new_model/Results")
 
 
 # ===== Helper functions for UI =====
@@ -2500,7 +2502,7 @@ class HSILateDetectionViewer(QMainWindow):
             logger.info("[CNN] Loading CNN model for classification...")
 
             # Model path - use grayscale trained model from original_gray results
-            model_path = Path(r"C:\Users\yovel\Desktop\Grape_Project\src\models\training_classification_model_cnn_for_grapes_berry\train_model\results\original_gray\best_model.pth")
+            model_path = Path(str(_PROJECT_ROOT / r"src/models/training_classification_model_cnn_for_grapes_berry/train_model/results/original_gray/best_model.pth"))
 
             logger.info(f"[CNN] Looking for model at: {model_path}")
 

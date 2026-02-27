@@ -8,6 +8,8 @@ of late detection results with 4-panel layout:
 3. HSI Patch Grid (grid-based visualization)
 4. RGB Image (Canon/standard RGB)
 """
+from pathlib import Path
+_PROJECT_ROOT = Path(__file__).resolve().parents[6]
 
 import os
 import sys
@@ -68,14 +70,14 @@ logger = logging.getLogger("HSI.Patch.UI")
 
 # ===== Config =====
 AVAILABLE_MODELS = {
-    "NEW LDA Multi-class": r"C:\Users\yovel\Desktop\Grape_Project\src\models\classification\full_image\Train\LDA\lda_model_multi_class.joblib",
-    "LDA F1-Optimized (CRACK)": r"C:\Users\yovel\Desktop\Grape_Project\src\models\classification\full_image\infernce_with_new_model_with_sam2_with_F1\lda_model_multi_class_f1_score.joblib",
-    "OLD LDA [1=CRACK, 0=regular]": r"C:\Users\yovel\Desktop\Grape_Project\src\models\classification\pixel_level\simple_classification_leave_one_out\comare_all_models\models\LDA_Balanced.pkl",
+    "NEW LDA Multi-class": str(_PROJECT_ROOT / r"src/models/classification/full_image/Train/LDA/lda_model_multi_class.joblib"),
+    "LDA F1-Optimized (CRACK)": str(_PROJECT_ROOT / r"src/models/classification/full_image/infernce_with_new_model_with_sam2_with_F1/lda_model_multi_class_f1_score.joblib"),
+    "OLD LDA [1=CRACK, 0=regular]": str(_PROJECT_ROOT / r"src/models/classification/pixel_level/simple_classification_leave_one_out/comare_all_models/models/LDA_Balanced.pkl"),
 }
-DEFAULT_SEARCH_FOLDER = r"C:\Users\yovel\Desktop\Grape_Project\data\raw"
-# DEFAULT_DATASET_CSV = r"C:\Users\yovel\Desktop\Grape_Project\src\preprocessing\prepare_dataset_for_full_image_classification\hole_image\late_detection\late_detection_dataset.csv"
-DEFAULT_DATASET_CSV = r"C:\Users\yovel\Desktop\Grape_Project\src\preprocessing\prepare_dataset_for_full_image_classification\hole_image\early_detection\early_detection_dataset.csv"
-RESULTS_FOLDER = r"C:\Users\yovel\Desktop\Grape_Project\src\models\classification\full_image\infernce_with_new_model\Results"
+DEFAULT_SEARCH_FOLDER = str(_PROJECT_ROOT / r"data/raw")
+# DEFAULT_DATASET_CSV = str(_PROJECT_ROOT / r"src/preprocessing/prepare_dataset_for_full_image_classification/hole_image/late_detection/late_detection_dataset.csv")
+DEFAULT_DATASET_CSV = str(_PROJECT_ROOT / r"src/preprocessing/prepare_dataset_for_full_image_classification/hole_image/early_detection/early_detection_dataset.csv")
+RESULTS_FOLDER = str(_PROJECT_ROOT / r"src/models/classification/full_image/infernce_with_new_model/Results")
 
 
 # ===== Helper functions for UI =====
@@ -2432,7 +2434,7 @@ class HSILateDetectionViewer(QMainWindow):
             logger.info("[CNN] Loading CNN model for classification...")
 
             # Model path - use grayscale trained model from original_gray results
-            model_path = Path(r"C:\Users\yovel\Desktop\Grape_Project\src\models\training_classification_model_cnn_for_grapes_berry\train_model\results\original_gray\best_model.pth")
+            model_path = Path(str(_PROJECT_ROOT / r"src/models/training_classification_model_cnn_for_grapes_berry/train_model/results/original_gray/best_model.pth"))
 
             logger.info(f"[CNN] Looking for model at: {model_path}")
 

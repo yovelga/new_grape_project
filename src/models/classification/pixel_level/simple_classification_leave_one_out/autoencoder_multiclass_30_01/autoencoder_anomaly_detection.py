@@ -60,6 +60,8 @@ Labels:
 Author: Refactored for thesis reproducibility
 Date: 2026-01-17
 """
+from pathlib import Path
+_PROJECT_ROOT = Path(__file__).resolve().parents[6]
 
 import os
 import random
@@ -960,10 +962,10 @@ def main():
     # =========================================================================
     # Configuration
     # =========================================================================
-    CSV_PATH = Path(r"C:\Users\yovel\Desktop\Grape_Project\src\preprocessing\dataset_builder_grapes\detection\raw_exported_data\all_origin_signatures_results_2026-01-13.csv")
+    CSV_PATH = Path(str(_PROJECT_ROOT / r"src/preprocessing/dataset_builder_grapes/detection/raw_exported_data/all_origin_signatures_results_2026-01-13.csv"))
     # Save experiments under the centralized experiments directory with a clear experiment name
     # User-requested base experiments directory:
-    EXPERIMENTS_BASE = Path(r"C:\Users\yovel\Desktop\Grape_Project\experiments")
+    EXPERIMENTS_BASE = Path(str(_PROJECT_ROOT / r"experiments"))
     # Create a descriptive experiment name (readable, includes date/time)
     # Allow overriding via environment variable EXPERIMENT_NAME for reproducibility
     env_name = os.environ.get('EXPERIMENT_NAME')

@@ -30,6 +30,8 @@ Usage example:
     # data.X, data.y, data.groups, data.segment_ids, data.image_ids,
     # data.label_encoder, data.class_names, data.feature_names
 """
+from pathlib import Path
+_PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 from __future__ import annotations
 
@@ -650,7 +652,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--csv",
         type=str,
-        default=r"C:\Users\yovel\Desktop\Grape_Project\src\preprocessing\dataset_builder_grapes\detection\raw_exported_data\all_origin_signatures_results_2026-01-13.csv",
+        default=str(_PROJECT_ROOT / r"src/preprocessing/dataset_builder_grapes/detection/raw_exported_data/all_origin_signatures_results_2026-01-13.csv"),
         help="Path to CSV file with spectral data",
     )
     args = parser.parse_args()

@@ -7,6 +7,8 @@ Comprehensive UI combining:
 
 All non-UI logic delegated to app/* modules. Single runnable entrypoint.
 """
+from pathlib import Path
+_PROJECT_ROOT = Path(__file__).resolve().parents[5]
 
 import sys
 import traceback
@@ -911,7 +913,7 @@ class VisualDebugTab(QWidget):
     def _load_params_json(self):
         """Load postprocessing parameters from Optuna experiment JSON for debugging."""
         # Default to Optuna experiments folder
-        default_dir = Path("C:/Users/yovel/Desktop/Grape_Project/experiments/optuna_full_image")
+        default_dir = _PROJECT_ROOT / "experiments/optuna_full_image"
         if not default_dir.exists():
             default_dir = Path.home()
         

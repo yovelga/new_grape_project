@@ -7,6 +7,8 @@ Provides UI for CSV-based Optuna hyperparameter tuning with:
 - Editable hyperparameter search space
 - Comprehensive metrics output
 """
+from pathlib import Path
+_PROJECT_ROOT = Path(__file__).resolve().parents[7]
 
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, QFormLayout,
@@ -46,7 +48,7 @@ class OptunaTabWidget(QWidget):
     
     # Default directories
     DEFAULT_DATA_DIR = Path(__file__).parent.parent.parent / "data"
-    DEFAULT_EXPERIMENTS_DIR = Path("C:/Users/yovel/Desktop/Grape_Project/experiments")
+    DEFAULT_EXPERIMENTS_DIR = _PROJECT_ROOT / "experiments"
     
     def __init__(self, model_manager: ModelManager, parent=None):
         """

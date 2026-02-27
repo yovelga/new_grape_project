@@ -1,3 +1,5 @@
+from pathlib import Path
+_PROJECT_ROOT = Path(__file__).resolve().parents[6]
 import time
 import warnings
 import re
@@ -284,8 +286,8 @@ def save_model(model, out_dir: Path, model_name: str, balance_mode: str):
 # ------------------- Main -------------------
 def main():
     # Paths
-    CSV_PATH = Path(r"C:\Users\yovel\Desktop\Grape_Project\src\preprocessing\dataset_builder_grapes\detection\raw_exported_data\all_origin_signatures_results_2026-01-13.csv")
-    EXPERIMENT_DIR = Path(r"C:\Users\yovel\Desktop\Grape_Project\experiments\pixel_level_classifier_2_classes")
+    CSV_PATH = Path(str(_PROJECT_ROOT / r"src/preprocessing/dataset_builder_grapes/detection/raw_exported_data/all_origin_signatures_results_2026-01-13.csv"))
+    EXPERIMENT_DIR = Path(str(_PROJECT_ROOT / r"experiments/pixel_level_classifier_2_classes"))
     OUT_PATH = EXPERIMENT_DIR / "model_comparison_results.xlsx"
     MODELS_DIR = EXPERIMENT_DIR / "models"
 

@@ -27,6 +27,8 @@ Plots include:
 Author: Feature Selection Pipeline
 Date: February 2026
 """
+from pathlib import Path
+_PROJECT_ROOT = Path(__file__).resolve().parents[5]
 
 import sys
 import argparse
@@ -516,7 +518,7 @@ def plot_both_objectives_same_metric(df_f1: pd.DataFrame, df_prauc: pd.DataFrame
 
 # ==================== DEFAULT CONFIG (for VS Code Play button) ====================
 # Modify this path to point to your experiment directory
-DEFAULT_EXPERIMENT_DIR = r"C:\Users\yovel\Desktop\Grape_Project\experiments\feature_selection\bfs_full_run\2026-02-01_20-53-40"
+DEFAULT_EXPERIMENT_DIR = str(_PROJECT_ROOT / r"experiments/feature_selection/bfs_full_run/2026-02-01_20-53-40")
 # ==================================================================================
 
 def main():

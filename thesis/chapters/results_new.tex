@@ -37,12 +37,12 @@ To ensure a rigorous and transparent evaluation, all experimental results are be
 \label{sec:spectral-characterization}
 
 \noindent
-Per-band spectral separability between healthy and cracked tissue was assessed prior to modeling, addressing \hyperref[hyp:spectral_distinguishability]{Hypothesis~1}. Preprocessing followed Section~\ref{subsec:global_preprocessing}.
+Prior to evaluating machine learning algorithms, a per-band spectral separability analysis was conducted to verify that healthy and cracked tissues exhibit physically distinguishable signatures, addressing \hyperref[hyp:spectral_distinguishability]{Hypothesis~1}. For this fundamental physical characterization, the relative reflectance spectra were analyzed \textit{prior} to the application of per-pixel SNV normalization in order to preserve and quantify the absolute amplitude differences between the classes.
 
 \subsection{Mean Spectral Signatures of Healthy and Cracked Tissue}
 
 \noindent
-Mean spectral signatures ($\pm$\,SD) for healthy and cracked tissue are shown in Figure~\ref{fig:mean_signatures}.
+The mean spectral reflectance signatures ($\pm$\,SD) for healthy and cracked grape tissues across the VIS--NIR range are presented in Figure~\ref{fig:mean_signatures}. Cracked tissue consistently exhibits lower absolute reflectance across the full spectrum compared to intact healthy tissue. As visually evident in the plot, this divergence is exceptionally pronounced in the Near-Infrared (NIR) region, specifically between 700\,nm and 850\,nm.
 
 \begin{figure}[htbp]
     \centering
@@ -58,11 +58,11 @@ Mean spectral signatures ($\pm$\,SD) for healthy and cracked tissue are shown in
 \subsection{Spectral Separability Across Wavelength Regions}
 
 \noindent
-Cohen's $d$~\cite{cohen1988statistical} ($d = |\mu_1 - \mu_2| / \sigma_{\mathrm{pooled}}$) and Fisher Score~\cite{duda2001pattern} (inter-class to intra-class variance ratio) were computed per band; results are shown in Figure~\ref{fig:spectral_separability}.
+To systematically quantify the discriminatory power of individual spectral bands, three complementary metrics were computed (Figure~\ref{fig:spectral_separability}): \textbf{Absolute Mean Difference ($|\Delta\mu|$)} to capture the raw reflectance gap, \textbf{Cohen's $d$~\cite{cohen1988statistical}} to measure the standardized effect size, and the \textbf{Fisher Score~\cite{duda2001pattern}} to evaluate the ratio of inter-class separation to intra-class spread.
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=\textwidth]{figures/results/spectral_signatures/separability_metrics.png}
+    \includegraphics[width=0.95\textwidth]{figures/results/spectral_signatures/separability_metrics.png}
     \caption{Wavelength-wise spectral separability metrics between healthy and cracked tissue, including absolute mean difference, Cohen's $d$, and Fisher score.}
     \label{fig:spectral_separability}
 \end{figure}
@@ -70,8 +70,7 @@ Cohen's $d$~\cite{cohen1988statistical} ($d = |\mu_1 - \mu_2| / \sigma_{\mathrm{
 \FloatBarrier
 
 \noindent
-Separation is substantially higher in the NIR, with peak discriminability at 727--757\,nm. Regional VIS--NIR summaries are in Appendix~\ref{app:vis_nir_summary}.
-
+The separability metrics indicate that class separation is substantially higher in the NIR region, with peak discriminability consistently observed between 727--757\,nm. As detailed in the regional summaries in Appendix~\ref{app:vis_nir_summary}, healthy tissue reflectance exceeds that of cracked tissue by an average of 32\% in the NIR and 37\% in the VIS range. These clear physical differences confirm \hyperref[hyp:spectral_distinguishability]{Hypothesis~1} and provide the basis for automated classification.
 \clearpage
 \begin{landscape}
 \thispagestyle{plain}

@@ -17,6 +17,8 @@ Available balanced models:
 - SVM_(RBF)_Balanced.pkl
 - XGBoost_Balanced.pkl
 """
+from pathlib import Path
+_PROJECT_ROOT = Path(__file__).resolve().parents[5]
 
 import os
 import sys
@@ -54,9 +56,9 @@ logging.basicConfig(
 logger = logging.getLogger("Binary.Classifier.UI")
 
 # ===== Config =====
-MODELS_DIR = Path(r"C:\Users\yovel\Desktop\Grape_Project\experiments\pixel_level_classifier_2_classes\models")
-DEFAULT_SEARCH_FOLDER = r"C:\Users\yovel\Desktop\Grape_Project\data\raw"
-DEFAULT_DATASET_CSV = r"C:\Users\yovel\Desktop\Grape_Project\src\preprocessing\prepare_dataset_for_full_image_classification\hole_image\first_date_dataset\early_detection_dataset.csv"
+MODELS_DIR = Path(str(_PROJECT_ROOT / r"experiments/pixel_level_classifier_2_classes/models"))
+DEFAULT_SEARCH_FOLDER = str(_PROJECT_ROOT / r"data/raw")
+DEFAULT_DATASET_CSV = str(_PROJECT_ROOT / r"src/preprocessing/prepare_dataset_for_full_image_classification/hole_image/first_date_dataset/early_detection_dataset.csv")
 
 # Balanced models only
 AVAILABLE_MODELS = {

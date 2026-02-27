@@ -41,6 +41,8 @@ Assumptions:
 - Excel cells contain 1 for crack, 0 or NaN for no crack
 - Images are stored at: {BASE_RAW_DIR}\{grape_id}\{week_date}\
 """
+from pathlib import Path
+_PROJECT_ROOT = Path(__file__).resolve().parents[5]
 
 from __future__ import annotations
 
@@ -56,13 +58,13 @@ import datetime as dt
 # =========================
 
 # Input Excel file path
-INPUT_XLSX = r"C:\Users\yovel\Desktop\Grape_Project\src\preprocessing\prepare_dataset_for_full_image_classification\hole_image\manual_labeling\crack_by_weeks_for_dataset.xlsx"
+INPUT_XLSX = str(_PROJECT_ROOT / r"src/preprocessing/prepare_dataset_for_full_image_classification/hole_image/manual_labeling/crack_by_weeks_for_dataset.xlsx")
 
 # Output CSV path
-OUTPUT_CSV = r"C:\Users\yovel\Desktop\Grape_Project\src\preprocessing\prepare_dataset_for_full_image_classification\hole_image\manual_labeling\output\row1_manual_label_template.csv"
+OUTPUT_CSV = str(_PROJECT_ROOT / r"src/preprocessing/prepare_dataset_for_full_image_classification/hole_image/manual_labeling/output/row1_manual_label_template.csv")
 
 # Base directory for raw images
-BASE_RAW_DIR = r"C:\Users\yovel\Desktop\Grape_Project\data\raw"
+BASE_RAW_DIR = str(_PROJECT_ROOT / r"data/raw")
 
 # Which row to export (vineyard row number)
 ROW_TO_EXPORT = 1

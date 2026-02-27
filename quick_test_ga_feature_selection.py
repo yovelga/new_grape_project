@@ -10,6 +10,8 @@ Usage:
 
 Expected runtime: 2-5 minutes
 """
+from pathlib import Path
+_PROJECT_ROOT = Path(__file__).resolve().parents[0]
 
 import os
 import sys
@@ -40,7 +42,7 @@ ga_module.GA_CONFIG = {
 }
 
 # Update results folder for test run
-ga_module.RESULTS_FOLDER = r"C:\Users\yovel\Desktop\Grape_Project\results\ga_feature_selection_TEST"
+ga_module.RESULTS_FOLDER = str(_PROJECT_ROOT / r"results/ga_feature_selection_TEST")
 
 print("\n" + "="*80)
 print(" QUICK TEST - GENETIC ALGORITHM FEATURE SELECTION ")
