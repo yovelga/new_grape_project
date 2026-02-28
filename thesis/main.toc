@@ -72,10 +72,20 @@
 \contentsline {subsubsection}{Wavelength Popularity and Stability}{57}{section*.21}%
 \contentsline {chapter}{\numberline {6}Discussion and Conclusions}{59}{chapter.6}%
 \contentsline {section}{\numberline {6.1}Physiological and Pre-processing Foundations}{59}{section.6.1}%
+\contentsline {subsection}{\numberline {6.1.1}The Biological Basis of Spectral Signatures}{59}{subsection.6.1.1}%
+\contentsline {subsection}{\numberline {6.1.2}Data Normalization and Pre-processing Restraint}{59}{subsection.6.1.2}%
 \contentsline {section}{\numberline {6.2}Managing Field Clutter: The Role of Spatial Aggregation}{61}{section.6.2}%
+\contentsline {subsection}{\numberline {6.2.1}Overcoming Spectral Ambiguity: The Dry Wood Challenge}{61}{subsection.6.2.1}%
+\contentsline {subsection}{\numberline {6.2.2}Geometric Filtering and Structural Regularization}{61}{subsection.6.2.2}%
 \contentsline {section}{\numberline {6.3}Dimensionality Reduction, Algorithm Selection, and Sensor Design}{63}{section.6.3}%
-\contentsline {subsection}{\numberline {6.3.1}Methodological Challenges and Data Curation Bottlenecks}{65}{subsection.6.3.1}%
+\contentsline {subsection}{\numberline {6.3.1}Feature Selection and Multispectral Sensor Design}{63}{subsection.6.3.1}%
+\contentsline {subsection}{\numberline {6.3.2}Methodological Rationale: BFS and Evaluation Metrics}{63}{subsection.6.3.2}%
+\contentsline {subsection}{\numberline {6.3.3}Classifier Selection and Spatial Validation}{64}{subsection.6.3.3}%
+\contentsline {subsection}{\numberline {6.3.4}The Limits of Unsupervised Anomaly Detection}{65}{subsection.6.3.4}%
+\contentsline {subsection}{\numberline {6.3.5}Methodological Challenges and Data Curation Bottlenecks}{66}{subsection.6.3.5}%
 \contentsline {section}{\numberline {6.4}Conclusions and Future Work}{67}{section.6.4}%
+\contentsline {subsection}{\numberline {6.4.1}Summary of Contributions}{67}{subsection.6.4.1}%
+\contentsline {subsection}{\numberline {6.4.2}Future Research Directions}{67}{subsection.6.4.2}%
 \contentsline {chapter}{\numberline {A}Supplementary Results}{69}{appendix.A}%
 \contentsline {section}{\numberline {A.1}Cross-Validation Statistics and Full Precision Tables}{69}{section.A.1}%
 \contentsline {subsection}{\numberline {A.1.1}Pixel-Level Classification: Binary and Multi-Class}{69}{subsection.A.1.1}%

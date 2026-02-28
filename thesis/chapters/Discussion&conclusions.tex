@@ -1,0 +1,214 @@
+\chapter{Discussion and Conclusions}
+\label{chap:discussion_conclusions}
+
+\section{Physiological and Pre-processing Foundations}
+\label{sec:physiology_preprocessing}
+
+\subsection{The Biological Basis of Spectral Signatures}
+\noindent
+The initial finding of this study---that cracked tissues exhibit significantly lower reflectance across both the VIS and NIR regions compared to healthy tissues---is strongly rooted in the biomechanical and physiological consequences of fruit cracking.
+In the VIS region (400--700\,nm), the depressed reflectance of cracked tissue is primarily driven by the rupture of the waxy cuticle and the subsequent oxidation of sub-epidermal cells.
+Once this protective barrier is breached, exposed phenolic compounds undergo rapid oxidative browning \cite{santos2023molecular}, which substantially increases light absorption.
+Furthermore, the loss of the smooth cuticle layer eliminates specular reflectance, causing the cracked area to appear darker.
+In the NIR region (700--850\,nm), where the spectral separability is most pronounced, the governing factors are cellular structure and water content \cite{thenkabail2016hyperspectral}.
+Healthy mesocarp tissue acts as a strong diffuse reflector due to internal scattering at air--cell interfaces and high turgor pressure.
+Cracking induces a localized collapse of this cellular architecture; the rapid loss of turgor and leakage of fluids destroy the scattering interfaces, resulting in a dramatic drop in NIR reflectance \cite{Chang2019,YU20251506}.
+
+\subsection{Data Normalization and Pre-processing Restraint}
+\noindent
+While these physiological changes establish a strong theoretical basis for detection, capturing them in uncontrolled vineyard conditions required specific pre-processing interventions to mitigate both sensor-level and field-induced noise.
+First, the usable spectral range was deliberately restricted to 450--925\,nm (yielding 159 contiguous bands).
+The extreme boundaries of the camera's full spectral range suffer from low signal-to-noise ratios (SNR) and high variance---a known hardware limitation in VIS-NIR hyperspectral sensors that is corroborated by prior studies \cite{thenkabail2016hyperspectral,behmann2018specim}.
+Truncating these noisy extremes prevented the classifiers from fitting to instrumental artifacts.
+Second, the extraction of tissue segments (ROIs) for the pixel-level models was explicitly designed to exclude the outer boundary pixels using a morphological erosion strategy.
+This spatial buffer was critical to prevent the inclusion of \textit{mixed pixels} \cite{bioucas2013hyperspectral}, where spectral information from the grape tissue blends with background elements or adjacent berries, corrupting the pure class signatures.
+Third, the highly variable illumination in the field---exacerbated by canopy shading and diverse berry acquisition angles---necessitated integration times that often deviated significantly from the camera's optimal recommendations.
+To prevent the models from overfitting to these lighting artifacts (e.g., underexposure or shadowing) rather than the underlying physiology, Standard Normal Variate (SNV) transformation was applied.
+By normalizing each pixel's spectrum relative to its own mean and variance, SNV effectively decoupled the absolute illumination intensity from the spectral shape.
+This ensured that the classifiers learned the true structural and chemical manifestations of the cracks, compensating for instances of over- or under-exposure within the same class.
+
+\medskip\noindent
+It is also worth noting the deliberate restraint exercised in the preprocessing pipeline.
+While early exploratory experiments tested spatial smoothing techniques (such as moving averages across neighboring pixels) to reduce localized noise, these were ultimately discarded.
+Applying aggressive smoothing in tandem with SNV normalization artificially inflates spatial collinearity and distances the dataset from its raw physical measurements.
+The adopted pipeline intentionally prioritized minimal, physically justified transformations over heavy mathematical manipulation, ensuring that the spectral signatures remained faithful to the underlying tissue physiology.
+
+\clearpage
+\section{Managing Field Clutter: The Role of Spatial Aggregation}
+\label{sec:spatial_aggregation}
+
+\subsection{Overcoming Spectral Ambiguity: The Dry Wood Challenge}
+\noindent
+The transition from a controlled pixel-level environment to whole-image field scenes exposed the severe limitations of binary classification in complex agricultural settings.
+Initial attempts to classify pixels using a simple binary approach (crack versus non-crack) resulted in unacceptable levels of random noise.
+This is mathematically predictable: grouping the infinite optical heterogeneity of the vineyard background into a single "non-crack" class creates an ill-defined, highly unstable decision boundary.
+To impose order on this heterogeneity, the problem was reformulated into a 10-class scheme, explicitly modeling the most prevalent background elements (e.g., leaves, soil, wood, and plastic markers).
+This multi-class mapping significantly stabilized the feature space and reduced random pixel-level noise, yet localized false positives persisted in the full-image predictions.
+
+\medskip\noindent
+Empirical observation of the whole-image classification maps revealed that the residual false positives were not entirely random;
+they were systematically driven by specific background materials, primarily dry woody branches (and occasionally plastic markers).
+Physiologically, this spectral confusion is highly logical. As established in Section~\ref{sec:physiology_preprocessing}, cracked tissue is characterized by depressed reflectance due to water loss and tissue oxidation.
+Dry wood shares these exact traits---it is devoid of cellular water and composed of brown, oxidized lignin---making its spectral signature in the VIS and NIR regions deceptively similar to that of a severe crack.
+
+\subsection{Geometric Filtering and Structural Regularization}
+\noindent
+To overcome this inherent spectral ambiguity, the detection pipeline was fundamentally shifted to incorporate spatial and geometric context, leveraging a key visual distinction: true berry cracks manifest as dense, concentrated "clouds" or blobs of pixels on the berry surface, whereas noise from branches typically appears as elongated lines, and other artifacts appear as scattered, isolated pixels.
+
+\medskip\noindent
+A multi-stage spatial aggregation strategy was implemented to exploit this geometric difference.
+First, morphological filtering operations were applied to the pixel-level probability maps.
+This step effectively consolidated the dense pixel clouds into cohesive blobs (closing) while eliminating the isolated "salt-and-pepper" noise points generated by random artifacts.
+Subsequently, a patch-based density evaluation was introduced. By dividing the image into spatial patches and analyzing the local crack probability, the system applied a strict density criterion: a region was only flagged as a true defect if the percentage of crack pixels within a patch exceeded a calibrated threshold.
+
+\medskip\noindent
+It is important to note that this spatial filtering was intentionally kept minimalist, avoiding more complex geometric descriptors such as circularity, eccentricity, or linearity.
+While advanced shape analysis could theoretically separate cracks from branches with higher precision on the calibration set, optimizing multiple morphological thresholds forces the pipeline to memorize the specific artifact shapes present in the calibration row.
+This excessive parameterization leads to severe post-processing overfitting, destroying the model's ability to generalize to new data.
+By restricting the spatial logic to fundamental density and blob-extraction, the system acts as a structural regularizer---sacrificing marginal gains in calibration performance to preserve robustness when deployed on unseen vines.
+
+\medskip\noindent
+Ultimately, this patch-density logic served as a robust structural filter.
+It successfully discarded the elongated, low-density pixel clusters associated with thin branches, ensuring that only concentrated, blob-like formations triggered a detection.
+While exceptionally thick dry branches occasionally satisfied this density threshold---remaining the primary source of whole-image classification errors---the spatial aggregation pipeline proved essential.
+It demonstrated that robust field-level detection cannot rely on spectral signatures alone, but must fuse pixel-level spectral predictions with macroscopic geometric rules.
+
+\medskip\noindent
+Developing this spatial pipeline exposed a significant computational optimization challenge.
+Initial exploratory iterations relied on brute-force grid searches across an 8-dimensional hyperparameter space, encompassing the baseline pixel-probability threshold, minimum and maximum blob areas, circularity and solidity constraints, morphological kernel sizes, patch dimensions, and the global crack-percentage criterion.
+It rapidly became evident that brute-force exploration of this massive combinatorial space was computationally prohibitive and yielded sub-optimal local minima.
+Consequently, the experimental design transitioned to Bayesian optimization via Optuna.
+By intelligently modeling the hyperparameter landscape, Optuna efficiently converged on a robust operating point that maximized early-stage precision while maintaining spatial coherence.
+The resulting pipeline achieved substantially higher precision (0.864 on the early-stage test set) than a naive pixel-level approach would.
+
+\clearpage
+\section{Dimensionality Reduction, Algorithm Selection, and Sensor Design}
+\label{sec:dimensionality_and_sensors}
+
+\subsection{Feature Selection and Multispectral Sensor Design}
+\noindent
+A central objective of this research was to determine whether the complex, high-dimensional data produced by a hyperspectral camera could be distilled into a practical, cost-effective agricultural tool.
+The Backward Feature Selection (BFS) analysis provided a definitive and positive answer.
+The results demonstrated that the original 159-band spectrum contains massive redundancy, and that performance can be maintained using a significantly truncated subset of wavelengths.
+
+\medskip\noindent
+The stability analysis across multiple random seeds revealed that the 30-wavelength configuration represents the optimal "sweet spot" for operational deployment.
+While the extreme 11-wavelength subset successfully detected cracks, its feature selection variance across seeds indicated instability due to the over-constraint of the feature space.
+Conversely, the full 159-wavelength cube introduced noise and risk of overfitting.
+The 30-wavelength subset achieved the highest early-stage independent test MCC (0.644) by balancing sufficient spectral resolution to separate cracks from background clutter, while discarding noisy, uninformative bands.
+This finding has immense practical implications for precision viticulture. In contrast to fragile and expensive full-range hyperspectral line-scan cameras, the robust spectral markers identified here---anchored by universally stable features closely aligned with key physiological traits, such as the Soret band (452\,nm), green reflection (548\,nm), anthocyanin absorption (580\,nm), and the red-edge inflection (729\,nm)---pave the way for manufacturing a dedicated, low-cost multispectral sensor.
+Utilizing 10 to 30 fixed optical filters targeting these exact physiological features, such a device could be easily mounted on UAVs or vineyard tractors for high-throughput screening.
+
+\subsection{Methodological Rationale: BFS and Evaluation Metrics}
+\noindent
+The methodological choice of Backward Feature Selection (BFS) over alternative dimensionality reduction strategies was fundamentally driven by the physical constraints of sensor design.
+Standard reduction techniques, such as Principal Component Analysis (PCA), were explicitly avoided.
+While PCA effectively compresses variance into a lower-dimensional space, it generates synthetic features (linear combinations of all original wavelengths).
+A PCA-based model cannot be translated into a physical, low-cost multispectral camera, as the hardware would still require the full 159-band hyperspectral sensor to compute the principal components.
+BFS, by contrast, isolates the exact, unaltered physical wavelengths required for manufacturing physical optical filters.
+Furthermore, BFS circumvents the pitfalls of Forward Feature Selection (FFS)---which struggles with the extreme multicollinearity of adjacent spectral bands---by starting with the full spectral context and meticulously pruning only the redundant features.
+
+\medskip\noindent
+Furthermore, while heuristic search methods like GA can optimize high-dimensional spaces, their stochastic nature (relying on random mutation and crossover) produces non-deterministic subsets that fluctuate wildly between runs, hindering physiological interpretation.
+BFS, conversely, provides a deterministic elimination sequence and a strict feature ranking.
+This traceability is what enabled the identification of the performance ``sweet spot'' across the elimination continuum, ensuring that the selected subsets are not random mathematical artifacts, but stable, physically meaningful markers.
+
+\medskip\noindent
+The explicit choice to optimize the BFS algorithm based on the Precision-Recall Area Under the Curve (PR--AUC) rather than the standard Receiver Operating Characteristic (ROC--AUC) was dictated by the extreme class imbalance inherent to the problem.
+In whole-image field scenes, cracked pixels typically constitute less than $0.001\%$ of the dataset.
+Under such severe imbalance, ROC--AUC yields overly optimistic and misleading scores, as it heavily rewards the correct classification of the massive, trivial ``background'' majority.
+PR--AUC, conversely, isolates the performance on the rare positive class, ensuring that the selected wavelengths genuinely maximize crack detection rather than merely excelling at background rejection.
+
+\subsection{Classifier Selection and Spatial Validation}
+\noindent
+Within the supervised paradigm, the superiority of tree-based ensembles (XGBoost, Random Forest) over linear models (PLS-DA, Logistic Regression) underscored the highly non-linear and collinear nature of the multi-class spectral boundaries.
+However, the ultimate selection of XGBoost as the primary classifier was driven as much by operational scalability as by accuracy.
+During preliminary trials, Support Vector Machines (SVM) achieved competitive pixel-level accuracy.
+Yet, their inference complexity ($O(n^2)$ to $O(n^3)$) proved prohibitive for whole-image deployment.
+A single field scene contains over 260,000 pixels ($512 \times 512$)---exceeding the total size of the extracted pixel-level training dataset.
+SVM inference on a single full image was computationally unfeasible for high-throughput screening.
+Tree-based architectures, alongside shallow Multi-Layer Perceptrons (MLPs), provided the necessary inference speed to make full-image field deployment practical, highlighting the critical transition from laboratory-scale accuracy to operational field constraints.
+
+\medskip\noindent
+Crucially, this pixel-level robustness was validated using a strict Leave-One-Group-Out (LOGO) cross-validation strategy, where each group corresponded to a distinct physical grape cluster.
+In agricultural computer vision, standard random K-fold splits frequently suffer from spatial data leakage, as adjacent pixels from the same physical object fall into both training and validation sets, artificially inflating performance.
+By enforcing a cluster-level separation during cross-validation, the reported pixel-level metrics represent true generalization to unseen biological samples rather than mere spatial memorization.
+
+\subsection{The Limits of Unsupervised Anomaly Detection}
+\noindent
+The algorithmic comparison between the supervised XGBoost model and the unsupervised Autoencoder architectures provided profound insights into the spectral structure of the dataset.
+Two distinct anomaly-detection paradigms were tested: training the autoencoder on all non-crack classes, and training it exclusively on the crack class.
+Training on the diverse non-crack background failed catastrophically. Because the "normal" background encompasses an enormous spectral variety (leaves, wood, soil, plastic, shadows), the autoencoder was forced to learn a highly generalized, expansive latent space.
+Consequently, its generalization capacity became entirely too broad; it successfully reconstructed unseen crack signatures simply because they fell within the interpolated boundaries of the diverse background manifold.
+As a result, the Mean Squared Error (MSE) for cracks rarely exceeded the predefined anomaly threshold.
+
+\medskip\noindent
+Conversely, training the autoencoder exclusively on the crack class yielded significantly better pixel-level discrimination.
+By learning only the narrow, specific spectral manifold of a crack, the model became highly adept at reconstructing cracks while failing to reconstruct (producing a high MSE for) any other vineyard material.
+However, while analytically elegant, this approach proved brittle. It overfits to the exact crack signatures present in the calibration set, reducing its ability to generalize to novel defect variations in unseen vines.
+Ultimately, the supervised XGBoost succeeded precisely because it was forced to explicitly learn the decision boundaries separating the crack from a well-defined 10-class background, rather than relying on reconstruction failures.
+
+\medskip\noindent
+It is also critical to acknowledge how the SNV transformation interacted with these models.
+While SNV was mathematically necessary to eliminate illumination disparities (as discussed in Section~\ref{sec:physiology_preprocessing}), it inherently discards absolute reflectance intensity (albedo), preserving only the spectral shape.
+This normalization severely handicapped the autoencoder. Forced to reconstruct only the normalized spectral geometry, the autoencoder reconstructed background elements that had drastically different physical brightness but incidentally similar spectral shapes to a crack with low MSE, effectively blinding the anomaly detector.
+This loss of absolute intensity information also exacerbated XGBoost's confusion between cracks and bright background artifacts (like plastic or reflective wood).
+Future pipelines might benefit from a hybrid approach, passing both the SNV-normalized spectrum and the absolute brightness vector to the classifiers.
+
+\subsection{Methodological Challenges and Data Curation Bottlenecks}
+\noindent
+Beyond the algorithmic findings, this study highlights a critical, often-underreported bottleneck in applied hyperspectral research: the massive data-engineering effort required to translate unstructured, high-dimensional field imagery into structured tabular data suitable for machine learning.
+In the context of an individual research project, this data curation phase constitutes the most labor-intensive and Sisyphean aspect of the pipeline.
+
+\medskip\noindent
+The first major hurdle was the manual ground-truth annotation. Labeling required a demanding dual-phase approach: physically scouting and tagging cracked clusters in the vineyard under harsh field conditions, followed by painstaking post-processing to isolate and label the exact cracked berries within the visually complex, overlapping canopy of the digital scenes.
+
+\medskip\noindent
+The second major challenge was cross-modal alignment and spatial processing.
+Operating on both RGB and Hyperspectral (HSI) modalities required flawlessly mapping coordinates between sensors with different resolutions and fields of view.
+Relying solely on automated scripts to segment an RGB image and crop the corresponding HSI region is highly prone to hidden geometric errors, such as unintended 90-degree rotations, mirroring, or scaling mismatches.
+Consequently, custom Graphical User Interfaces (GUIs) had to be developed from scratch for nearly every preprocessing and filtering task.
+
+\medskip\noindent
+These custom visual tools were not merely conveniences; they were absolute methodological necessities.
+Visual verification was the only way to guarantee that the extracted hyperspectral segments aligned perfectly with the physical berries, and that the morphological filters were behaving as mathematically intended before feature extraction.
+This rigorous, manual visual-validation loop was the invisible foundation of the study, ensuring that the downstream classifiers learned from accurate, biologically meaningful data rather than processing artifacts.
+
+\medskip\noindent
+Early in the research phase, fully automated unsupervised clustering algorithms (e.g., K-Means) were explored to bypass this manual annotation bottleneck.
+The objective was to automatically isolate cracked pixels as a distinct unsupervised cluster based on their spectral distance.
+However, this approach encountered a fundamental mathematical barrier: extreme class imbalance.
+Cracked tissue represents an infinitesimal fraction of the total field of view (often less than 0.001\% of the scene's pixels).
+In high-dimensional hyperspectral space, unsupervised algorithms are overwhelmingly dominated by the variance of the majority classes (canopy, soil, and healthy berries).
+The rare crack signatures were consistently swallowed by broader clusters, making it methodologically impossible to define stable distance thresholds or reliably isolate the sub-population without prior labels.
+This empirical limitation confirmed that for highly imbalanced, real-world agricultural scenes, labor-intensive supervised annotation remains a mandatory prerequisite.
+
+\clearpage
+\section{Conclusions and Future Work}
+\label{sec:conclusions}
+
+\subsection{Summary of Contributions}
+\noindent
+This study successfully demonstrated that visible--near-infrared (VIS-NIR) spectral imaging can detect table grape cracking, even under early-stage conditions prior to severe visual degradation.
+The physical mechanism driving this detection is deeply rooted in the biomechanics of the crack: the destruction of the waxy cuticle and subsequent cellular water loss produce a highly distinct, depressed reflectance signature, particularly in the NIR plateau and the red-edge inflection.
+
+\medskip\noindent
+Moving from laboratory pixel-level analysis to uncontrolled whole-image field deployment exposed significant challenges related to background clutter and illumination variance.
+These challenges were systematically mitigated through a novel pipeline that combined a multi-class supervised learning approach (XGBoost) with geometric spatial aggregation (patch-density blob filtering).
+This spatial logic proved that while spectral data is necessary for identifying the chemical and structural changes of a crack, spatial context is mandatory for suppressing the noise of the agricultural environment.
+Furthermore, the successful reduction of the required spectral bands from 159 to a stable subset of 30 wavelengths proves the feasibility of transitioning this technology from a scientific research tool to an affordable, tractor-mountable multispectral sensor.
+
+\subsection{Future Research Directions}
+\noindent
+Future research should focus on four primary avenues to bridge the gap to commercial deployment. First, cross-cultivar validation is essential;
+the spectral markers identified for 'Scarlotta Seedless' must be tested against grape varieties with different cuticle thicknesses and anthocyanin profiles.
+Second, the development of a hybrid preprocessing method that retains absolute albedo information alongside normalized spectral shapes could significantly reduce false positives caused by dry wood and plastic artifacts.
+Third, the hardware implementation of the selected 30-wavelength configuration into a physical, real-time multispectral camera must be tested in dynamic vineyard conditions.
+
+\medskip\noindent
+Finally, a highly promising direction involves deep-learning-based spatial filtering to refine the whole-image detection pipeline.
+Preliminary investigations during this study explored a multi-stage cascade: utilizing the spectral model to detect suspected defect blobs, extracting their centroids, applying the Segment Anything Model 2 (SAM2) to isolate the local structure, and feeding the corresponding RGB bounding box into a Convolutional Neural Network (CNN) to classify the object as 'grape' or 'non-grape' (e.g., dry wood).
+While the CNN achieved excellent accuracy on isolated calibration segments---testing various inputs such as tight bounding boxes, 5-pixel padded boxes, and fully masked background segments---it suffered a severe performance drop when deployed on whole-image field scenes.
+This discrepancy highlights a critical domain shift: spatial models trained on cleanly extracted ROIs struggle with the overlapping geometries, shadows, and contextual noise of a full canopy.
+Nevertheless, the core concept of a spectral-spatial cascade---using the hyperspectral pixel model as a highly sensitive primary detector, and an RGB-based CNN as a geometric secondary filter---remains conceptually sound.
+Future iterations of this architecture, potentially utilizing end-to-end training, could effectively eliminate the remaining false positives and yield a near-perfect early-warning detection system.

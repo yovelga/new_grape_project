@@ -14,3 +14,5 @@
 !README.md
 !*.bat
 !*.sh
+!thesis/chapters/*.tex
+!thesis/*.bib
