@@ -21,10 +21,11 @@
 \contentsline {figure}{\numberline {5.5}{\ignorespaces Distribution and popularity of the top-30 selected wavelengths across five varying-split seeds.}}{57}{figure.5.5}%
 \contentsline {figure}{\numberline {5.6}{\ignorespaces Wavelength selection frequency along the spectrum (2\,nm sliding window) for the top-30 subsets.}}{58}{figure.5.6}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {A.1}{\ignorespaces Regional mean reflectance ($\pm $1 SD) and absolute mean class difference for the VIS and NIR ranges.}}{62}{figure.A.1}%
-\contentsline {figure}{\numberline {A.2}{\ignorespaces Wavelength popularity at different bin sizes (1, 5, 10, 20\,nm) for the top-30 subsets.}}{69}{figure.A.2}%
-\contentsline {figure}{\numberline {A.3}{\ignorespaces Stability heatmap for the top-30 BFS subsets across five seeds (objective: PR--AUC\textsubscript {CRACK}). Each cell indicates how many seeds selected a wavelength within that 5\,nm bin.}}{70}{figure.A.3}%
-\contentsline {figure}{\numberline {A.4}{\ignorespaces Distribution and popularity of the top-11 selected wavelengths across five varying-split seeds.}}{71}{figure.A.4}%
-\contentsline {figure}{\numberline {A.5}{\ignorespaces Wavelength popularity at different bin sizes (1, 5, 10, 20\,nm) for the top-11 subsets.}}{71}{figure.A.5}%
-\contentsline {figure}{\numberline {A.6}{\ignorespaces Stability heatmap for the top-11 BFS subsets across five seeds (objective: PR--AUC\textsubscript {CRACK}; 0.5\% drop setting). Each cell indicates how many seeds selected a wavelength within that 5\,nm bin.}}{72}{figure.A.6}%
-\contentsline {figure}{\numberline {A.7}{\ignorespaces Wavelength selection frequency along the spectrum (2\,nm sliding window) for the top-11 subsets.}}{73}{figure.A.7}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {A.1}{\ignorespaces Regional mean reflectance ($\pm $1 SD) and absolute mean class difference for the VIS and NIR ranges.}}{71}{figure.A.1}%
+\contentsline {figure}{\numberline {A.2}{\ignorespaces Wavelength popularity at different bin sizes (1, 5, 10, 20\,nm) for the top-30 subsets.}}{78}{figure.A.2}%
+\contentsline {figure}{\numberline {A.3}{\ignorespaces Stability heatmap for the top-30 BFS subsets across five seeds (objective: PR--AUC\textsubscript {CRACK}). Each cell indicates how many seeds selected a wavelength within that 5\,nm bin.}}{79}{figure.A.3}%
+\contentsline {figure}{\numberline {A.4}{\ignorespaces Distribution and popularity of the top-11 selected wavelengths across five varying-split seeds.}}{80}{figure.A.4}%
+\contentsline {figure}{\numberline {A.5}{\ignorespaces Wavelength popularity at different bin sizes (1, 5, 10, 20\,nm) for the top-11 subsets.}}{80}{figure.A.5}%
+\contentsline {figure}{\numberline {A.6}{\ignorespaces Stability heatmap for the top-11 BFS subsets across five seeds (objective: PR--AUC\textsubscript {CRACK}; 0.5\% drop setting). Each cell indicates how many seeds selected a wavelength within that 5\,nm bin.}}{81}{figure.A.6}%
+\contentsline {figure}{\numberline {A.7}{\ignorespaces Wavelength selection frequency along the spectrum (2\,nm sliding window) for the top-11 subsets.}}{82}{figure.A.7}%

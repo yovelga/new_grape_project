@@ -70,22 +70,27 @@
 \contentsline {subsection}{\numberline {5.7.2}End-to-End Wavelength-Selection Results}{56}{subsection.5.7.2}%
 \contentsline {subsection}{\numberline {5.7.3}BFS Wavelength-Selection Stability Analysis}{57}{subsection.5.7.3}%
 \contentsline {subsubsection}{Wavelength Popularity and Stability}{57}{section*.21}%
-\contentsline {section}{\numberline {5.8}Physiological and Pre-processing Foundations}{58}{section.5.8}%
-\contentsline {chapter}{\numberline {A}Supplementary Results}{60}{appendix.A}%
-\contentsline {section}{\numberline {A.1}Cross-Validation Statistics and Full Precision Tables}{60}{section.A.1}%
-\contentsline {subsection}{\numberline {A.1.1}Pixel-Level Classification: Binary and Multi-Class}{60}{subsection.A.1.1}%
-\contentsline {subsection}{\numberline {A.1.2}Autoencoder-Based Anomaly Detection}{60}{subsection.A.1.2}%
-\contentsline {section}{\numberline {A.2}Regional VIS--NIR Reflectance Summaries}{60}{section.A.2}%
-\contentsline {section}{\numberline {A.3}Binary Pixel-Level Classification (Balanced)}{63}{section.A.3}%
-\contentsline {section}{\numberline {A.4}Multi-Class Pixel-Level Classification (Balanced)}{64}{section.A.4}%
-\contentsline {section}{\numberline {A.5}Autoencoder Anomaly Detection (Balanced)}{65}{section.A.5}%
-\contentsline {subsection}{\numberline {A.5.1}One-Class Binary Formulation}{65}{subsection.A.5.1}%
-\contentsline {subsection}{\numberline {A.5.2}Crack-Only Training Formulation}{65}{subsection.A.5.2}%
-\contentsline {subsection}{\numberline {A.5.3}Non-Crack Training Formulation}{66}{subsection.A.5.3}%
-\contentsline {section}{\numberline {A.6}Wavelength Selection: Generalization and Performance Analysis}{67}{section.A.6}%
-\contentsline {subsection}{\numberline {A.6.1}BFS Thresholds (Full Precision)}{67}{subsection.A.6.1}%
-\contentsline {subsection}{\numberline {A.6.2}Wavelength Results (Full Precision)}{67}{subsection.A.6.2}%
-\contentsline {subsection}{\numberline {A.6.3}Generalization Analysis}{67}{subsection.A.6.3}%
-\contentsline {paragraph}{Calibration-to-test generalization gap.}{67}{section*.22}%
-\contentsline {subsection}{\numberline {A.6.4}Wavelength Overlap Across Seeds}{67}{subsection.A.6.4}%
-\contentsline {section}{\numberline {A.7}Wavelength Stability: Supplementary Visualizations}{69}{section.A.7}%
+\contentsline {chapter}{\numberline {6}Discussion and Conclusions}{59}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Physiological and Pre-processing Foundations}{59}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Managing Field Clutter: The Role of Spatial Aggregation}{61}{section.6.2}%
+\contentsline {section}{\numberline {6.3}Dimensionality Reduction, Algorithm Selection, and Sensor Design}{63}{section.6.3}%
+\contentsline {subsection}{\numberline {6.3.1}Methodological Challenges and Data Curation Bottlenecks}{65}{subsection.6.3.1}%
+\contentsline {section}{\numberline {6.4}Conclusions and Future Work}{67}{section.6.4}%
+\contentsline {chapter}{\numberline {A}Supplementary Results}{69}{appendix.A}%
+\contentsline {section}{\numberline {A.1}Cross-Validation Statistics and Full Precision Tables}{69}{section.A.1}%
+\contentsline {subsection}{\numberline {A.1.1}Pixel-Level Classification: Binary and Multi-Class}{69}{subsection.A.1.1}%
+\contentsline {subsection}{\numberline {A.1.2}Autoencoder-Based Anomaly Detection}{69}{subsection.A.1.2}%
+\contentsline {section}{\numberline {A.2}Regional VIS--NIR Reflectance Summaries}{69}{section.A.2}%
+\contentsline {section}{\numberline {A.3}Binary Pixel-Level Classification (Balanced)}{72}{section.A.3}%
+\contentsline {section}{\numberline {A.4}Multi-Class Pixel-Level Classification (Balanced)}{73}{section.A.4}%
+\contentsline {section}{\numberline {A.5}Autoencoder Anomaly Detection (Balanced)}{74}{section.A.5}%
+\contentsline {subsection}{\numberline {A.5.1}One-Class Binary Formulation}{74}{subsection.A.5.1}%
+\contentsline {subsection}{\numberline {A.5.2}Crack-Only Training Formulation}{74}{subsection.A.5.2}%
+\contentsline {subsection}{\numberline {A.5.3}Non-Crack Training Formulation}{75}{subsection.A.5.3}%
+\contentsline {section}{\numberline {A.6}Wavelength Selection: Generalization and Performance Analysis}{76}{section.A.6}%
+\contentsline {subsection}{\numberline {A.6.1}BFS Thresholds (Full Precision)}{76}{subsection.A.6.1}%
+\contentsline {subsection}{\numberline {A.6.2}Wavelength Results (Full Precision)}{76}{subsection.A.6.2}%
+\contentsline {subsection}{\numberline {A.6.3}Generalization Analysis}{76}{subsection.A.6.3}%
+\contentsline {paragraph}{Calibration-to-test generalization gap.}{76}{section*.22}%
+\contentsline {subsection}{\numberline {A.6.4}Wavelength Overlap Across Seeds}{76}{subsection.A.6.4}%
+\contentsline {section}{\numberline {A.7}Wavelength Stability: Supplementary Visualizations}{78}{section.A.7}%
