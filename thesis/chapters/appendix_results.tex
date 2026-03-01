@@ -661,3 +661,28 @@ This section contains the secondary wavelength popularity and stability figures 
     \caption{Wavelength selection frequency along the spectrum (2\,nm sliding window) for the top-11 subsets.}
     \label{fig:stability_11_spectrum}
 \end{figure}
+
+% ==========================================================
+\section{Annotation Tool: Labeling Examples}
+\label{app:gui_labeling_examples}
+
+\noindent
+This appendix illustrates the custom GUI annotation tool described in Section~\ref{sec:spectral_dataset_construction}, showing representative labeling sessions for the two primary tissue classes.
+Figure~\ref{fig:gui_regular} shows the interface during annotation of a healthy (\textit{Regular}) grape cluster, where the operator selects intact berry regions to extract reference spectral signatures.
+Figure~\ref{fig:gui_cracked} shows the same tool applied to a cluster exhibiting visible cracking; in this case, the operator targets the damaged skin areas to capture the distinct spectral response associated with cracked tissue.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/appendix/figure_gui_tool_regular.jpg}
+    \caption{Annotation tool labeling session for a healthy (\textit{Regular}) grape cluster. The operator selects intact berry regions to extract reference spectral signatures.}
+    \label{fig:gui_regular}
+\end{figure}
+\FloatBarrier
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/appendix/figure_gui_tool_cracked.jpg}
+    \caption{Annotation tool labeling session for a cracked grape cluster. The operator targets damaged skin areas to capture the spectral response of cracked tissue.}
+    \label{fig:gui_cracked}
+\end{figure}
+\FloatBarrier

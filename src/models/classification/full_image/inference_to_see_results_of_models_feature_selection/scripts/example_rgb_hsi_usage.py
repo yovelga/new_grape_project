@@ -32,13 +32,23 @@ print("-"*70)
 
 csv_path = Path(__file__).parent.parent / "data" / "test_dataset.csv"
 
+# Project root for resolving relative image paths
+_PROJECT_ROOT = Path(__file__).resolve().parents[6]
+
+def _resolve_path(p):
+    """Resolve relative path against project root."""
+    path = Path(str(p))
+    if path.is_absolute():
+        return path
+    return _PROJECT_ROOT / path
+
 if csv_path.exists():
     df = pd.read_csv(csv_path)
     print(f"Loaded {len(df)} samples from CSV")
 
     # Check first few samples
     for i, row in df.head(5).iterrows():
-        sample_path = Path(row['image_path'])
+        sample_path = _resolve_path(row['image_path'])
         grape_id = row['grape_id']
         week = row['week_date']
 
@@ -104,7 +114,7 @@ if csv_path.exists():
     df = pd.read_csv(csv_path)
 
     for _, row in df.iterrows():
-        sample_path = Path(row['image_path'])
+        sample_path = _resolve_path(row['image_path'])
 
         if sample_path.exists():
             print(f"\nProcessing sample: {sample_path.name}")

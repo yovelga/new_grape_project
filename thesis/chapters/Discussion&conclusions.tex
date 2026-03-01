@@ -43,11 +43,26 @@ This is mathematically predictable: grouping the infinite optical heterogeneity 
 To impose order on this heterogeneity, the problem was reformulated into a 10-class scheme, explicitly modeling the most prevalent background elements (e.g., leaves, soil, wood, and plastic markers).
 This multi-class mapping significantly stabilized the feature space and reduced random pixel-level noise, yet localized false positives persisted in the full-image predictions.
 
+
 \medskip\noindent
 Empirical observation of the whole-image classification maps revealed that the residual false positives were not entirely random;
 they were systematically driven by specific background materials, primarily dry woody branches (and occasionally plastic markers).
 Physiologically, this spectral confusion is highly logical. As established in Section~\ref{sec:physiology_preprocessing}, cracked tissue is characterized by depressed reflectance due to water loss and tissue oxidation.
 Dry wood shares these exact traits---it is devoid of cellular water and composed of brown, oxidized lignin---making its spectral signature in the VIS and NIR regions deceptively similar to that of a severe crack.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/results/discussion/multi_vs_binary_cluster_42.JPG}
+    \caption{Multi-class vs.\ binary crack-probability maps on a \textbf{healthy (non-cracked)} cluster. Left: Canon R5 RGB reference. Centre: multi-class XGBoost overlay. Right: binary XGBoost overlay. The binary model produces widespread false positives across background elements (soil, branches, lighting gradients), whereas the multi-class model confines detections to a small number of localised regions. Yellow pixels indicate elevated CRACK probability.}
+    \label{fig:multi_vs_binary_nocrack}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/results/discussion/multi_vs_binary_cluster_19.JPG}
+    \caption{Multi-class vs.\ binary crack-probability maps on a \textbf{cracked} cluster. Left: Canon R5 RGB reference. Centre: multi-class XGBoost overlay. Right: binary XGBoost overlay. Both models detect the defect region, but the binary model additionally flags large background patches, severely reducing precision. The multi-class formulation isolates the true defect blob while suppressing background noise.}
+    \label{fig:multi_vs_binary_crack}
+\end{figure}
 
 \subsection{Geometric Filtering and Structural Regularization}
 \noindent
@@ -70,6 +85,13 @@ Ultimately, this patch-density logic served as a robust structural filter.
 It successfully discarded the elongated, low-density pixel clusters associated with thin branches, ensuring that only concentrated, blob-like formations triggered a detection.
 While exceptionally thick dry branches occasionally satisfied this density threshold---remaining the primary source of whole-image classification errors---the spatial aggregation pipeline proved essential.
 It demonstrated that robust field-level detection cannot rely on spectral signatures alone, but must fuse pixel-level spectral predictions with macroscopic geometric rules.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/results/discussion/Patch_map_output.JPG}
+    \caption{Example output of the spatial aggregation pipeline. The image illustrates the patch-based density map overlaid on a field scene, where the highlighted patch regions satisfy the crack-density criterion and trigger a positive detection. This visualization demonstrates how the pipeline transitions from a noisy, pixel-level probability map to a structured, spatially coherent image-level decision.}
+    \label{fig:patch_map_output}
+\end{figure}
 
 \medskip\noindent
 Developing this spatial pipeline exposed a significant computational optimization challenge.

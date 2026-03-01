@@ -14,6 +14,21 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+def _find_project_root() -> Path:
+    """
+    Find the top-level Grape_Project root by walking up from this file.
+
+    Looks for a directory containing both 'requirements.txt' and 'data/raw'.
+    Falls back to parents[7] from this file's location.
+    """
+    current = Path(__file__).resolve().parent
+    for _ in range(12):
+        if (current / "requirements.txt").exists() and (current / "data" / "raw").exists():
+            return current
+        current = current.parent
+    return Path(__file__).resolve().parents[7]
+
+
 @dataclass
 class Sample:
     """
@@ -205,7 +220,8 @@ class DatasetCSVLoader:
         Convert DataFrame to list of Sample objects.
         
         Args:
-            base_path: Optional base directory to resolve relative paths
+            base_path: Optional base directory to resolve relative paths.
+                       Defaults to the auto-detected project root.
             
         Returns:
             List of Sample objects
@@ -218,6 +234,10 @@ class DatasetCSVLoader:
         
         if self.label_col is None or self.path_col is None:
             raise ValueError("Column mapping not set. Call set_column_mapping() first.")
+        
+        # Default to project root for resolving relative paths
+        if base_path is None:
+            base_path = str(_find_project_root())
         
         samples = []
         errors = []

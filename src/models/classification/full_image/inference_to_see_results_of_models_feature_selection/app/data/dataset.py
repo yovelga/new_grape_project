@@ -13,24 +13,72 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+def _find_project_root() -> Path:
+    """
+    Find the top-level Grape_Project root by walking up from this file.
+
+    Looks for a directory containing both 'requirements.txt' and 'data/raw'.
+    Falls back to parents[7] from this file's location.
+    """
+    current = Path(__file__).resolve().parent
+    for _ in range(12):
+        if (current / "requirements.txt").exists() and (current / "data" / "raw").exists():
+            return current
+        current = current.parent
+    # Fallback: known relative position from app/data/dataset.py
+    return Path(__file__).resolve().parents[7]
+
+
+def _resolve_image_paths(df: pd.DataFrame, project_root: Optional[Path] = None) -> pd.DataFrame:
+    """
+    Resolve relative image_path values in a DataFrame against the project root.
+
+    Absolute paths are left unchanged. Relative paths are resolved against
+    the Grape_Project root directory.
+
+    Args:
+        df: DataFrame with an 'image_path' column
+        project_root: Optional explicit project root. Auto-detected if None.
+
+    Returns:
+        DataFrame with resolved image_path values
+    """
+    if 'image_path' not in df.columns:
+        return df
+
+    root = project_root or _find_project_root()
+
+    def _resolve(p):
+        path = Path(str(p))
+        if path.is_absolute():
+            return str(p)
+        return str(root / path)
+
+    df = df.copy()
+    df['image_path'] = df['image_path'].apply(_resolve)
+    return df
+
+
 # ===== CSV Dataset Loading =====
 
-def load_dataset_csv(path: str) -> pd.DataFrame:
+def load_dataset_csv(path: str, project_root: Optional[Path] = None) -> pd.DataFrame:
     """
     Load dataset from CSV file.
 
     Required columns:
     - grape_id: Unique identifier for each sample
-    - image_path: Path to image file
+    - image_path: Path to image file (absolute or relative to project root)
     - label: Class label
 
     Optional columns: Any additional metadata
 
     Args:
         path: Path to CSV file
+        project_root: Optional project root for resolving relative image_path
+                      values. Auto-detected if None.
 
     Returns:
-        DataFrame with validated columns
+        DataFrame with validated columns and resolved image paths
 
     Raises:
         FileNotFoundError: If CSV file doesn't exist
@@ -70,6 +118,9 @@ def load_dataset_csv(path: str) -> pd.DataFrame:
     # Log class distribution
     label_counts = df['label'].value_counts().to_dict()
     logger.info(f"  Class distribution: {label_counts}")
+
+    # Resolve relative image paths against project root
+    df = _resolve_image_paths(df, project_root)
 
     return df
 
@@ -208,13 +259,17 @@ def validate_image_paths(df: pd.DataFrame, base_dir: Optional[Path] = None) -> D
 
     Args:
         df: DataFrame with image_path column
-        base_dir: Optional base directory for relative paths
+        base_dir: Optional base directory for relative paths.
+                  Defaults to the auto-detected project root.
 
     Returns:
         Dictionary with 'missing' and 'found' lists
     """
     if 'image_path' not in df.columns:
         raise ValueError("DataFrame missing 'image_path' column")
+
+    if base_dir is None:
+        base_dir = _find_project_root()
 
     missing = []
     found = []

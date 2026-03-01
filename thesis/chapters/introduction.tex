@@ -3,6 +3,13 @@
 \section{The Problem of Fruit Cracking}
 Fruit cracking is a significant physiological disorder affecting a wide range of commercially important crops, including sweet cherries, tomatoes, pomegranates, and particularly table grapes (Vitis vinifera L.). The phenomenon is characterized by the rupture of the fruit's skin (cuticle and epidermis), exposing the internal flesh to the environment. These cracks render the fruit unmarketable and create entry points for pathogens, leading to rapid decay from secondary infections such as sour rot. Cracking typically occurs during the final stages of fruit ripening, a period when the fruit is most valuable. It is primarily caused by an imbalance between the turgor pressure within the fruit and the mechanical strength of its skin, a condition often exacerbated by environmental factors like rain, high humidity, and irrigation practices.
 
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figures/introduction/cracked_grape_berry.png}
+    \caption{Example of grape berry cracking in \textit{Vitis vinifera} L. cv.\ `Scarlotta Seedless'. The visible surface fissures expose inner flesh to the environment, rendering the fruit unmarketable and susceptible to secondary infections such as sour rot.}
+    \label{fig:cracked_grape_intro}
+\end{figure}
+
 \section{Economic Impact}
 \noindent
 The economic consequences of grape cracking are substantial. Direct losses can amount to up to 30\% of the marketable yield. For table grapes, this translates to an estimated financial loss of €625 per ton, culminating in a total industry loss of approximately €175 million annually, based on European market data (Table \ref{tab:economic_impact}). Beyond direct yield loss, cracking negatively impacts fruit appearance and quality, leading to price reductions of 20-50\% and a shortened shelf-life, further diminishing profitability for growers.
@@ -62,7 +69,40 @@ The main contributions of this thesis are as follows:
 \begin{itemize}[leftmargin=*]
     \item A consistent VIS--NIR preprocessing protocol was established and applied throughout the study by restricting spectra to 450--925\,nm and using per-spectrum SNV normalization, enabling direct comparability across experiments.
     \item A field-acquired hyperspectral dataset was curated at both pixel and whole-image levels, including manual pixel labeling and full-scene vineyard acquisitions, and was used to benchmark supervised classifiers under leave-one-group-out protocols and row-separated calibration/test evaluation, demonstrating reliable crack discrimination at the spectral-signature level (Chapter~\ref{ch:results}, Section~\ref{sec:pixel-level-classification}).
-    \item The limits of direct pixel-level segmentation in realistic vineyard scenes were analyzed by tracing error sources such as mixed pixels, illumination/BRDF effects, and spectrally confounding background materials, motivating a shift toward spatial aggregation (Chapter~\ref{ch:discussion}, Section~\ref{sec:pixel-level-failure-field}).
+    \item The limits of direct pixel-level segmentation in realistic vineyard scenes were analyzed by tracing error sources such as mixed pixels, illumination/BRDF effects, and spectrally confounding background materials, motivating a shift toward spatial aggregation (Chapter~\ref{chap:discussion_conclusions}, Section~\ref{sec:spatial_aggregation}).
     \item A whole-image crack-detection pipeline was developed by combining pixel-level inference with probability thresholding, morphological filtering, and patch/blob-based aggregation, with post-processing parameters optimized on calibration data and evaluated under early- vs.\ late-stage acquisition conditions (initial/minimal vs.\ advanced cracking; Chapter~\ref{ch:results}, Section~\ref{sec:full-image-early-late}).
     \item Backward Feature Selection (BFS) was used to quantify the performance--complexity trade-off of wavelength reduction and to assess selection stability across random seeds, providing a basis for compact band subsets and sensor-design implications (Chapter~\ref{ch:results}, Sections~\ref{sec:bfs-setup} and~\ref{sec:bfs-stability}).
 \end{itemize}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[
+        phaseBox/.style={rectangle, draw=black!70, thick, fill=blue!5, text width=3.6cm, align=center, minimum height=2.8cm, rounded corners=3mm},
+        arrow/.style={-{Stealth[length=3.5mm, width=2mm]}, thick, draw=blue!80!black}
+    ]
+
+    \node[phaseBox] (phase1) {
+        {\small\bfseries\color{blue!80!black}Phase 1}\\[1mm]
+        {\small\bfseries Pixel-Level\\Classification}\\[2mm]
+        {\footnotesize\color{black!70}SNV pre-processing \& multi-class XGBoost spectral modeling.}
+    };
+
+    \node[phaseBox, right=0.8cm of phase1] (phase2) {
+        {\small\bfseries\color{blue!80!black}Phase 2}\\[1mm]
+        {\small\bfseries Whole-Image\\Spatial Aggregation}\\[2mm]
+        {\footnotesize\color{black!70}Morphological filtering \& patch-density logic to reject field artifacts.}
+    };
+
+    \node[phaseBox, right=0.8cm of phase2] (phase3) {
+        {\small\bfseries\color{blue!80!black}Phase 3}\\[1mm]
+        {\small\bfseries Wavelength Selection\\\& Sensor Design}\\[2mm]
+        {\footnotesize\color{black!70}BFS reduces 159 bands to a stable 30-band multispectral subset.}
+    };
+
+    \draw[arrow] (phase1) -- (phase2);
+    \draw[arrow] (phase2) -- (phase3);
+
+    \end{tikzpicture}
+    \caption{Methodological pipeline overview. The research progresses from pixel-level spectral analysis, through whole-image spatial aggregation for field robustness, to spectral dimensionality reduction for practical sensor implementation.}
+    \label{fig:pipeline_overview}
+\end{figure}

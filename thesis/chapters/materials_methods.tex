@@ -84,18 +84,19 @@ Hyperspectral data were acquired using the \textbf{Specim IQ} (Specim, Spectral 
     \centering
     \begin{subfigure}[t]{0.48\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{figures/materials_methods/equipment/VICTOR_AND_ALON_WITH_SPECIM_IQ.jpeg}
-        \caption{Field deployment of the Specim IQ system in the vineyard.}
+        \includegraphics[width=\textwidth]{figures/materials_methods/equipment/taking_picture_with_hsi.jpg}
+        \caption{Hyperspectral image acquisition of grape clusters using the Specim IQ.}
     \end{subfigure}
     \hfill
     \begin{subfigure}[t]{0.48\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{figures/materials_methods/equipment/taking_picture_with_hsi.jpg}
-        \caption{Hyperspectral image acquisition of grape clusters using the Specim IQ.}
+        \includegraphics[width=\textwidth]{figures/materials_methods/study_area/hyperspectral_imaging_of_plants.png}
+        \caption{The Hyperspectral Data Cube Structure.}
     \end{subfigure}
     \caption{Hyperspectral imaging setup and data acquisition using the Specim IQ system under vineyard conditions.}
     \label{fig:hsi_setup}
 \end{figure}
+\FloatBarrier
 
 \begin{itemize}
     \item \textbf{Spectral Resolution:} The sensor captures 204 contiguous bands with a Full Width at Half Maximum (FWHM) of 7~nm and a spectral sampling interval of $\approx$3~nm. High signal fidelity is maintained by a signal-to-noise ratio (SNR) of $>400\!:\!1$.
@@ -287,6 +288,14 @@ To ensure methodological uniformity and prevent information leakage \cite{thenka
     \item \textbf{Per-Spectrum Normalization:} Each remaining spectral vector was independently normalized using the \textit{Standard Normal Variate} (SNV) transformation. By mean-centering and scaling each pixel exclusively by its own standard deviation, SNV mitigates illumination variability and scattering effects without relying on dataset-level statistics. This strictly per-pixel approach intrinsically prevents data leakage between training and testing partitions \cite{mishra2017close, kaltenborn2025data}.
 \end{itemize}
 
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/literature/snv_normalization_effect.png}
+    \caption{Effect of Standard Normal Variate (SNV) normalization on hyperspectral reflectance signatures for four representative material classes (Crack, Regular Berry, Plastic, Branch). Left column: raw reflectance spectra showing the mean (solid line) and $\pm 1$ standard deviation band (shaded region), illustrating substantial baseline and amplitude differences due to illumination variability and surface scattering. Right column: corresponding SNV-normalized spectra, in which each signature is mean-centered and scaled by its standard deviation, removing multiplicative and additive effects while preserving the class-discriminative spectral shape. Statistics computed over 500 sampled pixels per class.}
+    \label{fig:snv_effect}
+\end{figure}
+\FloatBarrier
+
 \subsection{Data Partitioning and Leakage Prevention Strategies}
 \label{subsec:leakage_control}
 
@@ -297,6 +306,14 @@ A foundational principle of this study was the strict prevention of spatial and 
 \label{subsec:cv_strategy}
 \noindent
 At the pixel level, contiguous pixels extracted from the same grape cluster share highly correlated spectral signatures. To prevent leakage, every extracted pixel was rigidly associated with its parent \emph{cluster ID} and \emph{acquisition date} (as defined in \S\ref{subsec:dataset_pixel}). This metadata was used to enforce a \textbf{Leave-One-Group-Out (LOGO)} cross-validation strategy. Under this protocol, all pixels originating from the same physical cluster were strictly assigned to either the training set or the test set in their entirety. For the multi-class formulation, a domain-aware LOGO variant was implemented: grape-containing acquisitions were folded using standard LOGO, while non-grape background samples (e.g., soil, leaves) were allocated to a fixed 80/20 hold-out split to prevent semantic leakage.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.55\textwidth]{figures/materials_methods/example4group_logo.png}
+    \caption{Illustration of the Leave-One-Group-Out (LOGO) cross-validation strategy. In each fold, all pixels from one grape cluster (group) are held out as the test set, while pixels from all remaining clusters form the training set. This ensures that no spatially correlated pixels from the same physical cluster appear in both partitions simultaneously.}
+    \label{fig:logo_illustration}
+\end{figure}
+\FloatBarrier
 
 \subsubsection{Whole-Image Leakage Prevention: Spatial Row Partitioning}
 \noindent
@@ -323,6 +340,7 @@ Supervised classification was applied at the pixel level to discriminate between
 \noindent
 \textbf{Algorithm Selection and Training:} Six algorithms were evaluated: Partial Least Squares Discriminant Analysis (PLS-DA), L1-regularized Logistic Regression, Support Vector Machine (RBF kernel), Random Forest, a shallow Multi-Layer Perceptron (MLP), and \textbf{XGBoost} (Gradient-boosted decision trees). XGBoost was ultimately adopted as the baseline model across all primary comparisons due to its robust handling of high-dimensional, correlated spectral features. Models were evaluated under both naturally unbalanced and strictly balanced training regimes (achieved via segment-proportional undersampling to preserve within-class diversity).
 
+\newpage
 \subsection{Autoencoder-Based Anomaly Detection}
 \label{subsec:anomaly_detection}
 
@@ -369,7 +387,7 @@ Figure~\ref{fig:whole_image_protocol_overview}, and consists of the following st
     \includegraphics[width=0.9\textwidth]{figures/materials_methods/pipeline/whole_image_pipeline.jpg}
   \caption{Whole-image crack-detection pipeline from pixel-level CRACK probabilities to image-level classification via spatial aggregation.}
 \end{figure}
-
+\FloatBarrier
 
 % \subsection{Whole-Image Detection and Spatial Aggregation Pipeline}
 % \label{subsec:full_image_pipeline}

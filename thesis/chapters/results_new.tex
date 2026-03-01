@@ -363,7 +363,33 @@ Early & Test &
 \noindent
 The results on the independent test set demonstrate robust system-level performance. Under late-stage conditions (advanced cracking), the supervised pipeline achieved a high F1\textsubscript{CRACK} score of 0.818. More importantly, under early-stage conditions--where cracks are minimal and visually indistinct--the system maintained strong predictive capability with an F1\textsubscript{CRACK} of 0.704. The expected performance drop between late and early stages reflects the physical difficulty of detecting incipient micro-cracks. Nevertheless, these results confirm both \hyperref[hyp:whole_image_robustness]{Hypothesis~3} and \hyperref[hyp:early_detection]{Hypothesis~4}: the spatial aggregation logic successfully suppresses background noise, enabling reliable early-warning triggers on entirely unseen vines.
 
-\FloatBarrier
+\begin{figure}[ht]
+    \centering
+    \begin{subfigure}[t]{0.6\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/results/full_images/full_images_classification/02_02/new_detect_2_02.png}
+        \caption{True-positive detection: pixel-level crack probability map overlaid on a cracked grape cluster.}
+        \label{fig:tp_detect}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.6\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/results/full_images/full_images_classification/02_02/new_patch_2_02.png}
+        \caption{Corresponding patch-based spatial aggregation output, with the crack-positive patch highlighted.}
+        \label{fig:tp_patch}
+    \end{subfigure}
+    \caption{Example of a correctly detected cracked cluster from the held-out Row~2 test set. Left: dense crack probability map produced by the multi-class XGBoost model. Right: final patch-level aggregation decision confirming the image-level crack-positive classification.}
+    \label{fig:tp_example}
+\end{figure}
+
+% \begin{figure}[ht]
+%     \centering
+%     \includegraphics[width=0.65\textwidth]{figures/results/full_images/full_images_classification/FP_example/02_04_FP_BRANCH.jpg}
+%     \caption{Example of a false-positive detection caused by dry branch tissue. The spectral similarity between desiccated woody material and cracked grape skin leads the pixel-level classifier to assign elevated crack probabilities to branch pixels, which propagate through the spatial aggregation pipeline. This failure mode is further analyzed in the Discussion (Section~\ref{sec:spatial_aggregation}).}
+%     \label{fig:fp_branch}
+% \end{figure}
+
+% \FloatBarrier
 
 \end{landscape}
 

@@ -59,9 +59,13 @@ class DemoWindow(QMainWindow):
 
         df = pd.read_csv(csv_path)
 
+        # Project root for resolving relative image paths
+        _PROJECT_ROOT = Path(__file__).resolve().parents[6]
+
         # Try to find a sample with data
         for _, row in df.head(20).iterrows():
-            sample_path = Path(row['image_path'])
+            p = Path(str(row['image_path']))
+            sample_path = p if p.is_absolute() else _PROJECT_ROOT / p
 
             if sample_path.exists():
                 success = self.dual_viewer.load_from_folder(sample_path)
