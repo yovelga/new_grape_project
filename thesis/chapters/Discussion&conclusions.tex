@@ -223,6 +223,15 @@ Third, the hardware implementation of the selected 30-wavelength configuration i
 
 \medskip\noindent
 Finally, a highly promising direction involves deep-learning-based spatial filtering to refine the whole-image detection pipeline. Preliminary investigations during this study explored a multi-stage cascade: utilizing the spectral model to detect suspected defect blobs, extracting their centroids, applying the Segment Anything Model 2 (SAM2) to isolate the local structure, and feeding the corresponding RGB bounding box into a Convolutional Neural Network (CNN). Crucially, the CNN was not tasked with detecting cracks, but rather with validating the Region of Interest (ROI)---classifying whether the suspected blob was actually located on a 'grape' or 'non-grape' (e.g., dry wood). This logic elegantly leverages the fact that a berry's macroscopic shape remains consistent regardless of localized cracking.
+The proposed spectral-spatial cascade is illustrated in Figure~\ref{fig:sam2_cnn_pipeline}.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{figures/common/pipeline_with_sam2_and_cnn.JPG}
+    \caption{Proposed spectral-spatial cascade for false-positive reduction. Suspected crack blobs detected by the hyperspectral pixel-level model are passed to SAM2 for spatial segmentation, and the resulting bounding boxes are fed into a CNN that validates whether the region of interest corresponds to grape tissue or a non-grape structure (e.g., dry wood).}
+    \label{fig:sam2_cnn_pipeline}
+\end{figure}
+\FloatBarrier
 
 \medskip\noindent
 While the CNN achieved excellent accuracy on isolated calibration segments, it suffered a severe performance drop when deployed on whole-image field scenes. A primary cause of this failure was the spatial transformation required to feed a very small, tightly cropped bounding box into the fixed-size input layer of the CNN. This severe resizing and warping distorted the natural geometry of the objects, causing lighting artifacts, shadows, and background elements to artificially resemble grape structures, leading to false ROI validations. 

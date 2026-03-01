@@ -382,10 +382,28 @@ Figure~\ref{fig:whole_image_protocol_overview}, and consists of the following st
 \end{enumerate}
 
 
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=0.9\textwidth]{figures/materials_methods/pipeline/whole_image_pipeline.jpg}
+%   \caption{Whole-image crack-detection pipeline from pixel-level CRACK probabilities to image-level classification via spatial aggregation.}
+% \end{figure}
+% \FloatBarrier
+
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.9\textwidth]{figures/materials_methods/pipeline/whole_image_pipeline.jpg}
-  \caption{Whole-image crack-detection pipeline from pixel-level CRACK probabilities to image-level classification via spatial aggregation.}
+    \includegraphics[width=\textwidth]{figures/materials_methods/pipeline/ui_for_EDA_with_notes.JPG}
+    \caption{Interactive EDA interface for the whole-image detection pipeline.
+    \textbf{(1)}~Sample browser: loads HSI datacube by cluster ID and date.
+    \textbf{(2)}~Model and filter panel: loads the pre-trained model and Optuna-tuned spatial parameters; includes a band selector for panel~7.
+    \textbf{(3)}~Canon RGB photo.
+    \textbf{(4)}~Raw HSI-camera RGB.
+    \textbf{(5)}~Crack detections after blob filtering on RGB.
+    \textbf{(6)}~Patch-based crack overlay on RGB.
+    \textbf{(7)}~Grayscale HSI band at the selected wavelength.
+    \textbf{(8)}~Raw pixel-level crack probability map.
+    \textbf{(9)}~Blob map after morphological and area filtering.
+    \textbf{(10)}~Patch-based detection map (here similar to~9, as crack regions fit within single patches).}
+    \label{fig:ui_eda_pipeline}
 \end{figure}
 \FloatBarrier
 

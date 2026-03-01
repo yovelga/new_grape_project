@@ -686,3 +686,78 @@ Figure~\ref{fig:gui_cracked} shows the same tool applied to a cluster exhibiting
     \label{fig:gui_cracked}
 \end{figure}
 \FloatBarrier
+
+% ==========================================================
+\section{Whole-Image Pipeline: True Positive and False Positive Examples}
+\label{app:tp_fp_examples}
+
+\noindent
+This appendix presents representative examples of correct detections (True Positives) and misclassifications (False Positives) produced by the whole-image crack-detection pipeline described in Section~\ref{subsec:full_image_pipeline}.
+These examples illustrate the pipeline's ability to identify genuine crack regions as well as recurring sources of false alarms.
+
+\subsection{True Positive Examples}
+\noindent
+Figures~\ref{fig:tp_example1}--\ref{fig:tp_example3} show clusters correctly classified as \textit{Cracked} by the pipeline.
+In each case, the spatial aggregation stages successfully localize the damaged tissue regions while suppressing background noise.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{figures/appendix/tp_fp_examples/TP_example1.png}
+    \caption{True Positive example~1: the pipeline correctly identifies crack regions on the grape cluster.}
+    \label{fig:tp_example1}
+\end{figure}
+\FloatBarrier
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{figures/appendix/tp_fp_examples/TP_example_2.png}
+    \caption{True Positive example~2: crack-affected tissue is correctly detected and spatially localized.}
+    \label{fig:tp_example2}
+\end{figure}
+\FloatBarrier
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{figures/appendix/tp_fp_examples/TP_example_3.png}
+    \caption{True Positive example~3: another correctly identified cracked cluster showing spatially coherent detection.}
+    \label{fig:tp_example3}
+\end{figure}
+\FloatBarrier
+
+\subsection{False Positive Examples}
+\noindent
+Figures~\ref{fig:fp_small_branch}--\ref{fig:fp_few_branches} show clusters incorrectly classified as \textit{Cracked}.
+A recurring source of false positives is the presence of small branches (rachis segments) within the field of view.
+These thin woody structures exhibit spectral signatures that partially overlap with cracked berry tissue, causing the pixel-level classifier to assign elevated crack probabilities to branch pixels.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{figures/appendix/tp_fp_examples/FP_small_branch.png}
+    \caption{False Positive example~1: a small branch segment triggers a false crack detection due to spectral similarity with cracked tissue.}
+    \label{fig:fp_small_branch}
+\end{figure}
+\FloatBarrier
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{figures/appendix/tp_fp_examples/FP_small_branch_2.png}
+    \caption{False Positive example~2: another small branch misclassified as a crack region.}
+    \label{fig:fp_small_branch_2}
+\end{figure}
+\FloatBarrier
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{figures/appendix/tp_fp_examples/FP_screenshot.png}
+    \caption{False Positive example~3: branch-like structure in the scene produces a spurious crack detection.}
+    \label{fig:fp_screenshot}
+\end{figure}
+\FloatBarrier
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{figures/appendix/tp_fp_examples/FP_few_branches.png}
+    \caption{False Positive example~4: multiple small branches visible in the cluster image cause several false crack detections across the field of view.}
+    \label{fig:fp_few_branches}
+\end{figure}
+\FloatBarrier
