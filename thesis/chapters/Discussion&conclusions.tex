@@ -6,14 +6,12 @@
 
 \subsection{The Biological Basis of Spectral Signatures}
 \noindent
-The initial finding of this study---that cracked tissues exhibit significantly lower reflectance across both the VIS and NIR regions compared to healthy tissues---is strongly rooted in the biomechanical and physiological consequences of fruit cracking.
-In the VIS region (400--700\,nm), the depressed reflectance of cracked tissue is primarily driven by the rupture of the waxy cuticle and the subsequent oxidation of sub-epidermal cells.
-Once this protective barrier is breached, exposed phenolic compounds undergo rapid oxidative browning \cite{santos2023molecular}, which substantially increases light absorption.
-Furthermore, the loss of the smooth cuticle layer eliminates specular reflectance, causing the cracked area to appear darker.
-In the NIR region (700--850\,nm), where the spectral separability is most pronounced, the governing factors are cellular structure and water content \cite{thenkabail2016hyperspectral}.
-Healthy mesocarp tissue acts as a strong diffuse reflector due to internal scattering at air--cell interfaces and high turgor pressure.
-Cracking induces a localized collapse of this cellular architecture; the rapid loss of turgor and leakage of fluids destroy the scattering interfaces, resulting in a dramatic drop in NIR reflectance \cite{Chang2019,YU20251506}.
+The initial finding of this study---that cracked tissues exhibit significantly lower reflectance across both the VIS and NIR regions---aligns with established agricultural literature regarding fruit cracking. 
+In the VIS region (400--700\,nm), the depressed reflectance is primarily attributed to the physical rupture of the waxy cuticle and the subsequent oxidation (browning) of the exposed tissue \cite{santos2023molecular}. 
+In the NIR region (700--850\,nm), which is highly sensitive to tissue water content and cellular structure \cite{thenkabail2016hyperspectral}, the reflectance drops dramatically due to the rapid loss of water and the physical collapse of the cells at the crack site \cite{Chang2019,YU20251506}. 
 
+\medskip\noindent
+Therefore, the strong spectral separability observed in this study is not merely a statistical artifact, but a direct measurement of the physical and structural degradation of the berry. By relying on these well-documented physiological changes, the algorithmic pipeline is grounded in true biological phenomena.
 \subsection{Data Normalization and Pre-processing Restraint}
 \noindent
 While these physiological changes establish a strong theoretical basis for detection, capturing them in uncontrolled vineyard conditions required specific pre-processing interventions to mitigate both sensor-level and field-induced noise.
@@ -115,24 +113,22 @@ This traceability is what enabled the identification of the performance ``sweet 
 
 \medskip\noindent
 The explicit choice to optimize the BFS algorithm based on the Precision-Recall Area Under the Curve (PR--AUC) rather than the standard Receiver Operating Characteristic (ROC--AUC) was dictated by the extreme class imbalance inherent to the problem.
-In whole-image field scenes, cracked pixels typically constitute less than $0.001\%$ of the dataset.
+In whole-image field scenes, cracked pixels typically constitute less than $0.1\%$ of the dataset.
 Under such severe imbalance, ROC--AUC yields overly optimistic and misleading scores, as it heavily rewards the correct classification of the massive, trivial ``background'' majority.
 PR--AUC, conversely, isolates the performance on the rare positive class, ensuring that the selected wavelengths genuinely maximize crack detection rather than merely excelling at background rejection.
 
-\subsection{Classifier Selection and Spatial Validation}
+\subsection{Classifier Selection, Computational Scalability, and Spatial Generalization}
 \noindent
-Within the supervised paradigm, the superiority of tree-based ensembles (XGBoost, Random Forest) over linear models (PLS-DA, Logistic Regression) underscored the highly non-linear and collinear nature of the multi-class spectral boundaries.
-However, the ultimate selection of XGBoost as the primary classifier was driven as much by operational scalability as by accuracy.
-During preliminary trials, Support Vector Machines (SVM) achieved competitive pixel-level accuracy.
-Yet, their inference complexity ($O(n^2)$ to $O(n^3)$) proved prohibitive for whole-image deployment.
-A single field scene contains over 260,000 pixels ($512 \times 512$)---exceeding the total size of the extracted pixel-level training dataset.
-SVM inference on a single full image was computationally unfeasible for high-throughput screening.
-Tree-based architectures, alongside shallow Multi-Layer Perceptrons (MLPs), provided the necessary inference speed to make full-image field deployment practical, highlighting the critical transition from laboratory-scale accuracy to operational field constraints.
+Within the supervised paradigm, the comparison between tree-based ensembles (XGBoost, Random Forest) and linear models (PLS-DA, Logistic Regression) revealed nuanced mathematical and operational trade-offs. Interestingly, L1-regularized Logistic Regression achieved remarkably high precision in isolating the specific 'crack' class, performing almost on par with XGBoost. This performance is mathematically consistent: the L1 penalty (Lasso) induces sparsity, effectively acting as an intrinsic feature selector that neutralizes the severe multicollinearity of the hyperspectral data by driving redundant band weights to zero. 
 
 \medskip\noindent
-Crucially, this pixel-level robustness was validated using a strict Leave-One-Group-Out (LOGO) cross-validation strategy, where each group corresponded to a distinct physical grape cluster.
-In agricultural computer vision, standard random K-fold splits frequently suffer from spatial data leakage, as adjacent pixels from the same physical object fall into both training and validation sets, artificially inflating performance.
-By enforcing a cluster-level separation during cross-validation, the reported pixel-level metrics represent true generalization to unseen biological samples rather than mere spatial memorization.
+Despite this success on the target class, the linear approach exhibited two critical failure points that necessitated the shift to XGBoost. First, while a linear hyperplane could easily isolate the distinct, dark signature of a crack, it struggled to resolve the complex, highly non-linear boundaries separating the diverse background classes (e.g., distinguishing dry wood from shadows or plastic), resulting in significantly lower overall Macro-F1 scores. Second, and crucially, optimizing the L1 penalty across high-dimensional spectral data for hundreds of thousands of pixels proved computationally exhaustive. The L1-regularized models required training times an order of magnitude longer than tree-based methods.
+
+\medskip\noindent
+This computational bottleneck was a recurring theme that drove the final model selection. Beyond linear models, Support Vector Machines (SVM) also achieved competitive pixel-level accuracy during preliminary trials. Yet, their inference complexity ($O(n^2)$ to $O(n^3)$) proved prohibitive for whole-image deployment. A single field scene contains over 260,000 pixels ($512 \times 512$)---exceeding the total size of the extracted pixel-level training dataset. SVM inference on a single full image was computationally unfeasible for high-throughput screening. Ultimately, tree-based architectures like XGBoost provided the optimal balance: the representational capacity to model complex non-linear background interactions, combined with the rapid inference speed necessary to make full-image field deployment practical.
+
+\medskip\noindent
+To rigorously validate the robustness of this chosen architecture, the model's spatial generalization was explicitly tested across different physical locations within the vineyard. Specifically, the XGBoost models calibrated entirely on data extracted from one specific row (Row 1) were evaluated against unseen whole-image scenes located in a completely different row (Row 2+). In precision agriculture, models frequently suffer from domain shift due to localized micro-climates, varied canopy architectures, or differing row orientations relative to the sun. The successful detection of cracks across unseen rows confirmed that the selected spectral features and XGBoost decision boundaries captured universal, biological traits of the defects, rather than merely overfitting to the localized illumination or background artifacts of the calibration row.
 
 \subsection{The Limits of Unsupervised Anomaly Detection}
 \noindent
@@ -170,9 +166,7 @@ Relying solely on automated scripts to segment an RGB image and crop the corresp
 Consequently, custom Graphical User Interfaces (GUIs) had to be developed from scratch for nearly every preprocessing and filtering task.
 
 \medskip\noindent
-These custom visual tools were not merely conveniences; they were absolute methodological necessities.
-Visual verification was the only way to guarantee that the extracted hyperspectral segments aligned perfectly with the physical berries, and that the morphological filters were behaving as mathematically intended before feature extraction.
-This rigorous, manual visual-validation loop was the invisible foundation of the study, ensuring that the downstream classifiers learned from accurate, biologically meaningful data rather than processing artifacts.
+These custom visual tools were not merely conveniences; they were absolute methodological necessities. Visual verification was the only way to guarantee that the extracted hyperspectral segments aligned perfectly with the physical berries before feature extraction. Furthermore, the development of the spatial aggregation pipeline itself was heavily reliant on these interactive tools. Deciding which morphological filters to apply, or how to tune the patch-density thresholds, could not be achieved through blind numerical optimization alone. It required extensive visual observation of the intermediate probability maps across numerous cluster scenes. The custom UI allowed for real-time parameter tuning and immediate visual feedback, making it an indispensable experimental instrument for navigating the complex trade-offs between noise suppression and signal retention, and ultimately deciding on the architecture of the final pipeline.
 
 \medskip\noindent
 Early in the research phase, fully automated unsupervised clustering algorithms (e.g., K-Means) were explored to bypass this manual annotation bottleneck.
@@ -206,9 +200,8 @@ Second, the development of a hybrid preprocessing method that retains absolute a
 Third, the hardware implementation of the selected 30-wavelength configuration into a physical, real-time multispectral camera must be tested in dynamic vineyard conditions.
 
 \medskip\noindent
-Finally, a highly promising direction involves deep-learning-based spatial filtering to refine the whole-image detection pipeline.
-Preliminary investigations during this study explored a multi-stage cascade: utilizing the spectral model to detect suspected defect blobs, extracting their centroids, applying the Segment Anything Model 2 (SAM2) to isolate the local structure, and feeding the corresponding RGB bounding box into a Convolutional Neural Network (CNN) to classify the object as 'grape' or 'non-grape' (e.g., dry wood).
-While the CNN achieved excellent accuracy on isolated calibration segments---testing various inputs such as tight bounding boxes, 5-pixel padded boxes, and fully masked background segments---it suffered a severe performance drop when deployed on whole-image field scenes.
-This discrepancy highlights a critical domain shift: spatial models trained on cleanly extracted ROIs struggle with the overlapping geometries, shadows, and contextual noise of a full canopy.
-Nevertheless, the core concept of a spectral-spatial cascade---using the hyperspectral pixel model as a highly sensitive primary detector, and an RGB-based CNN as a geometric secondary filter---remains conceptually sound.
-Future iterations of this architecture, potentially utilizing end-to-end training, could effectively eliminate the remaining false positives and yield a near-perfect early-warning detection system.
+Finally, a highly promising direction involves deep-learning-based spatial filtering to refine the whole-image detection pipeline. Preliminary investigations during this study explored a multi-stage cascade: utilizing the spectral model to detect suspected defect blobs, extracting their centroids, applying the Segment Anything Model 2 (SAM2) to isolate the local structure, and feeding the corresponding RGB bounding box into a Convolutional Neural Network (CNN). Crucially, the CNN was not tasked with detecting cracks, but rather with validating the Region of Interest (ROI)---classifying whether the suspected blob was actually located on a 'grape' or 'non-grape' (e.g., dry wood). This logic elegantly leverages the fact that a berry's macroscopic shape remains consistent regardless of localized cracking.
+
+\medskip\noindent
+While the CNN achieved excellent accuracy on isolated calibration segments, it suffered a severe performance drop when deployed on whole-image field scenes. A primary cause of this failure was the spatial transformation required to feed a very small, tightly cropped bounding box into the fixed-size input layer of the CNN. This severe resizing and warping distorted the natural geometry of the objects, causing lighting artifacts, shadows, and background elements to artificially resemble grape structures, leading to false ROI validations. 
+Nevertheless, the core concept of a spectral-spatial cascade---using the hyperspectral pixel model as a highly sensitive primary defect detector, and an RGB-based CNN as a geometric ROI validator---remains conceptually sound. Future iterations of this architecture, potentially utilizing scale-invariant models or end-to-end training without harsh bounding-box warping, could effectively eliminate the remaining false positives and yield a near-perfect early-warning detection system.
