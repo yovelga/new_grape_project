@@ -1,107 +1,112 @@
-\contentsline {chapter}{\numberline {1}Introduction}{10}{chapter.1}%
-\contentsline {section}{\numberline {1.1}The Problem of Fruit Cracking}{10}{section.1.1}%
-\contentsline {section}{\numberline {1.2}Economic Impact}{10}{section.1.2}%
-\contentsline {section}{\numberline {1.3}Research Motivation}{10}{section.1.3}%
-\contentsline {subsection}{\numberline {1.3.1}Main Research Question}{12}{subsection.1.3.1}%
-\contentsline {section}{\numberline {1.4}Research Objectives and Hypotheses}{13}{section.1.4}%
-\contentsline {subsection}{\numberline {1.4.1}Research Objectives}{13}{subsection.1.4.1}%
-\contentsline {subsection}{\numberline {1.4.2}Contributions}{13}{subsection.1.4.2}%
-\contentsline {chapter}{\numberline {2}Literature Review}{15}{chapter.2}%
-\contentsline {section}{\numberline {2.1}The Challenge of Grape Cracking: Physiology and Economic Impact}{16}{section.2.1}%
-\contentsline {section}{\numberline {2.2}Biomechanical Mechanisms and Cultivar Susceptibility}{17}{section.2.2}%
-\contentsline {section}{\numberline {2.3}Bridging the Gap: The Need for Advanced Sensing in Complex Environments}{18}{section.2.3}%
-\contentsline {section}{\numberline {2.4}Hyperspectral Imaging for Agricultural Applications}{19}{section.2.4}%
-\contentsline {subsection}{\numberline {2.4.1}Spectral Regions and Their Agricultural Relevance}{20}{subsection.2.4.1}%
-\contentsline {section}{\numberline {2.5}Machine Learning Paradigms for Hyperspectral Data}{22}{section.2.5}%
-\contentsline {section}{\numberline {2.6}Related Work: From Visible Defect Detection to Early Warning}{23}{section.2.6}%
-\contentsline {section}{\numberline {2.7}Research Gap and Study Positioning}{24}{section.2.7}%
-\contentsline {chapter}{\numberline {3}Research Objectives and Hypotheses}{25}{chapter.3}%
-\contentsline {section}{\numberline {3.1}Research Objectives}{25}{section.3.1}%
-\contentsline {section}{\numberline {3.2}Research Hypotheses}{25}{section.3.2}%
-\contentsline {subsubsection}{Hypothesis 1: Spectral Distinguishability (Physical Basis)}{25}{section*.4}%
-\contentsline {subsubsection}{Hypothesis 2: Pixel-Level Classification Feasibility}{26}{section*.5}%
-\contentsline {subsubsection}{Hypothesis 3: Whole-Image Detection and Robustness}{26}{section*.6}%
-\contentsline {subsubsection}{Hypothesis 4: Early Detection Capability}{26}{section*.7}%
-\contentsline {subsubsection}{Hypothesis 5: Spectral Efficiency and Operational Feasibility}{27}{section*.8}%
-\contentsline {section}{\numberline {3.3}Summary of Main Contributions}{27}{section.3.3}%
-\contentsline {section}{\numberline {3.4}Thesis Structure}{27}{section.3.4}%
-\contentsline {chapter}{\numberline {4}Materials and Methods}{28}{chapter.4}%
-\contentsline {section}{\numberline {4.1}Data Acquisition}{29}{section.4.1}%
-\contentsline {subsection}{\numberline {4.1.1}Study Area and Experimental Design}{29}{subsection.4.1.1}%
-\contentsline {subsection}{\numberline {4.1.2}Multi-Modal Imaging Systems}{31}{subsection.4.1.2}%
-\contentsline {subsubsection}{Hyperspectral Imaging System (HSI)}{31}{section*.9}%
-\contentsline {subsubsection}{RGB Imaging System}{32}{section*.10}%
-\contentsline {subsubsection}{Thermal Imaging System}{32}{section*.11}%
-\contentsline {subsection}{\numberline {4.1.3}Data Collection Protocol}{33}{subsection.4.1.3}%
-\contentsline {section}{\numberline {4.2}Dataset Construction and Partitioning}{34}{section.4.2}%
-\contentsline {subsection}{\numberline {4.2.1}Interactive Pixel-Level Annotation via SAM2}{34}{subsection.4.2.1}%
-\contentsline {subsection}{\numberline {4.2.2}Whole-Image Dataset Formulation}{36}{subsection.4.2.2}%
-\contentsline {section}{\numberline {4.3}Modeling and Evaluation Methodology}{37}{section.4.3}%
-\contentsline {subsection}{\numberline {4.3.1}Global Spectral Preprocessing}{37}{subsection.4.3.1}%
-\contentsline {subsection}{\numberline {4.3.2}Data Partitioning and Leakage Prevention Strategies}{39}{subsection.4.3.2}%
-\contentsline {subsubsection}{Pixel-Level Leakage Prevention: Leave-One-Group-Out (LOGO)}{39}{section*.12}%
-\contentsline {subsubsection}{Whole-Image Leakage Prevention: Spatial Row Partitioning}{40}{section*.13}%
-\contentsline {subsection}{\numberline {4.3.3}Pixel-Level Classification Framework}{40}{subsection.4.3.3}%
-\contentsline {subsection}{\numberline {4.3.4}Autoencoder-Based Anomaly Detection}{41}{subsection.4.3.4}%
-\contentsline {subsection}{\numberline {4.3.5}Whole-Image Detection and Aggregation Pipeline}{42}{subsection.4.3.5}%
-\contentsline {subsubsection}{Pipeline Architecture and Spatial Aggregation}{42}{section*.14}%
-\contentsline {subsubsection}{Calibration and Evaluation Stratification}{43}{section*.15}%
-\contentsline {subsection}{\numberline {4.3.6}Wavelength Selection}{43}{subsection.4.3.6}%
-\contentsline {subsubsection}{Spectral Preprocessing}{44}{section*.16}%
-\contentsline {subsubsection}{Classification Model}{44}{section*.17}%
-\contentsline {subsubsection}{Two Experimental Settings}{44}{section*.18}%
-\contentsline {subsubsection}{Train-Test Split Protocol}{44}{section*.19}%
-\contentsline {subsubsection}{Backward Feature Selection (BFS)}{44}{section*.20}%
-\contentsline {subsection}{\numberline {4.3.7}Evaluation Protocols and Performance Metrics}{45}{subsection.4.3.7}%
-\contentsline {subsection}{\numberline {4.3.8}Reproducibility and Implementation Details}{45}{subsection.4.3.8}%
-\contentsline {chapter}{\numberline {5}Experimental Results}{46}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Overview of Experimental Results}{46}{section.5.1}%
-\contentsline {subsection}{\numberline {5.1.1}Evaluation Baselines}{47}{subsection.5.1.1}%
-\contentsline {section}{\numberline {5.2}Spectral Separability and Informative Wavelengths}{48}{section.5.2}%
-\contentsline {subsection}{\numberline {5.2.1}Mean Spectral Signatures of Healthy and Cracked Tissue}{48}{subsection.5.2.1}%
-\contentsline {subsection}{\numberline {5.2.2}Spectral Separability Across Wavelength Regions}{49}{subsection.5.2.2}%
-\contentsline {section}{\numberline {5.3}Pixel-Level Binary Classification}{50}{section.5.3}%
-\contentsline {section}{\numberline {5.4}Pixel-Level Multi-Class Classification}{51}{section.5.4}%
-\contentsline {section}{\numberline {5.5}Autoencoder-Based Anomaly Detection}{52}{section.5.5}%
-\contentsline {section}{\numberline {5.6}Whole-Image Crack Detection}{54}{section.5.6}%
-\contentsline {subsection}{\numberline {5.6.1}Supervised Detection Performance}{54}{subsection.5.6.1}%
-\contentsline {subsection}{\numberline {5.6.2}Unsupervised Baseline Comparison}{56}{subsection.5.6.2}%
-\contentsline {section}{\numberline {5.7}Wavelength Selection via Backward Feature Selection}{57}{section.5.7}%
-\contentsline {subsection}{\numberline {5.7.1}BFS Trajectories and Subset Selection}{57}{subsection.5.7.1}%
-\contentsline {subsection}{\numberline {5.7.2}End-to-End Wavelength-Selection Results}{60}{subsection.5.7.2}%
-\contentsline {subsection}{\numberline {5.7.3}BFS Wavelength-Selection Stability Analysis}{61}{subsection.5.7.3}%
-\contentsline {subsubsection}{Wavelength Popularity and Stability}{61}{section*.21}%
-\contentsline {chapter}{\numberline {6}Discussion and Conclusions}{63}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Physiological and Pre-processing Foundations}{63}{section.6.1}%
-\contentsline {subsection}{\numberline {6.1.1}The Biological Basis of Spectral Signatures}{63}{subsection.6.1.1}%
-\contentsline {subsection}{\numberline {6.1.2}Data Normalization and Pre-processing Restraint}{63}{subsection.6.1.2}%
-\contentsline {section}{\numberline {6.2}Managing Field Clutter: The Role of Spatial Aggregation}{65}{section.6.2}%
-\contentsline {subsection}{\numberline {6.2.1}Overcoming Spectral Ambiguity: The Dry Wood Challenge}{65}{subsection.6.2.1}%
-\contentsline {subsection}{\numberline {6.2.2}Geometric Filtering and Structural Regularization}{65}{subsection.6.2.2}%
-\contentsline {section}{\numberline {6.3}Dimensionality Reduction, Algorithm Selection, and Sensor Design}{69}{section.6.3}%
-\contentsline {subsection}{\numberline {6.3.1}Feature Selection and Multispectral Sensor Design}{69}{subsection.6.3.1}%
-\contentsline {subsection}{\numberline {6.3.2}Methodological Rationale: BFS and Evaluation Metrics}{69}{subsection.6.3.2}%
-\contentsline {subsection}{\numberline {6.3.3}Classifier Selection, Computational Scalability, and Spatial Generalization}{70}{subsection.6.3.3}%
-\contentsline {subsection}{\numberline {6.3.4}The Limits of Unsupervised Anomaly Detection}{71}{subsection.6.3.4}%
-\contentsline {subsection}{\numberline {6.3.5}Methodological Challenges and Data Curation Bottlenecks}{72}{subsection.6.3.5}%
-\contentsline {section}{\numberline {6.4}Conclusions and Future Work}{74}{section.6.4}%
-\contentsline {subsection}{\numberline {6.4.1}Summary of Contributions}{74}{subsection.6.4.1}%
-\contentsline {subsection}{\numberline {6.4.2}Future Research Directions}{74}{subsection.6.4.2}%
-\contentsline {chapter}{\numberline {A}Supplementary Results}{76}{appendix.A}%
-\contentsline {section}{\numberline {A.1}Cross-Validation Statistics and Full Precision Tables}{76}{section.A.1}%
-\contentsline {subsection}{\numberline {A.1.1}Pixel-Level Classification: Binary and Multi-Class}{76}{subsection.A.1.1}%
-\contentsline {subsection}{\numberline {A.1.2}Autoencoder-Based Anomaly Detection}{76}{subsection.A.1.2}%
-\contentsline {section}{\numberline {A.2}Regional VIS--NIR Reflectance Summaries}{76}{section.A.2}%
-\contentsline {section}{\numberline {A.3}Binary Pixel-Level Classification (Balanced)}{79}{section.A.3}%
-\contentsline {section}{\numberline {A.4}Multi-Class Pixel-Level Classification (Balanced)}{80}{section.A.4}%
-\contentsline {section}{\numberline {A.5}Autoencoder Anomaly Detection (Balanced)}{81}{section.A.5}%
-\contentsline {subsection}{\numberline {A.5.1}One-Class Binary Formulation}{81}{subsection.A.5.1}%
-\contentsline {subsection}{\numberline {A.5.2}Crack-Only Training Formulation}{81}{subsection.A.5.2}%
-\contentsline {subsection}{\numberline {A.5.3}Non-Crack Training Formulation}{82}{subsection.A.5.3}%
-\contentsline {section}{\numberline {A.6}Wavelength Selection: Generalization and Performance Analysis}{83}{section.A.6}%
-\contentsline {subsection}{\numberline {A.6.1}BFS Thresholds (Full Precision)}{83}{subsection.A.6.1}%
-\contentsline {subsection}{\numberline {A.6.2}Wavelength Results (Full Precision)}{83}{subsection.A.6.2}%
-\contentsline {subsection}{\numberline {A.6.3}Generalization Analysis}{83}{subsection.A.6.3}%
-\contentsline {paragraph}{Calibration-to-test generalization gap.}{83}{section*.22}%
-\contentsline {subsection}{\numberline {A.6.4}Wavelength Overlap Across Seeds}{83}{subsection.A.6.4}%
-\contentsline {section}{\numberline {A.7}Wavelength Stability: Supplementary Visualizations}{85}{section.A.7}%
+\contentsline {chapter}{\numberline {1}Introduction}{11}{chapter.1}%
+\contentsline {section}{\numberline {1.1}The Problem of Fruit Cracking}{11}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Economic Impact}{11}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Research Motivation}{11}{section.1.3}%
+\contentsline {subsection}{\numberline {1.3.1}Main Research Question}{13}{subsection.1.3.1}%
+\contentsline {section}{\numberline {1.4}Research Objectives and Hypotheses}{14}{section.1.4}%
+\contentsline {subsection}{\numberline {1.4.1}Research Objectives}{14}{subsection.1.4.1}%
+\contentsline {subsection}{\numberline {1.4.2}Contributions}{14}{subsection.1.4.2}%
+\contentsline {chapter}{\numberline {2}Literature Review}{16}{chapter.2}%
+\contentsline {section}{\numberline {2.1}The Challenge of Grape Cracking: Physiology and Economic Impact}{17}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Biomechanical Mechanisms and Cultivar Susceptibility}{18}{section.2.2}%
+\contentsline {section}{\numberline {2.3}Bridging the Gap: The Need for Advanced Sensing in Complex Environments}{19}{section.2.3}%
+\contentsline {section}{\numberline {2.4}Hyperspectral Imaging for Agricultural Applications}{20}{section.2.4}%
+\contentsline {subsection}{\numberline {2.4.1}Spectral Regions and Their Agricultural Relevance}{21}{subsection.2.4.1}%
+\contentsline {section}{\numberline {2.5}Machine Learning Paradigms for Hyperspectral Data}{23}{section.2.5}%
+\contentsline {section}{\numberline {2.6}Related Work: From Visible Defect Detection to Early Warning}{24}{section.2.6}%
+\contentsline {section}{\numberline {2.7}Research Gap and Study Positioning}{25}{section.2.7}%
+\contentsline {chapter}{\numberline {3}Research Objectives and Hypotheses}{26}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Research Objectives}{26}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Research Hypotheses}{26}{section.3.2}%
+\contentsline {subsubsection}{Hypothesis 1: Spectral Distinguishability (Physical Basis)}{26}{section*.4}%
+\contentsline {subsubsection}{Hypothesis 2: Pixel-Level Classification Feasibility}{27}{section*.5}%
+\contentsline {subsubsection}{Hypothesis 3: Whole-Image Detection and Robustness}{27}{section*.6}%
+\contentsline {subsubsection}{Hypothesis 4: Early Detection Capability}{27}{section*.7}%
+\contentsline {subsubsection}{Hypothesis 5: Spectral Efficiency and Operational Feasibility}{28}{section*.8}%
+\contentsline {section}{\numberline {3.3}Summary of Main Contributions}{28}{section.3.3}%
+\contentsline {section}{\numberline {3.4}Thesis Structure}{28}{section.3.4}%
+\contentsline {chapter}{\numberline {4}Materials and Methods}{29}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Data Acquisition}{30}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}Study Area and Experimental Design}{30}{subsection.4.1.1}%
+\contentsline {subsection}{\numberline {4.1.2}Multi-Modal Imaging Systems}{32}{subsection.4.1.2}%
+\contentsline {subsubsection}{Hyperspectral Imaging System (HSI)}{32}{section*.9}%
+\contentsline {subsubsection}{RGB Imaging System}{33}{section*.10}%
+\contentsline {subsubsection}{Thermal Imaging System}{33}{section*.11}%
+\contentsline {subsection}{\numberline {4.1.3}Data Collection Protocol}{34}{subsection.4.1.3}%
+\contentsline {section}{\numberline {4.2}Dataset Construction and Partitioning}{35}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Interactive Pixel-Level Annotation via SAM2}{35}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Whole-Image Dataset Formulation}{37}{subsection.4.2.2}%
+\contentsline {section}{\numberline {4.3}Modeling and Evaluation Methodology}{38}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Global Spectral Preprocessing}{38}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}Data Partitioning and Leakage Prevention Strategies}{40}{subsection.4.3.2}%
+\contentsline {subsubsection}{Pixel-Level Leakage Prevention: Leave-One-Group-Out (LOGO)}{40}{section*.12}%
+\contentsline {subsubsection}{Whole-Image Leakage Prevention: Spatial Row Partitioning}{41}{section*.13}%
+\contentsline {subsection}{\numberline {4.3.3}Pixel-Level Classification Framework}{41}{subsection.4.3.3}%
+\contentsline {subsection}{\numberline {4.3.4}Autoencoder-Based Anomaly Detection}{42}{subsection.4.3.4}%
+\contentsline {subsection}{\numberline {4.3.5}Whole-Image Detection and Aggregation Pipeline}{43}{subsection.4.3.5}%
+\contentsline {subsubsection}{Pipeline Architecture and Spatial Aggregation}{43}{section*.14}%
+\contentsline {subsubsection}{Calibration and Evaluation Stratification}{45}{section*.15}%
+\contentsline {subsection}{\numberline {4.3.6}Wavelength Selection}{45}{subsection.4.3.6}%
+\contentsline {subsubsection}{Spectral Preprocessing}{46}{section*.16}%
+\contentsline {subsubsection}{Classification Model}{46}{section*.17}%
+\contentsline {subsubsection}{Two Experimental Settings}{46}{section*.18}%
+\contentsline {subsubsection}{Train-Test Split Protocol}{46}{section*.19}%
+\contentsline {subsubsection}{Backward Feature Selection (BFS)}{46}{section*.20}%
+\contentsline {subsection}{\numberline {4.3.7}Evaluation Protocols and Performance Metrics}{47}{subsection.4.3.7}%
+\contentsline {subsection}{\numberline {4.3.8}Reproducibility and Implementation Details}{47}{subsection.4.3.8}%
+\contentsline {chapter}{\numberline {5}Experimental Results}{48}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Overview of Experimental Results}{48}{section.5.1}%
+\contentsline {subsection}{\numberline {5.1.1}Evaluation Baselines}{49}{subsection.5.1.1}%
+\contentsline {section}{\numberline {5.2}Spectral Separability and Informative Wavelengths}{50}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}Mean Spectral Signatures of Healthy and Cracked Tissue}{50}{subsection.5.2.1}%
+\contentsline {subsection}{\numberline {5.2.2}Spectral Separability Across Wavelength Regions}{51}{subsection.5.2.2}%
+\contentsline {section}{\numberline {5.3}Pixel-Level Binary Classification}{52}{section.5.3}%
+\contentsline {section}{\numberline {5.4}Pixel-Level Multi-Class Classification}{53}{section.5.4}%
+\contentsline {section}{\numberline {5.5}Autoencoder-Based Anomaly Detection}{54}{section.5.5}%
+\contentsline {section}{\numberline {5.6}Whole-Image Crack Detection}{56}{section.5.6}%
+\contentsline {subsection}{\numberline {5.6.1}Supervised Detection Performance}{56}{subsection.5.6.1}%
+\contentsline {subsection}{\numberline {5.6.2}Unsupervised Baseline Comparison}{58}{subsection.5.6.2}%
+\contentsline {section}{\numberline {5.7}Wavelength Selection via Backward Feature Selection}{59}{section.5.7}%
+\contentsline {subsection}{\numberline {5.7.1}BFS Trajectories and Subset Selection}{59}{subsection.5.7.1}%
+\contentsline {subsection}{\numberline {5.7.2}End-to-End Wavelength-Selection Results}{62}{subsection.5.7.2}%
+\contentsline {subsection}{\numberline {5.7.3}BFS Wavelength-Selection Stability Analysis}{63}{subsection.5.7.3}%
+\contentsline {subsubsection}{Wavelength Popularity and Stability}{63}{section*.21}%
+\contentsline {chapter}{\numberline {6}Discussion and Conclusions}{65}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Physiological and Pre-processing Foundations}{65}{section.6.1}%
+\contentsline {subsection}{\numberline {6.1.1}The Biological Basis of Spectral Signatures}{65}{subsection.6.1.1}%
+\contentsline {subsection}{\numberline {6.1.2}Data Normalization and Pre-processing Restraint}{65}{subsection.6.1.2}%
+\contentsline {section}{\numberline {6.2}Managing Field Clutter: The Role of Spatial Aggregation}{67}{section.6.2}%
+\contentsline {subsection}{\numberline {6.2.1}Overcoming Spectral Ambiguity: The Dry Wood Challenge}{67}{subsection.6.2.1}%
+\contentsline {subsection}{\numberline {6.2.2}Geometric Filtering and Structural Regularization}{67}{subsection.6.2.2}%
+\contentsline {section}{\numberline {6.3}Dimensionality Reduction, Algorithm Selection, and Sensor Design}{71}{section.6.3}%
+\contentsline {subsection}{\numberline {6.3.1}Feature Selection and Multispectral Sensor Design}{71}{subsection.6.3.1}%
+\contentsline {subsection}{\numberline {6.3.2}Methodological Rationale: BFS and Evaluation Metrics}{72}{subsection.6.3.2}%
+\contentsline {subsection}{\numberline {6.3.3}Classifier Selection, Computational Scalability, and Spatial Generalization}{73}{subsection.6.3.3}%
+\contentsline {subsection}{\numberline {6.3.4}The Limits of Unsupervised Anomaly Detection}{74}{subsection.6.3.4}%
+\contentsline {subsection}{\numberline {6.3.5}Methodological Challenges and Data Curation Bottlenecks}{75}{subsection.6.3.5}%
+\contentsline {section}{\numberline {6.4}Conclusions and Future Work}{77}{section.6.4}%
+\contentsline {subsection}{\numberline {6.4.1}Summary of Contributions}{77}{subsection.6.4.1}%
+\contentsline {subsection}{\numberline {6.4.2}Future Research Directions}{77}{subsection.6.4.2}%
+\contentsline {chapter}{\numberline {A}Supplementary Results}{79}{appendix.A}%
+\contentsline {section}{\numberline {A.1}Cross-Validation Statistics and Full Precision Tables}{79}{section.A.1}%
+\contentsline {subsection}{\numberline {A.1.1}Pixel-Level Classification: Binary and Multi-Class}{79}{subsection.A.1.1}%
+\contentsline {subsection}{\numberline {A.1.2}Autoencoder-Based Anomaly Detection}{79}{subsection.A.1.2}%
+\contentsline {section}{\numberline {A.2}Regional VIS--NIR Reflectance Summaries}{79}{section.A.2}%
+\contentsline {section}{\numberline {A.3}Binary Pixel-Level Classification (Balanced)}{82}{section.A.3}%
+\contentsline {section}{\numberline {A.4}Multi-Class Pixel-Level Classification (Balanced)}{83}{section.A.4}%
+\contentsline {section}{\numberline {A.5}Autoencoder Anomaly Detection (Balanced)}{84}{section.A.5}%
+\contentsline {subsection}{\numberline {A.5.1}One-Class Binary Formulation}{84}{subsection.A.5.1}%
+\contentsline {subsection}{\numberline {A.5.2}Crack-Only Training Formulation}{84}{subsection.A.5.2}%
+\contentsline {subsection}{\numberline {A.5.3}Non-Crack Training Formulation}{85}{subsection.A.5.3}%
+\contentsline {section}{\numberline {A.6}Wavelength Selection: Generalization and Performance Analysis}{86}{section.A.6}%
+\contentsline {subsection}{\numberline {A.6.1}BFS Thresholds (Full Precision)}{86}{subsection.A.6.1}%
+\contentsline {subsection}{\numberline {A.6.2}Wavelength Results (Full Precision)}{86}{subsection.A.6.2}%
+\contentsline {subsection}{\numberline {A.6.3}Generalization Analysis}{86}{subsection.A.6.3}%
+\contentsline {paragraph}{Calibration-to-test generalization gap.}{86}{section*.22}%
+\contentsline {subsection}{\numberline {A.6.4}Wavelength Overlap Across Seeds}{86}{subsection.A.6.4}%
+\contentsline {subsection}{\numberline {A.6.5}Binned Pairwise Jaccard Similarity}{88}{subsection.A.6.5}%
+\contentsline {section}{\numberline {A.7}Wavelength Stability: Supplementary Visualizations}{90}{section.A.7}%
+\contentsline {section}{\numberline {A.8}Annotation Tool: Labeling Examples}{92}{section.A.8}%
+\contentsline {section}{\numberline {A.9}Whole-Image Pipeline: True Positive and False Positive Examples}{96}{section.A.9}%
+\contentsline {subsection}{\numberline {A.9.1}True Positive Examples}{96}{subsection.A.9.1}%
+\contentsline {subsection}{\numberline {A.9.2}False Positive Examples}{100}{subsection.A.9.2}%

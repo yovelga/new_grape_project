@@ -112,12 +112,48 @@ The Backward Feature Selection (BFS) analysis provided a definitive and positive
 The results demonstrated that the original 159-band spectrum contains massive redundancy, and that performance can be maintained using a significantly truncated subset of wavelengths.
 
 \medskip\noindent
-The stability analysis across multiple random seeds revealed that the 30-wavelength configuration represents the optimal "sweet spot" for operational deployment.
+The stability analysis across multiple random seeds revealed that the 30-wavelength configuration represents the optimal ``sweet spot'' for operational deployment.
 While the extreme 11-wavelength subset successfully detected cracks, its feature selection variance across seeds indicated instability due to the over-constraint of the feature space.
 Conversely, the full 159-wavelength cube introduced noise and risk of overfitting.
 The 30-wavelength subset achieved the highest early-stage independent test MCC (0.644) by balancing sufficient spectral resolution to separate cracks from background clutter, while discarding noisy, uninformative bands.
 This finding has immense practical implications for precision viticulture. In contrast to fragile and expensive full-range hyperspectral line-scan cameras, the robust spectral markers identified here---anchored by universally stable features closely aligned with key physiological traits, such as the Soret band (452\,nm), green reflection (548\,nm), anthocyanin absorption (580\,nm), and the red-edge inflection (729\,nm)---pave the way for manufacturing a dedicated, low-cost multispectral sensor.
 Utilizing 10 to 30 fixed optical filters targeting these exact physiological features, such a device could be easily mounted on UAVs or vineyard tractors for high-throughput screening.
+
+\medskip\noindent
+However, when measured by exact wavelength identity, the mean pairwise Jaccard similarity was only 0.493 for the top-30 subsets and 0.398 for the top-11 subsets (Tables~\ref{tab:jaccard_30}--\ref{tab:jaccard_11}), suggesting that roughly half of the selected wavelengths change from one random split to another.
+Because neighbouring hyperspectral channels are highly correlated, a seed that selects 548.55\,nm instead of 550.32\,nm is making a functionally equivalent choice.
+To quantify this, the pairwise Jaccard similarity was recomputed after binning the selected wavelengths into 5, 10, and 20\,nm windows (Table~\ref{tab:binned_jaccard_summary}; Figure~\ref{fig:binned_jaccard_summary}; full matrices in Appendix Tables~\ref{tab:binned_jaccard_30_bin5}--\ref{tab:binned_jaccard_11_bin20}).
+At a 10\,nm resolution the top-30 Jaccard rises from 0.493 to 0.697, and at 20\,nm it reaches 0.811, demonstrating that the five seeds overwhelmingly select from the same spectral regions.
+For the top-11 subsets the improvement is from 0.398 to $\approx$0.64 at both 10 and 20\,nm bins.
+These results confirm that the apparent instability in exact-wavelength identity largely reflects substitution among adjacent, strongly collinear bands rather than genuine disagreement about which spectral regions are informative.
+
+\begin{table}[!htbp]
+\centering
+\caption{Mean pairwise Jaccard similarity across 5 BFS seeds for exact and binned wavelength matching.}
+\label{tab:binned_jaccard_summary}
+\begin{tabular}{llrr}
+\toprule
+Top-K & Bin & Mean Jaccard & Std \\
+\midrule
+30 & Exact & 0.493 & 0.102 \\
+30 & 5\,nm  & 0.562 & 0.111 \\
+30 & 10\,nm & 0.697 & 0.081 \\
+30 & 20\,nm & 0.811 & 0.067 \\
+\midrule
+11 & Exact & 0.398 & 0.062 \\
+11 & 5\,nm  & 0.536 & 0.082 \\
+11 & 10\,nm & 0.639 & 0.071 \\
+11 & 20\,nm & 0.640 & 0.065 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.75\textwidth]{figures/results/feature_selection/binned_jaccard_summary.png}
+\caption{Effect of wavelength binning on cross-seed Jaccard similarity for the top-30 and top-11 BFS subsets. Error bars denote the standard deviation of all 10 pairwise comparisons.}
+\label{fig:binned_jaccard_summary}
+\end{figure}
 
 \subsection{Methodological Rationale: BFS and Evaluation Metrics}
 \noindent

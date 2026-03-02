@@ -611,6 +611,122 @@ Seed~5 & 0.412 & 0.333 & 0.333 & 0.333 & ---   \\
 \noindent
 The top-30 subsets share 13 wavelengths across all five seeds (mean Jaccard = 0.493); the top-11 subsets share 4 wavelengths (mean Jaccard = 0.398). The cross-seed intersection at top-11 comprises 452.25, 548.55, 580.90, and 729.53\,nm---all four also appear in the top-30 intersection, confirming consistent selection under both subset sizes.
 
+\subsection{Binned Pairwise Jaccard Similarity}
+\label{app:binned_jaccard}
+
+\noindent
+Because adjacent hyperspectral channels are highly correlated, substituting one wavelength for a nearby neighbour does not reflect genuine instability.
+Tables~\ref{tab:binned_jaccard_30_bin5}--\ref{tab:binned_jaccard_30_bin20} report the pairwise Jaccard similarity for the top-30 subsets after binning selected wavelengths into 5, 10, and 20\,nm windows, respectively.
+Tables~\ref{tab:binned_jaccard_11_bin5}--\ref{tab:binned_jaccard_11_bin20} present the corresponding matrices for the top-11 subsets.
+
+% --- Top-30, 5 nm bins ---
+\begin{table}[!htbp]
+\centering
+\caption{Pairwise Jaccard similarity of top-30 wavelengths across seeds (5\,nm bins). Mean Jaccard = 0.562.}
+\label{tab:binned_jaccard_30_bin5}
+\begin{tabular}{cccccc}
+\toprule
+ & Seed~1 & Seed~2 & Seed~3 & Seed~4 & Seed~5 \\
+\midrule
+Seed~1 & ---   & 0.457 & 0.724 & 0.724 & 0.500 \\
+Seed~2 & 0.457 & ---   & 0.457 & 0.417 & 0.529 \\
+Seed~3 & 0.724 & 0.457 & ---   & 0.667 & 0.645 \\
+Seed~4 & 0.724 & 0.417 & 0.667 & ---   & 0.500 \\
+Seed~5 & 0.500 & 0.529 & 0.645 & 0.500 & ---   \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% --- Top-30, 10 nm bins ---
+\begin{table}[!htbp]
+\centering
+\caption{Pairwise Jaccard similarity of top-30 wavelengths across seeds (10\,nm bins). Mean Jaccard = 0.697.}
+\label{tab:binned_jaccard_30_bin10}
+\begin{tabular}{cccccc}
+\toprule
+ & Seed~1 & Seed~2 & Seed~3 & Seed~4 & Seed~5 \\
+\midrule
+Seed~1 & ---   & 0.615 & 0.826 & 0.826 & 0.615 \\
+Seed~2 & 0.615 & ---   & 0.680 & 0.615 & 0.680 \\
+Seed~3 & 0.826 & 0.680 & ---   & 0.750 & 0.750 \\
+Seed~4 & 0.826 & 0.615 & 0.750 & ---   & 0.615 \\
+Seed~5 & 0.615 & 0.680 & 0.750 & 0.615 & ---   \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% --- Top-30, 20 nm bins ---
+\begin{table}[!htbp]
+\centering
+\caption{Pairwise Jaccard similarity of top-30 wavelengths across seeds (20\,nm bins). Mean Jaccard = 0.811.}
+\label{tab:binned_jaccard_30_bin20}
+\begin{tabular}{cccccc}
+\toprule
+ & Seed~1 & Seed~2 & Seed~3 & Seed~4 & Seed~5 \\
+\midrule
+Seed~1 & ---   & 0.778 & 0.882 & 0.933 & 0.778 \\
+Seed~2 & 0.778 & ---   & 0.789 & 0.722 & 0.789 \\
+Seed~3 & 0.882 & 0.789 & ---   & 0.824 & 0.889 \\
+Seed~4 & 0.933 & 0.722 & 0.824 & ---   & 0.722 \\
+Seed~5 & 0.778 & 0.789 & 0.889 & 0.722 & ---   \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% --- Top-11, 5 nm bins ---
+\begin{table}[!htbp]
+\centering
+\caption{Pairwise Jaccard similarity of top-11 wavelengths across seeds (5\,nm bins). Mean Jaccard = 0.536.}
+\label{tab:binned_jaccard_11_bin5}
+\begin{tabular}{cccccc}
+\toprule
+ & Seed~1 & Seed~2 & Seed~3 & Seed~4 & Seed~5 \\
+\midrule
+Seed~1 & ---   & 0.692 & 0.643 & 0.500 & 0.500 \\
+Seed~2 & 0.692 & ---   & 0.500 & 0.571 & 0.571 \\
+Seed~3 & 0.643 & 0.500 & ---   & 0.533 & 0.438 \\
+Seed~4 & 0.500 & 0.571 & 0.533 & ---   & 0.412 \\
+Seed~5 & 0.500 & 0.571 & 0.438 & 0.412 & ---   \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% --- Top-11, 10 nm bins ---
+\begin{table}[!htbp]
+\centering
+\caption{Pairwise Jaccard similarity of top-11 wavelengths across seeds (10\,nm bins). Mean Jaccard = 0.639.}
+\label{tab:binned_jaccard_11_bin10}
+\begin{tabular}{cccccc}
+\toprule
+ & Seed~1 & Seed~2 & Seed~3 & Seed~4 & Seed~5 \\
+\midrule
+Seed~1 & ---   & 0.692 & 0.769 & 0.643 & 0.600 \\
+Seed~2 & 0.692 & ---   & 0.615 & 0.615 & 0.692 \\
+Seed~3 & 0.769 & 0.615 & ---   & 0.692 & 0.533 \\
+Seed~4 & 0.643 & 0.615 & 0.692 & ---   & 0.533 \\
+Seed~5 & 0.600 & 0.692 & 0.533 & 0.533 & ---   \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% --- Top-11, 20 nm bins ---
+\begin{table}[!htbp]
+\centering
+\caption{Pairwise Jaccard similarity of top-11 wavelengths across seeds (20\,nm bins). Mean Jaccard = 0.640.}
+\label{tab:binned_jaccard_11_bin20}
+\begin{tabular}{cccccc}
+\toprule
+ & Seed~1 & Seed~2 & Seed~3 & Seed~4 & Seed~5 \\
+\midrule
+Seed~1 & ---   & 0.667 & 0.750 & 0.615 & 0.643 \\
+Seed~2 & 0.667 & ---   & 0.583 & 0.583 & 0.750 \\
+Seed~3 & 0.750 & 0.583 & ---   & 0.667 & 0.571 \\
+Seed~4 & 0.615 & 0.583 & 0.667 & ---   & 0.571 \\
+Seed~5 & 0.643 & 0.750 & 0.571 & 0.571 & ---   \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 % ==========================================================
 \section{Wavelength Stability: Supplementary Visualizations}
 \label{app:wavelength_details}
@@ -667,7 +783,7 @@ This section contains the secondary wavelength popularity and stability figures 
 \label{app:gui_labeling_examples}
 
 \noindent
-This appendix illustrates the custom GUI annotation tool described in Section~\ref{sec:spectral_dataset_construction}, showing representative labeling sessions for the two primary tissue classes.
+This appendix illustrates the custom GUI annotation tool described in Section~\ref{subsec:dataset_pixel}, showing representative labeling sessions for the two primary tissue classes.
 Figure~\ref{fig:gui_regular} shows the interface during annotation of a healthy (\textit{Regular}) grape cluster, where the operator selects intact berry regions to extract reference spectral signatures.
 Figure~\ref{fig:gui_cracked} shows the same tool applied to a cluster exhibiting visible cracking; in this case, the operator targets the damaged skin areas to capture the distinct spectral response associated with cracked tissue.
 

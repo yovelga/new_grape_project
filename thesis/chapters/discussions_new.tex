@@ -197,6 +197,7 @@ For early-warning applications in which sensitivity (recall) is prioritised over
 The stability analysis across five random seeds exposed a methodologically important finding: the \textit{identity} of the selected wavelengths is moderately sensitive to the data partition, even when the \textit{number and performance} of the selected bands remain stable (Table~\ref{tab:bfs_stability_summary}).
 The best CRACK PR--AUC ranged from 0.812 to 0.998 across seeds, and the optimal number of features varied between 64 and 153, revealing substantial sensitivity to the calibration--validation partition.
 Mean pairwise Jaccard similarity was 0.493 for the top-30 subsets and 0.398 for the top-11 subsets (Tables~\ref{tab:jaccard_30}--\ref{tab:jaccard_11}), indicating that roughly half of the selected wavelengths change from one random split to another.
+However, when binned to account for spectral collinearity, the cross-seed agreement increases substantially (Table~\ref{tab:binned_jaccard_summary}; Figure~\ref{fig:binned_jaccard_summary}), as discussed in Section~\ref{sec:dimensionality_and_sensors}.
 
 \noindent
 This level of variability is not unexpected in wrapper-based feature selection on high-dimensional, correlated data \cite{liu2022feature}: when adjacent spectral channels are highly collinear, BFS can substitute one for another without measurable loss, producing different subsets that are functionally equivalent.
