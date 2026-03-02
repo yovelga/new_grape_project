@@ -10,7 +10,7 @@ A multi-stage analytical framework was developed, including pixel-level classifi
 
 \medskip
 \noindent
-Direct application of pixel-level predictions to field scenes resulted in background-induced misclassification. To address this limitation, a whole-image crack-detection pipeline was developed, aggregating pixel-level CRACK probabilities using spatial post-processing (thresholding, morphological filtering, and patch/blob-based decision rules). The system was evaluated using a spatially disjoint row-based calibration--test split and reported with emphasis on the Cracked class. On the held-out test row, the pipeline achieved F1\textsubscript{CRACK} = 0.704 under early-stage acquisition and F1\textsubscript{CRACK} = 0.818 under late-stage acquisition.
+Direct application of pixel-level predictions to field scenes resulted in background-induced misclassification. To address this limitation, a whole-image crack-detection pipeline was developed, aggregating pixel-level CRACK probabilities using spatial post-processing (thresholding, morphological filtering, and patch/blob-based decision rules). The system was evaluated using a spatially disjoint row-based calibration--test split and reported with emphasis on the Cracked class. On the held-out test row, the pipeline achieved F1\textsubscript{CRACK} = \FoneEarlyBaseline{} under early-stage acquisition and F1\textsubscript{CRACK} = \FoneLateBaseline{} under late-stage acquisition (Table~\ref{tab:full_image_early_late_metrics}).
 
 \medskip
 \noindent

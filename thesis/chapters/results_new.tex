@@ -338,22 +338,22 @@ MCC \\
 \midrule
 
 Late & Calibration &
-34 & 5 & 120 & 1 &
-0.963 & 0.966 & 0.872 & 0.971 & 0.919 & 0.950 & 0.960 & 0.992 & 0.897 \\
+33 & 4 & 121 & 2 &
+0.963 & 0.955 & 0.892 & 0.943 & 0.917 & 0.932 & 0.968 & 0.984 & 0.893 \\
 
 Late & Test &
-27 & 5 & 21 & 7 &
-0.800 & 0.801 & 0.844 & 0.794 & 0.818 & 0.804 & 0.808 & 0.750 & 0.598 \\
+30 & 6 & 20 & 4 &
+0.833 & 0.826 & 0.833 & 0.882 & 0.857 & 0.872 & 0.769 & 0.833 & 0.659 \\
 
 \addlinespace[4pt]
 
 Early & Calibration &
-23 & 6 & 134 & 9 &
-0.913 & 0.838 & 0.793 & 0.719 & 0.754 & 0.732 & 0.957 & 0.937 & 0.703 \\
+24 & 10 & 130 & 8 &
+0.895 & 0.839 & 0.706 & 0.750 & 0.727 & 0.741 & 0.929 & 0.942 & 0.663 \\
 
 Early & Test &
-19 & 3 & 25 & 13 &
-0.733 & 0.743 & 0.864 & 0.594 & 0.704 & 0.633 & 0.893 & 0.658 & 0.504 \\
+24 & 4 & 24 & 8 &
+0.800 & 0.804 & 0.857 & 0.750 & 0.800 & 0.769 & 0.857 & 0.750 & 0.607 \\
 
 \bottomrule
 \end{tabular}
@@ -361,7 +361,7 @@ Early & Test &
 \end{table}
 
 \noindent
-The results on the independent test set demonstrate robust system-level performance. Under late-stage conditions (advanced cracking), the supervised pipeline achieved a high F1\textsubscript{CRACK} score of 0.818. More importantly, under early-stage conditions--where cracks are minimal and visually indistinct--the system maintained strong predictive capability with an F1\textsubscript{CRACK} of 0.704. The expected performance drop between late and early stages reflects the physical difficulty of detecting incipient micro-cracks. Nevertheless, these results confirm both \hyperref[hyp:whole_image_robustness]{Hypothesis~3} and \hyperref[hyp:early_detection]{Hypothesis~4}: the spatial aggregation logic successfully suppresses background noise, enabling reliable early-warning triggers on entirely unseen vines.
+The results on the independent test set demonstrate robust system-level performance. Under late-stage conditions (advanced cracking), the supervised pipeline achieved F1\textsubscript{CRACK}~=~0.857 (Table~\ref{tab:full_image_early_late_metrics}). More importantly, under early-stage conditions--where cracks are minimal and visually indistinct--the system maintained strong predictive capability with F1\textsubscript{CRACK}~=~0.800. The moderate performance drop between late and early stages reflects the physical difficulty of detecting incipient micro-cracks. Nevertheless, these results confirm both \hyperref[hyp:whole_image_robustness]{Hypothesis~3} and \hyperref[hyp:early_detection]{Hypothesis~4}: the spatial aggregation logic successfully suppresses background noise, enabling reliable early-warning triggers on entirely unseen vines.
 
 \begin{figure}[ht]
     \centering
@@ -571,7 +571,7 @@ Beyond raw detection performance, the physical reliability of the selected bands
 \subsubsection{Wavelength Popularity and Stability}
 
 \noindent
-The top-30 wavelength subsets demonstrated strong cross-seed consistency, predominantly converging on specific spectral regions in the near-infrared (NIR) portion of the spectrum (Figures~\ref{fig:stability_30_popularity} and \ref{fig:stability_30_spectrum}). This physical consistency is maintained even under coarser binning schemes, indicating that the selection algorithm successfully targets robust tissue characteristics rather than overfitting to dataset-specific noise. Detailed binning and heatmap visualizations for the top-30 subsets are provided in Appendix~\ref{app:wavelength_details}.
+The top-30 wavelength subsets demonstrated strong cross-seed consistency, predominantly converging on specific spectral regions in the near-infrared (NIR) portion of the spectrum (Figure~\ref{fig:stability_30_popularity}). Because the 11-wavelength subset is entirely contained within the 30-wavelength subset, its stability analysis is presented separately in Appendix~\ref{app:wavelength_details}. As expected with aggressive dimensionality reduction, the top-11 subsets exhibited more variance across seeds, since multiple highly correlated adjacent bands often act as interchangeable proxies for the same underlying physical trait. Nevertheless, consistent spectral regions remain clearly identifiable, supporting the feasibility of targeted multispectral sensor design. Additional visualizations (heatmaps, sliding-window frequency spectra, and top-11 popularity plots) are provided in Appendix~\ref{app:wavelength_details}.
 
 \begin{figure}[!htbp]
     \centering
@@ -580,19 +580,41 @@ The top-30 wavelength subsets demonstrated strong cross-seed consistency, predom
     \label{fig:stability_30_popularity}
 \end{figure}
 
+\FloatBarrier
+
+\subsubsection{Binned Wavelength Stability}
+\noindent
+Because neighbouring hyperspectral channels are highly correlated, substituting one wavelength for a nearby neighbour does not reflect genuine instability. To quantify this, the pairwise Jaccard similarity was recomputed after binning the selected wavelengths into 5, 10, and 20\,nm windows (Table~\ref{tab:binned_jaccard_summary}; full pairwise matrices in Appendix Tables~\ref{tab:binned_jaccard_30_bin5}--\ref{tab:binned_jaccard_11_bin20}).
+Figure~\ref{fig:stability_30_binning} illustrates how the top-30 popularity distribution consolidates under progressively coarser binning (the corresponding top-11 binning plot is in Appendix~\ref{app:wavelength_details}).
+
+At a 10\,nm resolution the top-30 Jaccard rises from 0.493 to 0.697, and at 20\,nm it reaches 0.811, demonstrating that the five seeds overwhelmingly select from the same spectral regions.
+For the top-11 subsets the improvement is from 0.398 to $\approx$0.64 at both 10 and 20\,nm bins.
+These results confirm that the apparent instability in exact-wavelength identity largely reflects substitution among adjacent, strongly collinear bands rather than genuine disagreement about which spectral regions are informative.
+
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=\textwidth,keepaspectratio]{figures/results/feature_selection/stability_varying_30wl_wavelength_frequency_spectrum.png}
-    \caption{Wavelength selection frequency along the spectrum (2\,nm sliding window) for the top-30 subsets.}
-    \label{fig:stability_30_spectrum}
+    \includegraphics[width=0.8\textwidth,keepaspectratio]{figures/results/feature_selection/stability_varying_30wl_wavelength_binning_comparison.png}
+    \caption{Wavelength popularity at different bin sizes (1, 5, 10, 20\,nm) for the top-30 subsets.}
+    \label{fig:stability_30_binning}
 \end{figure}
 
+\begin{table}[!htbp]
+\centering
+\caption{Mean pairwise Jaccard similarity across 5 BFS seeds for exact and binned wavelength matching.}
+\label{tab:binned_jaccard_summary}
+\begin{tabular}{lcccc}
+\toprule
+Bin & \makecell{Mean Jaccard\\30\,WL} & \makecell{Std\\30\,WL} & \makecell{Mean Jaccard\\11\,WL} & \makecell{Std\\11\,WL} \\
+\midrule
+Exact  & 0.493 & 0.102 & 0.398 & 0.062 \\
+5\,nm  & 0.562 & 0.111 & 0.536 & 0.082 \\
+10\,nm & 0.697 & 0.081 & 0.639 & 0.071 \\
+20\,nm & 0.811 & 0.067 & 0.640 & 0.065 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \FloatBarrier
 
 \noindent
-As expected with aggressive dimensionality reduction, the top-11 subsets exhibited more variance across seeds. This occurs because multiple highly correlated adjacent bands often act as interchangeable proxies for the same underlying physical trait. Nevertheless, consistent spectral regions remain clearly identifiable, supporting the feasibility of targeted multispectral sensor design. (Detailed popularity, binning, heatmap, and frequency spectrum visualizations for the top-11 subsets are provided in Appendix~\ref{app:wavelength_details}).
-
-\FloatBarrier
-
-\noindent
-Overall, the BFS procedure revealed a highly consistent selection pattern, heavily concentrated in the NIR region (700--850\,nm). Specific anchors, such as 730\,nm and 750\,nm, were repeatedly identified as primary contributors to model performance, perfectly aligning with the peak spectral separability metrics established earlier in this chapter. Even under the extreme constraints of the 11-wavelength subset, the selection reliably converged on key markers like 452\,nm (visible blue) and 729\,nm (NIR-edge) across diverse data splits. While these findings definitively validate the statistical importance of these specific bands for robust crack detection, a deeper interpretation of their physiological relevance and biomechanical implications is reserved for the Discussion (Chapter~\ref{chap:discussion_conclusions}).
+Overall, the BFS procedure revealed a highly consistent selection pattern, heavily concentrated in the NIR region (700--850\,nm). Specific anchors, such as 730\,nm and 750\,nm, were repeatedly identified as primary contributors to model performance, perfectly aligning with the peak spectral separability metrics established earlier in this chapter. Even under the extreme constraints of the 11-wavelength subset---which is entirely contained within the top-30 configuration---the selection reliably converged on key markers like 452\,nm (visible blue) and 729\,nm (NIR-edge) across diverse data splits (see Appendix Figures~\ref{fig:stability_11_popularity} and~\ref{fig:stability_11_binning}). While these findings definitively validate the statistical importance of these specific bands for robust crack detection, a deeper interpretation of their physiological relevance and biomechanical implications is reserved for the Discussion (Chapter~\ref{chap:discussion_conclusions}).

@@ -732,13 +732,15 @@ Seed~5 & 0.643 & 0.750 & 0.571 & 0.571 & ---   \\
 \label{app:wavelength_details}
 
 \noindent
-This section contains the secondary wavelength popularity and stability figures removed from the main text for brevity. Figures~\ref{fig:stability_30_binning} and~\ref{fig:stability_30_heatmap} correspond to the top-30 BFS subsets; Figures~\ref{fig:stability_11_popularity}--\ref{fig:stability_11_spectrum} correspond to the top-11 BFS subsets.
+This section contains supplementary wavelength stability visualizations for the BFS analysis.
+For the top-30 subsets, Figures~\ref{fig:stability_30_spectrum} and~\ref{fig:stability_30_heatmap} show the sliding-window frequency spectrum and the stability heatmap.
+For the top-11 subsets---which are entirely contained within the top-30 configuration---Figures~\ref{fig:stability_11_popularity} and~\ref{fig:stability_11_binning} present the wavelength popularity and binning comparison, while Figures~\ref{fig:stability_11_heatmap} and~\ref{fig:stability_11_spectrum} show the heatmap and sliding-window frequency spectrum.
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=0.8\textwidth,keepaspectratio]{figures/results/feature_selection/stability_varying_30wl_wavelength_binning_comparison.png}
-    \caption{Wavelength popularity at different bin sizes (1, 5, 10, 20\,nm) for the top-30 subsets.}
-    \label{fig:stability_30_binning}
+    \includegraphics[width=\textwidth,keepaspectratio]{figures/results/feature_selection/stability_varying_30wl_wavelength_frequency_spectrum.png}
+    \caption{Wavelength selection frequency along the spectrum (2\,nm sliding window) for the top-30 subsets.}
+    \label{fig:stability_30_spectrum}
 \end{figure}
 
 \begin{figure}[!htbp]

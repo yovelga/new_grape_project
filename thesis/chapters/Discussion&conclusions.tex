@@ -43,6 +43,16 @@ This is mathematically predictable: grouping the infinite optical heterogeneity 
 To impose order on this heterogeneity, the problem was reformulated into a 10-class scheme, explicitly modeling the most prevalent background elements (e.g., leaves, soil, wood, and plastic markers).
 This multi-class mapping significantly stabilized the feature space and reduced random pixel-level noise, yet localized false positives persisted in the full-image predictions.
 
+\FloatBarrier
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.75\textwidth]{figures/results/discussion/multi_vs_binary_cluster_42.JPG}\\[0.5em]
+    \includegraphics[width=0.75\textwidth]{figures/results/discussion/multi_vs_binary_cluster_19.JPG}
+    \caption{Multi-class vs.\ binary crack-probability maps. Top: a \textbf{healthy (non-cracked)} cluster; bottom: a \textbf{cracked} cluster. In each row---Left: Canon R5 RGB reference; Centre: multi-class XGBoost overlay; Right: binary XGBoost overlay. The binary model produces widespread false positives across background elements, whereas the multi-class formulation confines detections to localised regions and isolates the true defect blob. Yellow pixels indicate elevated CRACK probability.}
+    \label{fig:multi_vs_binary}
+\end{figure}
+\FloatBarrier
+
 
 \medskip\noindent
 Empirical observation of the whole-image classification maps revealed that the residual false positives were not entirely random;
@@ -50,19 +60,6 @@ they were systematically driven by specific background materials, primarily dry 
 Physiologically, this spectral confusion is highly logical. As established in Section~\ref{sec:physiology_preprocessing}, cracked tissue is characterized by depressed reflectance due to water loss and tissue oxidation.
 Dry wood shares these exact traits---it is devoid of cellular water and composed of brown, oxidized lignin---making its spectral signature in the VIS and NIR regions deceptively similar to that of a severe crack.
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.9\textwidth]{figures/results/discussion/multi_vs_binary_cluster_42.JPG}
-    \caption{Multi-class vs.\ binary crack-probability maps on a \textbf{healthy (non-cracked)} cluster. Left: Canon R5 RGB reference. Centre: multi-class XGBoost overlay. Right: binary XGBoost overlay. The binary model produces widespread false positives across background elements (soil, branches, lighting gradients), whereas the multi-class model confines detections to a small number of localised regions. Yellow pixels indicate elevated CRACK probability.}
-    \label{fig:multi_vs_binary_nocrack}
-\end{figure}
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.9\textwidth]{figures/results/discussion/multi_vs_binary_cluster_19.JPG}
-    \caption{Multi-class vs.\ binary crack-probability maps on a \textbf{cracked} cluster. Left: Canon R5 RGB reference. Centre: multi-class XGBoost overlay. Right: binary XGBoost overlay. Both models detect the defect region, but the binary model additionally flags large background patches, severely reducing precision. The multi-class formulation isolates the true defect blob while suppressing background noise.}
-    \label{fig:multi_vs_binary_crack}
-\end{figure}
 
 \subsection{Geometric Filtering and Structural Regularization}
 \noindent
@@ -86,12 +83,19 @@ It successfully discarded the elongated, low-density pixel clusters associated w
 While exceptionally thick dry branches occasionally satisfied this density threshold---remaining the primary source of whole-image classification errors---the spatial aggregation pipeline proved essential.
 It demonstrated that robust field-level detection cannot rely on spectral signatures alone, but must fuse pixel-level spectral predictions with macroscopic geometric rules.
 
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=0.9\textwidth]{figures/results/discussion/Patch_map_output.JPG}
+%     \caption{Example output of the spatial aggregation pipeline. The image illustrates the patch-based density map overlaid on a field scene, where the highlighted patch regions satisfy the crack-density criterion and trigger a positive detection. This visualization demonstrates how the pipeline transitions from a noisy, pixel-level probability map to a structured, spatially coherent image-level decision.}
+%     \label{fig:patch_map_output}
+% \end{figure}
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.9\textwidth]{figures/results/discussion/Patch_map_output.JPG}
-    \caption{Example output of the spatial aggregation pipeline. The image illustrates the patch-based density map overlaid on a field scene, where the highlighted patch regions satisfy the crack-density criterion and trigger a positive detection. This visualization demonstrates how the pipeline transitions from a noisy, pixel-level probability map to a structured, spatially coherent image-level decision.}
-    \label{fig:patch_map_output}
+    \includegraphics[width=\textwidth]{figures/materials_methods/pipeline/TP_example_3.png}
+    \caption{Example output of the custom spatial aggregation and EDA interface. The tool displays the RGB reference, the pixel-level crack-probability map, morphological filtering stages, and the final patch-density decision overlay side by side, enabling real-time parameter tuning and immediate visual feedback for diagnosing false positives and calibrating the detection pipeline.}
+    \label{fig:spatial_aggregation_ui}
 \end{figure}
+
 
 \medskip\noindent
 Developing this spatial pipeline exposed a significant computational optimization challenge.
@@ -99,7 +103,7 @@ Initial exploratory iterations relied on brute-force grid searches across an 8-d
 It rapidly became evident that brute-force exploration of this massive combinatorial space was computationally prohibitive and yielded sub-optimal local minima.
 Consequently, the experimental design transitioned to Bayesian optimization via Optuna.
 By intelligently modeling the hyperparameter landscape, Optuna efficiently converged on a robust operating point that maximized early-stage precision while maintaining spatial coherence.
-The resulting pipeline achieved substantially higher precision (0.864 on the early-stage test set) than a naive pixel-level approach would.
+The resulting pipeline achieved substantially higher precision (0.857 on the early-stage test set; Table~\ref{tab:full_image_early_late_metrics}) than a naive pixel-level approach would.
 
 \clearpage
 \section{Dimensionality Reduction, Algorithm Selection, and Sensor Design}
@@ -122,38 +126,10 @@ Utilizing 10 to 30 fixed optical filters targeting these exact physiological fea
 \medskip\noindent
 However, when measured by exact wavelength identity, the mean pairwise Jaccard similarity was only 0.493 for the top-30 subsets and 0.398 for the top-11 subsets (Tables~\ref{tab:jaccard_30}--\ref{tab:jaccard_11}), suggesting that roughly half of the selected wavelengths change from one random split to another.
 Because neighbouring hyperspectral channels are highly correlated, a seed that selects 548.55\,nm instead of 550.32\,nm is making a functionally equivalent choice.
-To quantify this, the pairwise Jaccard similarity was recomputed after binning the selected wavelengths into 5, 10, and 20\,nm windows (Table~\ref{tab:binned_jaccard_summary}; Figure~\ref{fig:binned_jaccard_summary}; full matrices in Appendix Tables~\ref{tab:binned_jaccard_30_bin5}--\ref{tab:binned_jaccard_11_bin20}).
+To quantify this, the pairwise Jaccard similarity was recomputed after binning the selected wavelengths into 5, 10, and 20\,nm windows (Table~\ref{tab:binned_jaccard_summary}; full matrices in Appendix Tables~\ref{tab:binned_jaccard_30_bin5}--\ref{tab:binned_jaccard_11_bin20}).
 At a 10\,nm resolution the top-30 Jaccard rises from 0.493 to 0.697, and at 20\,nm it reaches 0.811, demonstrating that the five seeds overwhelmingly select from the same spectral regions.
 For the top-11 subsets the improvement is from 0.398 to $\approx$0.64 at both 10 and 20\,nm bins.
 These results confirm that the apparent instability in exact-wavelength identity largely reflects substitution among adjacent, strongly collinear bands rather than genuine disagreement about which spectral regions are informative.
-
-\begin{table}[!htbp]
-\centering
-\caption{Mean pairwise Jaccard similarity across 5 BFS seeds for exact and binned wavelength matching.}
-\label{tab:binned_jaccard_summary}
-\begin{tabular}{llrr}
-\toprule
-Top-K & Bin & Mean Jaccard & Std \\
-\midrule
-30 & Exact & 0.493 & 0.102 \\
-30 & 5\,nm  & 0.562 & 0.111 \\
-30 & 10\,nm & 0.697 & 0.081 \\
-30 & 20\,nm & 0.811 & 0.067 \\
-\midrule
-11 & Exact & 0.398 & 0.062 \\
-11 & 5\,nm  & 0.536 & 0.082 \\
-11 & 10\,nm & 0.639 & 0.071 \\
-11 & 20\,nm & 0.640 & 0.065 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{figure}[!htbp]
-\centering
-\includegraphics[width=0.75\textwidth]{figures/results/feature_selection/binned_jaccard_summary.png}
-\caption{Effect of wavelength binning on cross-seed Jaccard similarity for the top-30 and top-11 BFS subsets. Error bars denote the standard deviation of all 10 pairwise comparisons.}
-\label{fig:binned_jaccard_summary}
-\end{figure}
 
 \subsection{Methodological Rationale: BFS and Evaluation Metrics}
 \noindent
@@ -225,6 +201,7 @@ Consequently, custom Graphical User Interfaces (GUIs) had to be developed from s
 
 \medskip\noindent
 These custom visual tools were not merely conveniences; they were absolute methodological necessities. Visual verification was the only way to guarantee that the extracted hyperspectral segments aligned perfectly with the physical berries before feature extraction. Furthermore, the development of the spatial aggregation pipeline itself was heavily reliant on these interactive tools. Deciding which morphological filters to apply, or how to tune the patch-density thresholds, could not be achieved through blind numerical optimization alone. It required extensive visual observation of the intermediate probability maps across numerous cluster scenes. The custom UI allowed for real-time parameter tuning and immediate visual feedback, making it an indispensable experimental instrument for navigating the complex trade-offs between noise suppression and signal retention, and ultimately deciding on the architecture of the final pipeline.
+
 
 \medskip\noindent
 Early in the research phase, fully automated unsupervised clustering algorithms (e.g., K-Means) were explored to bypass this manual annotation bottleneck.
