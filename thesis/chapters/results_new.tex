@@ -562,41 +562,224 @@ The results strongly confirm \hyperref[hyp:spectral_efficiency]{Hypothesis~5}. N
 
 \FloatBarrier
 
+% \subsection{BFS Wavelength-Selection Stability Analysis}
+% \label{sec:bfs-stability}
+
+% \noindent
+% Beyond raw detection performance, the physical reliability of the selected bands was evaluated through a cross-seed stability analysis. By varying the train-test data split across five random seeds, the spatial and spectral consistency of the selected subsets was quantified. 
+
+% \subsubsection{Wavelength Popularity and Stability}
+
+% \noindent
+% The top-30 wavelength subsets demonstrated strong cross-seed consistency, predominantly converging on specific spectral regions in the near-infrared (NIR) spectrum (Figure~\ref{fig:stability_30_popularity}). Since the 11-wavelength configuration acts as a direct subset of this 30-wavelength selection, both share these core identifiable regions, firmly supporting the feasibility of targeted multispectral sensor design. Detailed stability analyses and additional visualizations for both configurations (including heatmaps and frequency spectra) are provided in Appendix~\ref{app:wavelength_details}.
+% \begin{figure}[!htbp]
+%     \centering
+%     \includegraphics[width=0.8\textwidth,keepaspectratio]{figures/results/feature_selection/stability_varying_30wl_wavelength_popularity_overview.png}
+%     \caption{Distribution and popularity of the top-30 selected wavelengths across five varying-split seeds.}
+%     \label{fig:stability_30_popularity}
+% \end{figure}
+
+
+
+% \subsubsection{Binned Wavelength Stability}
+% \noindent
+% Because neighbouring hyperspectral channels are highly correlated, substituting one wavelength for a nearby neighbour does not reflect genuine instability. To quantify this, the pairwise Jaccard similarity was recomputed after binning the selected wavelengths into 5, 10, and 20\,nm windows (Table~\ref{tab:binned_jaccard_summary}; full pairwise matrices in Appendix Tables~\ref{tab:binned_jaccard_30_bin5}--\ref{tab:binned_jaccard_11_bin20}).
+% Figure~\ref{fig:stability_30_binning} illustrates how the top-30 popularity distribution consolidates under progressively coarser binning (the corresponding top-11 binning plot is in Appendix~\ref{app:wavelength_details}).
+
+% At a 10\,nm resolution the top-30 Jaccard rises from 0.493 to 0.697, and at 20\,nm it reaches 0.811, demonstrating that the five seeds overwhelmingly select from the same spectral regions.
+% For the top-11 subsets the improvement is from 0.398 to $\approx$0.64 at both 10 and 20\,nm bins.
+% These results confirm that the apparent instability in exact-wavelength identity largely reflects substitution among adjacent, strongly collinear bands rather than genuine disagreement about which spectral regions are informative.
+
+% \begin{figure}[!htbp]
+%     \centering
+%     \includegraphics[width=0.8\textwidth,keepaspectratio]{figures/results/feature_selection/stability_varying_30wl_wavelength_binning_comparison.png}
+%     \caption{Wavelength popularity at different bin sizes (1, 5, 10, 20\,nm) for the top-30 subsets.}
+%     \label{fig:stability_30_binning}
+% \end{figure}
+
+% \begin{table}[!htbp]
+% \centering
+% \caption{Mean pairwise Jaccard similarity across 5 BFS seeds for exact and binned wavelength matching.}
+% \label{tab:binned_jaccard_summary}
+% \begin{tabular}{lcccc}
+% \toprule
+% Bin & \makecell{Mean Jaccard\\30\,WL} & \makecell{Std\\30\,WL} & \makecell{Mean Jaccard\\11\,WL} & \makecell{Std\\11\,WL} \\
+% \midrule
+% Exact  & 0.493 & 0.102 & 0.398 & 0.062 \\
+% 5\,nm  & 0.562 & 0.111 & 0.536 & 0.082 \\
+% 10\,nm & 0.697 & 0.081 & 0.639 & 0.071 \\
+% 20\,nm & 0.811 & 0.067 & 0.640 & 0.065 \\
+% \bottomrule
+% \end{tabular}
+% \end{table}
+
+% \FloatBarrier
+
+% \noindent
+% Overall, the BFS procedure revealed a highly consistent selection pattern, heavily concentrated in the NIR region (700--850\,nm). Specific anchors, such as 730\,nm and 750\,nm, were repeatedly identified as primary contributors to model performance, perfectly aligning with the peak spectral separability metrics established earlier in this chapter. Even under the extreme constraints of the 11-wavelength subset---which is entirely contained within the top-30 configuration---the selection reliably converged on key markers like 452\,nm (visible blue) and 729\,nm (NIR-edge) across diverse data splits (see Appendix Figures~\ref{fig:stability_11_popularity} and~\ref{fig:stability_11_binning}). While these findings definitively validate the statistical importance of these specific bands for robust crack detection, a deeper interpretation of their physiological relevance and biomechanical implications is reserved for the Discussion (Chapter~\ref{chap:discussion_conclusions}).
+
+% \FloatBarrier
+
+% \noindent
+% To evaluate the stability of the feature selection process, the results of the Backward Feature Selection (BFS) were compared across five different random seeds. Out of the 30 wavelengths retained in each run, 13 specific wavelengths were selected unanimously (\textbf{5 out of 5 seeds}) in exact-wavelength matching: 452.25, 536.82, 545.62, 548.55, 572.07, 580.90, 634.11, 729.53, 756.56, 759.56, 777.64, 917.42, and 920.48\,nm.
+
+% \medskip\noindent
+% This universal core spans four distinct physiological regions: the Soret/blue zone ($\sim$452\,nm), the green--yellow--red-edge complex (537--635\,nm), the NIR plateau (730--778\,nm), and the far-NIR water-absorption shoulder (917--920\,nm).
+
+% \medskip\noindent
+% To account for minor spectral shifts and hardware tolerances, the selected wavelengths were further grouped into 5\,nm bins. Table~\ref{tab:bins_5} presents the 14 spectral bins that achieved a perfect consensus (selected by all 5 seeds). Table~\ref{tab:bins_4} lists 6 additional bins that demonstrated high stability, being selected by 4 out of 5 seeds. Together, these highly consistent regions reinforce the conclusion that the BFS procedure targets stable, physiologically grounded spectral markers rather than random noise.
+
+% \begin{table}[htbp]
+%     \centering
+%     \caption{Wavelength bins (5\,nm) selected unanimously by all 5 BFS seeds (5/5 consensus).}
+%     \label{tab:bins_5}
+%     \begin{tabular}{cc}
+%         \toprule
+%         \textbf{Bin Centre (nm)} & \textbf{Frequency (Seeds)} \\
+%         \midrule
+%         450 & 5/5 \\
+%         535 & 5/5 \\
+%         545 & 5/5 \\
+%         550 & 5/5 \\
+%         570 & 5/5 \\
+%         580 & 5/5 \\
+%         635 & 5/5 \\
+%         730 & 5/5 \\
+%         740 & 5/5 \\
+%         755 & 5/5 \\
+%         760 & 5/5 \\
+%         780 & 5/5 \\
+%         915 & 5/5 \\
+%         920 & 5/5 \\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
+
+% \begin{table}[htbp]
+%     \centering
+%     \caption{Additional wavelength bins (5\,nm) selected by 4 out of 5 BFS seeds (4/5 consensus).}
+%     \label{tab:bins_4}
+%     \begin{tabular}{cc}
+%         \toprule
+%         \textbf{Bin Centre (nm)} & \textbf{Frequency (Seeds)} \\
+%         \midrule
+%         515 & 4/5 \\
+%         605 & 4/5 \\
+%         735 & 4/5 \\
+%         770 & 4/5 \\
+%         840 & 4/5 \\
+%         900 & 4/5 \\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
+
+% \FloatBarrier
+
+
 \subsection{BFS Wavelength-Selection Stability Analysis}
 \label{sec:bfs-stability}
 
 \noindent
-Beyond raw detection performance, the physical reliability of the selected bands was evaluated through a cross-seed stability analysis. By varying the train-test data split across five random seeds, the spatial and spectral consistency of the selected subsets was quantified. 
+To evaluate selection stability, selected features were compared across five varying train-test data splits (seeds). Thirteen exact wavelengths were selected unanimously (\textbf{5 out of 5 seeds}): 452.25, 536.82, 545.62, 548.55, 572.07, 580.90, 634.11, 729.53, 756.56, 759.56, 777.64, 917.42, and 920.48\,nm.
 
-\subsubsection{Wavelength Popularity and Stability}
-
+\subsubsection{Wavelength Popularity Distribution}
 \noindent
-The top-30 wavelength subsets demonstrated strong cross-seed consistency, predominantly converging on specific spectral regions in the near-infrared (NIR) portion of the spectrum (Figure~\ref{fig:stability_30_popularity}). Because the 11-wavelength subset is entirely contained within the 30-wavelength subset, its stability analysis is presented separately in Appendix~\ref{app:wavelength_details}. As expected with aggressive dimensionality reduction, the top-11 subsets exhibited more variance across seeds, since multiple highly correlated adjacent bands often act as interchangeable proxies for the same underlying physical trait. Nevertheless, consistent spectral regions remain clearly identifiable, supporting the feasibility of targeted multispectral sensor design. Additional visualizations (heatmaps, sliding-window frequency spectra, and top-11 popularity plots) are provided in Appendix~\ref{app:wavelength_details}.
+Figure~\ref{fig:stability_30_popularity} visualizes the individual selection frequency of the top-30 spectral bands retained across the five random data splits.
+
+\FloatBarrier
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=0.8\textwidth,keepaspectratio]{figures/results/feature_selection/stability_varying_30wl_wavelength_popularity_overview.png}
+    \includegraphics[width=1\textwidth,keepaspectratio]{figures/results/feature_selection/stability_varying_30wl_wavelength_popularity_overview.png}
     \caption{Distribution and popularity of the top-30 selected wavelengths across five varying-split seeds.}
     \label{fig:stability_30_popularity}
 \end{figure}
 
 \FloatBarrier
 
-\subsubsection{Binned Wavelength Stability}
+\newpage
+\subsubsection{Effect of Spectral Binning on Popularity}
 \noindent
-Because neighbouring hyperspectral channels are highly correlated, substituting one wavelength for a nearby neighbour does not reflect genuine instability. To quantify this, the pairwise Jaccard similarity was recomputed after binning the selected wavelengths into 5, 10, and 20\,nm windows (Table~\ref{tab:binned_jaccard_summary}; full pairwise matrices in Appendix Tables~\ref{tab:binned_jaccard_30_bin5}--\ref{tab:binned_jaccard_11_bin20}).
-Figure~\ref{fig:stability_30_binning} illustrates how the top-30 popularity distribution consolidates under progressively coarser binning (the corresponding top-11 binning plot is in Appendix~\ref{app:wavelength_details}).
+Figure~\ref{fig:stability_30_binning} demonstrates how progressively coarser spectral binning consolidates individual wavelength selections into broader regions. Note that the $y$-axis reports the \emph{total number of wavelength selections} pooled across all five seeds; because each seed contributes up to 30 wavelengths, multiple selections from different seeds (or even from the same seed) can fall into a single bin, producing counts greater than~5.
 
-At a 10\,nm resolution the top-30 Jaccard rises from 0.493 to 0.697, and at 20\,nm it reaches 0.811, demonstrating that the five seeds overwhelmingly select from the same spectral regions.
-For the top-11 subsets the improvement is from 0.398 to $\approx$0.64 at both 10 and 20\,nm bins.
-These results confirm that the apparent instability in exact-wavelength identity largely reflects substitution among adjacent, strongly collinear bands rather than genuine disagreement about which spectral regions are informative.
+\FloatBarrier
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=0.8\textwidth,keepaspectratio]{figures/results/feature_selection/stability_varying_30wl_wavelength_binning_comparison.png}
+    \includegraphics[width=1\textwidth,keepaspectratio]{figures/results/feature_selection/stability_varying_30wl_wavelength_binning_comparison.png}
     \caption{Wavelength popularity at different bin sizes (1, 5, 10, 20\,nm) for the top-30 subsets.}
     \label{fig:stability_30_binning}
 \end{figure}
+
+\FloatBarrier
+
+\newpage
+\subsubsection{Unanimous 5\,nm Spectral Bins}
+\noindent
+In contrast to the pooled counts shown in Figure~\ref{fig:stability_30_binning}, Tables~\ref{tab:bins_5} and~\ref{tab:bins_4} report \emph{seed-level presence}: a bin is counted once per seed regardless of how many wavelengths that seed placed in it (maximum~=~5). Table~\ref{tab:bins_5} lists the fourteen 5\,nm bins selected by all five seeds.
+
+\FloatBarrier
+
+\begin{table}[htbp]
+    \centering
+    \caption{Wavelength bins (5\,nm) selected unanimously by all 5 BFS seeds (5/5 consensus).}
+    \label{tab:bins_5}
+    \begin{tabular}{cc}
+        \toprule
+        \textbf{Bin Centre (nm)} & \textbf{Frequency (Seeds)} \\
+        \midrule
+        450 & 5/5 \\
+        535 & 5/5 \\
+        545 & 5/5 \\
+        550 & 5/5 \\
+        570 & 5/5 \\
+        580 & 5/5 \\
+        635 & 5/5 \\
+        730 & 5/5 \\
+        740 & 5/5 \\
+        755 & 5/5 \\
+        760 & 5/5 \\
+        780 & 5/5 \\
+        915 & 5/5 \\
+        920 & 5/5 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\FloatBarrier
+
+\subsubsection{Highly Stable 5\,nm Spectral Bins}
+\noindent
+Table~\ref{tab:bins_4} presents the six additional 5\,nm spectral regions that were robustly retained by four out of the five seeds.
+
+\FloatBarrier
+
+\begin{table}[htbp]
+    \centering
+    \caption{Additional wavelength bins (5\,nm) selected by 4 out of 5 BFS seeds (4/5 consensus).}
+    \label{tab:bins_4}
+    \begin{tabular}{cc}
+        \toprule
+        \textbf{Bin Centre (nm)} & \textbf{Frequency (Seeds)} \\
+        \midrule
+        515 & 4/5 \\
+        605 & 4/5 \\
+        735 & 4/5 \\
+        770 & 4/5 \\
+        840 & 4/5 \\
+        900 & 4/5 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\FloatBarrier
+
+\newpage
+\subsubsection{Pairwise Jaccard Similarity Across Bins}
+\noindent
+Table~\ref{tab:binned_jaccard_summary} confirms regional stability, showing that coarser binning systematically increases the mean pairwise subset similarity across all seeds.
+
+\FloatBarrier
 
 \begin{table}[!htbp]
 \centering
@@ -615,6 +798,3 @@ Exact  & 0.493 & 0.102 & 0.398 & 0.062 \\
 \end{table}
 
 \FloatBarrier
-
-\noindent
-Overall, the BFS procedure revealed a highly consistent selection pattern, heavily concentrated in the NIR region (700--850\,nm). Specific anchors, such as 730\,nm and 750\,nm, were repeatedly identified as primary contributors to model performance, perfectly aligning with the peak spectral separability metrics established earlier in this chapter. Even under the extreme constraints of the 11-wavelength subset---which is entirely contained within the top-30 configuration---the selection reliably converged on key markers like 452\,nm (visible blue) and 729\,nm (NIR-edge) across diverse data splits (see Appendix Figures~\ref{fig:stability_11_popularity} and~\ref{fig:stability_11_binning}). While these findings definitively validate the statistical importance of these specific bands for robust crack detection, a deeper interpretation of their physiological relevance and biomechanical implications is reserved for the Discussion (Chapter~\ref{chap:discussion_conclusions}).
