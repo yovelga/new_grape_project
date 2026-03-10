@@ -36,7 +36,7 @@ The main text reports truncated mean values for clarity; unreduced values are pr
 
 \begin{table}[!htbp]
     \centering
-    \caption{Pixel-level classification metrics (\textbf{unbalanced} training set, multi-class). Values are reported as mean $\pm$ standard deviation across folds.}
+    \caption[Pixel-level classification: unbalanced multi-class (full CV)]{Pixel-level classification metrics (\textbf{unbalanced} training set, multi-class). Values are reported as mean $\pm$ standard deviation across folds.}
     \label{tab:pixel_metrics_unbalanced_all_full}
     \small
     \renewcommand{\arraystretch}{1.25}
@@ -80,7 +80,7 @@ The main text reports truncated mean values for clarity; unreduced values are pr
 \begin{table}[!htbp]
     \centering
     \small
-    \caption{Pixel-level autoencoder anomaly detection: binary setting (non-cracked as normal class). Values are reported as mean $\pm$ standard deviation across LOGO folds.}
+    \caption[Autoencoder anomaly detection: binary (full CV)]{Pixel-level autoencoder anomaly detection: binary setting (non-cracked as normal class). Values are reported as mean $\pm$ standard deviation across LOGO folds.}
     \label{tab:autoencoder_pixel_results_full}
     \renewcommand{\arraystretch}{1.2}
     \setlength{\tabcolsep}{5pt}
@@ -100,7 +100,7 @@ The main text reports truncated mean values for clarity; unreduced values are pr
 \begin{table}[!htbp]
     \centering
     \small
-    \caption{Pixel-level autoencoder anomaly detection: trained on CRACK pixels (multi-class setting). Values are mean across LOGO folds.}
+    \caption[Autoencoder anomaly detection: CRACK-only (full CV)]{Pixel-level autoencoder anomaly detection: trained on CRACK pixels (multi-class setting). Values are mean across LOGO folds.}
     \label{tab:autoencoder_pixel_results_crack_only_multiclass_full}
     \renewcommand{\arraystretch}{1.2}
     \setlength{\tabcolsep}{5pt}
@@ -120,7 +120,7 @@ The main text reports truncated mean values for clarity; unreduced values are pr
 \begin{table}[!htbp]
     \centering
     \small
-    \caption{Pixel-level autoencoder anomaly detection: trained on all non-CRACK classes (multi-class setting). Single group-wise train--test split.}
+    \caption[Autoencoder anomaly detection: non-CRACK training (full CV)]{Pixel-level autoencoder anomaly detection: trained on all non-CRACK classes (multi-class setting). Single group-wise train--test split.}
     \label{tab:autoencoder_pixel_results_noncrack_multiclass_full}
     \renewcommand{\arraystretch}{1.2}
     \setlength{\tabcolsep}{5pt}
@@ -147,7 +147,7 @@ Reflectance values were aggregated over two broad spectral regions (VIS and NIR)
 
 \begin{table}[htbp]
     \centering
-    \caption{Summary statistics of reflectance values across spectral regions for healthy and cracked tissue.}
+    \caption[Reflectance statistics: healthy vs.\ cracked tissue]{Summary statistics of reflectance values across spectral regions for healthy and cracked tissue.}
     \label{tab:reflectance_stats}
     \renewcommand{\arraystretch}{1.2}
     \begin{tabular}{@{}lcccc@{}}
@@ -164,7 +164,7 @@ Reflectance values were aggregated over two broad spectral regions (VIS and NIR)
 
 \begin{table}[htbp]
     \centering
-    \caption{Regional spectral separability metrics between healthy and cracked tissue.
+    \caption[Regional spectral separability metrics]{Regional spectral separability metrics between healthy and cracked tissue.
     Mean values are averaged across wavelengths within each range, while peak values
     indicate the maximum separability and the corresponding wavelength.}
     \label{tab:separability_scores}
@@ -194,7 +194,7 @@ Reflectance values were aggregated over two broad spectral regions (VIS and NIR)
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{figures/results/spectral_signatures/regional_comparison.png}
-    \caption{Regional mean reflectance ($\pm$1 SD) and absolute mean class difference for the VIS and NIR ranges.}
+    \caption[Regional mean reflectance by VIS/NIR range]{Regional mean reflectance ($\pm$1 SD) and absolute mean class difference for the VIS and NIR ranges.}
     \label{fig:regional_summary}
 \end{figure}
 
@@ -213,7 +213,7 @@ Table~\ref{tab:pixel_metrics_balanced} reports binary pixel-level classification
 
 \begin{table}[!htbp]
     \centering
-    \caption{Pixel-level classification metrics (balanced training set). Values are reported as mean $\pm$ standard deviation across folds where available. Precision/recall and ROC--AUC refer to the \textit{Cracked} class (positive class); F1 is the weighted F1-score.}
+    \caption[Pixel-level classification: balanced binary (full CV)]{Pixel-level classification metrics (balanced training set). Values are reported as mean $\pm$ standard deviation across folds where available. Precision/recall and ROC--AUC refer to the \textit{Cracked} class (positive class); F1 is the weighted F1-score.}
     \label{tab:pixel_metrics_balanced}
     \small
     \renewcommand{\arraystretch}{1.25}
@@ -248,7 +248,7 @@ Table~\ref{tab:pixel_metrics_balanced_all} reports multi-class pixel-level class
 
 \begin{table}[!htbp]
     \centering
-    \caption{Pixel-level classification metrics (\textbf{balanced} training set). Values are reported as mean $\pm$ standard deviation across folds.}
+    \caption[Pixel-level classification: balanced multi-class (full CV)]{Pixel-level classification metrics (\textbf{balanced} training set). Values are reported as mean $\pm$ standard deviation across folds.}
     \label{tab:pixel_metrics_balanced_all}
     \small
     \renewcommand{\arraystretch}{1.25}
@@ -305,7 +305,7 @@ Table~\ref{tab:autoencoder_pixel_results_balanced} reports one-class autoencoder
 
 \begin{table}[!htbp]
     \centering
-    \caption{Pixel-level anomaly detection performance using autoencoders trained on non-cracked samples (balanced sampling).
+    \caption[Autoencoder anomaly detection: non-cracked balanced (full CV)]{Pixel-level anomaly detection performance using autoencoders trained on non-cracked samples (balanced sampling).
     Values are reported as mean $\pm$ standard deviation across folds.
     Accuracy is reported overall, while Precision/Recall/F1/ROC--AUC/PR--AUC correspond to the \textit{Cracked} class (positive class).}
     \label{tab:autoencoder_pixel_results_balanced}
@@ -369,7 +369,7 @@ Table~\ref{tab:autoencoder_pixel_results_crack_only_multiclass_balanced} reports
 
 \begin{table}[!htbp]
     \centering
-    \caption{Pixel-level anomaly detection performance using autoencoders trained exclusively on \textit{Cracked} pixels and evaluated in a multi-class setting (balanced sampling).
+    \caption[Autoencoder anomaly detection: CRACK-only balanced (full CV)]{Pixel-level anomaly detection performance using autoencoders trained exclusively on \textit{Cracked} pixels and evaluated in a multi-class setting (balanced sampling).
     Values are reported as mean $\pm$ standard deviation across LOGO folds.
     Accuracy is reported overall, while Precision/Recall/F1/ROC--AUC/PR--AUC correspond to the \textit{Cracked} class (positive class).}
     \label{tab:autoencoder_pixel_results_crack_only_multiclass_balanced}
@@ -433,7 +433,7 @@ Table~\ref{tab:autoencoder_pixel_results_noncrack_multiclass_balanced} reports m
 
 \begin{table}[!htbp]
     \centering
-    \caption{Pixel-level anomaly detection performance using autoencoders trained on all semantic classes except \textit{Cracked} and evaluated in a multi-class setting (balanced sampling).
+    \caption[Autoencoder anomaly detection: non-CRACK balanced (full CV)]{Pixel-level anomaly detection performance using autoencoders trained on all semantic classes except \textit{Cracked} and evaluated in a multi-class setting (balanced sampling).
     Values are reported for the held-out test split.
     Accuracy is reported overall, while Precision/Recall/F1/ROC--AUC/PR--AUC correspond to the \textit{Cracked} class (positive class).}
     \label{tab:autoencoder_pixel_results_noncrack_multiclass_balanced}
@@ -492,7 +492,7 @@ Table~\ref{tab:autoencoder_pixel_results_noncrack_multiclass_balanced} reports m
 \end{landscape}
 
 \section{Wavelength Selection: Generalization and Performance Analysis}
-\label{app:wavelength_details}
+\label{app:wavelength_generalization}
 
 \noindent
 This section provides supplementary metrics from the backward feature selection (BFS) analysis on the whole-image pipeline, including calibration-to-test generalization gaps and performance metrics across additional wavelength subsets.
@@ -502,7 +502,7 @@ This section provides supplementary metrics from the backward feature selection 
 
 \begin{table}[!htbp]
 \centering
-\caption{Summary of BFS wavelength-count thresholds for CRACK metrics (full precision).}
+\caption[BFS wavelength-count thresholds (full precision)]{Summary of BFS wavelength-count thresholds for CRACK metrics (full precision).}
 \label{tab:bfs_thresholds_summary_full}
 \begin{adjustbox}{max width=\linewidth,center}
 \begin{tabular}{lcccccc}
@@ -521,7 +521,7 @@ CRACK F1      & 0.9854 & 159 & 105 & 0.9800 & 88 & 0.9751 \\
 
 \begin{table}[!htbp]
 \centering
-\caption{Full-image crack-detection performance for different wavelength subsets under early- and late-stage conditions (full precision).}
+\caption[Full-image performance by wavelength subset (full precision)]{Full-image crack-detection performance for different wavelength subsets under early- and late-stage conditions (full precision).}
 \label{tab:full_image_wavelength_results_full}
 \begin{adjustbox}{max width=\linewidth,center}
 \begin{tabular}{cccccccc}
@@ -549,7 +549,7 @@ Late  & 159 & \textbf{0.8333} & 0.8258 & 0.8333 & \textbf{0.8824} & \textbf{0.85
 
 \begin{table}[!htbp]
 \centering
-\caption{Model Generalization Analysis: Comparison between Calibration and Test MCC for wavelength subsets.}
+\caption[Model generalization: calibration vs.\ test MCC]{Model Generalization Analysis: Comparison between Calibration and Test MCC for wavelength subsets.}
 \label{tab:mcc_generalization}
 \begin{tabular}{ccccc}
 \toprule
@@ -576,7 +576,7 @@ Tables~\ref{tab:jaccard_30} and~\ref{tab:jaccard_11} report the pairwise Jaccard
 
 \begin{table}[!htbp]
 \centering
-\caption{Pairwise Jaccard similarity of top-30 wavelengths across seeds (varying split). Mean Jaccard = 0.493.}
+\caption[Jaccard similarity: top-30, varying split]{Pairwise Jaccard similarity of top-30 wavelengths across seeds (varying split). Mean Jaccard = 0.493.}
 \label{tab:jaccard_30}
 \begin{tabular}{cccccc}
 \toprule
@@ -593,7 +593,7 @@ Seed~5 & 0.442 & 0.476 & 0.442 & 0.476 & ---   \\
 
 \begin{table}[!htbp]
 \centering
-\caption{Pairwise Jaccard similarity of top-11 wavelengths across seeds (varying split). Mean Jaccard = 0.398.}
+\caption[Jaccard similarity: top-11, varying split]{Pairwise Jaccard similarity of top-11 wavelengths across seeds (varying split). Mean Jaccard = 0.398.}
 \label{tab:jaccard_11}
 \begin{tabular}{cccccc}
 \toprule
@@ -622,7 +622,7 @@ Tables~\ref{tab:binned_jaccard_11_bin5}--\ref{tab:binned_jaccard_11_bin20} prese
 % --- Top-30, 5 nm bins ---
 \begin{table}[!htbp]
 \centering
-\caption{Pairwise Jaccard similarity of top-30 wavelengths across seeds (5\,nm bins). Mean Jaccard = 0.562.}
+\caption[Jaccard similarity: top-30, 5\,nm bins]{Pairwise Jaccard similarity of top-30 wavelengths across seeds (5\,nm bins). Mean Jaccard = 0.562.}
 \label{tab:binned_jaccard_30_bin5}
 \begin{tabular}{cccccc}
 \toprule
@@ -640,7 +640,7 @@ Seed~5 & 0.500 & 0.529 & 0.645 & 0.500 & ---   \\
 % --- Top-30, 10 nm bins ---
 \begin{table}[!htbp]
 \centering
-\caption{Pairwise Jaccard similarity of top-30 wavelengths across seeds (10\,nm bins). Mean Jaccard = 0.697.}
+\caption[Jaccard similarity: top-30, 10\,nm bins]{Pairwise Jaccard similarity of top-30 wavelengths across seeds (10\,nm bins). Mean Jaccard = 0.697.}
 \label{tab:binned_jaccard_30_bin10}
 \begin{tabular}{cccccc}
 \toprule
@@ -658,7 +658,7 @@ Seed~5 & 0.615 & 0.680 & 0.750 & 0.615 & ---   \\
 % --- Top-30, 20 nm bins ---
 \begin{table}[!htbp]
 \centering
-\caption{Pairwise Jaccard similarity of top-30 wavelengths across seeds (20\,nm bins). Mean Jaccard = 0.811.}
+\caption[Jaccard similarity: top-30, 20\,nm bins]{Pairwise Jaccard similarity of top-30 wavelengths across seeds (20\,nm bins). Mean Jaccard = 0.811.}
 \label{tab:binned_jaccard_30_bin20}
 \begin{tabular}{cccccc}
 \toprule
@@ -676,7 +676,7 @@ Seed~5 & 0.778 & 0.789 & 0.889 & 0.722 & ---   \\
 % --- Top-11, 5 nm bins ---
 \begin{table}[!htbp]
 \centering
-\caption{Pairwise Jaccard similarity of top-11 wavelengths across seeds (5\,nm bins). Mean Jaccard = 0.536.}
+\caption[Jaccard similarity: top-11, 5\,nm bins]{Pairwise Jaccard similarity of top-11 wavelengths across seeds (5\,nm bins). Mean Jaccard = 0.536.}
 \label{tab:binned_jaccard_11_bin5}
 \begin{tabular}{cccccc}
 \toprule
@@ -694,7 +694,7 @@ Seed~5 & 0.500 & 0.571 & 0.438 & 0.412 & ---   \\
 % --- Top-11, 10 nm bins ---
 \begin{table}[!htbp]
 \centering
-\caption{Pairwise Jaccard similarity of top-11 wavelengths across seeds (10\,nm bins). Mean Jaccard = 0.639.}
+\caption[Jaccard similarity: top-11, 10\,nm bins]{Pairwise Jaccard similarity of top-11 wavelengths across seeds (10\,nm bins). Mean Jaccard = 0.639.}
 \label{tab:binned_jaccard_11_bin10}
 \begin{tabular}{cccccc}
 \toprule
@@ -712,7 +712,7 @@ Seed~5 & 0.600 & 0.692 & 0.533 & 0.533 & ---   \\
 % --- Top-11, 20 nm bins ---
 \begin{table}[!htbp]
 \centering
-\caption{Pairwise Jaccard similarity of top-11 wavelengths across seeds (20\,nm bins). Mean Jaccard = 0.640.}
+\caption[Jaccard similarity: top-11, 20\,nm bins]{Pairwise Jaccard similarity of top-11 wavelengths across seeds (20\,nm bins). Mean Jaccard = 0.640.}
 \label{tab:binned_jaccard_11_bin20}
 \begin{tabular}{cccccc}
 \toprule
@@ -739,14 +739,14 @@ For the top-11 subsets---which are entirely contained within the top-30 configur
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=\textwidth,keepaspectratio]{figures/results/feature_selection/stability_varying_30wl_wavelength_frequency_spectrum.png}
-    \caption{Wavelength selection frequency along the spectrum (2\,nm sliding window) for the top-30 subsets.}
+    \caption[Wavelength selection frequency: top-30 (2\,nm window)]{Wavelength selection frequency along the spectrum (2\,nm sliding window) for the top-30 subsets.}
     \label{fig:stability_30_spectrum}
 \end{figure}
 
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=\textwidth,height=0.85\textheight,keepaspectratio]{figures/results/feature_selection/stability_varying_30wl_wavelength_stability_heatmap.png}
-    \caption{Stability heatmap for the top-30 BFS subsets across five seeds (objective: PR--AUC\textsubscript{CRACK}). Each cell indicates how many seeds selected a wavelength within that 5\,nm bin.}
+    \caption[BFS stability heatmap: top-30, 5\,nm bins]{Stability heatmap for the top-30 BFS subsets across five seeds (objective: PR--AUC\textsubscript{CRACK}). Each cell indicates how many seeds selected a wavelength within that 5\,nm bin.}
     \label{fig:stability_30_heatmap}
 \end{figure}
 
@@ -755,28 +755,28 @@ For the top-11 subsets---which are entirely contained within the top-30 configur
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=0.8\textwidth,keepaspectratio]{figures/results/feature_selection/stability_varying_11wl_wavelength_popularity_overview.png}
-    \caption{Distribution and popularity of the top-11 selected wavelengths across five varying-split seeds.}
+    \caption[Top-11 wavelength popularity across BFS seeds]{Distribution and popularity of the top-11 selected wavelengths across five varying-split seeds.}
     \label{fig:stability_11_popularity}
 \end{figure}
 
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=0.8\textwidth,keepaspectratio]{figures/results/feature_selection/stability_varying_11wl_wavelength_binning_comparison.png}
-    \caption{Wavelength popularity at different bin sizes (1, 5, 10, 20\,nm) for the top-11 subsets.}
+    \caption[Top-11 wavelength popularity by bin size]{Wavelength popularity at different bin sizes (1, 5, 10, 20\,nm) for the top-11 subsets.}
     \label{fig:stability_11_binning}
 \end{figure}
 
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=\textwidth,height=0.85\textheight,keepaspectratio]{figures/results/feature_selection/stability_varying_11wl_wavelength_stability_heatmap.png}
-    \caption{Stability heatmap for the top-11 BFS subsets across five seeds (objective: PR--AUC\textsubscript{CRACK}; 0.5\% drop setting). Each cell indicates how many seeds selected a wavelength within that 5\,nm bin.}
+    \caption[BFS stability heatmap: top-11, 5\,nm bins]{Stability heatmap for the top-11 BFS subsets across five seeds (objective: PR--AUC\textsubscript{CRACK}; 0.5\% drop setting). Each cell indicates how many seeds selected a wavelength within that 5\,nm bin.}
     \label{fig:stability_11_heatmap}
 \end{figure}
 
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=\textwidth,keepaspectratio]{figures/results/feature_selection/stability_varying_11wl_wavelength_frequency_spectrum.png}
-    \caption{Wavelength selection frequency along the spectrum (2\,nm sliding window) for the top-11 subsets.}
+    \caption[Wavelength selection frequency: top-11 (2\,nm window)]{Wavelength selection frequency along the spectrum (2\,nm sliding window) for the top-11 subsets.}
     \label{fig:stability_11_spectrum}
 \end{figure}
 
@@ -792,7 +792,7 @@ Figure~\ref{fig:gui_cracked} shows the same tool applied to a cluster exhibiting
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.95\textwidth]{figures/appendix/figure_gui_tool_regular.jpg}
-    \caption{Annotation tool labeling session for a healthy (\textit{Regular}) grape cluster. The operator selects intact berry regions to extract reference spectral signatures.}
+    \caption[Annotation tool: healthy cluster labeling]{Annotation tool labeling session for a healthy (\textit{Regular}) grape cluster. The operator selects intact berry regions to extract reference spectral signatures.}
     \label{fig:gui_regular}
 \end{figure}
 \FloatBarrier
@@ -800,7 +800,7 @@ Figure~\ref{fig:gui_cracked} shows the same tool applied to a cluster exhibiting
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.95\textwidth]{figures/appendix/figure_gui_tool_cracked.jpg}
-    \caption{Annotation tool labeling session for a cracked grape cluster. The operator targets damaged skin areas to capture the spectral response of cracked tissue.}
+    \caption[Annotation tool: cracked cluster labeling]{Annotation tool labeling session for a cracked grape cluster. The operator targets damaged skin areas to capture the spectral response of cracked tissue.}
     \label{fig:gui_cracked}
 \end{figure}
 \FloatBarrier
@@ -821,7 +821,7 @@ In each case, the spatial aggregation stages successfully localize the damaged t
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{figures/appendix/tp_fp_examples/TP_example1.png}
-    \caption{True Positive example~1: the pipeline correctly identifies crack regions on the grape cluster.}
+    \caption[True Positive example 1]{True Positive example~1: the pipeline correctly identifies crack regions on the grape cluster.}
     \label{fig:tp_example1}
 \end{figure}
 \FloatBarrier
@@ -829,7 +829,7 @@ In each case, the spatial aggregation stages successfully localize the damaged t
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{figures/appendix/tp_fp_examples/TP_example_2.png}
-    \caption{True Positive example~2: crack-affected tissue is correctly detected and spatially localized.}
+    \caption[True Positive example 2]{True Positive example~2: crack-affected tissue is correctly detected and spatially localized.}
     \label{fig:tp_example2}
 \end{figure}
 \FloatBarrier
@@ -837,7 +837,7 @@ In each case, the spatial aggregation stages successfully localize the damaged t
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{figures/appendix/tp_fp_examples/TP_example_3.png}
-    \caption{True Positive example~3: another correctly identified cracked cluster showing spatially coherent detection.}
+    \caption[True Positive example 3]{True Positive example~3: another correctly identified cracked cluster showing spatially coherent detection.}
     \label{fig:tp_example3}
 \end{figure}
 \FloatBarrier
@@ -851,7 +851,7 @@ These thin woody structures exhibit spectral signatures that partially overlap w
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{figures/appendix/tp_fp_examples/FP_small_branch.png}
-    \caption{False Positive example~1: a small branch segment triggers a false crack detection due to spectral similarity with cracked tissue.}
+    \caption[False Positive example 1: small branch]{False Positive example~1: a small branch segment triggers a false crack detection due to spectral similarity with cracked tissue.}
     \label{fig:fp_small_branch}
 \end{figure}
 \FloatBarrier
@@ -859,7 +859,7 @@ These thin woody structures exhibit spectral signatures that partially overlap w
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{figures/appendix/tp_fp_examples/FP_small_branch_2.png}
-    \caption{False Positive example~2: another small branch misclassified as a crack region.}
+    \caption[False Positive example 2: small branch]{False Positive example~2: another small branch misclassified as a crack region.}
     \label{fig:fp_small_branch_2}
 \end{figure}
 \FloatBarrier
@@ -867,7 +867,7 @@ These thin woody structures exhibit spectral signatures that partially overlap w
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{figures/appendix/tp_fp_examples/FP_screenshot.png}
-    \caption{False Positive example~3: branch-like structure in the scene produces a spurious crack detection.}
+    \caption[False Positive example 3: branch-like structure]{False Positive example~3: branch-like structure in the scene produces a spurious crack detection.}
     \label{fig:fp_screenshot}
 \end{figure}
 \FloatBarrier
@@ -875,7 +875,7 @@ These thin woody structures exhibit spectral signatures that partially overlap w
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{figures/appendix/tp_fp_examples/FP_few_branches.png}
-    \caption{False Positive example~4: multiple small branches visible in the cluster image cause several false crack detections across the field of view.}
+    \caption[False Positive example 4: multiple branches]{False Positive example~4: multiple small branches visible in the cluster image cause several false crack detections across the field of view.}
     \label{fig:fp_few_branches}
 \end{figure}
 \FloatBarrier

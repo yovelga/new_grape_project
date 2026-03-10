@@ -1,14 +1,10 @@
 \chapter{Research Objectives and Hypotheses}
-\label{chap:objectives_hypotheses}
-
-\medskip
-\noindent
-Following the identification of the research gap detailed in Chapter 2, this chapter directly outlines the specific objectives and hypotheses that guide this study.
 
 \section{Research Objectives}
 
 \noindent
 The primary objective of this research is to develop and validate hyperspectral imaging (HSI) methods for crack-related \textit{detection/identification at the time of measurement} in table grapes ('Scarlotta' cultivar) under field conditions, spanning both early-stage (absent-to-minimal/incipient cracking) and late-stage (advanced, macroscopically visible cracking) acquisition conditions. The work bridges the gap between spectroscopic research on cracking mechanisms and practical, non-destructive agricultural screening by leveraging imaging, machine learning, and robust whole-image aggregation.
+
 
 \section{Research Hypotheses}
 
@@ -70,3 +66,13 @@ This hypothesis examines whether the detection capabilities demonstrated in Hypo
     \item \textbf{$H_0$:} Reducing the number of spectral bands results in a significant degradation in detection performance, either in whole-image scenarios or during early-stage detection, implying that the full hyperspectral spectrum is required.
     \item \textbf{$H_1$:} A carefully selected subset of informative wavelengths captures the key physiological markers of cracking, enabling robust detection in both whole-image and early-stage scenarios using cost-effective multispectral sensing configurations.
 \end{itemize}
+
+\section{Summary of Main Contributions}
+
+\noindent
+To address the objectives and hypotheses outlined above, this study developed an end-to-end hyperspectral imaging framework. As will be detailed in the subsequent chapters, the findings first confirm the physical distinguishability of cracks at the pixel level, where an optimized XGBoost classifier achieved near-perfect performance (PR--AUC $\approx$ 1.0). Crucially, the study successfully transitioned this capability to realistic, whole-image vineyard scenes containing complex background clutter. By employing strategic backward feature selection, the framework reduced the spectral dimensionality to an optimal subset of 30 wavelengths while achieving robust full-image detection performance. Specifically, with the optimal BFS-30 wavelength subset, the aggregated model yielded F1\textsubscript{CRACK}~=~\FoneEarlyTopThirty{} under early-stage (initial observable cracking) conditions and \FoneLateTopThirty{} under late-stage conditions (Table~\ref{tab:full_image_wavelength_results}). These results not only validate the research hypotheses but also demonstrate the operational feasibility of transitioning HSI into a proactive.
+
+\section{Thesis Structure}
+
+\noindent
+This thesis is organized into several interconnected chapters. The \textit{Literature Review} chapter provides a comprehensive overview of grape cracking mechanisms and relevant precision agriculture techniques. The \textit{Materials and Methods} chapter describes the experimental design, data acquisition procedures, hyperspectral imaging systems, and modeling approaches used in this study. The \textit{Results} chapter presents the experimental findings, including pixel-level classification, whole-image crack detection, and wavelength selection experiments. The \textit{Discussion} chapter interprets these results in the context of early crack detection, physiological relevance, and practical deployment considerations. Finally, the \textit{Conclusions and Future Work} chapter summarizes the main contributions of the study and outlines directions for future research.

@@ -6,7 +6,8 @@ Grape cracking is a severe physiological disorder that leads to substantial econ
 
 \medskip
 \noindent
-A multi-stage analytical framework was developed, including pixel-level classification, whole-image crack detection, and wavelength selection. Pixel-level spectral signatures of healthy and cracked berries were manually annotated and used to train an XGBoost classifier, achieving high discrimination performance (accuracy $\approx$ 97\%, AUC $\approx$ 0.99) and confirming the existence of a distinct spectral separation between tissue states.
+% A multi-stage analytical framework was developed, including pixel-level classification, whole-image crack detection, and wavelength selection. Pixel-level spectral signatures of healthy and cracked berries were manually annotated and used to train an XGBoost classifier, achieving high discrimination performance (accuracy $\approx$ 97\%, AUC $\approx$ 0.99) and confirming the existence of a distinct spectral separation between tissue states.
+A multi-stage analytical framework was developed, including pixel-level classification, whole-image crack detection, and wavelength selection. Pixel-level spectral signatures of healthy and cracked berries were manually annotated and used to train an XGBoost classifier. This model achieved high discrimination on isolated, pure pixels (accuracy $\approx$ 97\%, AUC $\approx$ 0.99); while these idealized metrics do not reflect cluttered field conditions, they successfully confirmed the fundamental physical existence of a distinct spectral separation between tissue states.
 
 \medskip
 \noindent
@@ -14,9 +15,9 @@ Direct application of pixel-level predictions to field scenes resulted in backgr
 
 \medskip
 \noindent
-Wavelength selection experiments demonstrated that comparable detection performance can be retained using reduced spectral-band subsets, indicating the potential for compact sensing configurations suitable for field deployment. Overall, the results establish the feasibility of HSI-based crack detection under realistic vineyard conditions and provide a methodological foundation for operational, non-destructive monitoring tools.
+Wavelength selection experiments demonstrated that high detection performance can be maintained using a small, specific subset of wavelengths. This indicates the clear potential to replace expensive hyperspectral cameras with simpler, low-cost multispectral sensors for everyday field deployment. Overall, the results establish the feasibility of HSI-based crack detection under realistic vineyard conditions and provide a methodological foundation for operational, non-destructive monitoring tools.
 
 \medskip
 \noindent
-Rigorous feature selection reduced the hyperspectral cube to 30 key wavelengths, highlighting the commercial viability of low-cost sensors. Finally, the spatial pipeline exhibited strong generalization on unseen vineyard rows, proving its robustness to environmental variances and yielding a field-ready solution.
+Specifically, rigorous feature selection reduced the required data to just 30 key wavelengths, reinforcing the commercial viability of this approach. Furthermore, when tested on images from entirely new vineyard rows, the pipeline successfully identified cracks while ignoring complex background clutter and lighting changes, confirming its robustness to real-world field conditions.
 \end{abstract}

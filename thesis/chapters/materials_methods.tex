@@ -25,7 +25,7 @@ The study was conducted in the Lachish region of Israel, a semi-arid area charac
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.6\textwidth]{figures/materials_methods/study_area/lachish_vineyard_row_2.png}
-    \caption{A general view of the Lachish vineyard (Row~2) illustrating the semi-arid landscape and vine rows.}
+    \caption[Lachish vineyard overview]{A general view of the Lachish vineyard (Row~2) illustrating the semi-arid landscape and vine rows.}
     \label{fig:lachish_landscape}
 \end{figure}
 
@@ -67,7 +67,7 @@ The experimental campaign ran continuously until late September 2024. Alongside 
         \caption{Tagged grape cluster used for tracking and repeated imaging; tags indicate the specific irrigation regime.}
         \label{fig:grape_tag}
     \end{subfigure}
-    \caption{(a) Vineyard map with randomized blocks and irrigation treatments; (b) example of a plastic-tagged grape cluster.}
+    \caption[Vineyard map and tagged cluster]{(a) Vineyard map with randomized blocks and irrigation treatments; (b) example of a plastic-tagged grape cluster.}
     \label{fig:vineyard_example}
 \end{figure}
 
@@ -93,7 +93,7 @@ Hyperspectral data were acquired using the \textbf{Specim IQ} (Specim, Spectral 
         \includegraphics[width=\textwidth]{figures/materials_methods/study_area/hyperspectral_imaging_of_plants.png}
         \caption{The Hyperspectral Data Cube Structure.}
     \end{subfigure}
-    \caption{Hyperspectral imaging setup and data acquisition using the Specim IQ system under vineyard conditions.}
+    \caption[Specim IQ HSI field setup]{Hyperspectral imaging setup and data acquisition using the Specim IQ system under vineyard conditions.}
     \label{fig:hsi_setup}
 \end{figure}
 \FloatBarrier
@@ -125,7 +125,7 @@ Surface temperatures of the canopy and clusters were monitored using a \textbf{F
         \includegraphics[width=\textwidth]{figures/materials_methods/equipment/thermal_image_with_decay_and_cracksjpg.jpg}
         \caption{Thermal image of a grape cluster showing surface temperature variations.}
     \end{subfigure}
-    \caption{Thermal imaging system and example thermal data acquired from grape clusters under vineyard conditions.}
+    \caption[FLIR T1020 thermal imaging setup]{Thermal imaging system and example thermal data acquired from grape clusters under vineyard conditions.}
     \label{fig:thermal_setup}
 \end{figure}
 
@@ -164,24 +164,25 @@ Transforming raw hyperspectral datacubes into machine-learning-ready datasets re
 \label{subsec:dataset_pixel}
 
 \noindent
-To enable accurate extraction of spectral signatures for both the binary (\textit{Cracked} vs. \textit{Healthy}) and multi-class problem formulations, a custom graphical user interface (GUI) was developed in Python. This tool integrated data visualization, interactive annotation, and automated segmentation into a single streamlined platform (Figure~\ref{fig:gui_sam2_pixelpicker}).
-
-\begin{figure}[!htbp]
-    \centering
-    \includegraphics[width=1\linewidth]{figures/materials_methods/gui/gui_sam2_pointer_with_numbers.png}
-    \caption{Graphical user interface of the HSI--RGB annotation tool. (1) Hyperspectral image visualized as an RGB composite with a SAM2-generated segmentation overlay, (2) wavelength-selectable grayscale HSI band, and (3) high-resolution RGB image of the same cluster. (4) Spectral signature extracted from a pixel within the segmented region, and (5) autoencoder reconstruction of the signature.}
-    \label{fig:gui_sam2_pixelpicker}
-\end{figure}
-\FloatBarrier
+To enable accurate extraction of spectral signatures for both the binary (\textit{Cracked} vs. \textit{Healthy}) and multi-class problem formulations, a custom graphical user interface (GUI) was developed. This tool integrated data visualization, interactive annotation, and automated segmentation into a single streamlined platform (Figure~\ref{fig:gui_sam2_pixelpicker}).
 
 \medskip
 \noindent
 The annotation workflow leveraged foundation vision models to overcome the low spatial resolution of the HSI data. The procedure operated as follows:
 \begin{enumerate}
     \item \textbf{Interactive Seeding:} The user selected a seed pixel on a target object (e.g., a cracked berry, intact tissue, leaf, or background element) using either the high-resolution RGB image or the HSI composite.
-    \item \textbf{SAM2 Segmentation:} The seed pixel served as a point prompt for the \textbf{Segment Anything Model 2 (SAM2)} \cite{ravi2024sam2}. SAM2 generated a precise binary mask of the object on the RGB image, which was subsequently spatially aligned and projected onto the hyperspectral datacube.
+    \item \textbf{SAM2 Segmentation:} The seed pixel served as a point prompt for the \textbf{Segment Anything Model 2 (SAM2)} \parencite{ravi2024sam2}. SAM2 generated a precise binary mask of the object on the RGB image, which was subsequently spatially aligned and projected onto the hyperspectral datacube.
     \item \textbf{Spectral Extraction:} The tool extracted the 204-band spectral vectors for all pixels within the projected mask. The user assigned a definitive class label to the region, and the grouped signatures were stored along with their parent cluster ID and acquisition date.
 \end{enumerate}
+
+\FloatBarrier
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=1\linewidth]{figures/materials_methods/gui/gui_sam2_pointer_with_numbers.png}
+    \caption[HSI--RGB annotation GUI (SAM2-based)]{Graphical user interface of the HSI--RGB annotation tool. (1) Hyperspectral image visualized as an RGB composite with a SAM2-generated segmentation overlay, (2) wavelength-selectable grayscale HSI band, and (3) high-resolution RGB image of the same cluster. (4) Spectral signature extracted from a pixel within the segmented region, and (5) autoencoder reconstruction of the signature.}
+    \label{fig:gui_sam2_pixelpicker}
+\end{figure}
+\FloatBarrier
 
 \medskip
 \noindent
@@ -209,7 +210,7 @@ IRON              & 6{,}961 & Metallic elements (wires, stakes). \\
 \end{tabularx}
 
 
-\caption{Multi-class pixel-level dataset: exported pixels by class.}
+\caption[Multi-class pixel dataset: class distribution]{Multi-class pixel-level dataset: exported pixels by class.}
 \label{tab:multiclass_pixel_distribution}
 \end{table}
 
@@ -237,7 +238,7 @@ The exact sample distributions for these stages are detailed in Table~\ref{tab:d
     \centering
     Row split $\rightarrow$ Train pixel-level model on pixels from Late-stage (Row~1) $\rightarrow$ Tune full-image aggregation hyperparameters on Row~1 (separately for Early/Late) $\rightarrow$ Freeze parameters $\rightarrow$ Inference on held-out evaluation set (Row~2) $\rightarrow$ Stage-specific reporting (Early/Late)
     \end{minipage}}
-    \caption{Protocol overview for the row-based split, training and calibration on Row~1 Late-stage data, held-out evaluation on Row~2, and post-inference reporting stratified by acquisition stage.}
+    \caption[Row-based training and evaluation protocol]{Protocol overview for the row-based split, training and calibration on Row~1 Late-stage data, held-out evaluation on Row~2, and post-inference reporting stratified by acquisition stage.}
     \label{fig:whole_image_protocol_overview}
 \end{figure}
 
@@ -260,7 +261,7 @@ The exact sample distributions for these stages are detailed in Table~\ref{tab:d
         Whole-Image Late & Row~2 test  & 60 & 34 & 26 \\
         \bottomrule
     \end{tabular}
-    \caption{Exact dataset statistics used in the experiments. $^*$Note: The negative class in the multi-class pixel dataset also includes the background classes detailed in Table~\ref{tab:multiclass_pixel_distribution}.}
+    \caption[Dataset statistics for all experimental splits]{Exact dataset statistics used in the experiments. $^*$Note: The negative class in the multi-class pixel dataset also includes the background classes detailed in Table~\ref{tab:multiclass_pixel_distribution}.}
     \label{tab:dataset_statistics}
 \end{table}
 
@@ -281,17 +282,17 @@ This section outlines the computational frameworks used to analyze the hyperspec
 \label{subsec:global_preprocessing}
 
 \noindent
-To ensure methodological uniformity and prevent information leakage \cite{thenkabail2016hyperspectral}, all hyperspectral datacubes were subjected to a strictly fixed preprocessing pipeline prior to any model training or evaluation.
+To ensure methodological uniformity and prevent information leakage \parencite{thenkabail2016hyperspectral}, all hyperspectral datacubes were subjected to a strictly fixed preprocessing pipeline prior to any model training or evaluation.
 
 \begin{itemize}
-    \item \textbf{Spectral Range Restriction:} Raw signatures were cropped to the 450--925\,nm range (159 contiguous bands). This step discarded extreme wavelengths (400--450\,nm and 925--1000\,nm) known to exhibit low signal-to-noise ratios and reflectance artifacts under outdoor field conditions \cite{behmann2018specim}.
-    \item \textbf{Per-Spectrum Normalization:} Each remaining spectral vector was independently normalized using the \textit{Standard Normal Variate} (SNV) transformation. By mean-centering and scaling each pixel exclusively by its own standard deviation, SNV mitigates illumination variability and scattering effects without relying on dataset-level statistics. This strictly per-pixel approach intrinsically prevents data leakage between training and testing partitions \cite{mishra2017close, kaltenborn2025data}.
+    \item \textbf{Spectral Range Restriction:} Raw signatures were cropped to the 450--925\,nm range (159 contiguous bands). This step discarded extreme wavelengths (400--450\,nm and 925--1000\,nm) known to exhibit low signal-to-noise ratios and reflectance artifacts under outdoor field conditions \parencite{behmann2018specim}.
+    \item \textbf{Per-Spectrum Normalization:} Each remaining spectral vector was independently normalized using the \textit{Standard Normal Variate} (SNV) transformation. By mean-centering and scaling each pixel exclusively by its own standard deviation, SNV mitigates illumination variability and scattering effects without relying on dataset-level statistics. This strictly per-pixel approach intrinsically prevents data leakage between training and testing partitions \parencite{mishra2017close, kaltenborn2025data}.
 \end{itemize}
 
 \begin{figure}[ht]
     \centering
     \includegraphics[width=0.7\textwidth]{figures/literature/snv_normalization_effect.png}
-    \caption{Effect of Standard Normal Variate (SNV) normalization on hyperspectral reflectance signatures for four representative material classes (Crack, Regular Berry, Plastic, Branch). Left column: raw reflectance spectra showing the mean (solid line) and $\pm 1$ standard deviation band (shaded region), illustrating substantial baseline and amplitude differences due to illumination variability and surface scattering. Right column: corresponding SNV-normalized spectra, in which each signature is mean-centered and scaled by its standard deviation, removing multiplicative and additive effects while preserving the class-discriminative spectral shape. Statistics computed over 500 sampled pixels per class.}
+    \caption[Effect of SNV normalization on spectral signatures]{Effect of Standard Normal Variate (SNV) normalization on hyperspectral reflectance signatures for four representative material classes (Crack, Regular Berry, Plastic, Branch). Left column: raw reflectance spectra showing the mean (solid line) and $\pm 1$ standard deviation band (shaded region), illustrating substantial baseline and amplitude differences due to illumination variability and surface scattering. Right column: corresponding SNV-normalized spectra, in which each signature is mean-centered and scaled by its standard deviation, removing multiplicative and additive effects while preserving the class-discriminative spectral shape. Statistics computed over 500 sampled pixels per class.}
     \label{fig:snv_effect}
 \end{figure}
 \FloatBarrier
@@ -309,8 +310,18 @@ At the pixel level, contiguous pixels extracted from the same grape cluster shar
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.55\textwidth]{figures/materials_methods/example4group_logo.png}
-    \caption{Illustration of the Leave-One-Group-Out (LOGO) cross-validation strategy. In each fold, all pixels from one grape cluster (group) are held out as the test set, while pixels from all remaining clusters form the training set. This ensures that no spatially correlated pixels from the same physical cluster appear in both partitions simultaneously.}
+    \begin{subfigure}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/images_to_use/The_problem_logo.jpg}
+        \caption{Train pixels (blue) and Test pixels (red). Holding out entire clusters as indivisible units prevents data leakage.}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.64\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/images_to_use/The_solution_logo.png}
+        \caption{The LOGO solution: all pixels from one cluster are held out entirely as the test set.}
+    \end{subfigure}
+    \caption[LOGO cross-validation: problem and solution]{Illustration of the Leave-One-Group-Out (LOGO) cross-validation strategy. In each fold, all pixels from one grape cluster (group) are held out as the test set, while pixels from all remaining clusters form the training set. This ensures that no spatially correlated pixels from the same physical cluster appear in both partitions simultaneously.}
     \label{fig:logo_illustration}
 \end{figure}
 \FloatBarrier
@@ -391,8 +402,8 @@ Figure~\ref{fig:whole_image_protocol_overview}, and consists of the following st
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=\textwidth]{figures/materials_methods/pipeline/ui_for_EDA_with_notes_2.JPG}
-    \caption{Interactive EDA interface for the whole-image detection pipeline.
+    \includegraphics[width=\textwidth]{figures/materials_methods/pipeline/ui_for_EDA_with_notes.JPG}
+    \caption[Interactive EDA interface for the whole-image pipeline]{Interactive EDA interface for the whole-image detection pipeline.
     \textbf{(1)}~Sample browser: loads HSI datacube by cluster ID and date.
     \textbf{(2)}~Model and filter panel: loads the pre-trained model and Optuna-tuned spatial parameters; includes a band selector for panel~7.
     \textbf{(3)}~Canon RGB photo.

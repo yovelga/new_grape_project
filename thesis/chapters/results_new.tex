@@ -47,7 +47,7 @@ The mean spectral reflectance signatures ($\pm$\,SD) for healthy and cracked gra
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{figures/results/spectral_signatures/spectral_signatures_mean_std.png}
-    \caption{Mean spectral signatures ($\pm$ standard deviation) for healthy and cracked tissue across the VIS--NIR range.}
+    \caption[Mean spectral signatures: healthy vs.\ cracked tissue]{Mean spectral signatures ($\pm$ standard deviation) for healthy and cracked tissue across the VIS--NIR range.}
     \label{fig:mean_signatures}
 \end{figure}
 
@@ -63,7 +63,7 @@ To systematically quantify the discriminatory power of individual spectral bands
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.95\textwidth]{figures/results/spectral_signatures/separability_metrics.png}
-    \caption{Wavelength-wise spectral separability metrics between healthy and cracked tissue, including absolute mean difference, Cohen's $d$, and Fisher score.}
+    \caption[Wavelength-wise spectral separability metrics]{Wavelength-wise spectral separability metrics between healthy and cracked tissue, including absolute mean difference, Cohen's $d$, and Fisher score.}
     \label{fig:spectral_separability}
 \end{figure}
 
@@ -137,7 +137,7 @@ While binary classification validates baseline spectral separability, operationa
 
 \begin{table}[h!]
     \centering
-    \caption{Pixel-level classification metrics (unbalanced, multi-class). Truncated mean values. Full cross-validation statistics in Appendix~\ref{app:cv_statistics}.}
+    \caption[Pixel-level classification: unbalanced multi-class]{Pixel-level classification metrics (unbalanced, multi-class). Truncated mean values. Full cross-validation statistics in Appendix~\ref{app:cv_statistics}.}
     \label{tab:pixel_metrics_unbalanced_all}
     \small
     \renewcommand{\arraystretch}{1.10}
@@ -193,7 +193,7 @@ To explore whether crack damage could be identified without the need for exhaust
 \begin{table}[!htbp]
     \centering
     \small
-    \caption{Pixel-level autoencoder anomaly detection (binary setting). Truncated mean values. Full statistics in Appendix~\ref{app:cv_statistics}.}
+    \caption[Autoencoder anomaly detection: binary setting]{Pixel-level autoencoder anomaly detection (binary setting). Truncated mean values. Full statistics in Appendix~\ref{app:cv_statistics}.}
     \label{tab:autoencoder_pixel_results}
     \renewcommand{\arraystretch}{1.2}
     \setlength{\tabcolsep}{4pt}
@@ -215,7 +215,7 @@ To explore whether crack damage could be identified without the need for exhaust
 \begin{table}[h!]
     \centering
     \small
-    \caption{Pixel-level autoencoder anomaly detection (crack-only training). Truncated mean values. Full statistics in Appendix~\ref{app:cv_statistics}.}
+    \caption[Autoencoder anomaly detection: crack-only training]{Pixel-level autoencoder anomaly detection (crack-only training). Truncated mean values. Full statistics in Appendix~\ref{app:cv_statistics}.}
     \label{tab:autoencoder_pixel_results_crack_only_multiclass}
     \renewcommand{\arraystretch}{1.15}
     \setlength{\tabcolsep}{4pt}
@@ -237,7 +237,7 @@ To explore whether crack damage could be identified without the need for exhaust
 \begin{table}[h!]
     \centering
     \small
-    \caption{Pixel-level autoencoder anomaly detection (all non-CRACK training). Truncated mean values. Full statistics in Appendix~\ref{app:cv_statistics}.}
+    \caption[Autoencoder anomaly detection: all non-CRACK training]{Pixel-level autoencoder anomaly detection (all non-CRACK training). Truncated mean values. Full statistics in Appendix~\ref{app:cv_statistics}.}
     \label{tab:autoencoder_pixel_results_noncrack_multiclass}
     \renewcommand{\arraystretch}{1.15}
     \setlength{\tabcolsep}{4pt}
@@ -278,7 +278,7 @@ The baseline for whole-image comparison is the full-spectrum XGBoost aggregation
 % =========================================================
 \begin{table}[htbp]
 \centering
-\caption{Dataset composition for full-image crack-detection experiments under early- and late-stage acquisition conditions (initial/minimal vs.\ advanced cracking). Row~1 was used for calibration, while Row~2 served as an independent test set.}
+\caption[Full-image dataset: early- and late-stage composition]{Dataset composition for full-image crack-detection experiments under early- and late-stage acquisition conditions (initial/minimal vs.\ advanced cracking). Row~1 was used for calibration, while Row~2 served as an independent test set.}
 \label{tab:full_image_dataset_composition}
 
 \small
@@ -309,7 +309,7 @@ Row 2 & Late  & Test        & 60  & 60 & 34 & 26  \\
 
 \begin{table}[!h]
 \centering
-\caption{Full-image crack detection performance for early- and late-stage acquisition conditions. F1 (Cracked) is the primary metric; the Cracked class is positive.}
+\caption[Full-image crack detection: early- and late-stage performance]{Full-image crack detection performance for early- and late-stage acquisition conditions. F1 (Cracked) is the primary metric; the Cracked class is positive.}
 \label{tab:full_image_early_late_metrics}
 
 \small
@@ -378,7 +378,7 @@ The results on the independent test set demonstrate robust system-level performa
         \caption{Corresponding patch-based spatial aggregation output, with the crack-positive patch highlighted.}
         \label{fig:tp_patch}
     \end{subfigure}
-    \caption{Example of a correctly detected cracked cluster from the held-out Row~2 test set. Left: dense crack probability map produced by the multi-class XGBoost model. Right: final patch-level aggregation decision confirming the image-level crack-positive classification.}
+    \caption[True-positive detection example from Row~2 test set]{Example of a correctly detected cracked cluster from the held-out Row~2 test set. Left: dense crack probability map produced by the multi-class XGBoost model. Right: final patch-level aggregation decision confirming the image-level crack-positive classification.}
     \label{fig:tp_example}
 \end{figure}
 
@@ -407,7 +407,7 @@ To verify whether the supervised XGBoost engine was strictly necessary for whole
 
 \begin{table}[!h]
 \centering
-\caption{Full-image crack detection using autoencoder-based anomaly detection. F1 (Cracked) is the primary metric; the Cracked class is positive.}
+\caption[Full-image autoencoder-based crack detection]{Full-image crack detection using autoencoder-based anomaly detection. F1 (Cracked) is the primary metric; the Cracked class is positive.}
 \label{tab:full_image_autoencoder_metrics}
 
 \small
@@ -482,7 +482,7 @@ To systematically define candidate subsets for the whole-image pipeline, perform
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=0.95\linewidth]{figures/results/feature_selection/bfs_dual_metric.png}
-    \caption{BFS trajectories for the whole-image pipeline: CRACK-class PR--AUC (primary objective) and CRACK-class F1 versus the number of retained wavelengths ($n$; full baseline $n=159$).}
+    \caption[BFS performance trajectories vs.\ number of wavelengths]{BFS trajectories for the whole-image pipeline: CRACK-class PR--AUC (primary objective) and CRACK-class F1 versus the number of retained wavelengths ($n$; full baseline $n=159$).}
     \label{fig:bfs_dual_metric}
 \end{figure}
 
@@ -501,13 +501,13 @@ To systematically define candidate subsets for the whole-image pipeline, perform
         \caption{CRACK-class PR--AUC (primary BFS objective) vs. number of wavelengths ($n$), with the same threshold markers.}
         \label{fig:bfs_prauc_thresholds}
     \end{subfigure}
-    \caption{BFS threshold-marker visualization on CRACK metrics. Markers indicate the maximum and the first $n$ where performance drops more than 0.5\% and 1.0\% below that maximum.}
+    \caption[BFS threshold markers on CRACK metrics]{BFS threshold-marker visualization on CRACK metrics. Markers indicate the maximum and the first $n$ where performance drops more than 0.5\% and 1.0\% below that maximum.}
     \label{fig:bfs_threshold_markers}
 \end{figure}
 
 \begin{table}[!htbp]
 \centering
-\caption{Summary of BFS wavelength-count thresholds for CRACK metrics (Full precision in Appendix~\ref{app:bfs_full_precision}).}
+\caption[BFS wavelength-count threshold summary]{Summary of BFS wavelength-count thresholds for CRACK metrics (Full precision in Appendix~\ref{app:bfs_full_precision}).}
 \label{tab:bfs_thresholds_summary}
 \begin{tabular}{lcccccc}
 \toprule
@@ -531,7 +531,7 @@ To validate the operational efficacy of these reduced subsets, the top-30 and to
 
 \begin{table}[!htbp]
 \centering
-\caption{Full-image crack-detection performance for different wavelength subsets under early- and late-stage conditions.}
+\caption[Full-image performance across wavelength subsets]{Full-image crack-detection performance for different wavelength subsets under early- and late-stage conditions.}
 \label{tab:full_image_wavelength_results}
 \begin{tabular}{cccccccc}
 \toprule
@@ -691,7 +691,7 @@ Figure~\ref{fig:stability_30_popularity} visualizes the individual selection fre
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=1\textwidth,keepaspectratio]{figures/results/feature_selection/stability_varying_30wl_wavelength_popularity_overview.png}
-    \caption{Distribution and popularity of the top-30 selected wavelengths across five varying-split seeds.}
+    \caption[Top-30 wavelength popularity across BFS seeds]{Distribution and popularity of the top-30 selected wavelengths across five varying-split seeds.}
     \label{fig:stability_30_popularity}
 \end{figure}
 
@@ -707,7 +707,7 @@ Figure~\ref{fig:stability_30_binning} demonstrates how progressively coarser spe
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=1\textwidth,keepaspectratio]{figures/results/feature_selection/stability_varying_30wl_wavelength_binning_comparison.png}
-    \caption{Wavelength popularity at different bin sizes (1, 5, 10, 20\,nm) for the top-30 subsets.}
+    \caption[Top-30 wavelength popularity by bin size]{Wavelength popularity at different bin sizes (1, 5, 10, 20\,nm) for the top-30 subsets.}
     \label{fig:stability_30_binning}
 \end{figure}
 
@@ -722,7 +722,7 @@ In contrast to the pooled counts shown in Figure~\ref{fig:stability_30_binning},
 
 \begin{table}[htbp]
     \centering
-    \caption{Wavelength bins (5\,nm) selected unanimously by all 5 BFS seeds (5/5 consensus).}
+    \caption[5\,nm wavelength bins: 5/5 seed consensus]{Wavelength bins (5\,nm) selected unanimously by all 5 BFS seeds (5/5 consensus).}
     \label{tab:bins_5}
     \begin{tabular}{cc}
         \toprule
@@ -756,7 +756,7 @@ Table~\ref{tab:bins_4} presents the six additional 5\,nm spectral regions that w
 
 \begin{table}[htbp]
     \centering
-    \caption{Additional wavelength bins (5\,nm) selected by 4 out of 5 BFS seeds (4/5 consensus).}
+    \caption[5\,nm wavelength bins: 4/5 seed consensus]{Additional wavelength bins (5\,nm) selected by 4 out of 5 BFS seeds (4/5 consensus).}
     \label{tab:bins_4}
     \begin{tabular}{cc}
         \toprule
@@ -783,7 +783,7 @@ Table~\ref{tab:binned_jaccard_summary} confirms regional stability, showing that
 
 \begin{table}[!htbp]
 \centering
-\caption{Mean pairwise Jaccard similarity across 5 BFS seeds for exact and binned wavelength matching.}
+\caption[BFS wavelength stability: mean Jaccard similarity]{Mean pairwise Jaccard similarity across 5 BFS seeds for exact and binned wavelength matching.}
 \label{tab:binned_jaccard_summary}
 \begin{tabular}{lcccc}
 \toprule

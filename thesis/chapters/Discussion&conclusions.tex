@@ -7,8 +7,8 @@
 \subsection{The Biological Basis of Spectral Signatures}
 \noindent
 The initial finding of this study---that cracked tissues exhibit significantly lower reflectance across both the VIS and NIR regions---aligns with established agricultural literature regarding fruit cracking. 
-In the VIS region (400--700\,nm), the depressed reflectance is primarily attributed to the physical rupture of the waxy cuticle and the subsequent oxidation (browning) of the exposed tissue \cite{santos2023molecular}. 
-In the NIR region (700--850\,nm), which is highly sensitive to tissue water content and cellular structure \cite{thenkabail2016hyperspectral}, the reflectance drops dramatically due to the rapid loss of water and the physical collapse of the cells at the crack site \cite{Chang2019,YU20251506}. 
+In the VIS region (400--700\,nm), the depressed reflectance is primarily attributed to the physical rupture of the waxy cuticle and the subsequent oxidation (browning) of the exposed tissue \parencite{santos2023molecular}. 
+In the NIR region (700--850\,nm), which is highly sensitive to tissue water content and cellular structure \parencite{thenkabail2016hyperspectral}, the reflectance drops dramatically due to the rapid loss of water and the physical collapse of the cells at the crack site \parencite{Chang2019,YU20251506}. 
 
 \medskip\noindent
 Therefore, the strong spectral separability observed in this study is not merely a statistical artifact, but a direct measurement of the physical and structural degradation of the berry. By relying on these well-documented physiological changes, the algorithmic pipeline is grounded in true biological phenomena.
@@ -19,12 +19,12 @@ Therefore, the strong spectral separability observed in this study is not merely
 While these physiological changes establish a strong theoretical basis for detection, capturing them in uncontrolled vineyard conditions required specific pre-processing interventions to mitigate both sensor-level and field-induced noise.
 
 \medskip\noindent
-\textbf{First}, the extraction of tissue segments (ROIs) for the pixel-level models was explicitly designed to exclude the outer boundary pixels using a morphological erosion strategy (Figure~\ref{fig:boundary_buffer}). This spatial buffer was critical to prevent the inclusion of \textit{mixed pixels} \cite{bioucas2013hyperspectral}, where spectral information from the grape tissue blends with background elements or adjacent berries, which would otherwise corrupt the pure class signatures.
+\textbf{First}, the extraction of tissue segments (ROIs) for the pixel-level models was explicitly designed to exclude the outer boundary pixels using a morphological erosion strategy (Figure~\ref{fig:boundary_buffer}). This spatial buffer was critical to prevent the inclusion of \textit{mixed pixels} \parencite{bioucas2013hyperspectral}, where spectral information from the grape tissue blends with background elements or adjacent berries, which would otherwise corrupt the pure class signatures.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=1\textwidth]{figures/results/discussion/boundary_buffer.png}
-    \caption{Illustration of the morphological erosion boundary buffer applied to segmented grape ROIs, excluding edge pixels to prevent mixed-pixel contamination.}
+    \caption[Morphological erosion boundary buffer for grape ROIs]{Illustration of the morphological erosion boundary buffer applied to segmented grape ROIs, excluding edge pixels to prevent mixed-pixel contamination.}
     \label{fig:boundary_buffer}
 \end{figure}
 \FloatBarrier
@@ -32,24 +32,24 @@ While these physiological changes establish a strong theoretical basis for detec
 
 \newpage
 \medskip\noindent
-\textbf{Second}, the usable spectral range was deliberately restricted to 450--925\,nm (yielding 159 contiguous bands). The extreme boundaries of the camera's full spectral range suffer from low signal-to-noise ratios (SNR) and high variance---a known hardware limitation in VIS-NIR hyperspectral sensors that is corroborated by prior studies \cite{behmann2018specim}. As illustrated in Figure~\ref{fig:hardware_snr}, the raw spectral signal degrades sharply near the sensor edges. Truncating these noisy extremes prevented the classifiers from fitting to instrumental artifacts rather than actual physiological data.
+\textbf{Second}, the usable spectral range was deliberately restricted to 450--925\,nm (yielding 159 contiguous bands). The extreme boundaries of the camera's full spectral range suffer from low signal-to-noise ratios (SNR) and high variance---a known hardware limitation in VIS-NIR hyperspectral sensors that is corroborated by prior studies \parencite{behmann2018specim}. As illustrated in Figure~\ref{fig:hardware_snr}, the raw spectral signal degrades sharply near the sensor edges. Truncating these noisy extremes prevented the classifiers from fitting to instrumental artifacts rather than actual physiological data.
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.85\textwidth]{figures/results/discussion/Hardware_Limitations.png}
-    \caption{Spectral reflectance comparison from an outdoor experiment showing increased reflectance and elevated systematic deviations in the NIR region of the Specim~IQ sensor. Reproduced from \cite{behmann2018specim}.}
+    \caption[Specim IQ NIR spectral artifacts (Behmann et al.)]{Spectral reflectance comparison from an outdoor experiment showing increased reflectance and elevated systematic deviations in the NIR region of the Specim~IQ sensor. Reproduced from \parencite{behmann2018specim}.}
     \label{fig:hardware_snr}
 \end{figure}
 \FloatBarrier
 
 \newpage
 \noindent
-\textbf{Third}, the highly variable illumination in the field---exacerbated by canopy shading and diverse berry acquisition angles---necessitated integration times that often deviated significantly from the camera's optimal recommendations. To prevent the models from overfitting to these lighting artifacts (e.g., underexposure or shadowing), a Standard Normal Variate (SNV) transformation was applied (Figure~\ref{fig:snv_effect}). By normalizing each pixel's spectrum relative to its own mean and variance, SNV effectively decoupled the absolute illumination intensity from the spectral shape. This ensured that the classifiers learned the true structural and chemical manifestations of the cracks, compensating for instances of over- or under-exposure within the same class.
+\textbf{Third}, the highly variable illumination in the field---exacerbated by canopy shading and diverse berry acquisition angles---necessitated integration times that often deviated significantly from the camera's optimal recommendations. To prevent the models from overfitting to these lighting artifacts (e.g., underexposure or shadowing), a Standard Normal Variate (SNV) transformation was applied (Figure~\ref{fig:snv_effect_disc}). By normalizing each pixel's spectrum relative to its own mean and variance, SNV effectively decoupled the absolute illumination intensity from the spectral shape. This ensured that the classifiers learned the true structural and chemical manifestations of the cracks, compensating for instances of over- or under-exposure within the same class.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.6\textwidth]{figures/results/discussion/snv_normalization_effect.png}
-    \caption{Effect of SNV normalization: raw spectra with varying baseline offsets (left) are transformed into shape-normalized signatures (right), removing illumination-induced amplitude differences.}
-    \label{fig:snv_effect}
+    \caption[SNV normalization: removing illumination-induced baselines]{Effect of SNV normalization: raw spectra with varying baseline offsets (left) are transformed into shape-normalized signatures (right), removing illumination-induced amplitude differences.}
+    \label{fig:snv_effect_disc}
 \end{figure}
 \FloatBarrier
 
@@ -71,7 +71,7 @@ To impose order on this heterogeneity, the problem was reformulated into a 10-cl
     \centering
     \includegraphics[width=\textwidth]{figures/results/discussion/multi_vs_binary_cluster_42.JPG}
     % \includegraphics[width=0.75\textwidth]{figures/results/discussion/multi_vs_binary_cluster_19.JPG}
-    \caption{Multi-class vs.\ binary crack-probability maps for a healthy cluster. Left: RGB reference; Centre: multi-class overlay; Right: binary overlay. The binary model produces widespread false positives, whereas the multi-class formulation confines detections to localised regions.}
+    \caption[Multi-class vs.\ binary crack-probability maps]{Multi-class vs.\ binary crack-probability maps for a healthy cluster. Left: RGB reference; Centre: multi-class overlay; Right: binary overlay. The binary model produces widespread false positives, whereas the multi-class formulation confines detections to localised regions.}
     \label{fig:multi_vs_binary}
 \end{figure}
 \FloatBarrier
@@ -93,7 +93,7 @@ Subsequently, a patch-based density evaluation was introduced. By dividing the i
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{figures/materials_methods/pipeline/whole_image_pipeline.jpg}
-    \caption{Overview of the whole-image spatial aggregation pipeline, from raw pixel-level probability maps through morphological filtering and patch-based density evaluation to the final image-level detection decision.}
+    \caption[Whole-image spatial aggregation pipeline overview]{Overview of the whole-image spatial aggregation pipeline, from raw pixel-level probability maps through morphological filtering and patch-based density evaluation to the final image-level detection decision.}
     \label{fig:whole_image_pipeline}
 \end{figure}
 \FloatBarrier
@@ -114,7 +114,7 @@ It demonstrated that robust field-level detection cannot rely on spectral signat
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{figures/materials_methods/pipeline/ui_for_EDA_with_notes.JPG}
-    \caption{Example output of the custom spatial aggregation and EDA interface. The tool displays the RGB reference, the pixel-level crack-probability map, morphological filtering stages, and the final patch-density decision overlay side by side, enabling real-time parameter tuning and immediate visual feedback for diagnosing false positives and calibrating the detection pipeline.}
+    \caption[Spatial aggregation EDA interface output example]{Example output of the custom spatial aggregation and EDA interface. The tool displays the RGB reference, the pixel-level crack-probability map, morphological filtering stages, and the final patch-density decision overlay side by side, enabling real-time parameter tuning and immediate visual feedback for diagnosing false positives and calibrating the detection pipeline.}
     \label{fig:spatial_aggregation_ui}
 \end{figure}
 
@@ -186,8 +186,28 @@ The explicit choice to optimize the BFS algorithm based on the Area Under the Pr
 \noindent
 Within the supervised classification paradigm, the comparison between tree-based ensembles (XGBoost, Random Forest) and linear models (PLS-DA, Logistic Regression) revealed nuanced mathematical and operational trade-offs. Notably, L1-regularized Logistic Regression achieved remarkably high precision in isolating the target `crack' class, performing comparably to XGBoost. This behavior is mathematically consistent: the L1 penalty (Lasso) induces sparsity, effectively acting as an intrinsic feature selector that neutralizes the severe multicollinearity of the hyperspectral data by driving redundant band weights to zero. 
 
-\medskip\noindent
-Despite this localized success, the linear approach exhibited two critical limitations that necessitated the shift to tree-based architectures. First, although a linear hyperplane could adequately isolate the distinct, dark spectral signature of a crack, it struggled to resolve the highly non-linear decision boundaries separating diverse background elements (e.g., distinguishing dry wood from shadowed canopy or plastic markers). This inability to model complex background clutter resulted in a significantly degraded overall Macro-F1 score. Second, optimizing the L1 penalty across high-dimensional spectral data for hundreds of thousands of pixels proved computationally exhaustive, requiring training times an order of magnitude longer than those of gradient boosting frameworks.
+% \medskip\noindent
+% Despite this localized success, the linear approach exhibited two critical limitations that necessitated the shift to tree-based architectures. First, although a linear hyperplane could adequately isolate the distinct, dark spectral signature of a crack, it struggled to resolve the highly non-linear decision boundaries separating diverse background elements (e.g., distinguishing dry wood from shadowed canopy or plastic markers). This inability to model complex background clutter resulted in a significantly degraded overall Macro-F1 score. Second, optimizing the L1 penalty across high-dimensional spectral data for hundreds of thousands of pixels proved computationally exhaustive, requiring training times an order of magnitude longer than those of gradient boosting frameworks. Figure~\ref{fig:xgboost_vs_logreg} illustrates this contrast on the same field scene.
+
+% \begin{figure}[htbp]
+%     \centering
+%     \begin{subfigure}[t]{0.48\textwidth}
+%         \centering
+%         \includegraphics[width=\textwidth]{figures/images_to_use/example_XGboost.png}
+%         \caption{XGBoost: compact, localised detections.}
+%         \label{fig:xgboost_example}
+%     \end{subfigure}
+%     \hfill
+%     \begin{subfigure}[t]{0.48\textwidth}
+%         \centering
+%         \includegraphics[width=\textwidth]{figures/images_to_use/example_logisticregression.png}
+%         \caption{Logistic Regression: widespread false positives.}
+%         \label{fig:logreg_example}
+%     \end{subfigure}
+%     \caption{Whole-image crack detection on the same scene: XGBoost (left) vs.\ L1-regularized Logistic Regression (right).}
+%     \label{fig:xgboost_vs_logreg}
+% \end{figure}
+% \FloatBarrier
 
 \medskip\noindent
 Computational scalability remained a decisive factor throughout the model selection process. While Support Vector Machines (SVM) achieved competitive pixel-level accuracy during preliminary trials, their inference complexity (scaling between $\mathcal{O}(n^2)$ and $\mathcal{O}(n^3)$) proved prohibitive for whole-image deployment. A single $512 \times 512$ field scene contains over 250,000 pixels---a volume often exceeding the size of the entire pixel-level training corpus. Consequently, applying SVM inference to a full image was computationally unfeasible for high-throughput agricultural screening. Ultimately, XGBoost provided the optimal balance: possessing the representational capacity to model complex, non-linear background interactions, while maintaining the rapid inference speeds requisite for practical field deployment.
@@ -271,7 +291,7 @@ Finally, on the algorithmic front, integrating advanced deep-learning-based spat
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{figures/common/pipeline_with_sam2_and_cnn.JPG}
-    \caption{Proposed spectral-spatial cascade for false-positive reduction. Suspected crack blobs detected by the hyperspectral pixel-level model are passed to SAM2 for spatial segmentation, and the resulting bounding boxes are fed into a CNN that validates whether the region of interest corresponds to grape tissue or a non-grape structure (e.g., dry wood).}
+    \caption[Proposed spectral-spatial cascade for false-positive reduction]{Proposed spectral-spatial cascade for false-positive reduction. Suspected crack blobs detected by the hyperspectral pixel-level model are passed to SAM2 for spatial segmentation, and the resulting bounding boxes are fed into a CNN that validates whether the region of interest corresponds to grape tissue or a non-grape structure (e.g., dry wood).}
     \label{fig:sam2_cnn_pipeline}
 \end{figure}
 \FloatBarrier

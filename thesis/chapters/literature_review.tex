@@ -68,12 +68,12 @@
 
 This chapter establishes the theoretical and technological foundation for the non-destructive detection of grape cracking. The review is structured as a logical progression from the biological nature of the problem to the proposed computational solutions:
 
-\begin{itemize}
+\begin{enumerate}
   \item \textbf{The Biological \& Economic Context:} Explores grape cracking as a physiological disorder, detailing its biomechanical mechanisms and the substantial economic impact that necessitates proactive monitoring.
   \item \textbf{Sensing Technologies:} Introduces precision agriculture concepts and highlights Hyperspectral Imaging (HSI) as a powerful non-destructive sensing modality to address this agricultural need.
   \item \textbf{Computational Approaches:} Examines relevant machine learning paradigms, as extracting actionable insights from HSI data requires advanced analytics.
   \item \textbf{Related Work \& Research Gap:} Reviews existing literature on fruit defect detection, culminating in the identification of the critical research gap addressed by this thesis: the absence of robust, field-ready frameworks for early-stage crack detection.
-\end{itemize}
+\end{enumerate}
 
 % -------------------------------------new section 2.1-2.3-------------------------------------
 \newpage
@@ -85,7 +85,41 @@ Fruit cracking is a major physiological disorder in table grapes (\textit{Vitis 
 
 \medskip
 \noindent
-The economic impact of this disorder is substantial. Even minor skin fissures diminish visual quality and accelerate postharvest decay, leading to increased water loss, tissue browning, and higher susceptibility to secondary infections such as sour rot \parencite{plants14162462, agronomy12102437, xu2025overview}. Crucially, because sour rot is highly contagious and spreads rapidly to adjacent healthy berries, a single cracked grape can act as a catalyst for a broader, cluster-wide outbreak \parencite{Hall2018}. This cascading infection effect drastically multiplies crop losses, making early-stage monitoring essential to prevent localized damage from becoming an epidemic. Consequently, cracking results in significant preharvest rejection rates and postharvest waste \parencite{santos2023molecular}. In the European table grape industry alone, annual financial losses from cracking are estimated at approximately €175 million, assuming a standard 25\% yield loss \parencite{CrackSense2022}.
+The economic impact of this disorder is substantial. Even minor skin fissures diminish visual quality and accelerate postharvest decay, leading to increased water loss, tissue browning, and higher susceptibility to secondary infections such as sour rot \parencite{plants14162462, agronomy12102437, xu2025overview}. Crucially, because these fissures expose the berry's internal sugars to a synergistic infection by ethanol-producing yeasts and acetic acid bacteria, a single cracked grape can act as a catalyst for a broader, cluster-wide outbreak \parencite{Hall2018}. This cascading infection effect drastically multiplies crop losses, making early-stage monitoring essential to prevent localized damage from becoming an epidemic. Consequently, cracking results in significant preharvest rejection rates and postharvest waste \parencite{santos2023molecular}. In the European table grape industry alone, annual financial losses from cracking are estimated at approximately €175 million, assuming a standard 25\% yield loss \parencite{CrackSense2022}.
+
+\begin{figure}[hbt!]
+    \centering
+    \scalebox{0.82}{%
+    \begin{tikzpicture}[
+        node distance=1.0cm, % Slightly larger distance for better spacing
+        box/.style={
+            rectangle, draw=black, rounded corners,
+            text width=4.0cm, % width for text, larger than before
+            align=flush center, % CRUCIAL: this prevents hyphens while centering
+            minimum height=1.6cm, % fixed height for uniformity
+            fill=gray!10,
+            inner sep=5pt % inner padding
+        },
+        arrow/.style={->, >=stealth, thick}
+    ]
+
+    % Nodes
+    % I've also reworded the first node descriptive text for better fit.
+    \node (crack) [box] {\textbf{1. Skin Cracking}\\ Micro-fissures expose sugars};
+    \node (infection) [box, right=of crack] {\textbf{2. Infection}\\ Yeast/Bacteria colonization};
+    \node (rot) [box, right=of infection] {\textbf{3. Sour Rot}\\ Tissue decay and browning};
+    \node (spread) [box, right=of rot] {\textbf{4. Cluster Spread}\\ Adjacent berries infected};
+
+    % Arrows connect horizontally
+    \draw [arrow] (crack) -- (infection);
+    \draw [arrow] (infection) -- (rot);
+    \draw [arrow] (rot) -- (spread);
+
+    \end{tikzpicture}}%
+    \caption{The compact biological pathway from skin cracking to a sour rot epidemic in the grape cluster, showing a clean layout without text hyphenation.}
+    \label{fig:sour_rot_cascade_compact_fixed}
+\end{figure}
+
 
 \medskip
 \noindent
@@ -95,15 +129,15 @@ Currently, agricultural management relies heavily on reactive interventions, suc
 
 \medskip
 \noindent
-Understanding the physiological processes of the berry skin is essential for identifying when and how cracking develops. A primary driver of cracking is the dynamic relationship between water uptake and internal pressure. Even minor fluctuations in soil moisture or surface wetness can cause a rapid increase in berry volume. When mesocarp expansion outpaces skin extensibility---especially near maturity when cuticular deposition slows---tensile stress accumulates. This reduces the skin's elastic reserve and increases the likelihood of splitting \cite{Khadivi2014}. 
+Understanding the physiological processes of the berry skin is essential for identifying when and how cracking develops. A primary driver of cracking is the dynamic relationship between water uptake and internal pressure. Even minor fluctuations in soil moisture or surface wetness can cause a rapid increase in berry volume. When mesocarp expansion outpaces skin extensibility---especially near maturity when cuticular deposition slows---tensile stress accumulates. This reduces the skin's elastic reserve and increases the likelihood of splitting \parencite{Khadivi2014}. 
 
 \medskip
 \noindent
-This mechanical stress initially manifests as microcracks within the cuticle, which acts as both a diffusion barrier and a protective shell. Microcracks can form days before visible splitting occurs. They propagate through structurally weak regions of the skin under mechanical stress or excessive hydration (e.g., from high humidity or rain) \cite{Peschel2005, Emmons1998, Chang2021}. Conversely, heat and drought conditions can induce structural fatigue through repeated cycles of dehydration and rehydration. Because these early microcracks are not visually apparent, sensitive spectral tools are required to detect them. 
+This mechanical stress initially manifests as microcracks within the cuticle, which acts as both a diffusion barrier and a protective shell. Microcracks can form days before visible splitting occurs. They propagate through structurally weak regions of the skin under mechanical stress or excessive hydration (e.g., from high humidity or rain) \parencite{Peschel2005, Emmons1998, Chang2021}. Conversely, heat and drought conditions can induce structural fatigue through repeated cycles of dehydration and rehydration. Because these early microcracks are not visually apparent, sensitive spectral tools are required to detect them. 
 
 \medskip
 \noindent
-Beyond mechanical factors, cracking susceptibility is modulated by plant hormones and cultivar-specific traits. Hormones such as gibberellins (GA\textsubscript{3}) and abscisic acid (ABA), which are routinely used in table grape viticulture, alter skin biomechanics, fruit firmness, and cell wall architecture, indirectly influencing the risk of cracking \cite{Lichter2014, Castellarin2016}. Cultivars with thin cuticles or rapid sugar accumulation, such as the `Scarlotta Seedless' evaluated in this study, exhibit heightened sensitivity to temperature fluctuations and hydration-induced damage \cite{Chang2021, Scarlotta2024, Scarlotta2022}. Once the cuticle barrier is breached, the fruit becomes highly vulnerable to secondary diseases such as sour rot \cite{Hall2018}. Therefore, the onset of pre-symptomatic microcracking represents a pivotal point of failure. This underscores the necessity for non-destructive optical methods, such as hyperspectral imaging, to identify these latent structural vulnerabilities.% -------------------------------------new section 2.1-2.3-------------------------------------
+Beyond mechanical factors, cracking susceptibility is modulated by plant hormones and cultivar-specific traits. Hormones such as gibberellins (GA\textsubscript{3}) and abscisic acid (ABA), which are routinely used in table grape viticulture, alter skin biomechanics, fruit firmness, and cell wall architecture, indirectly influencing the risk of cracking \parencite{Lichter2014, Castellarin2016}. Cultivars with thin cuticles or rapid sugar accumulation, such as the `Scarlotta Seedless' evaluated in this study, exhibit heightened sensitivity to temperature fluctuations and hydration-induced damage \parencite{Chang2021, Scarlotta2024, Scarlotta2022}. Once the cuticle barrier is breached, the fruit becomes highly vulnerable to secondary diseases such as sour rot \parencite{Hall2018}. Therefore, the onset of incipient microcracking represents a pivotal point of failure. This underscores the necessity for non-destructive optical methods, such as hyperspectral imaging, to identify these latent structural vulnerabilities.% -------------------------------------new section 2.1-2.3-------------------------------------
 % -------------------------------------new section 2.1-2.3-------------------------------------
 \newpage
 \section{Bridging the Gap: The Need for Advanced Sensing in Complex Environments}
@@ -115,22 +149,22 @@ Detecting grape cracking before it becomes visually apparent is a highly complex
 
 \medskip
 \noindent
-While standard computer vision (CV) using simple RGB cameras has been widely adopted in agriculture for tasks like yield estimation or identifying obvious external defects \cite{tian2020computer, patricio2018computer}, it is fundamentally ill-equipped for early crack detection. Standard cameras primarily capture surface color information. In addition, their performance heavily degrades under the dynamic lighting, shadows, and complex backgrounds typical of a real-world vineyard \cite{benos2021machine, DHANYA2022211}. Because standard RGB imaging cannot probe beneath the skin of the fruit, it completely misses the pre-symptomatic physiological stress that precedes actual cracking.
+While standard computer vision (CV) using simple RGB cameras has been widely adopted in agriculture for tasks like yield estimation or identifying obvious external defects \parencite{tian2020computer, patricio2018computer}, it is fundamentally ill-equipped for early crack detection. Standard cameras primarily capture surface color information. In addition, their performance heavily degrades under the dynamic lighting, shadows, and complex backgrounds typical of a real-world vineyard \parencite{benos2021machine, DHANYA2022211}. Because standard RGB imaging cannot probe beneath the skin of the fruit, it completely misses the pre-symptomatic physiological stress that precedes actual cracking.
 
 \medskip
 \noindent
-To overcome these limitations, the complexity of the problem must be met with equally sophisticated tools. Solving this requires a paradigm shift: coupling non-destructive, deep-sensing technologies with advanced artificial intelligence. Specifically, there is a critical need for sensing modalities that can capture broad spectral information---revealing both the chemical and structural state of the tissue---paired with machine learning algorithms capable of decoding this high-dimensional data \cite{cao2025review}. This necessity forms the core motivation for transitioning to Hyperspectral Imaging (HSI) as an innovative solution for early defect detection.
+To overcome these limitations, the complexity of the problem must be met with equally sophisticated tools. Solving this requires a paradigm shift: coupling non-destructive, deep-sensing technologies with advanced artificial intelligence. Specifically, there is a critical need for sensing modalities that can capture broad spectral information---revealing both the chemical and structural state of the tissue---paired with machine learning algorithms capable of decoding this high-dimensional data \parencite{cao2025review}. This necessity forms the core motivation for transitioning to Hyperspectral Imaging (HSI) as an innovative solution for early defect detection.
 \newpage
 \section{Hyperspectral Imaging for Agricultural Applications}
 \label{sec:hyperspectral_imaging}
 
 \medskip
 \noindent
-Hyperspectral imaging (HSI) overcomes the limitations of conventional vision systems by capturing detailed spectral information across a broad and continuous range of electromagnetic wavelengths. While traditional RGB cameras record reflected light in only three broad bands (red, green, and blue) and multispectral imaging (MSI) captures a limited discrete set (typically 3 to 15 bands), HSI acquires reflectance data across hundreds of narrow, contiguous spectral bands, often with a resolution finer than 5 nm \cite{benelli2020hyperspectral, Mehta2018}. This produces a three-dimensional data cube where each spatial pixel contains a dense, continuous spectral vector, enabling the detection of both surface and subsurface physicochemical properties \cite{hong2025hyperspectralimaging}.
+Hyperspectral imaging (HSI) overcomes the limitations of conventional vision systems by capturing detailed spectral information across a broad and continuous range of electromagnetic wavelengths. While traditional RGB cameras record reflected light in only three broad bands (red, green, and blue) and multispectral imaging (MSI) captures a limited discrete set (typically 3 to 15 bands), HSI acquires reflectance data across hundreds of narrow, contiguous spectral bands, often with a resolution finer than 5 nm \parencite{benelli2020hyperspectral, Mehta2018}. This produces a three-dimensional data cube where each spatial pixel contains a dense, continuous spectral vector, enabling the detection of both surface and subsurface physicochemical properties \parencite{hong2025hyperspectralimaging}.
 
 \medskip
 \noindent
-The fundamental metric in this analysis is reflectance, defined as the ratio of radiation reflected by a surface to the radiation it receives \cite{blackburn2007}:
+The fundamental metric in this analysis is reflectance, defined as the ratio of radiation reflected by a surface to the radiation it receives \parencite{blackburn2007}:
 
 \begin{equation}
 \label{eq:reflectance}
@@ -142,7 +176,7 @@ This normalization ensures that the measurement reflects the intrinsic chemical 
 
 \medskip
 \noindent
-When exposed to light, different materials absorb and reflect specific wavelengths based on their molecular bonds, creating a unique "spectral signature" \cite{shaw2002}. This allows HSI to reliably distinguish between tissues that appear identical to the naked eye but differ physiologically, as variations in moisture content or chemical composition produce systematic, wavelength-dependent shifts in reflectance.
+When exposed to light, different materials absorb and reflect specific wavelengths based on their molecular bonds, creating a unique "spectral signature" \parencite{shaw2002}. This allows HSI to reliably distinguish between tissues that appear identical to the naked eye but differ physiologically, as variations in moisture content or chemical composition produce systematic, wavelength-dependent shifts in reflectance.
 
 \begin{figure}[htbp]
 \centering
@@ -171,33 +205,39 @@ To interpret hyperspectral data effectively, it is important to understand how t
     \item \textbf{Green} - wavelengths between 500~nm and 600~nm, associated with the chlorophyll reflectance peak.
     \item \textbf{Red} - wavelengths between 600~nm and 700~nm, dominated by chlorophyll absorption features.
     \item \textbf{NIR (Near-Infrared)} - wavelengths between 700~nm and 1000~nm, highly sensitive to internal cellular structure and water content.
-    \item \textbf{SWIR (Short-Wave Infrared)} - wavelengths above 970~nm, responsive to moisture absorption and biochemical composition.
+    \item \textbf{SWIR (Short-Wave Infrared)} - wavelengths above 1000~nm, responsive to moisture absorption and biochemical composition.
 \end{itemize}
 
 
 \noindent
-In agricultural applications, the visible and near-infrared (VIS--NIR) range (typically 400--1000~nm) is particularly valuable. The visible bands correlate strongly with plant pigments such as chlorophyll and anthocyanins, while the NIR bands are highly sensitive to water content and internal cellular structure \cite{ball2007field, Zwinkels2015, zhang2022reflectance, wang2024frontiers}. This dual sensitivity makes VIS--NIR HSI uniquely suited for early defect detection in fruit. Because grape cracking is fundamentally driven by water uptake and cuticular structural failure, the high responsiveness of the NIR bands to moisture and cellular integrity enables the detection of physiological stress and microcracking before physical symptoms emerge \cite{liu2023sensors, Abade2025SpectrumToYield, sun2024fruit}. Consequently, HSI has been successfully employed to assess internal quality attributes (such as soluble solid content and firmness) and detect both external and internal defects, including bruises, decay, and scars, across various fruit species \cite{yang2025jafc, frontiers2024fruit, akter2025defects, min2023decay, zhu2025bagging, tian2023mango, kanwal2025quality}. 
+In agricultural applications, the visible and near-infrared (VIS--NIR) range (typically 400--1000~nm) is particularly valuable. The visible bands correlate strongly with plant pigments such as chlorophyll and anthocyanins, while the NIR bands are highly sensitive to water content and internal cellular structure \parencite{ball2007field, Zwinkels2015, zhang2022reflectance, wang2024frontiers}. This dual sensitivity makes VIS--NIR HSI uniquely suited for early defect detection in fruit. Because grape cracking is fundamentally driven by water uptake and cuticular structural failure, the high responsiveness of the NIR bands to moisture and cellular integrity enables the detection of physiological stress and microcracking before physical symptoms emerge \parencite{liu2023sensors, Abade2025SpectrumToYield, sun2024fruit}. Consequently, HSI has been successfully employed to assess internal quality attributes (such as soluble solid content and firmness) and detect both external and internal defects, including bruises, decay, and scars, across various fruit species \parencite{yang2025jafc, frontiers2024fruit, akter2025defects, min2023decay, zhu2025bagging, tian2023mango, kanwal2025quality}. 
 
 \medskip
 \noindent
-By combining the rich spectral data of HSI with advanced machine learning techniques, it is possible to transition from post-symptomatic visual inspection to proactive, field-ready monitoring. This establishes the necessary technological foundation for the early-warning crack detection framework proposed in this thesis.
+By combining the rich spectral data of HSI with advanced machine learning techniques, it is possible to transition from late-stage, post-symptomatic visual inspection to early-stage detection at the time of measurement. This establishes the necessary technological foundation for the field-ready crack detection framework proposed in this thesis.
 
-
-\newpage
 \section{Machine Learning Paradigms for Hyperspectral Data}
 \label{sec:ml_hsi}
 
 \medskip
 \noindent
-Extracting actionable insights from high-dimensional hyperspectral data requires robust analytical frameworks. Traditional machine learning (ML) approaches, such as Partial Least Squares (PLS) and Support Vector Machines (SVM), have been widely adopted in agricultural applications due to their effectiveness on small-to-medium datasets and their interpretability \cite{RAM2024109037, su16146064}. These models heavily rely on established spectral preprocessing pipelines---including Savitzky--Golay smoothing and Standard Normal Variate (SNV) normalization---to mitigate sensor noise and illumination variability \cite{agriculture13051086, horticulturae8070598}. A major advantage of classical ML is its compatibility with feature extraction and wavelength selection techniques (e.g., CARS), which reduce spectral redundancy and computational complexity, making the models highly suitable for fast, field-ready applications \cite{foods13233956}.
+Extracting actionable insights from high-dimensional hyperspectral data requires robust analytical frameworks. Traditional machine learning (ML) approaches, such as Partial Least Squares (PLS) and Support Vector Machines (SVM), have been widely adopted in agricultural applications due to their effectiveness on small-to-medium datasets and their interpretability \parencite{RAM2024109037, su16146064}. These models heavily rely on established spectral preprocessing pipelines---including Savitzky--Golay smoothing and Standard Normal Variate (SNV) normalization---to mitigate sensor noise and illumination variability \parencite{agriculture13051086, horticulturae8070598}. A major advantage of classical ML is its compatibility with feature extraction and wavelength selection techniques (e.g., CARS), which reduce spectral redundancy and computational complexity, making the models highly suitable for fast, field-ready applications \parencite{foods13233956}.
+
+% \medskip
+% \noindent
+% In recent years, deep learning architectures have emerged as powerful alternatives capable of exploiting complex non-linear structures and spatial contexts without hand-crafted features \parencite{Chen2024MutationHSI}. However, hyperspectral deep learning in agriculture faces severe practical constraints: it requires massive amounts of densely annotated data, which is rarely available for pixel-level field tasks. Furthermore, the high dimensionality of HSI combined with limited field data significantly increases the risk of overfitting and domain shift \parencite{ATTRI2023102217}. Consequently, classical pipelines---combining explicit spectral preprocessing, interpretable models, and wavelength selection---remain operationally attractive and highly competitive for agricultural datasets.
 
 \medskip
 \noindent
-In recent years, deep learning architectures have emerged as powerful alternatives capable of exploiting complex non-linear structures and spatial contexts without hand-crafted features \cite{Chen2024MutationHSI}. However, hyperspectral deep learning in agriculture faces severe practical constraints: it requires massive amounts of densely annotated data, which is rarely available for pixel-level field tasks. Furthermore, the high dimensionality of HSI combined with limited field data significantly increases the risk of overfitting and domain shift \cite{ATTRI2023102217}. Consequently, classical pipelines---combining explicit spectral preprocessing, interpretable models, and wavelength selection---remain operationally attractive and highly competitive for agricultural datasets.
+The choice of an appropriate machine learning algorithm is fundamentally dictated by the specific task requirements and the volume of available data. In recent years, deep learning architectures have emerged as powerful tools capable of exploiting complex non-linear structures and spatial contexts without hand-crafted features, dominating tasks where massive, generalized datasets are abundant \parencite{Chen2024MutationHSI}. However, hyperspectral analysis in agriculture presents a different paradigm. It faces severe practical constraints: acquiring massive amounts of densely annotated, pixel-level field data is exceptionally labor-intensive and costly. In these low-data regimes, complex deep learning models are highly susceptible to severe overfitting and domain shift \parencite{ATTRI2023102217}. Conversely, "simpler" traditional algorithms (such as Random Forest or XGBoost) excel in these specific, data-limited environments. They establish a robust, generalizable performance baseline without requiring enormous training sets. Consequently, classical pipelines---combining explicit spectral preprocessing, interpretable models, and wavelength selection---remain operationally attractive and highly competitive for such specialized agricultural datasets.
 
 \medskip
 \noindent
-Beyond algorithm selection, the choice of modeling paradigm dictates system robustness. Pixel-level modeling enables fine-grained discrimination of subtle biochemical variations, which is critical for detecting micro-scale pre-symptomatic stress. Yet, pixel-wise approaches are highly sensitive to background clutter (e.g., soil, leaves), mixed pixels, and severe class imbalances typical of early-stage defect detection \cite{RAM2024109037}. To overcome these practical field challenges, modern workflows increasingly rely on spatial aggregation strategies, translating sensitive pixel-level classifications into conservative, robust image-level or region-level decisions \cite{Chen2024MutationHSI, c5ae649d7cf34cb7aaf3b08a25dbd79d}.
+Beyond algorithm selection, the choice of modeling paradigm dictates system robustness. Pixel-level modeling enables fine-grained discrimination of subtle biochemical variations, which is critical for detecting micro-scale pre-symptomatic stress. Yet, pixel-wise approaches are highly sensitive to background clutter (e.g., soil, leaves), mixed pixels, and severe class imbalances typical of early-stage defect detection \parencite{RAM2024109037}. To overcome these practical field challenges, modern workflows increasingly rely on spatial aggregation strategies, translating sensitive pixel-level classifications into conservative, robust image-level or region-level decisions \parencite{Chen2024MutationHSI, c5ae649d7cf34cb7aaf3b08a25dbd79d}.
+
+\medskip
+\noindent
+\textbf{Proposed Approach:} To bridge the gap between theoretical micro-scale detection and practical field application, this thesis champions a hybrid and pragmatic framework. By leveraging the data-efficiency and interpretability of classical machine learning algorithms for pixel-level spectral analysis, combined with robust spatial aggregation techniques, this research explicitly addresses the data scarcity and background clutter inherent to field-based hyperspectral agriculture. This targeted strategy not only circumvents the overfitting risks associated with deep learning in low-data regimes but also delivers a computationally efficient, deployable solution tailored specifically for the early, proactive detection of grape cracking.
 
 \newpage
 \section{Related Work: From Visible Defect Detection to Early Warning}
@@ -205,28 +245,32 @@ Beyond algorithm selection, the choice of modeling paradigm dictates system robu
 
 \medskip
 \noindent
-Prior applications of HSI in fruit quality analysis can be broadly categorized into two objectives: the detection of already manifested defects, and the early identification of latent physiological disorders. HSI is a well-established and highly accurate tool for the former, successfully employed in postharvest inspection to detect visible blemishes, mechanical injuries, and advanced decay across diverse fruit types \cite{app13053279, agriculture15202167, min2023decay, app13179740}. 
+Prior applications of HSI in fruit quality analysis can be broadly categorized into two objectives: the detection of already manifested defects, and the early identification of latent physiological disorders. HSI is a well-established and highly accurate tool for the former, successfully employed in postharvest inspection to detect visible blemishes, mechanical injuries, and advanced decay across diverse fruit types \parencite{app13053279, agriculture15202167, min2023decay, app13179740}. 
 
 \medskip
 \noindent
-More recently, research has shifted toward pre-symptomatic detection. Several studies have demonstrated that HSI can capture latent spectral changes associated with internal disorders, such as early-stage bitter pit in apples \cite{DONG2025101166} and initial pathogen stress like gray mold or bacterial leaf spots before visual symptoms appear \cite{haghbin2023non, zhang2024early, zhang2024hyperspectral, ou2024hyperspectral}. 
+More recently, research has shifted toward pre-symptomatic detection. Several studies have demonstrated that HSI can capture latent spectral changes associated with internal disorders, such as early-stage bitter pit in apples \parencite{DONG2025101166} and initial pathogen stress like gray mold or bacterial leaf spots before visual symptoms appear \parencite{haghbin2023non, zhang2024early, zhang2024hyperspectral, ou2024hyperspectral}. 
+
+% \medskip
+% \noindent
+% Despite these promising results, the vast majority of both visible and early-detection studies remain confined to highly controlled laboratory or postharvest environments. Operational field deployment introduces immense environmental variability, including dynamic ambient lighting, complex backgrounds, and shifting plant phenology, all of which distort spectral signatures and degrade model transferability \parencite{app13179740, agriculture15202167}. Because dense data annotation under such chaotic field conditions is prohibitively difficult, true preharvest frameworks that provide early-warning signals under realistic vineyard conditions remain critically scarce \parencite{haghbin2023non, zhang2024early}. 
 
 \medskip
 \noindent
-Despite these promising results, the vast majority of both visible and early-detection studies remain confined to highly controlled laboratory or postharvest environments. Operational field deployment introduces immense environmental variability, including dynamic ambient lighting, complex backgrounds, and shifting plant phenology, all of which distort spectral signatures and degrade model transferability \cite{app13179740, agriculture15202167}. Because dense data annotation under such chaotic field conditions is prohibitively difficult, true preharvest frameworks that provide early-warning signals under realistic vineyard conditions remain critically scarce \cite{haghbin2023non, zhang2024early}. 
+A critical bottleneck in advancing HSI research toward deep learning solutions is the inherent data scale: a single HSI datacube (204 bands, $512 \times 512$ pixels) requires approximately 200~MB of storage---versus 11~MB for an RGB image---causing the full season's dataset to exceed 575~GB. Processing such high-dimensional inputs demands powerful hardware and massive amounts of densely annotated training samples to prevent overfitting. Unlike RGB vision, the agricultural HSI domain currently lacks large, standardized public datasets and robust pre-trained foundation models, making deep learning from scratch computationally and practically prohibitive.
+
+\medskip
+\noindent
+Despite these promising results in controlled settings, the vast majority of both visible and early-detection studies remain confined to highly controlled laboratory or postharvest environments. Operational field deployment introduces immense environmental variability, including dynamic ambient lighting, complex backgrounds, and shifting plant phenology, all of which distort spectral signatures and degrade model transferability \parencite{app13179740, agriculture15202167}. Because dense data annotation under such chaotic field conditions is prohibitively difficult, true preharvest frameworks that provide early-warning signals under realistic vineyard conditions remain critically scarce \parencite{haghbin2023non, zhang2024early}.
 
 \newpage
-\section{Research Gap and Study Positioning}
+\section{The Research Gap: Towards Proactive In-Field Detection}
 \label{sec:research_gap}
 
 \medskip
 \noindent
-The literature review reveals a significant conceptual and methodological disconnect. On one hand, the physiological and biomechanical mechanisms driving grape cracking are well documented, establishing that internal pressure imbalances and micro-structural failures precede macroscopic skin rupture. On the other hand, while hyperspectral imaging has proven highly capable of detecting latent internal defects, its application has been largely restricted to reactive, post-symptomatic identification or highly controlled laboratory settings. 
+The literature review reveals a significant conceptual and methodological disconnect. On one hand, the physiological and biomechanical mechanisms driving grape cracking are well documented, establishing that internal pressure imbalances and micro-structural failures precede macroscopic skin rupture. On the other hand, while hyperspectral imaging has proven highly capable of detecting latent internal defects, its application has been largely restricted to reactive, post-symptomatic identification or highly controlled laboratory settings. Consequently, a critical research gap persists: \textbf{there is currently no established, non-destructive framework capable of providing proactive, early-warning detection of grape cracking susceptibility under realistic preharvest field conditions.} 
 
 \medskip
 \noindent
-Consequently, a critical research gap persists: \textbf{there is currently no established, non-destructive framework capable of providing proactive, early-warning detection of grape cracking susceptibility under realistic preharvest field conditions.} 
-
-\medskip
-\noindent
-The present study is directly positioned to bridge this gap. By integrating VIS--NIR hyperspectral imaging with optimized classical machine learning and spectral wavelength selection, this research moves beyond reactive defect detection. Unlike prior works, the proposed framework emphasizes early-stage identification under actual vineyard variability. By explicitly linking highly sensitive pixel-level spectral classification with robust whole-image spatial aggregation, this thesis introduces a novel, field-ready early warning tool designed to identify the physiological onset of grape cracking before it translates into irreversible economic loss.
+The present study is directly positioned to bridge this gap. By integrating VIS--NIR hyperspectral imaging with optimized classical machine learning and spectral wavelength selection, this research moves beyond reactive defect detection. Unlike prior works, the proposed framework emphasizes early-stage identification under actual vineyard variability. As conceptualized in Figure~\ref{fig:pipeline_overview}, this targeted methodology offers a distinct advantage: rather than relying on data-hungry deep learning models that risk severe overfitting on limited field data, it leverages the data-efficiency and interpretability of classical algorithms. By explicitly linking highly sensitive pixel-level spectral classification with robust whole-image spatial aggregation, this approach filters out background clutter and mitigates domain shift. Ultimately, this thesis introduces a novel, computationally efficient, and field-ready early warning tool designed to identify the physiological onset of grape cracking before it translates into irreversible economic loss.
