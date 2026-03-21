@@ -447,8 +447,7 @@ where $\alpha \approx 0.3\tau$ served as a temperature parameter controlling the
 
 \medskip
 \noindent
-The whole-image pipeline aggregates pixel-wise crack probability maps produced by the trained multi-class pixel-level classifier into image-level decisions. All upstream pixel-level models were fixed at their trained states and were not retrained or tuned at the image level.
-
+The whole-image pipeline takes the crack probabilities of individual pixels and combines them to make a single decision for the entire image. During this stage, the pixel-level models were kept frozen and were not retrained.
 \subsubsection{Pipeline Architecture and Spatial Aggregation}
 
 \noindent
@@ -456,7 +455,7 @@ The whole-image aggregation pipeline follows a sequential process, illustrated i
 Figure~\ref{fig:whole_image_protocol_overview}, and consists of the following stages:
 
 \begin{enumerate}
-    \item \textbf{Probability Map Generation:} The trained multi-class XGBoost model processes the full input datacube ($H \times W \times 159$), producing a dense crack probability map $P_{\mathrm{CRACK}} \in [0,1]^{H \times W}$.
+   \item \textbf{Probability Map Generation:} The trained XGBoost model evaluates the hyperspectral image pixel by pixel, generating a map where each pixel is assigned a crack probability score between 0 and 1.
     \item \textbf{Morphological Integration:} To enforce spatial coherence, adjacent pixels with elevated crack probabilities are connected using morphological closing operations. This bridges tiny gaps in hairline micro-cracks and suppresses isolated noisy pixels, forming continuous regions of interest (BLOBs).
     \item \textbf{Geometric Filtering:} The resulting connected components are filtered based on area constraints. BLOBs smaller than a defined minimum area are discarded as noise, while structurally valid regions are retained.
     \item \textbf{Patch-Based Decision Logic:} The filtered probability map is divided into fixed-size spatial patches. A patch is classified as crack-positive if the density of crack-related pixels within its boundaries exceeds a calibrated threshold.
@@ -464,12 +463,12 @@ Figure~\ref{fig:whole_image_protocol_overview}, and consists of the following st
 \end{enumerate}
 
 
-% \begin{figure}[htbp]
-%     \centering
-%     \includegraphics[width=0.9\textwidth]{figures/materials_methods/pipeline/whole_image_pipeline.jpg}
-%   \caption{Whole-image crack-detection pipeline from pixel-level CRACK probabilities to image-level classification via spatial aggregation.}
-% \end{figure}
-% \FloatBarrier
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/materials_methods/pipeline/whole_image_pipeline.jpg}
+  \caption{Whole-image crack-detection pipeline from pixel-level CRACK probabilities to image-level classification via spatial aggregation.}
+\end{figure}
+\FloatBarrier
 
 \begin{figure}[htbp]
     \centering
