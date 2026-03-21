@@ -6,10 +6,27 @@ Fruit cracking is a significant physiological disorder affecting a wide range of
 \FloatBarrier
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.6\textwidth]{figures/introduction/cracked_grape_berry.png}
-    \caption{Example of grape berry cracking in \textit{Vitis vinifera} L. cv.\ `Scarlotta Seedless'. The visible surface fissures expose inner flesh to the environment, rendering the fruit unmarketable and susceptible to secondary infections such as sour rot.}
+    \begin{subfigure}[t]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/images_to_use/crack_begining_cluster_10.jpeg}
+        \caption{Early-stage cracking: initial surface fissures on a grape cluster.}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/images_to_use/rot_beginning.jpeg}
+        \caption{Onset of secondary rot infection following skin rupture.}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/introduction/cracked_grape_berry_matched.png}
+        \caption{Advanced sour rot infection.}
+    \end{subfigure}
+    \caption[Grape berry cracking and decay progression]{Examples of grape berry cracking in \textit{Vitis vinifera} L. cv.\ `Scarlotta Seedless'. The visible surface fissures expose inner flesh to the environment, rendering the fruit unmarketable and susceptible to secondary infections such as sour rot.}
     \label{fig:cracked_grape_intro}
 \end{figure}
+\FloatBarrier
 
 \section{Economic Impact}
 \noindent
@@ -35,30 +52,21 @@ Sweet cherry & 560 & 37.3 & 2.0 & 20 & 400 & 224.0 \\
 
 \newpage
 \section{Research Motivation}
+\medskip
 \noindent
 Current methods for managing cracking risk are reactive and often insufficient. There is a critical need for a non-destructive, reliable method to detect early-stage crack-related spectral signatures at the time of measurement, when cracking is minimal and visually indistinct at the field scale. Hyperspectral imaging (HSI) has emerged as a powerful tool in precision agriculture for assessing plant health and fruit quality due to its ability to capture detailed spectral information beyond the spectrum visible to the human eye. This research aims to investigate the potential of HSI and machine learning to address the challenge of grape cracking.
 
+\medskip
 \noindent
-This thesis addresses two related but distinct analysis settings. \textit{Identification/detection} concerns recognising existing crack tissue based on its hyperspectral signature and can be naturally posed as a pixel-level classification problem when representative labels are available. \textit{Early-warning screening}, in contrast, targets early-stage field assessment under realistic vineyard conditions, where direct pixel-wise segmentation of complex scenes is often unstable for example, background clutter (e.g., leaves, wood, and artificial materials) acquisition-dependent domain shifts (illumination, viewing geometry) which can dominate individual pixel-level outputs and lead to unreliable image-level decisions. For this reason, the early-warning setting is approached through robust single-acquisition representations that aggregate information at the grape-cluster/image level. 
-% In particular, early-stage acquisitions are not a focal point for clear field identification because reliable field indicators are often not yet present, whereas late-stage acquisitions typically allow clearer field identification.
-Unlike late-stage cracking, which presents easily observable structural damage, early-stage defects lack reliable visual indicators. Therefore, early-warning detection relies on the potential of HSI to capture subtle, pre-visual spectral changes before macroscopic symptoms fully develop.
+This thesis addresses two related settings. \textit{Identification/detection} focuses on existing crack tissue and its hyperspectral signature. \textit{Early-warning screening}, in contrast, addresses early-stage field assessment under realistic vineyard conditions.
 
-% \medskip
-% \noindent
-% \textbf{Terminology (Early vs.\ Late Acquisition).} In this thesis, \textit{detection/identification} refers to classification at the time of measurement using hyperspectral signatures. The terms \textit{early-stage} and \textit{late-stage} denote acquisition-stage subsets relative to crack progression within the same cluster, as defined by vineyard monitoring records:
+\medskip
+\noindent
+In such scenes, direct pixel-wise segmentation is often unstable. Background clutter (e.g., leaves, wood, and artificial materials), together with changes in illumination and viewing geometry, can strongly affect pixel-level outputs and make image-level decisions unreliable. For this reason, the early-warning setting relies on image-level or cluster-level representations that aggregate information across the acquisition rather than on individual pixels alone.
 
-% \begin{itemize}[leftmargin=*]
-%     \item \textbf{Late-stage:} Images acquired after the first recorded cracking event, representing an advanced cracking condition.
-%     \item \textbf{Early-stage:} The earliest available image associated with the onset of cracking for the same cluster, representing the initial observable stage.
-% \end{itemize}
-% -------------------------
-% \medskip
-% \noindent
-% Throughout this thesis, \textit{detection} refers to the classification of cracked tissue using its hyperspectral signature at the time of measurement. To analyze the progression of the damage, images of the grape clusters are categorized into two main phases. \textit{Early-stage} refers to the first image captured when cracking initially begins, representing the earliest observable signs of the disorder. In contrast, \textit{late-stage} refers to images taken after cracking is already established, representing a more advanced and severe condition.
-
-% \medskip
-% \noindent
-% Both stages involve detection of crack-related spectral signatures at the time of measurement. These terms describe crack status at the time of acquisition, not a future outcome or pre-symptomatic prediction.
+\medskip
+\noindent
+Unlike late-stage cracking, which shows clear structural damage, early-stage defects have weak visual cues. Early-warning detection therefore uses HSI to capture subtle spectral changes before macroscopic symptoms become clearly visible.
 
 \medskip
 \noindent
@@ -69,27 +77,24 @@ To ensure clarity throughout this analysis, the following core terms are defined
     \item[Late-stage] An advanced cracking condition where the damage is already well-established and more severe.
 \end{description}
 
+\medskip
 \noindent
 It is important to emphasize that both terms describe the \textbf{physical status at the time of acquisition}. This thesis focuses on identifying existing crack-related spectral signatures rather than predicting future outcomes or pre-symptomatic conditions.
 
 \clearpage
-\subsection{Problem Statement and Research Gap} 
-While previous studies have demonstrated the potential of hyperspectral imaging (HSI) for agricultural anomaly detection, most research has been confined to controlled laboratory settings or detached fruit (What was done). A critical knowledge gap remains regarding the operational translation of these methods to complex, unconstrained field conditions. Specifically, existing direct pixel-level approaches struggle to cope with severe environmental clutter (e.g., varying illumination, background materials) and lack the robustness required to identify early-stage, pre-visual cracking in intact grape clusters (What is missing). To bridge this gap, this thesis introduces a novel spatial-aggregation framework combined with dimensionality reduction, shifting the detection paradigm from idealized laboratory analysis to practical, field-ready monitoring (Why this work is needed). 
+\subsection{Problem Statement and Research Gap}
 
+\noindent
+While HSI shows strong potential for agricultural anomaly detection, most existing work has been conducted under controlled laboratory conditions or on detached fruit. A critical gap remains in translating these methods to real vineyard conditions, where background clutter, changing illumination, and other sources of variability make direct pixel-level approaches unreliable for detecting early-stage cracking in intact clusters.
+
+\medskip
+\noindent
+To address this gap, this thesis proposes a spatial-aggregation framework combined with dimensionality reduction, shifting the analysis from controlled laboratory settings toward a practical, field-ready monitoring strategy.
+
+\medskip
 \noindent
 Consequently, this research addresses the following overarching question:
 
-% \subsection{Main Research Question}
-% Can hyperspectral imaging and machine learning models be used to detect and identify cracking-related status at the time of measurement under field conditions, including both early- and late-stage acquisitions (initial/minimal vs.\ advanced cracking)?
-
-% \section{Research Objectives and Hypotheses}
-
-% \subsection{Research Objectives}
-% \begin{enumerate}
-%     \item \textbf{Identification:} To develop a high-accuracy classification model to differentiate between healthy and cracked grape tissue at the pixel level using their hyperspectral signatures.
-%     \item \textbf{Whole-image screening:} To develop and evaluate an image-level crack-detection pipeline by combining pixel-level inference with spatial aggregation and post-processing, and to assess performance under early- and late-stage acquisition conditions (initial/minimal vs.\ advanced cracking).
-%     \item \textbf{Wavelength selection:} To quantify the performance--complexity trade-off of reduced spectral-band subsets and identify stable candidate wavelengths to support compact sensing configurations.
-% \end{enumerate}
 
 \subsection{Research Objectives and Sub-Questions}
 
@@ -112,51 +117,31 @@ The goal of this research is to move from theoretical spectral analysis to a pra
     \end{itemize}
 \end{enumerate}
 
+\clearpage
 \subsection{Contributions}
 \noindent
 The main contributions of this thesis are as follows:
 
-\begin{itemize}[leftmargin=*]
-    % \item A consistent VIS--NIR preprocessing protocol was established and applied throughout the study by restricting spectra to 450--925\,nm and using per-spectrum SNV normalization, enabling direct comparability across experiments.
-    \item A standardized data preprocessing pipeline was established to clean the raw camera measurements and ensure consistency. This included filtering out noisy sensor bands by restricting the data to the most reliable wavelength range (450--925\,nm), and applying a normalization technique (SNV) to neutralize the effects of varying field illumination and shadows, enabling accurate comparisons across all experiments.
-    % \item A field-acquired hyperspectral dataset was collected and curated at both pixel and whole-image levels, including manual pixel labeling and full-scene vineyard acquisitions, and was used to benchmark supervised classifiers under leave-one-group-out protocols and row-separated calibration/test evaluation, demonstrating reliable crack discrimination at the spectral-signature level (Chapter~\ref{ch:results}, Section~\ref{sec:pixel-level-classification}).
-    \item A comprehensive hyperspectral dataset was collected directly from the vineyard, comprising both manually labeled isolated pixels and full-scene images. 
-    \item Supervised classifiers were trained and rigorously evaluated on this dataset. By testing the models on distinct, unseen vineyard rows, the study successfully demonstrated reliable crack discrimination based on spectral signatures (Chapter~\ref{ch:results}, Section~\ref{sec:pixel-level-classification}).
-    \item The limits of direct pixel-level segmentation in realistic vineyard scenes were analyzed by tracing error sources such as mixed pixels, illumination/BRDF effects, and spectrally confounding background materials, motivating a shift toward spatial aggregation (Chapter~\ref{chap:discussion_conclusions}, Section~\ref{sec:spatial_aggregation}).
-    \item A whole-image crack-detection pipeline was developed by combining pixel-level inference with probability thresholding, morphological filtering, and patch/blob-based aggregation, with post-processing parameters optimized on calibration data and evaluated under early- vs.\ late-stage acquisition conditions (initial/minimal vs.\ advanced cracking; Chapter~\ref{ch:results}, Section~\ref{sec:full-image-early-late}).
-    \item Backward Feature Selection (BFS) was used to quantify the performance--complexity trade-off of wavelength reduction and to assess selection stability across random seeds, providing a basis for compact band subsets and sensor-design implications (Chapter~\ref{ch:results}, Sections~\ref{sec:bfs-setup} and~\ref{sec:bfs-stability}).
+% \begin{itemize}
+%     \item \textbf{In-Field Dataset \& SAM2 Annotation:} Collected a comprehensive hyperspectral dataset directly in the vineyard. To handle the complexity of labeling these realistic scenes, SAM2 (Segment Anything Model 2) was utilized to streamline and generate precise masks for full-scene images, alongside manually labeled isolated pixels.
+
+%     \item \textbf{Standardized Preprocessing Pipeline:} Developed a robust pipeline to clean raw camera measurements and ensure consistency. The analysis was restricted to the most reliable wavelength range (450–925 nm), and Standard Normal Variate (SNV) normalization was applied to mitigate the effects of field illumination, shadows, and varying BRDF.
+        
+%     \item \textbf{Pixel-Level Classification:} Trained and evaluated supervised classifiers on the dataset. Testing on distinct, unseen vineyard rows demonstrated reliable grape crack discrimination based on spectral signatures (Chapter 5, Section 5.3).
+    
+%     \item \textbf{Analysis of Classification Limits:} Evaluated the limitations of direct pixel-level classification in realistic vineyard scenes. Identified key error sources that persist despite preprocessing—such as mixed pixels at object boundaries and spectrally confounding backgrounds—motivating a shift toward spatial aggregation (Chapter 6, Section 6.2).
+    
+%     \item \textbf{Whole-Image Detection Pipeline:} Developed a comprehensive whole-image crack-detection pipeline integrating pixel-level inference, probability thresholding, and morphological filtering. The pipeline was evaluated under both early-stage (minimal) and late-stage (advanced) cracking conditions (Chapter 5, Section 5.6).
+    
+%     \item \textbf{Wavelength Selection for Practical Sensors:} Identified stable, compact wavelength subsets that reduce spectral dimensionality while preserving strong detection performance. This provides a practical foundation for designing simpler, cost-effective multispectral sensors (Chapter 5, Sections 5.7 and 5.7.3).
+% \end{itemize}
+
+\begin{itemize}
+    \item \textbf{In-Field Dataset \& SAM2 Annotation:} Collected a comprehensive hyperspectral dataset directly in the vineyard. To handle the complexity of labeling realistic agricultural scenes, SAM2 (Segment Anything Model 2) was utilized to streamline and generate precise masks for full-scene images, alongside manually labeled isolated pixels.
+    
+    \item \textbf{Analysis of Classification Limits:} Evaluated the inherent limitations of direct pixel-level classification in realistic vineyard scenes. Identified key error sources that persist despite standard spectral preprocessing—such as mixed pixels at object boundaries and spectrally confounding backgrounds—motivating a critical shift toward spatial aggregation (Chapter 6, Section 6.2).
+    
+    \item \textbf{Whole-Image Detection Pipeline:} Developed a comprehensive, robust crack-detection pipeline that moves beyond isolated pixels by integrating pixel-level inference, probability thresholding, and morphological filtering. The pipeline was successfully evaluated under both early-stage (minimal) and late-stage (advanced) cracking conditions (Chapter 5, Section 5.6).
+    
+    \item \textbf{Wavelength Selection for Practical Sensors:} Identified stable, compact wavelength subsets that significantly reduce spectral dimensionality while preserving strong detection performance. This provides a direct, practical foundation for designing simpler, cost-effective multispectral sensors for field use (Chapter 5, Sections 5.7 and 5.7.3).
 \end{itemize}
-
-% \begin{figure}[htbp]
-%     \centering
-%     \scalebox{0.88}{%
-%     \begin{tikzpicture}[
-%         phaseBox/.style={rectangle, draw=black!70, thick, fill=blue!5, text width=3.6cm, align=center, minimum height=2.8cm, rounded corners=3mm},
-%         arrow/.style={-{Stealth[length=3.5mm, width=2mm]}, thick, draw=blue!80!black}
-%     ]
-
-%     \node[phaseBox] (phase1) {
-%         {\small\bfseries\color{blue!80!black}Phase 1}\\[1mm]
-%         {\small\bfseries Pixel-Level\\Classification}\\[2mm]
-%         {\footnotesize\color{black!70}SNV pre-processing \& multi-class XGBoost spectral modeling.}
-%     };
-
-%     \node[phaseBox, right=0.8cm of phase1] (phase2) {
-%         {\small\bfseries\color{blue!80!black}Phase 2}\\[1mm]
-%         {\small\bfseries Whole-Image\\Spatial Aggregation}\\[2mm]
-%         {\footnotesize\color{black!70}Morphological filtering \& patch-density logic to reject field artifacts.}
-%     };
-
-%     \node[phaseBox, right=0.8cm of phase2] (phase3) {
-%         {\small\bfseries\color{blue!80!black}Phase 3}\\[1mm]
-%         {\small\bfseries Wavelength Selection\\\& Sensor Design}\\[2mm]
-%         {\footnotesize\color{black!70}BFS reduces 159 bands to a stable 30-band multispectral subset.}
-%     };
-
-%     \draw[arrow] (phase1) -- (phase2);
-%     \draw[arrow] (phase2) -- (phase3);
-
-%     \end{tikzpicture}}%
-%     \caption{Methodological pipeline overview. The research progresses from pixel-level spectral analysis, through whole-image spatial aggregation for field robustness, to spectral dimensionality reduction for practical sensor implementation.}
-%     \label{fig:pipeline_overview}
-% \end{figure}

@@ -231,71 +231,6 @@
       \endverb
       \keyw{Deep learning,CNN,Smart farming,Weed and pest detection,Disease detection,Yield estimation}
     \endentry
-    \entry{Scarlotta2022}{article}{}{}
-      \true{moreauthor}
-      \true{morelabelname}
-      \name{author}{1}{}{%
-        {{un=1,uniquepart=given,hash=1318a946c3fffa54cec1130748f21c17}{%
-           family={Author},
-           familyi={A\bibinitperiod},
-           given={A.},
-           giveni={A\bibinitperiod},
-           givenun=1}}%
-      }
-      \strng{namehash}{65b92fb550f32f3304ab7503a6dff18f}
-      \strng{fullhash}{65b92fb550f32f3304ab7503a6dff18f}
-      \strng{fullhashraw}{65b92fb550f32f3304ab7503a6dff18f}
-      \strng{bibnamehash}{65b92fb550f32f3304ab7503a6dff18f}
-      \strng{authorbibnamehash}{65b92fb550f32f3304ab7503a6dff18f}
-      \strng{authornamehash}{65b92fb550f32f3304ab7503a6dff18f}
-      \strng{authorfullhash}{65b92fb550f32f3304ab7503a6dff18f}
-      \strng{authorfullhashraw}{65b92fb550f32f3304ab7503a6dff18f}
-      \field{sortinit}{A}
-      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{journaltitle}{Foods}
-      \field{number}{5}
-      \field{title}{Assessment of Scarlotta Seedless table grape maturation and quality}
-      \field{volume}{11}
-      \field{year}{2022}
-      \field{pages}{663}
-      \range{pages}{1}
-    \endentry
-    \entry{Scarlotta2024}{article}{}{}
-      \true{moreauthor}
-      \true{morelabelname}
-      \name{author}{1}{}{%
-        {{un=1,uniquepart=given,hash=bfd608ec341f02d80ef61a344bb781ac}{%
-           family={Author},
-           familyi={A\bibinitperiod},
-           given={B.},
-           giveni={B\bibinitperiod},
-           givenun=1}}%
-      }
-      \strng{namehash}{04ec98458d18bdd2197f2a47bc65be57}
-      \strng{fullhash}{04ec98458d18bdd2197f2a47bc65be57}
-      \strng{fullhashraw}{04ec98458d18bdd2197f2a47bc65be57}
-      \strng{bibnamehash}{04ec98458d18bdd2197f2a47bc65be57}
-      \strng{authorbibnamehash}{04ec98458d18bdd2197f2a47bc65be57}
-      \strng{authornamehash}{04ec98458d18bdd2197f2a47bc65be57}
-      \strng{authorfullhash}{04ec98458d18bdd2197f2a47bc65be57}
-      \strng{authorfullhashraw}{04ec98458d18bdd2197f2a47bc65be57}
-      \field{sortinit}{A}
-      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{journaltitle}{Postharvest Biology and Technology}
-      \field{title}{Impact of storage temperature on postharvest quality of Scarlotta Seedless}
-      \field{volume}{215}
-      \field{year}{2024}
-      \field{pages}{113013}
-      \range{pages}{1}
-    \endentry
     \entry{ball2007field}{book}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=7deba6762adab6f8765ff4889fb122e9}{%
@@ -666,25 +601,24 @@
       \range{pages}{1}
     \endentry
     \entry{Castellarin2016}{article}{}{}
-      \name{author}{2}{}{%
+      \true{moreauthor}
+      \true{morelabelname}
+      \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=e0888a989653704148e57838f6b906ab}{%
            family={Castellarin},
            familyi={C\bibinitperiod},
            given={S.\bibnamedelimi D.},
            giveni={S\bibinitperiod\bibinitdelim D\bibinitperiod},
            givenun=0}}%
-        {{un=0,uniquepart=base,hash=795f3202b17cb6bc3d4b771d8c6c9eaf}{%
-           family={other},
-           familyi={o\bibinitperiod}}}%
       }
-      \strng{namehash}{ce5e9bb29a146d78c933993688a69278}
-      \strng{fullhash}{ce5e9bb29a146d78c933993688a69278}
-      \strng{fullhashraw}{ce5e9bb29a146d78c933993688a69278}
-      \strng{bibnamehash}{ce5e9bb29a146d78c933993688a69278}
-      \strng{authorbibnamehash}{ce5e9bb29a146d78c933993688a69278}
-      \strng{authornamehash}{ce5e9bb29a146d78c933993688a69278}
-      \strng{authorfullhash}{ce5e9bb29a146d78c933993688a69278}
-      \strng{authorfullhashraw}{ce5e9bb29a146d78c933993688a69278}
+      \strng{namehash}{22910164de483618328121627e331980}
+      \strng{fullhash}{22910164de483618328121627e331980}
+      \strng{fullhashraw}{22910164de483618328121627e331980}
+      \strng{bibnamehash}{22910164de483618328121627e331980}
+      \strng{authorbibnamehash}{22910164de483618328121627e331980}
+      \strng{authornamehash}{22910164de483618328121627e331980}
+      \strng{authorfullhash}{22910164de483618328121627e331980}
+      \strng{authorfullhashraw}{22910164de483618328121627e331980}
       \field{sortinit}{C}
       \field{sortinithash}{4d103a86280481745c9c897c925753c0}
       \field{extradatescope}{labelyear}
@@ -2314,6 +2248,61 @@
       \verb 10.3390/agronomy14112694
       \endverb
     \endentry
+    \entry{paoletti2019deep}{article}{}{}
+      \name{author}{4}{}{%
+        {{un=0,uniquepart=base,hash=f1fd3bba3d3ad9dcb2d367f134e6c17b}{%
+           family={Paoletti},
+           familyi={P\bibinitperiod},
+           given={M.\bibnamedelimi E.},
+           giveni={M\bibinitperiod\bibinitdelim E\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=41b82b24f7d07e400b9486dac86e265c}{%
+           family={Haut},
+           familyi={H\bibinitperiod},
+           given={J.\bibnamedelimi M.},
+           giveni={J\bibinitperiod\bibinitdelim M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=473715e344cf3a1a3c7b0b5ece58aa43}{%
+           family={Plaza},
+           familyi={P\bibinitperiod},
+           given={J.},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=24a582cda9a7ce3858c2aed8e9d129d2}{%
+           family={Plaza},
+           familyi={P\bibinitperiod},
+           given={A.},
+           giveni={A\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {Elsevier}%
+      }
+      \strng{namehash}{4f942aa609e486fa31c77da4e8260053}
+      \strng{fullhash}{eac2269230e9762cb7a0fc11ae16f975}
+      \strng{fullhashraw}{eac2269230e9762cb7a0fc11ae16f975}
+      \strng{bibnamehash}{eac2269230e9762cb7a0fc11ae16f975}
+      \strng{authorbibnamehash}{eac2269230e9762cb7a0fc11ae16f975}
+      \strng{authornamehash}{4f942aa609e486fa31c77da4e8260053}
+      \strng{authorfullhash}{eac2269230e9762cb7a0fc11ae16f975}
+      \strng{authorfullhashraw}{eac2269230e9762cb7a0fc11ae16f975}
+      \field{sortinit}{P}
+      \field{sortinithash}{ff3bcf24f47321b42cb156c2cc8a8422}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{ISPRS Journal of Photogrammetry and Remote Sensing}
+      \field{title}{Deep learning classifiers for hyperspectral imaging: A review}
+      \field{volume}{158}
+      \field{year}{2019}
+      \field{pages}{279\bibrangedash 317}
+      \range{pages}{39}
+      \verb{doi}
+      \verb 10.1016/j.isprsjprs.2019.09.006
+      \endverb
+    \endentry
     \entry{patricio2018computer}{article}{}{}
       \name{author}{2}{}{%
         {{un=0,uniquepart=base,hash=a9eef84afd1aa4780957da0c149a0205}{%
@@ -2583,6 +2572,69 @@
       \field{volume}{14}
       \field{year}{2023}
       \field{pages}{1130857}
+      \range{pages}{1}
+    \endentry
+    \entry{Scarlotta2022}{article}{}{}
+      \true{moreauthor}
+      \true{morelabelname}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=78d6affc3a98b283ad7d07a7e96d1081}{%
+           family={{Scarlotta Seedless Consortium}},
+           familyi={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
+      \strng{fullhash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
+      \strng{fullhashraw}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
+      \strng{bibnamehash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
+      \strng{authorbibnamehash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
+      \strng{authornamehash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
+      \strng{authorfullhash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
+      \strng{authorfullhashraw}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
+      \field{extraname}{1}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Foods}
+      \field{number}{5}
+      \field{title}{Assessment of Scarlotta Seedless table grape maturation and quality}
+      \field{volume}{11}
+      \field{year}{2022}
+      \field{pages}{663}
+      \range{pages}{1}
+    \endentry
+    \entry{Scarlotta2024}{article}{}{}
+      \true{moreauthor}
+      \true{morelabelname}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=78d6affc3a98b283ad7d07a7e96d1081}{%
+           family={{Scarlotta Seedless Consortium}},
+           familyi={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
+      \strng{fullhash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
+      \strng{fullhashraw}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
+      \strng{bibnamehash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
+      \strng{authorbibnamehash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
+      \strng{authornamehash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
+      \strng{authorfullhash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
+      \strng{authorfullhashraw}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
+      \field{extraname}{2}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Postharvest Biology and Technology}
+      \field{title}{Impact of storage temperature on postharvest quality of Scarlotta Seedless}
+      \field{volume}{215}
+      \field{year}{2024}
+      \field{pages}{113013}
       \range{pages}{1}
     \endentry
     \entry{agronomy12102437}{article}{}{}
@@ -4065,71 +4117,6 @@
       \endverb
       \keyw{Deep learning,CNN,Smart farming,Weed and pest detection,Disease detection,Yield estimation}
     \endentry
-    \entry{Scarlotta2022}{article}{}{}
-      \true{moreauthor}
-      \true{morelabelname}
-      \name{author}{1}{}{%
-        {{un=1,uniquepart=given,hash=1318a946c3fffa54cec1130748f21c17}{%
-           family={Author},
-           familyi={A\bibinitperiod},
-           given={A.},
-           giveni={A\bibinitperiod},
-           givenun=1}}%
-      }
-      \strng{namehash}{65b92fb550f32f3304ab7503a6dff18f}
-      \strng{fullhash}{65b92fb550f32f3304ab7503a6dff18f}
-      \strng{fullhashraw}{65b92fb550f32f3304ab7503a6dff18f}
-      \strng{bibnamehash}{65b92fb550f32f3304ab7503a6dff18f}
-      \strng{authorbibnamehash}{65b92fb550f32f3304ab7503a6dff18f}
-      \strng{authornamehash}{65b92fb550f32f3304ab7503a6dff18f}
-      \strng{authorfullhash}{65b92fb550f32f3304ab7503a6dff18f}
-      \strng{authorfullhashraw}{65b92fb550f32f3304ab7503a6dff18f}
-      \field{sortinit}{A}
-      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{journaltitle}{Foods}
-      \field{number}{5}
-      \field{title}{Assessment of Scarlotta Seedless table grape maturation and quality}
-      \field{volume}{11}
-      \field{year}{2022}
-      \field{pages}{663}
-      \range{pages}{1}
-    \endentry
-    \entry{Scarlotta2024}{article}{}{}
-      \true{moreauthor}
-      \true{morelabelname}
-      \name{author}{1}{}{%
-        {{un=1,uniquepart=given,hash=bfd608ec341f02d80ef61a344bb781ac}{%
-           family={Author},
-           familyi={A\bibinitperiod},
-           given={B.},
-           giveni={B\bibinitperiod},
-           givenun=1}}%
-      }
-      \strng{namehash}{04ec98458d18bdd2197f2a47bc65be57}
-      \strng{fullhash}{04ec98458d18bdd2197f2a47bc65be57}
-      \strng{fullhashraw}{04ec98458d18bdd2197f2a47bc65be57}
-      \strng{bibnamehash}{04ec98458d18bdd2197f2a47bc65be57}
-      \strng{authorbibnamehash}{04ec98458d18bdd2197f2a47bc65be57}
-      \strng{authornamehash}{04ec98458d18bdd2197f2a47bc65be57}
-      \strng{authorfullhash}{04ec98458d18bdd2197f2a47bc65be57}
-      \strng{authorfullhashraw}{04ec98458d18bdd2197f2a47bc65be57}
-      \field{sortinit}{A}
-      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{journaltitle}{Postharvest Biology and Technology}
-      \field{title}{Impact of storage temperature on postharvest quality of Scarlotta Seedless}
-      \field{volume}{215}
-      \field{year}{2024}
-      \field{pages}{113013}
-      \range{pages}{1}
-    \endentry
     \entry{ball2007field}{book}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=7deba6762adab6f8765ff4889fb122e9}{%
@@ -4500,25 +4487,24 @@
       \range{pages}{1}
     \endentry
     \entry{Castellarin2016}{article}{}{}
-      \name{author}{2}{}{%
+      \true{moreauthor}
+      \true{morelabelname}
+      \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=e0888a989653704148e57838f6b906ab}{%
            family={Castellarin},
            familyi={C\bibinitperiod},
            given={S.\bibnamedelimi D.},
            giveni={S\bibinitperiod\bibinitdelim D\bibinitperiod},
            givenun=0}}%
-        {{un=0,uniquepart=base,hash=795f3202b17cb6bc3d4b771d8c6c9eaf}{%
-           family={other},
-           familyi={o\bibinitperiod}}}%
       }
-      \strng{namehash}{ce5e9bb29a146d78c933993688a69278}
-      \strng{fullhash}{ce5e9bb29a146d78c933993688a69278}
-      \strng{fullhashraw}{ce5e9bb29a146d78c933993688a69278}
-      \strng{bibnamehash}{ce5e9bb29a146d78c933993688a69278}
-      \strng{authorbibnamehash}{ce5e9bb29a146d78c933993688a69278}
-      \strng{authornamehash}{ce5e9bb29a146d78c933993688a69278}
-      \strng{authorfullhash}{ce5e9bb29a146d78c933993688a69278}
-      \strng{authorfullhashraw}{ce5e9bb29a146d78c933993688a69278}
+      \strng{namehash}{22910164de483618328121627e331980}
+      \strng{fullhash}{22910164de483618328121627e331980}
+      \strng{fullhashraw}{22910164de483618328121627e331980}
+      \strng{bibnamehash}{22910164de483618328121627e331980}
+      \strng{authorbibnamehash}{22910164de483618328121627e331980}
+      \strng{authornamehash}{22910164de483618328121627e331980}
+      \strng{authorfullhash}{22910164de483618328121627e331980}
+      \strng{authorfullhashraw}{22910164de483618328121627e331980}
       \field{sortinit}{C}
       \field{sortinithash}{4d103a86280481745c9c897c925753c0}
       \field{extradatescope}{labelyear}
@@ -6148,6 +6134,61 @@
       \verb 10.3390/agronomy14112694
       \endverb
     \endentry
+    \entry{paoletti2019deep}{article}{}{}
+      \name{author}{4}{}{%
+        {{un=0,uniquepart=base,hash=f1fd3bba3d3ad9dcb2d367f134e6c17b}{%
+           family={Paoletti},
+           familyi={P\bibinitperiod},
+           given={M.\bibnamedelimi E.},
+           giveni={M\bibinitperiod\bibinitdelim E\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=41b82b24f7d07e400b9486dac86e265c}{%
+           family={Haut},
+           familyi={H\bibinitperiod},
+           given={J.\bibnamedelimi M.},
+           giveni={J\bibinitperiod\bibinitdelim M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=473715e344cf3a1a3c7b0b5ece58aa43}{%
+           family={Plaza},
+           familyi={P\bibinitperiod},
+           given={J.},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=24a582cda9a7ce3858c2aed8e9d129d2}{%
+           family={Plaza},
+           familyi={P\bibinitperiod},
+           given={A.},
+           giveni={A\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {Elsevier}%
+      }
+      \strng{namehash}{4f942aa609e486fa31c77da4e8260053}
+      \strng{fullhash}{eac2269230e9762cb7a0fc11ae16f975}
+      \strng{fullhashraw}{eac2269230e9762cb7a0fc11ae16f975}
+      \strng{bibnamehash}{eac2269230e9762cb7a0fc11ae16f975}
+      \strng{authorbibnamehash}{eac2269230e9762cb7a0fc11ae16f975}
+      \strng{authornamehash}{4f942aa609e486fa31c77da4e8260053}
+      \strng{authorfullhash}{eac2269230e9762cb7a0fc11ae16f975}
+      \strng{authorfullhashraw}{eac2269230e9762cb7a0fc11ae16f975}
+      \field{sortinit}{P}
+      \field{sortinithash}{ff3bcf24f47321b42cb156c2cc8a8422}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{ISPRS Journal of Photogrammetry and Remote Sensing}
+      \field{title}{Deep learning classifiers for hyperspectral imaging: A review}
+      \field{volume}{158}
+      \field{year}{2019}
+      \field{pages}{279\bibrangedash 317}
+      \range{pages}{39}
+      \verb{doi}
+      \verb 10.1016/j.isprsjprs.2019.09.006
+      \endverb
+    \endentry
     \entry{patricio2018computer}{article}{}{}
       \name{author}{2}{}{%
         {{un=0,uniquepart=base,hash=a9eef84afd1aa4780957da0c149a0205}{%
@@ -6417,6 +6458,69 @@
       \field{volume}{14}
       \field{year}{2023}
       \field{pages}{1130857}
+      \range{pages}{1}
+    \endentry
+    \entry{Scarlotta2022}{article}{}{}
+      \true{moreauthor}
+      \true{morelabelname}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=78d6affc3a98b283ad7d07a7e96d1081}{%
+           family={{Scarlotta Seedless Consortium}},
+           familyi={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
+      \strng{fullhash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
+      \strng{fullhashraw}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
+      \strng{bibnamehash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
+      \strng{authorbibnamehash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
+      \strng{authornamehash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
+      \strng{authorfullhash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
+      \strng{authorfullhashraw}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
+      \field{extraname}{1}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Foods}
+      \field{number}{5}
+      \field{title}{Assessment of Scarlotta Seedless table grape maturation and quality}
+      \field{volume}{11}
+      \field{year}{2022}
+      \field{pages}{663}
+      \range{pages}{1}
+    \endentry
+    \entry{Scarlotta2024}{article}{}{}
+      \true{moreauthor}
+      \true{morelabelname}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=78d6affc3a98b283ad7d07a7e96d1081}{%
+           family={{Scarlotta Seedless Consortium}},
+           familyi={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
+      \strng{fullhash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
+      \strng{fullhashraw}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
+      \strng{bibnamehash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
+      \strng{authorbibnamehash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
+      \strng{authornamehash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
+      \strng{authorfullhash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
+      \strng{authorfullhashraw}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
+      \field{extraname}{2}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Postharvest Biology and Technology}
+      \field{title}{Impact of storage temperature on postharvest quality of Scarlotta Seedless}
+      \field{volume}{215}
+      \field{year}{2024}
+      \field{pages}{113013}
       \range{pages}{1}
     \endentry
     \entry{agronomy12102437}{article}{}{}

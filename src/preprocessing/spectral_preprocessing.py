@@ -30,10 +30,10 @@ Usage example:
     # data.X, data.y, data.groups, data.segment_ids, data.image_ids,
     # data.label_encoder, data.class_names, data.feature_names
 """
+from __future__ import annotations
+
 from pathlib import Path
 _PROJECT_ROOT = Path(__file__).resolve().parents[2]
-
-from __future__ import annotations
 
 import re
 import json
