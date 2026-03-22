@@ -133,11 +133,11 @@ All five models achieve PR--AUC\textsubscript{CRACK} $\geq 0.987$ (Table~\ref{ta
 \label{sec:pixel-multiclass}
 
 \noindent
-While binary classification validates baseline spectral separability, operational field detection requires robustness against severe background clutter. To evaluate this, the detection task was expanded to a 10-class taxonomy encompassing diverse vineyard elements (Section~\ref{subsec:pixel_level_framework}). Performance was assessed across three labeling strategies: \textit{crack\_regular\_rest}, \textit{crack\_vs\_rest}, and \textit{multi\_class}. Balanced-training results are detailed in Appendix~\ref{app:balanced_results}.
+While binary classification validates baseline spectral separability, operational field detection requires robustness against severe background clutter. To evaluate this, the detection task was expanded to a 10-class taxonomy encompassing diverse vineyard elements (Section~\ref{subsec:pixel_level_framework}). Results for alternative labeling strategies (\textit{crack\_vs\_rest}, \textit{crack\_regular\_rest}) are provided in Appendix~\ref{app:cv_statistics}; balanced-training results are detailed in Appendix~\ref{app:balanced_results}.
 
 \begin{table}[h!]
     \centering
-    \caption[Pixel-level classification: unbalanced multi-class]{Pixel-level classification metrics (unbalanced, multi-class). Truncated mean values. All CRACK-subscripted metrics are computed one-vs-rest for the CRACK class. Full cross-validation statistics in Appendix~\ref{app:cv_statistics}.}
+    \caption[Pixel-level classification: unbalanced multi-class (10 classes)]{Pixel-level classification metrics (unbalanced, full 10-class setting). CRACK constitutes ${\sim}2\%$ of total pixels. All CRACK-subscripted metrics are computed one-vs-rest. Full cross-validation statistics and alternative labeling strategies in Appendix~\ref{app:cv_statistics}.}
     \label{tab:pixel_metrics_unbalanced_all}
     \small
     \renewcommand{\arraystretch}{1.10}
@@ -145,24 +145,15 @@ While binary classification validates baseline spectral separability, operationa
     \begin{adjustbox}{max width=\linewidth,center}
     \begin{tabular}{@{}llccccccc@{}}
         \toprule
-        Label setup & Model & Accuracy & Balanced Acc. & Precision (Cracked) & Recall (Cracked) & F1\textsubscript{CRACK} & ROC--AUC\textsubscript{CRACK} & PR--AUC\textsubscript{CRACK} \\
+        Label setup & Model & Accuracy & Balanced Acc. & Precision\textsubscript{CRACK} & Recall\textsubscript{CRACK} & F1\textsubscript{CRACK} & ROC--AUC\textsubscript{CRACK} & PR--AUC\textsubscript{CRACK} \\
         \midrule
-        % \multicolumn{9}{@{}l@{}}{\textbf{crack\_regular\_rest}} \\
-        % & PLS-DA                & 0.508 & 0.687 & 0.882 & 0.753 & 0.581 & 0.997 & 0.863 \\
-        % & Logistic Regression (L1) & 0.853 & 0.868 & 0.965 & 0.966 & 0.801 & 0.999 & 0.983 \\
-        % & Random Forest         & 0.917 & 0.917 & 0.894 & 0.939 & 0.890 & 0.997 & 0.962 \\
-        % & XGBoost               & 0.921 & 0.916 & 0.980 & 0.949 & 0.883 & 0.999 & 0.990 \\
-        % & MLP (Small)           & 0.917 & 0.916 & 0.953 & 0.972 & 0.875 & 0.999 & 0.991 \\
-        \addlinespace[4pt]
-        % crack_vs_rest — FIXED binary results (2026-03-22), unbalanced mode
-        \multicolumn{9}{@{}l@{}}{\textbf{crack\_vs\_rest}} \\
-        & PLS-DA                & 0.982 & 0.541 & 0.164 & 0.084 & 0.108 & 0.994 & 0.591 \\
-        & Logistic Regression (L1) & 0.943 & 0.956 & 0.220 & 0.969 & 0.347 & 0.955 & 0.180 \\
-        & Random Forest         & 0.997 & 0.961 & 0.910 & 0.923 & 0.911 & 0.997 & 0.965 \\
-        & XGBoost               & 0.999 & 0.970 & 0.985 & 0.939 & 0.958 & 0.999 & 0.988 \\
-        & MLP (Small)           & 0.999 & 0.974 & 0.964 & 0.948 & 0.953 & 0.998 & 0.963 \\
-        
-    \addlinespace[4pt]
+        % --- crack_regular_rest and crack_vs_rest moved to Appendix ---
+        % crack_vs_rest — FIXED binary results (2026-03-22), unbalanced mode:
+        % PLS-DA: 0.982 / 0.541 / 0.164 / 0.084 / 0.108 / 0.994 / 0.591
+        % LogReg: 0.943 / 0.956 / 0.220 / 0.969 / 0.347 / 0.955 / 0.180
+        % RF:     0.997 / 0.961 / 0.910 / 0.923 / 0.911 / 0.997 / 0.965
+        % XGB:    0.999 / 0.970 / 0.985 / 0.939 / 0.958 / 0.999 / 0.988
+        % MLP:    0.999 / 0.974 / 0.964 / 0.948 / 0.953 / 0.998 / 0.963
         \multicolumn{9}{@{}l@{}}{\textbf{multi\_class}} \\
         & PLS-DA                & 0.967 & 0.978 & 0.720 & 0.992 & 0.821 & 0.997 & 0.967 \\
         & Logistic Regression (L1) & 0.997 & 0.995 & 0.967 & 0.997 & 0.995 & 0.999 & 0.997 \\
@@ -175,7 +166,7 @@ While binary classification validates baseline spectral separability, operationa
 \end{table}
 
 \noindent
-The results demonstrate that supervised models maintain high discriminative power even in the presence of complex background materials. The \textit{multi\_class} formulation yielded the highest overall performance, with Logistic Regression, Random Forest, and XGBoost all exceeding a PR--AUC\textsubscript{CRACK} of 0.990 (Table~\ref{tab:pixel_metrics_unbalanced_all}). This confirms that crack signatures remain distinct from background clutter, justifying the use of the trained multi-class XGBoost model as the core engine for the whole-image aggregation pipeline.
+Despite CRACK pixels accounting for only ${\sim}2\%$ of the dataset, Logistic Regression, Random Forest, and XGBoost all exceeded a PR--AUC\textsubscript{CRACK} of 0.990 (Table~\ref{tab:pixel_metrics_unbalanced_all}). This confirms that crack signatures remain spectrally distinct even amidst severe background clutter, justifying the use of the trained multi-class XGBoost model as the core engine for the whole-image aggregation pipeline.
 
 \end{landscape}
 
@@ -285,12 +276,12 @@ The baseline for whole-image comparison is the full-spectrum XGBoost aggregation
 
 \small
 \renewcommand{\arraystretch}{1.2}
-\setlength{\tabcolsep}{8pt}
+\setlength{\tabcolsep}{6pt}
 
+\begin{adjustbox}{max width=\textwidth,center}
 \begin{tabular}{@{}lllcccc@{}}
-
 \toprule
-Row & Stage & Split & Total & Unique & Pos & Neg \\
+Vineyard row & Acquisition stage & Dataset split & Total images & Unique clusters & Cracked images & Non-cracked images \\
 \midrule
 Row 1 & Early & Calibration & 172 & 60 & 32 & 140 \\
 Row 1 & Late  & Calibration & 160 & 60 & 35 & 125 \\
@@ -299,6 +290,7 @@ Row 2 & Early & Test        & 60  & 60 & 32 & 28  \\
 Row 2 & Late  & Test        & 60  & 60 & 34 & 26  \\
 \bottomrule
 \end{tabular}
+\end{adjustbox}
 
 \end{table}
 
@@ -363,35 +355,19 @@ Early & Test &
 \end{table}
 
 \noindent
-The results on the independent test set demonstrate robust system-level performance. Under late-stage conditions (advanced cracking), the supervised pipeline achieved F1\textsubscript{CRACK}~=~0.857 (Table~\ref{tab:full_image_early_late_metrics}). More importantly, under early-stage conditions--where cracks are minimal and visually indistinct--the system maintained strong predictive capability with F1\textsubscript{CRACK}~=~0.800. The moderate performance drop between late and early stages reflects the physical difficulty of detecting incipient micro-cracks. Nevertheless, these results confirm both \hyperref[hyp:whole_image_robustness]{Hypothesis~3} and \hyperref[hyp:early_detection]{Hypothesis~4}: the spatial aggregation logic successfully suppresses background noise, enabling reliable early-warning triggers on entirely unseen vines.
+The results on the independent test set demonstrate robust system-level performance. Under late-stage conditions (advanced cracking), the supervised pipeline achieved F1\textsubscript{CRACK}~=~0.857 (Table~\ref{tab:full_image_early_late_metrics}). More importantly, under early-stage conditions---where cracks are minimal and visually indistinct---the system maintained strong predictive capability with F1\textsubscript{CRACK}~=~0.800. The moderate performance drop between late and early stages reflects the physical difficulty of detecting incipient micro-cracks. Nevertheless, these results confirm both \hyperref[hyp:whole_image_robustness]{Hypothesis~3} and \hyperref[hyp:early_detection]{Hypothesis~4}: the spatial aggregation logic successfully suppresses background noise, enabling reliable early-warning triggers on entirely unseen vines.
+
+\clearpage
+\noindent
+Figure~\ref{fig:tp_example} illustrates this on a correctly detected example from the Row~2 test set. On the left, the pixel-level XGBoost model produces scattered crack-positive responses; on the right, the spatial aggregation step suppresses isolated detections and retains only the coherent crack-positive region on the grape cluster, yielding the final image-level positive decision.
 
 \begin{figure}[ht]
     \centering
-    \begin{subfigure}[t]{0.6\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{figures/results/full_images/full_images_classification/02_02/new_detect_2_02.png}
-        \caption{True-positive detection: pixel-level crack probability map overlaid on a cracked grape cluster.}
-        \label{fig:tp_detect}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[t]{0.6\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{figures/results/full_images/full_images_classification/02_02/new_patch_2_02.png}
-        \caption{Corresponding patch-based spatial aggregation output, with the crack-positive patch highlighted.}
-        \label{fig:tp_patch}
-    \end{subfigure}
-    \caption[True-positive detection example from Row~2 test set]{Example of a correctly detected cracked cluster from the held-out Row~2 test set. Left: dense crack probability map produced by the multi-class XGBoost model. Right: final patch-level aggregation decision confirming the image-level crack-positive classification.}
+    \includegraphics[width=1\textwidth]{figures/results/full_images/full_images_classification/02_02/image.png}
+   \caption[True-positive detection example from Row~2 test set]{Example of a correctly detected cracked cluster from the held-out Row~2 test set. Left: raw pixel-level crack probability map produced by the multi-class XGBoost model. Right: output after patch/blob-based spatial aggregation, in which isolated responses are suppressed and a coherent crack-positive region is retained, confirming the final image-level crack-positive classification.}
     \label{fig:tp_example}
 \end{figure}
 
-% \begin{figure}[ht]
-%     \centering
-%     \includegraphics[width=0.65\textwidth]{figures/results/full_images/full_images_classification/FP_example/02_04_FP_BRANCH.jpg}
-%     \caption{Example of a false-positive detection caused by dry branch tissue. The spectral similarity between desiccated woody material and cracked grape skin leads the pixel-level classifier to assign elevated crack probabilities to branch pixels, which propagate through the spatial aggregation pipeline. This failure mode is further analyzed in the Discussion (Section~\ref{sec:spatial_aggregation}).}
-%     \label{fig:fp_branch}
-% \end{figure}
-
-% \FloatBarrier
 
 \end{landscape}
 
@@ -477,7 +453,8 @@ Having demonstrated robust whole-image detection using the full 159-band spectru
 \noindent
 The elimination trajectories for both the primary objective (PR--AUC$_{\text{CRACK}}$) and the corresponding F1 score are illustrated in Figure~\ref{fig:bfs_dual_metric}. The curves illustrate a high degree of spectral redundancy; performance remains remarkably stable even as the majority of the original 159 wavelengths are discarded. This suggests that the key physiological markers of grape cracking are tightly concentrated within specific spectral regions rather than distributed across the entire contiguous spectrum.
 
-To systematically define candidate subsets for the whole-image pipeline, performance drop thresholds of 0.5\% and 1.0\% below the maximum PR--AUC score were established (Figure~\ref{fig:bfs_threshold_markers}). As summarized in Table~\ref{tab:bfs_thresholds_summary}, the more conservative 0.5\% tolerance yields a 30-wavelength subset, while the 1.0\% tolerance isolates an extremely compact 11-wavelength subset.
+\noindent
+To systematically define candidate subsets for the whole-image pipeline, performance drop thresholds of 0.5\% and 1.0\% below the maximum PR--AUC score were established (Figure~\ref{fig:bfs_threshold_markers} in Appendix~\ref{app:bfs_full_precision}). As summarized in Table~\ref{tab:bfs_thresholds_summary}, the more conservative 0.5\% tolerance yields a 30-wavelength subset, while the 1.0\% tolerance isolates an extremely compact 11-wavelength subset.
 
 \FloatBarrier
 
@@ -488,22 +465,12 @@ To systematically define candidate subsets for the whole-image pipeline, perform
     \label{fig:bfs_dual_metric}
 \end{figure}
 
+% BFS F1 threshold figure moved to Appendix~\ref{app:bfs_full_precision}
+
 \begin{figure}[!htbp]
     \centering
-    \begin{subfigure}{\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{figures/results/feature_selection/bfs_f1_thresholds.png}
-        \caption{CRACK-class F1 vs. number of wavelengths ($n$), with markers at the maximum and at 0.5\%/1.0\% drop points.}
-        \label{fig:bfs_f1_thresholds}
-    \end{subfigure}
-    \vspace{0.5em}
-    \begin{subfigure}{\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{figures/results/feature_selection/bfs_prauc_thresholds.png}
-        \caption{CRACK-class PR--AUC (primary BFS objective) vs. number of wavelengths ($n$), with the same threshold markers.}
-        \label{fig:bfs_prauc_thresholds}
-    \end{subfigure}
-    \caption[BFS threshold markers on CRACK metrics]{BFS threshold-marker visualization on CRACK metrics. Markers indicate the maximum and the first $n$ where performance drops more than 0.5\% and 1.0\% below that maximum.}
+    \includegraphics[width=0.95\textwidth]{figures/results/feature_selection/bfs_prauc_thresholds.png}
+    \caption[BFS PR--AUC threshold markers]{BFS threshold-marker visualization on CRACK PR--AUC. Markers indicate the maximum and the first $n$ where performance drops more than 0.5\% and 1.0\% below that maximum. Notably, even with only 4 retained wavelengths, PR--AUC\textsubscript{CRACK} exceeds 0.8. The corresponding F1 threshold plot is in Appendix~\ref{app:bfs_full_precision}.}
     \label{fig:bfs_threshold_markers}
 \end{figure}
 
@@ -563,119 +530,6 @@ The results strongly confirm \hyperref[hyp:spectral_efficiency]{Hypothesis~5}. N
 \clearpage
 
 \FloatBarrier
-
-% \subsection{BFS Wavelength-Selection Stability Analysis}
-% \label{sec:bfs-stability}
-
-% \noindent
-% Beyond raw detection performance, the physical reliability of the selected bands was evaluated through a cross-seed stability analysis. By varying the train-test data split across five random seeds, the spatial and spectral consistency of the selected subsets was quantified. 
-
-% \subsubsection{Wavelength Popularity and Stability}
-
-% \noindent
-% The top-30 wavelength subsets demonstrated strong cross-seed consistency, predominantly converging on specific spectral regions in the near-infrared (NIR) spectrum (Figure~\ref{fig:stability_30_popularity}). Since the 11-wavelength configuration acts as a direct subset of this 30-wavelength selection, both share these core identifiable regions, firmly supporting the feasibility of targeted multispectral sensor design. Detailed stability analyses and additional visualizations for both configurations (including heatmaps and frequency spectra) are provided in Appendix~\ref{app:wavelength_details}.
-% \begin{figure}[!htbp]
-%     \centering
-%     \includegraphics[width=0.8\textwidth,keepaspectratio]{figures/results/feature_selection/stability_varying_30wl_wavelength_popularity_overview.png}
-%     \caption{Distribution and popularity of the top-30 selected wavelengths across five varying-split seeds.}
-%     \label{fig:stability_30_popularity}
-% \end{figure}
-
-
-
-% \subsubsection{Binned Wavelength Stability}
-% \noindent
-% Because neighbouring hyperspectral channels are highly correlated, substituting one wavelength for a nearby neighbour does not reflect genuine instability. To quantify this, the pairwise Jaccard similarity was recomputed after binning the selected wavelengths into 5, 10, and 20\,nm windows (Table~\ref{tab:binned_jaccard_summary}; full pairwise matrices in Appendix Tables~\ref{tab:binned_jaccard_30_bin5}--\ref{tab:binned_jaccard_11_bin20}).
-% Figure~\ref{fig:stability_30_binning} illustrates how the top-30 popularity distribution consolidates under progressively coarser binning (the corresponding top-11 binning plot is in Appendix~\ref{app:wavelength_details}).
-
-% At a 10\,nm resolution the top-30 Jaccard rises from 0.493 to 0.697, and at 20\,nm it reaches 0.811, demonstrating that the five seeds overwhelmingly select from the same spectral regions.
-% For the top-11 subsets the improvement is from 0.398 to $\approx$0.64 at both 10 and 20\,nm bins.
-% These results confirm that the apparent instability in exact-wavelength identity largely reflects substitution among adjacent, strongly collinear bands rather than genuine disagreement about which spectral regions are informative.
-
-% \begin{figure}[!htbp]
-%     \centering
-%     \includegraphics[width=0.8\textwidth,keepaspectratio]{figures/results/feature_selection/stability_varying_30wl_wavelength_binning_comparison.png}
-%     \caption{Wavelength popularity at different bin sizes (1, 5, 10, 20\,nm) for the top-30 subsets.}
-%     \label{fig:stability_30_binning}
-% \end{figure}
-
-% \begin{table}[!htbp]
-% \centering
-% \caption{Mean pairwise Jaccard similarity across 5 BFS seeds for exact and binned wavelength matching.}
-% \label{tab:binned_jaccard_summary}
-% \begin{tabular}{lcccc}
-% \toprule
-% Bin & \makecell{Mean Jaccard\\30\,WL} & \makecell{Std\\30\,WL} & \makecell{Mean Jaccard\\11\,WL} & \makecell{Std\\11\,WL} \\
-% \midrule
-% Exact  & 0.493 & 0.102 & 0.398 & 0.062 \\
-% 5\,nm  & 0.562 & 0.111 & 0.536 & 0.082 \\
-% 10\,nm & 0.697 & 0.081 & 0.639 & 0.071 \\
-% 20\,nm & 0.811 & 0.067 & 0.640 & 0.065 \\
-% \bottomrule
-% \end{tabular}
-% \end{table}
-
-% \FloatBarrier
-
-% \noindent
-% Overall, the BFS procedure revealed a highly consistent selection pattern, heavily concentrated in the NIR region (700--850\,nm). Specific anchors, such as 730\,nm and 750\,nm, were repeatedly identified as primary contributors to model performance, perfectly aligning with the peak spectral separability metrics established earlier in this chapter. Even under the extreme constraints of the 11-wavelength subset---which is entirely contained within the top-30 configuration---the selection reliably converged on key markers like 452\,nm (visible blue) and 729\,nm (NIR-edge) across diverse data splits (see Appendix Figures~\ref{fig:stability_11_popularity} and~\ref{fig:stability_11_binning}). While these findings definitively validate the statistical importance of these specific bands for robust crack detection, a deeper interpretation of their physiological relevance and biomechanical implications is reserved for the Discussion (Chapter~\ref{chap:discussion_conclusions}).
-
-% \FloatBarrier
-
-% \noindent
-% To evaluate the stability of the feature selection process, the results of the Backward Feature Selection (BFS) were compared across five different random seeds. Out of the 30 wavelengths retained in each run, 13 specific wavelengths were selected unanimously (\textbf{5 out of 5 seeds}) in exact-wavelength matching: 452.25, 536.82, 545.62, 548.55, 572.07, 580.90, 634.11, 729.53, 756.56, 759.56, 777.64, 917.42, and 920.48\,nm.
-
-% \medskip\noindent
-% This universal core spans four distinct physiological regions: the Soret/blue zone ($\sim$452\,nm), the green--yellow--red-edge complex (537--635\,nm), the NIR plateau (730--778\,nm), and the far-NIR water-absorption shoulder (917--920\,nm).
-
-% \medskip\noindent
-% To account for minor spectral shifts and hardware tolerances, the selected wavelengths were further grouped into 5\,nm bins. Table~\ref{tab:bins_5} presents the 14 spectral bins that achieved a perfect consensus (selected by all 5 seeds). Table~\ref{tab:bins_4} lists 6 additional bins that demonstrated high stability, being selected by 4 out of 5 seeds. Together, these highly consistent regions reinforce the conclusion that the BFS procedure targets stable, physiologically grounded spectral markers rather than random noise.
-
-% \begin{table}[htbp]
-%     \centering
-%     \caption{Wavelength bins (5\,nm) selected unanimously by all 5 BFS seeds (5/5 consensus).}
-%     \label{tab:bins_5}
-%     \begin{tabular}{cc}
-%         \toprule
-%         \textbf{Bin Centre (nm)} & \textbf{Frequency (Seeds)} \\
-%         \midrule
-%         450 & 5/5 \\
-%         535 & 5/5 \\
-%         545 & 5/5 \\
-%         550 & 5/5 \\
-%         570 & 5/5 \\
-%         580 & 5/5 \\
-%         635 & 5/5 \\
-%         730 & 5/5 \\
-%         740 & 5/5 \\
-%         755 & 5/5 \\
-%         760 & 5/5 \\
-%         780 & 5/5 \\
-%         915 & 5/5 \\
-%         920 & 5/5 \\
-%         \bottomrule
-%     \end{tabular}
-% \end{table}
-
-% \begin{table}[htbp]
-%     \centering
-%     \caption{Additional wavelength bins (5\,nm) selected by 4 out of 5 BFS seeds (4/5 consensus).}
-%     \label{tab:bins_4}
-%     \begin{tabular}{cc}
-%         \toprule
-%         \textbf{Bin Centre (nm)} & \textbf{Frequency (Seeds)} \\
-%         \midrule
-%         515 & 4/5 \\
-%         605 & 4/5 \\
-%         735 & 4/5 \\
-%         770 & 4/5 \\
-%         840 & 4/5 \\
-%         900 & 4/5 \\
-%         \bottomrule
-%     \end{tabular}
-% \end{table}
-
-% \FloatBarrier
 
 
 \subsection{BFS Wavelength-Selection Stability Analysis}

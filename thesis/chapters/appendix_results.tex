@@ -57,11 +57,11 @@ The main text reports truncated mean values for clarity; unreduced values are pr
         \addlinespace[4pt]
 
         \multicolumn{9}{@{}l@{}}{\textbf{crack\_vs\_rest}} \\
-        & PLS-DA                & 0.5120 $\pm$ 0.0047 & 0.6940 $\pm$ 0.0189 & 0.8843 $\pm$ 0.1117 & 0.7623 $\pm$ 0.2303 & 0.5893 $\pm$ 0.0164 & 0.9979 $\pm$ 0.0045 & 0.8669 $\pm$ 0.1186 \\
-        & Logistic Regression (L1) & 0.8574 $\pm$ 0.0022 & 0.8704 $\pm$ 0.0076 & 0.9669 $\pm$ 0.0190 & 0.9651 $\pm$ 0.0759 & 0.8049 $\pm$ 0.0050 & 0.9993 $\pm$ 0.0022 & 0.9847 $\pm$ 0.0114 \\
-        & Random Forest         & 0.9147 $\pm$ 0.0060 & 0.9159 $\pm$ 0.0126 & 0.8871 $\pm$ 0.0701 & 0.9368 $\pm$ 0.0751 & 0.8857 $\pm$ 0.0116 & 0.9975 $\pm$ 0.0041 & 0.9610 $\pm$ 0.0535 \\
-        & XGBoost               & 0.9200 $\pm$ 0.0043 & 0.9154 $\pm$ 0.0098 & 0.9809 $\pm$ 0.0120 & 0.9508 $\pm$ 0.0888 & 0.8825 $\pm$ 0.0078 & 0.9992 $\pm$ 0.0018 & 0.9900 $\pm$ 0.0165 \\
-        & MLP (Small)           & 0.9163 $\pm$ 0.0062 & 0.9158 $\pm$ 0.0129 & 0.9521 $\pm$ 0.0282 & 0.9736 $\pm$ 0.0390 & 0.8741 $\pm$ 0.0188 & 0.9994 $\pm$ 0.0017 & 0.9912 $\pm$ 0.0122 \\
+        & PLS-DA                & 0.9820 $\pm$ 0.0112 & 0.5412 $\pm$ 0.0836 & 0.1638 $\pm$ 0.2956 & 0.0837 $\pm$ 0.1673 & 0.1080 $\pm$ 0.2113 & 0.9942 $\pm$ 0.0068 & 0.5907 $\pm$ 0.1519 \\
+        & Logistic Regression (L1) & 0.9434 $\pm$ 0.0011 & 0.9559 $\pm$ 0.0399 & 0.2195 $\pm$ 0.1030 & 0.9689 $\pm$ 0.0805 & 0.3465 $\pm$ 0.1331 & 0.9554 $\pm$ 0.0084 & 0.1802 $\pm$ 0.1264 \\
+        & Random Forest         & 0.9971 $\pm$ 0.0035 & 0.9607 $\pm$ 0.0604 & 0.9099 $\pm$ 0.0507 & 0.9225 $\pm$ 0.1209 & 0.9108 $\pm$ 0.0713 & 0.9970 $\pm$ 0.0047 & 0.9650 $\pm$ 0.0609 \\
+        & XGBoost               & 0.9986 $\pm$ 0.0024 & 0.9696 $\pm$ 0.0528 & 0.9852 $\pm$ 0.0105 & 0.9394 $\pm$ 0.1057 & 0.9584 $\pm$ 0.0635 & 0.9993 $\pm$ 0.0015 & 0.9881 $\pm$ 0.0198 \\
+        & MLP (Small)           & 0.9986 $\pm$ 0.0019 & 0.9738 $\pm$ 0.0482 & 0.9638 $\pm$ 0.0198 & 0.9481 $\pm$ 0.0966 & 0.9525 $\pm$ 0.0562 & 0.9979 $\pm$ 0.0056 & 0.9627 $\pm$ 0.0290 \\
         \addlinespace[4pt]
 
         \multicolumn{9}{@{}l@{}}{\textbf{multi\_class}} \\
@@ -499,6 +499,13 @@ This section provides supplementary metrics from the backward feature selection 
 
 \subsection{BFS Thresholds (Full Precision)}
 \label{app:bfs_full_precision}
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=\textwidth]{figures/results/feature_selection/bfs_f1_thresholds.png}
+    \caption[BFS F1 threshold markers]{CRACK-class F1 vs.\ number of wavelengths ($n$), with markers at the maximum and at 0.5\%/1.0\% drop points.}
+    \label{fig:bfs_f1_thresholds}
+\end{figure}
 
 \begin{table}[!htbp]
 \centering

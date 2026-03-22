@@ -373,13 +373,13 @@ Pixel-level samples extracted from the same grape cluster are highly correlated 
 For the multi-class setting, this protocol was applied only to grape-containing samples, for which cluster identity was meaningful. Non-grape background classes (e.g., soil and leaves) were not naturally organized by grape-cluster groups and were therefore assigned using a fixed 80/20 train--test split. This yielded a practical domain-aware evaluation protocol while still preventing semantic leakage between the grape and non-grape categories.
 \begin{figure}[ht]
     \centering
-    \begin{subfigure}[t]{0.32\textwidth}
+    \begin{subfigure}[t]{0.3\textwidth}
         \centering
         \includegraphics[width=\textwidth]{figures/images_to_use/The_problem_logo.jpg}
         \caption{Train pixels (blue) and Test pixels (red). Holding out entire clusters as indivisible units prevents data leakage.}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[t]{0.64\textwidth}
+    \begin{subfigure}[t]{0.6\textwidth}
         \centering
         \includegraphics[width=\textwidth]{figures/images_to_use/The_solution_logo.png}
         \caption{The LOGO solution: all pixels from one cluster are held out entirely as the test set.}
@@ -416,12 +416,12 @@ Supervised classification was applied at the pixel level to discriminate between
 \noindent
 \textbf{Algorithm Selection and Training:} Six algorithms were evaluated: Partial Least Squares Discriminant Analysis (PLS-DA), L1-regularized Logistic Regression, Support Vector Machine (RBF kernel), Random Forest, a shallow Multi-Layer Perceptron (MLP), and \textbf{XGBoost} (Gradient-boosted decision trees). XGBoost was ultimately adopted as the baseline model across all primary comparisons due to its robust handling of high-dimensional, correlated spectral features. Models were evaluated under both naturally unbalanced and strictly balanced training regimes (achieved via segment-proportional undersampling to preserve within-class diversity).
 
-\newpage
+
 \subsection{Autoencoder-Based Anomaly Detection}
 \label{subsec:anomaly_detection}
 
 \noindent
-To explore whether crack damage could be identified without explicit positive labels, a one-class anomaly detection framework was implemented using a fully connected, symmetric autoencoder. The autoencoder follows a U-Net--inspired encoder--decoder architecture: the encoder progressively compresses the input spectral vector into a low-dimensional latent (bottleneck) representation, and the decoder mirrors the encoder to reconstruct the original input from that compressed code (Figure~\ref{fig:autoencoder_arch}). Each hidden layer applies ReLU activation, batch normalization, and dropout for regularization. Several encoder--decoder width configurations were evaluated; the specific architectures and their comparative performance are reported in Chapter~\ref{chap:results}.
+To explore whether crack damage could be identified without explicit positive labels, a one-class anomaly detection framework was implemented using a fully connected, symmetric autoencoder. The autoencoder follows a U-Net--inspired encoder--decoder architecture: the encoder progressively compresses the input spectral vector into a low-dimensional latent (bottleneck) representation, and the decoder mirrors the encoder to reconstruct the original input from that compressed code (Figure~\ref{fig:autoencoder_arch}). Each hidden layer applies ReLU activation, batch normalization, and dropout for regularization. Several encoder--decoder width configurations were evaluated; the specific architectures and their comparative performance are reported in Section~\ref{sec:anomaly-detection}.
 
 \begin{figure}[htbp]
     \centering
@@ -537,7 +537,7 @@ additional wavelength adaptation at the image level.
 \noindent
 Wavelength selection was evaluated separately for binary (\textit{Cracked} vs.\ \textit{Healthy}) and multi-class (with background classes) settings, as formulated in \S\ref{subsec:pixel_level_framework}.
 
-\clearpage
+
 \subsubsection{Spectral Preprocessing}
 
 \noindent
@@ -586,7 +586,6 @@ robustness of the wavelength selection process against variations in the data sp
 % src/models/classification/pixel_level/feature_selection/run_bfs_80_20_grapeid.py
 % src/models/classification/pixel_level/feature_selection/run_bfs_prauc_stability_5runs.py
 
-\clearpage
 \subsection{Evaluation Protocols and Performance Metrics}
 \label{subsec:evaluation_protocols}
 
