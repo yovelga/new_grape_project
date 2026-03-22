@@ -58,7 +58,7 @@ The mean spectral reflectance signatures ($\pm$\,SD) for healthy and cracked gra
 \subsection{Spectral Separability Across Wavelength Regions}
 
 \noindent
-To systematically quantify the discriminatory power of individual spectral bands, three complementary metrics were computed (Figure~\ref{fig:spectral_separability}): \textbf{Absolute Mean Difference ($|\Delta\mu|$)} to capture the raw reflectance gap, \textbf{Cohen's $d$~\cite{cohen1988statistical}} to measure the standardized effect size, and the \textbf{Fisher Score~\cite{duda2001pattern}} to evaluate the ratio of inter-class separation to intra-class spread.
+To systematically quantify the discriminatory power of individual spectral bands, three complementary metrics were computed (Figure~\ref{fig:spectral_separability}): \textbf{Absolute Mean Difference ($|\Delta\mu|$)} to capture the raw reflectance gap, \textbf{Cohen's $d$~\parencite{cohen1988statistical}} to measure the standardized effect size, and the \textbf{Fisher Score~\parencite{duda2001pattern}} to evaluate the ratio of inter-class separation to intra-class spread.
 
 \begin{figure}[htbp]
     \centering
@@ -137,7 +137,7 @@ While binary classification validates baseline spectral separability, operationa
 
 \begin{table}[h!]
     \centering
-    \caption[Pixel-level classification: unbalanced multi-class]{Pixel-level classification metrics (unbalanced, multi-class). Truncated mean values. Full cross-validation statistics in Appendix~\ref{app:cv_statistics}.}
+    \caption[Pixel-level classification: unbalanced multi-class]{Pixel-level classification metrics (unbalanced, multi-class). Truncated mean values. All CRACK-subscripted metrics are computed one-vs-rest for the CRACK class. Full cross-validation statistics in Appendix~\ref{app:cv_statistics}.}
     \label{tab:pixel_metrics_unbalanced_all}
     \small
     \renewcommand{\arraystretch}{1.10}
@@ -145,7 +145,7 @@ While binary classification validates baseline spectral separability, operationa
     \begin{adjustbox}{max width=\linewidth,center}
     \begin{tabular}{@{}llccccccc@{}}
         \toprule
-        Label setup & Model & Accuracy & Balanced Acc. & Precision (Cracked) & Recall (Cracked) & Macro-F1 & ROC--AUC & PR--AUC \\
+        Label setup & Model & Accuracy & Balanced Acc. & Precision (Cracked) & Recall (Cracked) & F1\textsubscript{CRACK} & ROC--AUC\textsubscript{CRACK} & PR--AUC\textsubscript{CRACK} \\
         \midrule
         % \multicolumn{9}{@{}l@{}}{\textbf{crack\_regular\_rest}} \\
         % & PLS-DA                & 0.508 & 0.687 & 0.882 & 0.753 & 0.581 & 0.997 & 0.863 \\
@@ -154,19 +154,21 @@ While binary classification validates baseline spectral separability, operationa
         % & XGBoost               & 0.921 & 0.916 & 0.980 & 0.949 & 0.883 & 0.999 & 0.990 \\
         % & MLP (Small)           & 0.917 & 0.916 & 0.953 & 0.972 & 0.875 & 0.999 & 0.991 \\
         \addlinespace[4pt]
+        % crack_vs_rest — FIXED binary results (2026-03-22), unbalanced mode
         \multicolumn{9}{@{}l@{}}{\textbf{crack\_vs\_rest}} \\
-        & PLS-DA                & 0.512 & 0.694 & 0.884 & 0.762 & 0.589 & 0.997 & 0.866 \\
-        & Logistic Regression (L1) & 0.857 & 0.870 & 0.966 & 0.965 & 0.804 & 0.999 & 0.984 \\
-        & Random Forest         & 0.914 & 0.915 & 0.887 & 0.936 & 0.885 & 0.997 & 0.961 \\
-        & XGBoost               & 0.920 & 0.915 & 0.980 & 0.950 & 0.882 & 0.999 & 0.990 \\
-        & MLP (Small)           & 0.916 & 0.915 & 0.952 & 0.973 & 0.874 & 0.999 & 0.991 \\
-        \addlinespace[4pt]
+        & PLS-DA                & 0.982 & 0.541 & 0.164 & 0.084 & 0.108 & 0.994 & 0.591 \\
+        & Logistic Regression (L1) & 0.943 & 0.956 & 0.220 & 0.969 & 0.347 & 0.955 & 0.180 \\
+        & Random Forest         & 0.997 & 0.961 & 0.910 & 0.923 & 0.911 & 0.997 & 0.965 \\
+        & XGBoost               & 0.999 & 0.970 & 0.985 & 0.939 & 0.958 & 0.999 & 0.988 \\
+        & MLP (Small)           & 0.999 & 0.974 & 0.964 & 0.948 & 0.953 & 0.998 & 0.963 \\
+        
+    \addlinespace[4pt]
         \multicolumn{9}{@{}l@{}}{\textbf{multi\_class}} \\
-        & PLS-DA                & 0.967 & 0.978 & 0.720 & 0.992 & 0.901 & 0.997 & 0.967 \\
-        & Logistic Regression (L1) & 0.997 & 0.995 & 0.967 & 0.997 & 0.992 & 0.999 & 0.997 \\
-        & Random Forest         & 0.996 & 0.994 & 0.967 & 0.996 & 0.990 & 0.999 & 0.997 \\
-        & XGBoost               & 0.997 & 0.994 & 0.981 & 0.990 & 0.992 & 0.999 & 0.997 \\
-        & MLP (Small)           & 0.990 & 0.989 & 0.924 & 0.986 & 0.969 & 0.996 & 0.989 \\
+        & PLS-DA                & 0.967 & 0.978 & 0.720 & 0.992 & 0.821 & 0.997 & 0.967 \\
+        & Logistic Regression (L1) & 0.997 & 0.995 & 0.967 & 0.997 & 0.995 & 0.999 & 0.997 \\
+        & Random Forest         & 0.996 & 0.994 & 0.967 & 0.996 & 0.985 & 0.999 & 0.997 \\
+        & XGBoost               & 0.997 & 0.994 & 0.981 & 0.990 & 0.986 & 0.999 & 0.997 \\
+        & MLP (Small)           & 0.990 & 0.989 & 0.924 & 0.986 & 0.975 & 0.996 & 0.989 \\
         \bottomrule
     \end{tabular}
     \end{adjustbox}

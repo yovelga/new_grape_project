@@ -1,19 +1,19 @@
 [0] Config.pm:328> INFO - This is Biber 2.21
 [0] Config.pm:331> INFO - Logfile is 'main.blg'
-[72] biber-MSWIN64:342> INFO - === 
-[102] Biber.pm:421> INFO - Reading 'main.bcf'
-[196] Biber.pm:1002> INFO - Found 69 citekeys in bib section 0
-[207] Biber.pm:4487> INFO - Processing section 0
-[214] Biber.pm:4678> INFO - Looking for bibtex file 'bibliography/references.bib' for section 0
-[265] bibtex.pm:1713> INFO - LaTeX decoding ...
-[344] bibtex.pm:1519> INFO - Found BibTeX data source 'bibliography/references.bib'
-[679] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
-[679] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
-[679] Biber.pm:4307> INFO - Sorting list 'apa/apasortcite//global/global/global' of type 'entry' with template 'apa' and locale 'en-US'
-[679] Biber.pm:4313> INFO - No sort tailoring available for locale 'en-US'
-[789] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
-[789] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
-[789] Biber.pm:4307> INFO - Sorting list 'apa/global//global/global/global' of type 'entry' with template 'apa' and locale 'en-US'
-[789] Biber.pm:4313> INFO - No sort tailoring available for locale 'en-US'
-[853] bbl.pm:676> INFO - Writing 'main.bbl' with encoding 'UTF-8'
-[953] bbl.pm:779> INFO - Output to main.bbl
+[71] biber-MSWIN64:342> INFO - === 
+[100] Biber.pm:421> INFO - Reading 'main.bcf'
+[194] Biber.pm:1002> INFO - Found 69 citekeys in bib section 0
+[206] Biber.pm:4487> INFO - Processing section 0
+[213] Biber.pm:4678> INFO - Looking for bibtex file 'bibliography/references.bib' for section 0
+[266] bibtex.pm:1713> INFO - LaTeX decoding ...
+[348] bibtex.pm:1519> INFO - Found BibTeX data source 'bibliography/references.bib'
+[690] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[690] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[690] Biber.pm:4307> INFO - Sorting list 'apa/apasortcite//global/global/global' of type 'entry' with template 'apa' and locale 'en-US'
+[690] Biber.pm:4313> INFO - No sort tailoring available for locale 'en-US'
+[802] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[802] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[802] Biber.pm:4307> INFO - Sorting list 'apa/global//global/global/global' of type 'entry' with template 'apa' and locale 'en-US'
+[802] Biber.pm:4313> INFO - No sort tailoring available for locale 'en-US'
+[866] bbl.pm:676> INFO - Writing 'main.bbl' with encoding 'UTF-8'
+[970] bbl.pm:779> INFO - Output to main.bbl

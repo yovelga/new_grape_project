@@ -15,7 +15,8 @@
 \contentsline {figure}{\numberline {4.7}{\ignorespaces Effect of SNV normalization on spectral signatures}}{36}{figure.4.7}%
 \contentsline {figure}{\numberline {4.8}{\ignorespaces LOGO cross-validation: problem and solution}}{38}{figure.4.8}%
 \contentsline {figure}{\numberline {4.9}{\ignorespaces Schematic of the symmetric autoencoder used for anomaly detection. The encoder compresses the input spectral vector into a compact latent space (bottleneck), and the decoder reconstructs the original spectrum. The reconstruction error serves as the anomaly score.}}{40}{figure.4.9}%
-\contentsline {figure}{\numberline {4.10}{\ignorespaces Interactive EDA interface for the whole-image pipeline}}{42}{figure.4.10}%
+\contentsline {figure}{\numberline {4.10}{\ignorespaces Whole-image crack-detection pipeline from pixel-level CRACK probabilities to image-level classification via spatial aggregation.}}{42}{figure.4.10}%
+\contentsline {figure}{\numberline {4.11}{\ignorespaces Interactive EDA interface for the whole-image pipeline}}{42}{figure.4.11}%
 \addvspace {10\p@ }
 \contentsline {figure}{\numberline {5.1}{\ignorespaces Mean spectral signatures: healthy vs.\ cracked tissue}}{48}{figure.5.1}%
 \contentsline {figure}{\numberline {5.2}{\ignorespaces Wavelength-wise spectral separability metrics}}{49}{figure.5.2}%
