@@ -359,15 +359,14 @@ The results on the independent test set demonstrate robust system-level performa
 
 \clearpage
 \noindent
-Figure~\ref{fig:tp_example} illustrates this on a correctly detected example from the Row~2 test set. On the left, the pixel-level XGBoost model produces scattered crack-positive responses; on the right, the spatial aggregation step suppresses isolated detections and retains only the coherent crack-positive region on the grape cluster, yielding the final image-level positive decision.
+Figure~\ref{fig:tp_example} demonstrates the effectiveness of the spatial aggregation pipeline on a held-out test image. While the initial pixel-level Logistic Regression produces scattered, noisy probability responses (a), the subsequent patch-based filtering successfully suppresses this noise and isolates the true crack region (b). This final detection accurately aligns with the visual ground truth shown in the corresponding RGB images (c, d).
 
 \begin{figure}[ht]
     \centering
     \includegraphics[width=1\textwidth]{figures/results/full_images/full_images_classification/02_02/image.png}
-   \caption[True-positive detection example from Row~2 test set]{Example of a correctly detected cracked cluster from the held-out Row~2 test set. Left: raw pixel-level crack probability map produced by the multi-class XGBoost model. Right: output after patch/blob-based spatial aggregation, in which isolated responses are suppressed and a coherent crack-positive region is retained, confirming the final image-level crack-positive classification.}
+    \caption[True-positive detection pipeline example]{Correct detection pipeline. (a) Noisy pixel-level probability map (Logistic Regression). (b) Final output after spatial aggregation, showing isolated crack detection. (c) Reconstructed HSI-RGB image. (d) High-resolution RGB reference.}
     \label{fig:tp_example}
 \end{figure}
-
 
 \end{landscape}
 
@@ -554,81 +553,120 @@ Figure~\ref{fig:stability_30_popularity} visualizes the individual selection fre
 \FloatBarrier
 
 \newpage
+% \subsubsection{Effect of Spectral Binning on Popularity}
+% \noindent
+% Figure~\ref{fig:stability_30_binning} demonstrates how progressively coarser spectral binning consolidates individual wavelength selections into broader regions. Note that the $y$-axis reports the \emph{total number of wavelength selections} pooled across all five seeds; because each seed contributes up to 30 wavelengths, multiple selections from different seeds (or even from the same seed) can fall into a single bin, producing counts greater than~5.
+
+% \FloatBarrier
+
+% \begin{figure}[!htbp]
+%     \centering
+%     \includegraphics[width=1\textwidth,keepaspectratio]{figures/results/feature_selection/stability_varying_30wl_wavelength_binning_comparison.png}
+%     \caption[Top-30 wavelength popularity by bin size]{Wavelength popularity at different bin sizes (1, 5, 10, 20\,nm) for the top-30 subsets.}
+%     \label{fig:stability_30_binning}
+% \end{figure}
 \subsubsection{Effect of Spectral Binning on Popularity}
 \noindent
-Figure~\ref{fig:stability_30_binning} demonstrates how progressively coarser spectral binning consolidates individual wavelength selections into broader regions. Note that the $y$-axis reports the \emph{total number of wavelength selections} pooled across all five seeds; because each seed contributes up to 30 wavelengths, multiple selections from different seeds (or even from the same seed) can fall into a single bin, producing counts greater than~5.
+Figure~\ref{fig:stability_30_binning} illustrates how grouping adjacent wavelengths into wider spectral intervals (bins of 1, 5, 10, and 20\,nm) helps identify broader, highly influential spectral regions rather than just isolated bands. 
+
+\noindent
+To properly interpret the charts, it is important to clarify how the counts are calculated. The feature selection was executed across 5 random seeds, with each seed selecting 30 wavelengths, resulting in a total pool of 150 selections. The horizontal axis (\textit{x-axis}) displays the total number of times any of these 150 selections fell into a specific bin. Because a wider bin (e.g., 10\,nm) can capture multiple closely spaced wavelengths from the \emph{same} seed, as well as selections across \emph{different} seeds, the cumulative count for a single bin can easily exceed~5. This indicates that while exact single-wavelength picks may vary slightly between runs, they consistently cluster within the exact same spectral neighborhoods.
 
 \FloatBarrier
 
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=1\textwidth,keepaspectratio]{figures/results/feature_selection/stability_varying_30wl_wavelength_binning_comparison.png}
-    \caption[Top-30 wavelength popularity by bin size]{Wavelength popularity at different bin sizes (1, 5, 10, 20\,nm) for the top-30 subsets.}
+    \caption[Top-30 wavelength popularity by bin size]{Wavelength popularity at different bin sizes (1, 5, 10, 20\,nm) for the top-30 subsets. The horizontal axis (Count) represents the total occurrences of selected wavelengths falling within each defined bin across all five random seeds.}
     \label{fig:stability_30_binning}
 \end{figure}
 
 \FloatBarrier
 
+% \newpage
+% \subsubsection{Unanimous 5\,nm Spectral Bins}
+% \noindent
+% In contrast to the pooled counts shown in Figure~\ref{fig:stability_30_binning}, Tables~\ref{tab:bins_5} and~\ref{tab:bins_4} report \emph{seed-level presence}: a bin is counted once per seed regardless of how many wavelengths that seed placed in it (maximum~=~5). Table~\ref{tab:bins_5} lists the fourteen 5\,nm bins selected by all five seeds.
+
+% \FloatBarrier
+
+% \begin{table}[htbp]
+%     \centering
+%     \caption[5\,nm wavelength bins: 5/5 seed consensus]{Wavelength bins (5\,nm) selected unanimously by all 5 BFS seeds (5/5 consensus).}
+%     \label{tab:bins_5}
+%     \begin{tabular}{cc}
+%         \toprule
+%         \textbf{Bin Centre (nm)} & \textbf{Frequency (Seeds)} \\
+%         \midrule
+%         450 & 5/5 \\
+%         535 & 5/5 \\
+%         545 & 5/5 \\
+%         550 & 5/5 \\
+%         570 & 5/5 \\
+%         580 & 5/5 \\
+%         635 & 5/5 \\
+%         730 & 5/5 \\
+%         740 & 5/5 \\
+%         755 & 5/5 \\
+%         760 & 5/5 \\
+%         780 & 5/5 \\
+%         915 & 5/5 \\
+%         920 & 5/5 \\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
+
+% \FloatBarrier
+
+% \subsubsection{Highly Stable 5\,nm Spectral Bins}
+% \noindent
+% Table~\ref{tab:bins_4} presents the six additional 5\,nm spectral regions that were robustly retained by four out of the five seeds.
+
+% \FloatBarrier
+
+% \begin{table}[htbp]
+%     \centering
+%     \caption[5\,nm wavelength bins: 4/5 seed consensus]{Additional wavelength bins (5\,nm) selected by 4 out of 5 BFS seeds (4/5 consensus).}
+%     \label{tab:bins_4}
+%     \begin{tabular}{cc}
+%         \toprule
+%         \textbf{Bin Centre (nm)} & \textbf{Frequency (Seeds)} \\
+%         \midrule
+%         515 & 4/5 \\
+%         605 & 4/5 \\
+%         735 & 4/5 \\
+%         770 & 4/5 \\
+%         840 & 4/5 \\
+%         900 & 4/5 \\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
+
+% \FloatBarrier
+
 \newpage
-\subsubsection{Unanimous 5\,nm Spectral Bins}
+\subsubsection{Consensus on Specific Spectral Bins}
 \noindent
-In contrast to the pooled counts shown in Figure~\ref{fig:stability_30_binning}, Tables~\ref{tab:bins_5} and~\ref{tab:bins_4} report \emph{seed-level presence}: a bin is counted once per seed regardless of how many wavelengths that seed placed in it (maximum~=~5). Table~\ref{tab:bins_5} lists the fourteen 5\,nm bins selected by all five seeds.
+While Figure~\ref{fig:stability_30_binning} illustrates the overall density of selections, it is critical to identify the specific wavelengths that consistently drove the model's decisions. To evaluate this, seed-level presence was analyzed: a 5\,nm bin was counted once per seed regardless of how many individual wavelengths that specific seed placed within it. 
 
-\FloatBarrier
+\noindent
+Table~\ref{tab:stable_bins} summarizes the most robust spectral regions discovered. Fourteen distinct 5\,nm bins achieved unanimous consensus (selected by all 5 seeds), and an additional six bins were highly stable (selected by 4 out of 5 seeds). These specific bands represent the optimal candidates for designing a targeted, low-cost multispectral sensor.
 
-\begin{table}[htbp]
+\begin{table}[!htbp]
     \centering
-    \caption[5\,nm wavelength bins: 5/5 seed consensus]{Wavelength bins (5\,nm) selected unanimously by all 5 BFS seeds (5/5 consensus).}
-    \label{tab:bins_5}
-    \begin{tabular}{cc}
+    \caption[Consensus of 5\,nm wavelength bins across BFS seeds]{Highly stable 5\,nm wavelength bins identified across the feature selection seeds. Bins are categorized by their consensus level among the 5 random seeds.}
+    \label{tab:stable_bins}
+    \begin{tabular}{@{}lp{10cm}@{}}
         \toprule
-        \textbf{Bin Centre (nm)} & \textbf{Frequency (Seeds)} \\
+        \textbf{Consensus Level} & \textbf{Selected 5\,nm Bin Centres (nm)} \\
         \midrule
-        450 & 5/5 \\
-        535 & 5/5 \\
-        545 & 5/5 \\
-        550 & 5/5 \\
-        570 & 5/5 \\
-        580 & 5/5 \\
-        635 & 5/5 \\
-        730 & 5/5 \\
-        740 & 5/5 \\
-        755 & 5/5 \\
-        760 & 5/5 \\
-        780 & 5/5 \\
-        915 & 5/5 \\
-        920 & 5/5 \\
+        \textbf{Unanimous (5/5 Seeds)} & 450, 535, 545, 550, 570, 580, 635, 730, 740, 755, 760, 780, 915, 920 \\
+        \addlinespace
+        \textbf{Highly Stable (4/5 Seeds)} & 515, 605, 735, 770, 840, 900 \\
         \bottomrule
     \end{tabular}
 \end{table}
 
-\FloatBarrier
-
-\subsubsection{Highly Stable 5\,nm Spectral Bins}
-\noindent
-Table~\ref{tab:bins_4} presents the six additional 5\,nm spectral regions that were robustly retained by four out of the five seeds.
-
-\FloatBarrier
-
-\begin{table}[htbp]
-    \centering
-    \caption[5\,nm wavelength bins: 4/5 seed consensus]{Additional wavelength bins (5\,nm) selected by 4 out of 5 BFS seeds (4/5 consensus).}
-    \label{tab:bins_4}
-    \begin{tabular}{cc}
-        \toprule
-        \textbf{Bin Centre (nm)} & \textbf{Frequency (Seeds)} \\
-        \midrule
-        515 & 4/5 \\
-        605 & 4/5 \\
-        735 & 4/5 \\
-        770 & 4/5 \\
-        840 & 4/5 \\
-        900 & 4/5 \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-\FloatBarrier
 
 \newpage
 \subsubsection{Pairwise Jaccard Similarity Across Bins}
@@ -654,3 +692,18 @@ Exact  & 0.493 & 0.102 & 0.398 & 0.062 \\
 \end{table}
 
 \FloatBarrier
+
+\begin{landscape}
+\thispagestyle{plain}
+
+\noindent
+Figure~\ref{fig:consensus_bins_interpretation} visualizes this consensus alongside the physical interpretation of each spectral region, linking the data-driven selections to known biological and structural properties.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=\linewidth]{figures/results/feature_selection/consensus_bins_physical_interpretation.png}
+    \caption[Consensus wavelength bins with physical interpretation]{Consensus wavelength bins (5\,nm) across five BFS seeds, overlaid with approximate spectral interpretation regions: pigment-sensitive visible range (440--620\,nm), the red-edge chlorophyll--structure transition (680--750\,nm), and the late-NIR water-sensitive shoulder (890--930\,nm).}
+    \label{fig:consensus_bins_interpretation}
+\end{figure}
+
+\end{landscape}
