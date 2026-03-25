@@ -1,20 +1,34 @@
-% --- Abstract ---
+% % --- Abstract ---
+% \begin{abstract}
+
+% \noindent
+% Grape cracking is a severe physiological disorder that leads to substantial economic losses in table-grape production by reducing marketable yield and increasing susceptibility to secondary infections such as sour rot. Early, non-destructive detection is therefore critical for enabling timely management interventions. This study investigates the feasibility of hyperspectral imaging (HSI; VNIR 400--1000~nm) combined with machine learning for crack detection under field conditions, considering both early- and late-stage acquisitions (initial/minimal vs.\ advanced cracking). All spectral analyses were restricted to 450--925~nm and employed per-spectrum Standard Normal Variate (SNV) normalization.
+
+% \medskip
+% \noindent
+% A multi-stage analytical framework was developed, including pixel-level classification, whole-image crack detection, and wavelength selection.
+
+% \medskip
+% \noindent
+% Direct application of pixel-level predictions to field scenes resulted in background-induced misclassification. To address this limitation, a whole-image crack-detection pipeline was developed, aggregating pixel-level CRACK probabilities using spatial post-processing (thresholding, morphological filtering, and patch/blob-based decision rules). The system was evaluated using a spatially disjoint row-based calibration--test split and reported with emphasis on the Cracked class. On the field data quality results, the pipeline achieved F1\textsubscript{CRACK} = \FoneEarlyBaseline{} under early-stage acquisition and F1\textsubscript{CRACK} = \FoneLateBaseline{} under late-stage acquisition (Table~\ref{tab:full_image_early_late_metrics}).
+
+% \medskip
+% \noindent
+% Wavelength selection experiments demonstrated that high detection performance can be maintained using a small, specific subset of wavelengths. This indicates the clear potential to replace expensive hyperspectral cameras with simpler, low-cost multispectral sensors for everyday field deployment. Overall, the results establish the feasibility of HSI-based crack detection under realistic vineyard conditions and provide a methodological foundation for operational, non-destructive monitoring tools.
+
+% \end{abstract}
+
 \begin{abstract}
 
 \noindent
-Grape cracking is a severe physiological disorder that leads to substantial economic losses in table-grape production by reducing marketable yield and increasing susceptibility to secondary infections such as sour rot. Early, non-destructive detection is therefore critical for enabling timely management interventions. This study investigates the feasibility of hyperspectral imaging (HSI; VNIR 400--1000~nm) combined with machine learning for crack detection under field conditions, considering both early- and late-stage acquisitions (initial/minimal vs.\ advanced cracking). All spectral analyses were restricted to 450--925~nm and employed per-spectrum Standard Normal Variate (SNV) normalization.
+Grape cracking is a severe physiological disorder that leads to substantial economic losses in table-grape production by reducing marketable yield and increasing susceptibility to secondary infections such as sour rot. Early, non-destructive detection is therefore critical for enabling timely management interventions. This study investigates the feasibility of hyperspectral imaging (HSI; VNIR 400--1000~nm) combined with machine learning for crack detection under field conditions, focusing on both early- and late-stage acquisitions (initial/minimal vs.\ advanced cracking).
 
 \medskip
 \noindent
-A multi-stage analytical framework was developed, including pixel-level classification, whole-image crack detection, and wavelength selection.
+A multi-stage analytical framework was developed, encompassing pixel-level classification, whole-image spatial aggregation, and spectral dimensionality reduction. Initial models, trained on spectral signatures of healthy and cracked tissue, achieved high discrimination on isolated pixels. However, direct application of these pixel-level predictions to complex field scenes resulted in severe background-induced misclassification. To address this critical limitation, a robust whole-image crack-detection pipeline was developed. This pipeline aggregates pixel-level probabilities using spatial post-processing---including probability thresholding, morphological filtering, and patch-based decision rules---to successfully suppress environmental noise. Evaluated using a spatially disjoint, row-based test split, the pipeline reliably identified both early-stage (F1\textsubscript{CRACK} = \FoneEarlyBaseline{}) and late-stage (F1\textsubscript{CRACK} = \FoneLateBaseline{}) cracking under realistic vineyard conditions.
 
 \medskip
 \noindent
-Direct application of pixel-level predictions to field scenes resulted in background-induced misclassification. To address this limitation, a whole-image crack-detection pipeline was developed, aggregating pixel-level CRACK probabilities using spatial post-processing (thresholding, morphological filtering, and patch/blob-based decision rules). The system was evaluated using a spatially disjoint row-based calibration--test split and reported with emphasis on the Cracked class. On the field data quality results, the pipeline achieved F1\textsubscript{CRACK} = \FoneEarlyBaseline{} under early-stage acquisition and F1\textsubscript{CRACK} = \FoneLateBaseline{} under late-stage acquisition (Table~\ref{tab:full_image_early_late_metrics}).
-
-\medskip
-\noindent
-Wavelength selection experiments demonstrated that high detection performance can be maintained using a small, specific subset of wavelengths. This indicates the clear potential to replace expensive hyperspectral cameras with simpler, low-cost multispectral sensors for everyday field deployment. Overall, the results establish the feasibility of HSI-based crack detection under realistic vineyard conditions and provide a methodological foundation for operational, non-destructive monitoring tools.
+Crucially, dimensionality reduction experiments revealed that a minimal subset of just 30 key wavelengths not only matched but slightly outperformed the full 159-band hyperspectral baseline in early-stage detection. This indicates that removing redundant spectral noise actively enhances model generalization. Ultimately, these findings highlight the clear commercial potential to replace expensive, full-spectrum cameras with low-cost, targeted multispectral sensors, providing a strong methodological foundation for operational, non-destructive field monitoring tools.
 
 \end{abstract}
-
