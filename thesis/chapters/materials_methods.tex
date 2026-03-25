@@ -330,7 +330,7 @@ This section outlines the computational frameworks used to analyze the hyperspec
 \label{subsec:global_preprocessing}
 
 \noindent
-To ensure methodological uniformity and prevent information leakage \parencite{thenkabail2016hyperspectral}, all hyperspectral datacubes were subjected to a strictly fixed preprocessing pipeline prior to any model training or evaluation.
+To ensure methodological uniformity and prevent information leakage, all hyperspectral datacubes were subjected to a strictly fixed preprocessing pipeline prior to any model training or evaluation.
 
 \begin{itemize}
     \item \textbf{Spectral Range Restriction:} Raw signatures were cropped to the 450--925\,nm range (159 contiguous bands). This step discarded extreme wavelengths (400--450\,nm and 925--1000\,nm) known to exhibit low signal-to-noise ratios and reflectance artifacts under outdoor field conditions \parencite{behmann2018specim}.

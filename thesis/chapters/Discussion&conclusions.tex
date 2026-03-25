@@ -6,55 +6,86 @@
 
 \subsection{The Biological Basis of Spectral Signatures}
 \noindent
-The initial finding of this study---that cracked tissues exhibit significantly lower reflectance across both the VIS and NIR regions---aligns with established agricultural literature regarding fruit cracking. 
-In the VIS region (400--700\,nm), the depressed reflectance is primarily attributed to the physical rupture of the waxy cuticle and the subsequent oxidation (browning) of the exposed tissue \parencite{santos2023molecular}. 
-In the NIR region (700--850\,nm), which is highly sensitive to tissue water content and cellular structure \parencite{thenkabail2016hyperspectral}, the reflectance drops dramatically due to the rapid loss of water and the physical collapse of the cells at the crack site \parencite{Chang2019,YU20251506}. 
+The finding that cracked grape tissues exhibit significantly lower reflectance across the 450--925\,nm range aligns directly with the established optical and physiological consequences of fruit cracking.
 
 \medskip\noindent
-Therefore, the strong spectral separability observed in this study is not merely a statistical artifact, but a direct measurement of the physical and structural degradation of the berry. By relying on these well-documented physiological changes, the algorithmic pipeline is grounded in true biological phenomena.
+In the visible spectrum, the depressed reflectance is driven by physical and biochemical changes. In the pigment region (\texttildelow430--560\,nm), this depression is compatible with the exposure and subsequent enzymatic oxidation (browning) of mesocarp tissue following cuticle rupture \parencite{Wang2015FruitQualitySpectroscopy, Gitelson1994ChlorophyllReflectance, santos2023molecular, Moon2020EnzymaticBrowning}. Furthermore, the red chlorophyll-absorption zone (\texttildelow640--680\,nm) emerged as a consensus feature in the selection analysis, reflecting the disruption of chloroplast-bearing sub-epidermal cells \parencite{Gitelson1994ChlorophyllReflectance}.
 
-\newpage
+\medskip\noindent
+The red-edge transition (\texttildelow680--750\,nm), which bridges chlorophyll absorption and NIR scattering, also yielded multiple consensus bins. This region is highly sensitive to both pigment concentration and cellular integrity, making the observed shifts a well-documented indicator of structural and biochemical fruit tissue damage \parencite{Lu2020OpticalPropertiesReview, Imran2020RedEdgeNIRShoulder}.
+
+\medskip\noindent
+In the near-infrared (NIR), the classification relies on structural and hydration factors. In the structural-scattering plateau (\texttildelow750--850\,nm), reflectance is governed primarily by internal air--cell-wall interfaces. The significant reflectance reduction recorded here signifies physical cellular collapse at the crack site \parencite{Lu2020OpticalPropertiesReview, Grimm2019CatastrophicFruitCracking, Chang2019, YU20251506}. Additionally, consensus bins in the upper measured range (\texttildelow890--925\,nm) capture the ascending shoulder of the $\sim$970\,nm O--H water-absorption band \parencite{Cheng2019AppleDRS, Sun2021PeachBruisingOptical, Munera2021PersimmonDamageHSI}. This demonstrates that even partial coverage of the water-absorption wing is sufficient to detect the rapid, localized moisture loss accompanying tissue rupture.
+
+\medskip\noindent
+Ultimately, the strong spectral separability observed is not a statistical artifact but a multifaceted measurement of pigment oxidation, cellular collapse, and localized water loss. By capturing these complementary optical phenomena, the classification pipeline is robustly grounded in genuine biological and structural degradation.
+
 \subsection{Data Normalization and Pre-processing Restraint}
-\noindent
+
+\medskip\noindent
 While these physiological changes establish a strong theoretical basis for detection, capturing them in uncontrolled vineyard conditions required specific pre-processing interventions to mitigate both sensor-level and field-induced noise.
 
 \medskip\noindent
 \textbf{First}, the extraction of tissue segments (ROIs) for the pixel-level models was explicitly designed to exclude the outer boundary pixels using a morphological erosion strategy (Figure~\ref{fig:boundary_buffer}). This spatial buffer was critical to prevent the inclusion of \textit{mixed pixels} \parencite{bioucas2013hyperspectral}, where spectral information from the grape tissue blends with background elements or adjacent berries, which would otherwise corrupt the pure class signatures.
 
 \begin{figure}[htbp]
+
     \centering
+
     \includegraphics[width=1\textwidth]{figures/results/discussion/boundary_buffer.png}
+
     \caption[Morphological erosion boundary buffer for grape ROIs]{Illustration of the morphological erosion boundary buffer applied to segmented grape ROIs, excluding edge pixels to prevent mixed-pixel contamination.}
+
     \label{fig:boundary_buffer}
+
 \end{figure}
+
 \FloatBarrier
 
-
 \newpage
+
 \medskip\noindent
 \textbf{Second}, the usable spectral range was deliberately restricted to 450--925\,nm (yielding 159 contiguous bands). The extreme boundaries of the camera's full spectral range suffer from low signal-to-noise ratios (SNR) and high variance---a known hardware limitation in VIS-NIR hyperspectral sensors that is corroborated by prior studies \parencite{behmann2018specim}. As illustrated in Figure~\ref{fig:hardware_snr}, the raw spectral signal degrades sharply near the sensor edges. Truncating these noisy extremes prevented the classifiers from fitting to instrumental artifacts rather than actual physiological data.
+
 \begin{figure}[htbp]
+
     \centering
+
     \includegraphics[width=0.85\textwidth]{figures/results/discussion/Hardware_Limitations.png}
+
     \caption[Specim IQ NIR spectral artifacts (Behmann et al.)]{Spectral reflectance comparison from an outdoor experiment showing increased reflectance and elevated systematic deviations in the NIR region of the Specim~IQ sensor. Reproduced from \parencite{behmann2018specim}.}
+
     \label{fig:hardware_snr}
+
 \end{figure}
+
 \FloatBarrier
 
 \newpage
-\noindent
-\textbf{Third}, the highly variable illumination in the field---exacerbated by canopy shading and diverse berry acquisition angles---necessitated integration times that often deviated significantly from the camera's optimal recommendations. To prevent the models from overfitting to these lighting artifacts (e.g., underexposure or shadowing), a Standard Normal Variate (SNV) transformation was applied (Figure~\ref{fig:snv_effect_disc}). By normalizing each pixel's spectrum relative to its own mean and variance, SNV effectively decoupled the absolute illumination intensity from the spectral shape. This ensured that the classifiers learned the true structural and chemical manifestations of the cracks, compensating for instances of over- or under-exposure within the same class.
+
+\medskip\noindent
+\textbf{Third}, highly variable field illumination---caused by canopy shading and varying camera angles---created significant lighting artifacts such as shadowing and underexposure. To prevent the models from overfitting to these intensity differences, a Standard Normal Variate (SNV) transformation was applied (Figure~\ref{fig:snv_effect_disc}). By normalizing each pixel's spectrum relative to its own mean and variance, SNV effectively isolates the spectral \textit{shape} from its absolute \textit{brightness}. This ensured the classifiers learned the true biological signatures of the cracks rather than incidental lighting variations.
 
 \begin{figure}[htbp]
+
     \centering
+
     \includegraphics[width=0.6\textwidth]{figures/results/discussion/snv_normalization_effect.png}
+
     \caption[SNV normalization: removing illumination-induced baselines]{Effect of SNV normalization: raw spectra with varying baseline offsets (left) are transformed into shape-normalized signatures (right), removing illumination-induced amplitude differences.}
+
     \label{fig:snv_effect_disc}
+
 \end{figure}
+
 \FloatBarrier
 
 \medskip\noindent
-Finally, it is worth noting the deliberate restraint exercised throughout the preprocessing pipeline. While early exploratory experiments tested spatial smoothing techniques (such as moving averages across neighboring pixels) to reduce localized noise, these were ultimately discarded. Applying aggressive smoothing in tandem with SNV normalization artificially inflates spatial collinearity and distances the dataset from its raw physical measurements. The adopted pipeline intentionally prioritized minimal, physically justified transformations over heavy mathematical manipulation, ensuring that the spectral signatures remained faithful to the underlying tissue physiology.
+Finally, the preprocessing pipeline was intentionally kept minimal. While early experiments tested spatial smoothing techniques (e.g., moving averages across neighboring pixels) to reduce noise, these were ultimately discarded. Aggressive smoothing, especially alongside SNV, artificially inflates spatial collinearity and distorts the raw physical measurements. Therefore, the final pipeline prioritized minimal, physically justified transformations to ensure the spectral signatures remained faithful to the actual tissue physiology.
+
+
+
+
 
 \newpage
 \section{Managing Field Clutter: The Role of Spatial Aggregation}
