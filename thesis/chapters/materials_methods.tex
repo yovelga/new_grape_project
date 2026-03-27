@@ -172,26 +172,54 @@ The annotation workflow leveraged foundation vision models to overcome the low s
 \begin{enumerate}
     \item \textbf{Interactive Seeding:} The user selected a seed pixel on a target object (e.g., a cracked berry, intact tissue, leaf, or background element) using either the high-resolution RGB image or the HSI composite.
     \item \textbf{SAM2 Segmentation:} The seed pixel served as a point prompt for the \textbf{Segment Anything Model 2 (SAM2)} \parencite{ravi2024sam2}. SAM2 generated a precise binary mask of the object on the RGB image, which was subsequently spatially aligned and projected onto the hyperspectral datacube.
-    \item \textbf{Spectral Extraction:} The tool extracted the 204-band spectral vectors for all pixels within the projected mask. The user assigned a definitive class label to the region, and the grouped signatures were stored along with their parent cluster ID and acquisition date.
+    \item \textbf{ROI Refinement:} Each annotated ROI was morphologically eroded to exclude outer boundary pixels (Figure~\ref{fig:boundary_buffer}), thereby reducing mixed-pixel contamination from adjacent objects and segmentation boundaries.
+    \item \textbf{Spectral Extraction:} The tool extracted the 204-band spectral vectors for all pixels within the refined ROI. The user assigned a definitive class label to the region, and the grouped signatures were stored along with their parent cluster ID and acquisition date.
 \end{enumerate}
 
-\FloatBarrier
-\begin{figure}[!htbp]
+% \medskip
+% \noindent
+% \textbf{Labeling criteria.}
+% Class labels were assigned manually by a trained annotator using an RGB rendering of each HSI datacube.
+% \medskip
+% \noindent
+% Using this workflow, a binary pixel-level dataset was first constructed from healthy and cracked grape tissues only. The dataset was subsequently expanded into a 10-class multi-class taxonomy by incorporating vineyard background elements, enabling the classifier to reject non-grape clutter during whole-image inference. The definitions and pixel counts for each class are summarized in Table~\ref{tab:multiclass_pixel_distribution}.
+
+
+\begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{figures/materials_methods/gui/gui_sam2_pointer_with_numbers.png}
-    \caption[HSI--RGB annotation GUI (SAM2-based)]{Graphical user interface of the HSI--RGB annotation tool. (1) Hyperspectral image visualized as an RGB composite with a SAM2-generated segmentation overlay, (2) wavelength-selectable grayscale HSI band, and (3) high-resolution RGB image of the same cluster. (4) Spectral signature extracted from a pixel within the segmented region, and (5) autoencoder reconstruction of the signature.}
+    \includegraphics[width=0.9\linewidth]{figures/materials_methods/gui/gui_sam2_pointer_with_numbers.png}
+    \caption[HSI--RGB annotation GUI]{Annotation GUI: (1)~HSI RGB composite with SAM2 overlay, (2)~band-selectable grayscale view, (3)~high-resolution RGB, (4)~extracted spectral signature, (5)~autoencoder reconstruction.}
     \label{fig:gui_sam2_pixelpicker}
+\end{figure}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/results/discussion/boundary_buffer.png}
+    \caption[Boundary buffer for grape ROIs]{Morphological erosion applied to segmented ROIs, discarding edge pixels to reduce mixed-pixel contamination.}
+    \label{fig:boundary_buffer}
 \end{figure}
 \FloatBarrier
 
+
+
+% \noindent
+% Using this workflow, the annotator labeled berry regions with visible fissures as \textsc{CRACK} and intact tissue as \textsc{REGULAR}; background elements were assigned to dedicated non-grape classes. A binary pixel-level dataset was first constructed from grape tissues only, then expanded into a 10-class taxonomy (Table~\ref{tab:multiclass_pixel_distribution}) to enable rejection of vineyard clutter during whole-image inference.
+
+\newpage
 \medskip
 \noindent
 \textbf{Labeling criteria.}
-All class labels were defined manually by a trained annotator using an RGB rendering derived directly from the HSI datacube. For each sample, the annotator clicked on the target object, assigned its semantic class, and SAM generated the corresponding segmentation mask. All hyperspectral pixels within that mask inherited the assigned label. Berry regions showing visible surface fissures or skin rupture were labeled \textsc{CRACK}, whereas intact berry tissue was labeled \textsc{REGULAR}. Background elements such as soil, foliage, woody structures, calibration panels, and artificial objects were assigned to dedicated non-grape classes according to their material identity.
+% Class labels were assigned manually by a trained annotator on an RGB rendering of each HSI datacube. Berry regions with visible fissures or skin rupture were labeled \textsc{CRACK}; intact tissue was labeled \textsc{REGULAR}. Background elements (soil, foliage, wood, calibration panels, artificial objects) were assigned to dedicated non-grape classes.
+Class labels were assigned manually by a trained annotator using an RGB rendering of each HSI datacube.
+
 
 \medskip
 \noindent
 Using this workflow, a binary pixel-level dataset was first constructed from healthy and cracked grape tissues only. The dataset was subsequently expanded into a 10-class multi-class taxonomy by incorporating vineyard background elements, enabling the classifier to reject non-grape clutter during whole-image inference. The definitions and pixel counts for each class are summarized in Table~\ref{tab:multiclass_pixel_distribution}.
+
+
+
 
 \begin{table}[htbp]
 \centering
@@ -232,10 +260,236 @@ To rigorously evaluate the system's early-warning capabilities, the whole-image 
     \item \textbf{Late-stage:} Images acquired after the first recorded cracking event, representing an advanced cracking condition.
 \end{itemize}
 
+% \medskip
+% \noindent
+% \begin{figure}[H]
+%     \centering
+%     \scalebox{0.7}{%
+%     \begin{tikzpicture}[
+%         node distance=0.9cm and 1.2cm,
+%         every node/.style={font=\small},
+%         data/.style={rectangle, rounded corners, draw=black!60, fill=green!8,
+%                       text width=3.8cm, align=center, minimum height=0.9cm},
+%         process/.style={rectangle, rounded corners, draw=blue!50, fill=blue!6,
+%                         text width=4.2cm, align=center, minimum height=0.9cm},
+%         split/.style={diamond, draw=orange!70, fill=orange!8,
+%                       aspect=2.2, align=center, inner sep=2pt},
+%         result/.style={rectangle, rounded corners, draw=black!50, fill=gray!8,
+%                        text width=2.2cm, align=center, minimum height=0.7cm},
+%         arrow/.style={->, >=stealth, thick, draw=black!60}
+%     ]
+%         % Top
+%         \node[data] (dataset) {Dataset};
+%         \node[split, below=of dataset] (split) {Split by Row};
+
+%         % Row 1 branch (left)
+%         \node[process, below left=1.2cm and 1.6cm of split] (train)
+%             {Train Pixel Model\\(Late-stage)};
+%         \node[process, below=of train] (tune)
+%             {Tune Aggregation\\(Row~1)};
+%         \node[process, below=of tune] (freeze) {Freeze Settings};
+
+%         % Row 2 branch (right)
+%         \node[data, below right=1.2cm and 1.6cm of split] (heldout)
+%             {Held-out Set\\(Row~2)};
+
+%         % Merge
+%         \node[process, below right=1.2cm and -0.4cm of freeze] (inference)
+%             {Held-out Inference};
+
+%         % Reporting
+%         \node[split, below=1.0cm of inference] (report) {Report by Stage};
+%         \node[result, below left=0.9cm and 1.0cm of report] (early) {Early-stage};
+%         \node[result, below right=0.9cm and 1.0cm of report] (late) {Late-stage};
+
+%         % Arrows
+%         \draw[arrow] (dataset) -- (split);
+%         \draw[arrow] (split) -- node[above left, font=\footnotesize] {Row 1} (train);
+%         \draw[arrow] (split) -- node[above right, font=\footnotesize] {Row 2} (heldout);
+%         \draw[arrow] (train) -- (tune);
+%         \draw[arrow] (tune) -- (freeze);
+%         \draw[arrow] (freeze) -- (inference);
+%         \draw[arrow] (heldout) |- (inference);
+%         \draw[arrow] (inference) -- (report);
+%         \draw[arrow] (report) -- node[left, font=\footnotesize] {Early} (early);
+%         \draw[arrow] (report) -- node[right, font=\footnotesize] {Late} (late);
+%     \end{tikzpicture}}%
+%     \caption[Row-based training and evaluation protocol]{Protocol overview for the row-based split: pixel-level training and aggregation calibration on Row~1 Late-stage data, held-out evaluation on Row~2, and post-inference reporting stratified by acquisition stage.}
+%     \label{fig:whole_image_protocol_overview}
+% \end{figure}
+
+
+\begin{table}[H]
+    \centering
+    \caption[Dataset statistics for all experimental splits]{Exact dataset statistics used in the experiments. $^*$Note: The negative class in the multi-class pixel dataset also includes the background classes detailed in Table~\ref{tab:multiclass_pixel_distribution}.}
+    \label{tab:dataset_statistics}
+    \small
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{@{} l l r r r @{} }
+        \toprule
+        \textbf{Dataset} & \textbf{Split / Variant} & \textbf{Samples} & \textbf{Positive} & \textbf{Negative} \\
+        & & & \textbf{(CRACK)} & \textbf{(REGULAR)} \\
+        \midrule
+        Pixel-Level Binary & Exported labeled pixels & 94{,}166 & 24{,}548  & 69{,}618  \\
+        Pixel-Level Multi-Class & Exported labeled pixels & 1{,}189{,}041 & 24{,}548 & 69{,}618$^*$ \\
+        \midrule
+        Whole-Image Early & Row~1 calibration  & 172 & 32 & 140 \\
+        Whole-Image Early & Row~2 test  & 60 & 32 & 28 \\
+        \midrule
+        Whole-Image Late & Row~1 calibration  & 160 & 35 & 125 \\
+        Whole-Image Late & Row~2 test  & 60 & 34 & 26 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\FloatBarrier
+
+
+% -----------------------------
+% MODELING AND EVALUATION
+% -----------------------------
+
+% -----old text but good -----
+% \section{Modeling and Evaluation Methodology}
+% \label{sec:modeling_evaluation}
+
+% \noindent
+% This section outlines the computational frameworks used to analyze the hyperspectral data, progressing from fundamental spectral preprocessing to robust pixel-level classification and anomaly detection.
+
+% \subsection{Global Spectral Preprocessing}
+% \label{subsec:global_preprocessing}
+
+% \noindent
+% To ensure methodological uniformity and prevent information leakage, all hyperspectral datacubes were subjected to a strictly fixed preprocessing pipeline prior to any model training or evaluation.
+
+% \begin{itemize}
+%     \item \textbf{Spectral Range Restriction:} Raw signatures were cropped to the 450--925\,nm range (159 contiguous bands). This step discarded extreme wavelengths (400--450\,nm and 925--1000\,nm) known to exhibit low signal-to-noise ratios and reflectance artifacts under outdoor field conditions \parencite{behmann2018specim}.
+%     \item \textbf{Per-Spectrum Normalization:} Each remaining spectral vector was independently normalized using the \textit{Standard Normal Variate} (SNV) transformation. By mean-centering and scaling each pixel exclusively by its own standard deviation, SNV mitigates illumination variability and scattering effects without relying on dataset-level statistics. This strictly per-pixel approach intrinsically prevents data leakage between training and testing partitions \parencite{mishra2017close, kaltenborn2025data}.
+% \end{itemize}
+
+% \clearpage
+% \noindent
+% Pixels belonging to the same material class are expected to share a similar underlying spectral shape. However, under field conditions, part of the observed within-class variability may arise from illumination differences, local geometry, and surface scattering rather than from true material differences. SNV was therefore applied to reduce this nuisance variability and obtain a more homogeneous spectral representation prior to classification.
+
+% \begin{figure}[ht]
+%     \centering
+%     \includegraphics[width=0.7\textwidth]{figures/literature/snv_normalization_effect.png}
+%     \caption[Effect of SNV normalization on spectral signatures]{Effect of Standard Normal Variate (SNV) normalization on hyperspectral reflectance signatures for four representative material classes (Crack, Regular Berry, Plastic, Branch). The left column shows the raw spectra, and the right column shows the corresponding SNV-normalized spectra. Statistics were computed over 500 sampled pixels per class.}
+%     \label{fig:snv_effect}
+% \end{figure}
+% \FloatBarrier
+
+% -----end old text but good -----
+
+% -- new text --
+\section{Modeling and Evaluation Methodology}
+\label{sec:modeling_evaluation}
+
+\noindent
+% This section describes the computational pipeline used to analyze the hyperspectral data. The presentation follows the progression of the experimental workflow: global spectral preprocessing and feature representation (\S\ref{subsec:global_preprocessing}--\S\ref{subsec:feature_extraction}), leakage-aware data partitioning (\S\ref{subsec:leakage_control}), pixel-level supervised classification (\S\ref{subsec:pixel_level_framework}), one-class anomaly detection (\S\ref{subsec:anomaly_detection}), whole-image spatial aggregation (\S\ref{subsec:full_image_pipeline}), and wavelength selection for sensor simplification (\S\ref{subsec:wavelength_selection}). The section concludes with the evaluation protocols and performance metrics used throughout the study (\S\ref{subsec:evaluation_protocols}).
+This section outlines the computational frameworks used to analyze the hyperspectral data, progressing from fundamental spectral preprocessing to robust pixel-level classification and anomaly detection.
+
+\subsection{Global Spectral Preprocessing}
+\label{subsec:global_preprocessing}
+
+\noindent
+To ensure methodological uniformity and prevent information leakage, all hyperspectral
+datacubes were subjected to a strictly fixed preprocessing pipeline prior to any model
+training or evaluation
+
+% \medskip\noindent
+% \textbf{Spatial boundary buffering.}
+% During ROI extraction for the pixel-level dataset, outer boundary pixels were excluded using a morphological erosion step (Figure~\ref{fig:boundary_buffer}). This operation reduced mixed-pixel contamination at tissue boundaries, where pixels may contain spectral contributions from grape tissue together with adjacent berries, background elements, or segmentation uncertainty. Only the eroded inner region of each annotated object was retained for spectral extraction.
+
+\medskip\noindent
+\begin{itemize}
+    \item \textbf{Spectral range restriction:} Spectra range were restricted to the 450--925~nm range, yielding 159 contiguous bands. The extreme regions of the original Specim IQ acquisition range (400--450~nm and 925--1000~nm) were excluded because they are more susceptible to reduced signal quality and elevated variance under outdoor acquisition conditions. This behavior is consistent with previously reported sensor limitations in VIS--NIR field imaging \parencite{behmann2018specim}.
+    \item \textbf{Per-spectrum normalization using SNV:} Each spectral vector was independently mean-centered and scaled by its own standard deviation via the Standard Normal Variate (SNV) transformation. SNV suppresses additive and multiplicative artifacts from illumination geometry and surface scattering without relying on any dataset-level statistics, thereby intrinsically preventing information leakage across data partitions \parencite{mishra2017close, kaltenborn2025data}.
+\end{itemize}
+
+
+
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=0.8\textwidth]{figures/results/discussion/Hardware_Limitations.png}
+%     \caption[Specim IQ NIR spectral artifacts (Behmann et al.)]{Spectral reflectance comparison from an outdoor experiment showing increased reflectance and elevated systematic deviations in the NIR region of the Specim~IQ sensor. Reproduced from \parencite{behmann2018specim}.}
+%     \label{fig:hardware_snr}
+% \end{figure}
+% \FloatBarrier
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/literature/snv_normalization_effect.png}
+    \caption[Effect of SNV normalization]{Raw (left) versus SNV-normalized (right) reflectance signatures for four material classes (500 pixels each).}
+    \label{fig:snv_effect}
+\end{figure}
+\FloatBarrier
+
+% \medskip\noindent
+% \textbf{Restrained preprocessing design.}
+% The preprocessing pipeline was intentionally kept minimal. Additional smoothing operations were considered during preliminary stages but were not included in the final workflow. The final design therefore consisted only of boundary cleaning, spectral-range restriction, and per-spectrum SNV normalization. This restrained preprocessing strategy was adopted to avoid unnecessary alteration of the measured signal and to preserve the original spectral structure for downstream analysis.
+
+\medskip\noindent
+\textbf{Restrained preprocessing design.}
+To ensure spectral signatures remained faithful to the true tissue physiology, the preprocessing pipeline was intentionally kept minimal. Preliminary spatial and spectral smoothing techniques were discarded, as they artificially inflate spatial collinearity and distort the raw physical measurements. Consequently, the final workflow relied exclusively on boundary cleaning, range restriction, and SNV normalization.
+
+
+
+% -- new text --
+% \medskip\noindent
+% \subsection{Feature Extraction and Tabular Representation}
+% \label{subsec:feature_extraction}
+
+% To train the pixel-level classification models, the hyperspectral data was transformed from a spatial-spectral datacube into a tabular dataset. Each individual pixel was treated as an independent sample. The spectral signature of each pixel, consisting of 159 distinct spectral bands, was extracted to serve as the feature vector. 
+
+% Following the global spectral preprocessing, the intensity values across these 159 dimensions were normalized to a range of $[-1, 1]$. Consequently, the input for the machine learning models consisted of 159 normalized features per record, accurately representing the full spectral profile of a single pixel in a tabular format suitable for XGBoost and the other evaluated algorithms.
+
+\newpage
+\subsection{Data Partitioning and Leakage Prevention Strategies}
+\label{subsec:leakage_control}
+
+\noindent
+A foundational principle of this study was the strict prevention of spatial and spectral information leakage. Because hyperspectral vineyard data exhibit strong spatial autocorrelation, improper data splitting would artificially inflate model performance. To ensure robust evaluation, distinct leakage prevention strategies were enforced at both the pixel and whole-image levels.
+
+\subsubsection{Pixel-Level Leakage Prevention: Leave-One-Group-Out (LOGO)}
+\label{subsec:cv_strategy}
+
+\noindent
+Pixel-level samples extracted from the same grape cluster are highly correlated and therefore cannot be treated as independent observations. To prevent leakage between training and testing, samples were grouped according to their source cluster (with acquisition date retained as metadata; see \S\ref{subsec:dataset_pixel}). A \textbf{Leave-One-Group-Out (LOGO)} cross-validation strategy was then applied, such that in each fold, all pixels belonging to one group were held out for testing, while pixels from the remaining groups were used for training. As a result, no pixels from the same physical cluster appeared in both partitions.
+
 \medskip
 \noindent
-\begin{figure}[htbp]
+For the multi-class setting, this protocol was applied only to grape-containing samples, for which cluster identity was meaningful. Non-grape background classes (e.g., soil and leaves) were not naturally organized by grape-cluster groups and were therefore assigned using a fixed 80/20 train--test split. This yielded a practical domain-aware evaluation protocol while still preventing semantic leakage between the grape and non-grape categories.
+\begin{figure}[ht]
     \centering
+    \begin{subfigure}[t]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/images_to_use/The_problem_logo.jpg}
+        \caption{Train pixels (blue) and Test pixels (red). Holding out entire clusters as indivisible units prevents data leakage.}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.6\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/images_to_use/The_solution_logo.png}
+        \caption{The LOGO solution: all pixels from one cluster are held out entirely as the test set.}
+    \end{subfigure}
+    \caption[LOGO cross-validation: problem and solution]{Illustration of the Leave-One-Group-Out (LOGO) cross-validation strategy. In each fold, all pixels from one grape cluster (group) are held out as the test set, while pixels from all remaining clusters form the training set. This ensures that no spatially correlated pixels from the same physical cluster appear in both partitions simultaneously.}
+    \label{fig:logo_illustration}
+\end{figure}
+\FloatBarrier
+
+\subsubsection{Whole-Image Leakage Prevention: Spatial Row Partitioning}
+\noindent
+At the whole-image level, to prevent spatial autocorrelation between adjacent vines, a strict geographical partitioning scheme was enforced. All hyperspectral records acquired from vineyard \textbf{Row 1} were designated exclusively as the calibration and training set, while records from \textbf{Row 2} served as the held-out evaluation (test) set. Because the two rows are physically disjoint (separated by distance and foliage), this row-based split robustly evaluates the model's ability to generalize to entirely new regions of the vineyard.
+
+\medskip
+\noindent
+Crucially, to simulate a true early-warning application, the underlying pixel-level models used in the whole-image pipeline were trained \textit{exclusively} on pixels extracted from \textbf{Late-stage} images in Row 1. Early-stage records were entirely hidden from the pixel-level training phase. The whole-image aggregation hyperparameters were tuned strictly on Row 1, frozen, and then applied blindly to the Row 2 held-out set.
+
+\begin{figure}[H]
+    \centering
+    \scalebox{0.85}{%
     \begin{tikzpicture}[
         node distance=0.9cm and 1.2cm,
         every node/.style={font=\small},
@@ -284,119 +538,11 @@ To rigorously evaluate the system's early-warning capabilities, the whole-image 
         \draw[arrow] (inference) -- (report);
         \draw[arrow] (report) -- node[left, font=\footnotesize] {Early} (early);
         \draw[arrow] (report) -- node[right, font=\footnotesize] {Late} (late);
-    \end{tikzpicture}
+    \end{tikzpicture}}%
     \caption[Row-based training and evaluation protocol]{Protocol overview for the row-based split: pixel-level training and aggregation calibration on Row~1 Late-stage data, held-out evaluation on Row~2, and post-inference reporting stratified by acquisition stage.}
     \label{fig:whole_image_protocol_overview}
 \end{figure}
-
-
-\begin{table}[htbp]
-    \centering
-    \caption[Dataset statistics for all experimental splits]{Exact dataset statistics used in the experiments. $^*$Note: The negative class in the multi-class pixel dataset also includes the background classes detailed in Table~\ref{tab:multiclass_pixel_distribution}.}
-    \label{tab:dataset_statistics}
-    \small
-    \renewcommand{\arraystretch}{1.3}
-    \begin{tabular}{@{} l l r r r @{} }
-        \toprule
-        \textbf{Dataset} & \textbf{Split / Variant} & \textbf{Samples} & \textbf{Positive} & \textbf{Negative} \\
-        & & & \textbf{(CRACK)} & \textbf{(REGULAR)} \\
-        \midrule
-        Pixel-Level Binary & Exported labeled pixels & 94{,}166 & 24{,}548  & 69{,}618  \\
-        Pixel-Level Multi-Class & Exported labeled pixels & 1{,}189{,}041 & 24{,}548 & 69{,}618$^*$ \\
-        \midrule
-        Whole-Image Early & Row~1 calibration  & 172 & 32 & 140 \\
-        Whole-Image Early & Row~2 test  & 60 & 32 & 28 \\
-        \midrule
-        Whole-Image Late & Row~1 calibration  & 160 & 35 & 125 \\
-        Whole-Image Late & Row~2 test  & 60 & 34 & 26 \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
 \FloatBarrier
-
-
-
-% -----------------------------
-% MODELING AND EVALUATION
-% -----------------------------
-\section{Modeling and Evaluation Methodology}
-\label{sec:modeling_evaluation}
-
-\noindent
-This section outlines the computational frameworks used to analyze the hyperspectral data, progressing from fundamental spectral preprocessing to robust pixel-level classification and anomaly detection.
-
-\subsection{Global Spectral Preprocessing}
-\label{subsec:global_preprocessing}
-
-\noindent
-To ensure methodological uniformity and prevent information leakage, all hyperspectral datacubes were subjected to a strictly fixed preprocessing pipeline prior to any model training or evaluation.
-
-\begin{itemize}
-    \item \textbf{Spectral Range Restriction:} Raw signatures were cropped to the 450--925\,nm range (159 contiguous bands). This step discarded extreme wavelengths (400--450\,nm and 925--1000\,nm) known to exhibit low signal-to-noise ratios and reflectance artifacts under outdoor field conditions \parencite{behmann2018specim}.
-    \item \textbf{Per-Spectrum Normalization:} Each remaining spectral vector was independently normalized using the \textit{Standard Normal Variate} (SNV) transformation. By mean-centering and scaling each pixel exclusively by its own standard deviation, SNV mitigates illumination variability and scattering effects without relying on dataset-level statistics. This strictly per-pixel approach intrinsically prevents data leakage between training and testing partitions \parencite{mishra2017close, kaltenborn2025data}.
-\end{itemize}
-
-\clearpage
-\noindent
-Pixels belonging to the same material class are expected to share a similar underlying spectral shape. However, under field conditions, part of the observed within-class variability may arise from illumination differences, local geometry, and surface scattering rather than from true material differences. SNV was therefore applied to reduce this nuisance variability and obtain a more homogeneous spectral representation prior to classification.
-
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=0.7\textwidth]{figures/literature/snv_normalization_effect.png}
-    \caption[Effect of SNV normalization on spectral signatures]{Effect of Standard Normal Variate (SNV) normalization on hyperspectral reflectance signatures for four representative material classes (Crack, Regular Berry, Plastic, Branch). The left column shows the raw spectra, and the right column shows the corresponding SNV-normalized spectra. Statistics were computed over 500 sampled pixels per class.}
-    \label{fig:snv_effect}
-\end{figure}
-\FloatBarrier
-
-\subsection{Feature Extraction and Tabular Representation}
-\label{subsec:feature_extraction}
-
-To train the pixel-level classification models, the hyperspectral data was transformed from a spatial-spectral datacube into a tabular dataset. Each individual pixel was treated as an independent sample. The spectral signature of each pixel, consisting of 159 distinct spectral bands, was extracted to serve as the feature vector. 
-
-Following the global spectral preprocessing, the intensity values across these 159 dimensions were normalized to a range of $[-1, 1]$. Consequently, the input for the machine learning models consisted of 159 normalized features per record, accurately representing the full spectral profile of a single pixel in a tabular format suitable for XGBoost and the other evaluated algorithms.
-
-\subsection{Data Partitioning and Leakage Prevention Strategies}
-\label{subsec:leakage_control}
-
-\noindent
-A foundational principle of this study was the strict prevention of spatial and spectral information leakage. Because hyperspectral vineyard data exhibit strong spatial autocorrelation, improper data splitting would artificially inflate model performance. To ensure robust evaluation, distinct leakage prevention strategies were enforced at both the pixel and whole-image levels.
-
-\subsubsection{Pixel-Level Leakage Prevention: Leave-One-Group-Out (LOGO)}
-\label{subsec:cv_strategy}
-
-\noindent
-Pixel-level samples extracted from the same grape cluster are highly correlated and therefore cannot be treated as independent observations. To prevent leakage between training and testing, samples were grouped according to their source cluster (with acquisition date retained as metadata; see \S\ref{subsec:dataset_pixel}). A \textbf{Leave-One-Group-Out (LOGO)} cross-validation strategy was then applied, such that in each fold, all pixels belonging to one group were held out for testing, while pixels from the remaining groups were used for training. As a result, no pixels from the same physical cluster appeared in both partitions.
-
-\medskip
-\noindent
-For the multi-class setting, this protocol was applied only to grape-containing samples, for which cluster identity was meaningful. Non-grape background classes (e.g., soil and leaves) were not naturally organized by grape-cluster groups and were therefore assigned using a fixed 80/20 train--test split. This yielded a practical domain-aware evaluation protocol while still preventing semantic leakage between the grape and non-grape categories.
-\begin{figure}[ht]
-    \centering
-    \begin{subfigure}[t]{0.3\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{figures/images_to_use/The_problem_logo.jpg}
-        \caption{Train pixels (blue) and Test pixels (red). Holding out entire clusters as indivisible units prevents data leakage.}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[t]{0.6\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{figures/images_to_use/The_solution_logo.png}
-        \caption{The LOGO solution: all pixels from one cluster are held out entirely as the test set.}
-    \end{subfigure}
-    \caption[LOGO cross-validation: problem and solution]{Illustration of the Leave-One-Group-Out (LOGO) cross-validation strategy. In each fold, all pixels from one grape cluster (group) are held out as the test set, while pixels from all remaining clusters form the training set. This ensures that no spatially correlated pixels from the same physical cluster appear in both partitions simultaneously.}
-    \label{fig:logo_illustration}
-\end{figure}
-\FloatBarrier
-
-\subsubsection{Whole-Image Leakage Prevention: Spatial Row Partitioning}
-\noindent
-At the whole-image level, to prevent spatial autocorrelation between adjacent vines, a strict geographical partitioning scheme was enforced. All hyperspectral records acquired from vineyard \textbf{Row 1} were designated exclusively as the calibration and training set, while records from \textbf{Row 2} served as the held-out evaluation (test) set. Because the two rows are physically disjoint (separated by distance and foliage), this row-based split robustly evaluates the model's ability to generalize to entirely new regions of the vineyard.
-
-\medskip
-\noindent
-Crucially, to simulate a true early-warning application, the underlying pixel-level models used in the whole-image pipeline were trained \textit{exclusively} on pixels extracted from \textbf{Late-stage} images in Row 1. Early-stage records were entirely hidden from the pixel-level training phase. The whole-image aggregation hyperparameters were tuned strictly on Row 1, frozen, and then applied blindly to the Row 2 held-out set.
-
 
 \subsection{Pixel-Level Classification Framework}
 \label{subsec:pixel_level_framework}
@@ -417,6 +563,7 @@ Supervised classification was applied at the pixel level to discriminate between
 \textbf{Algorithm Selection and Training:} Six algorithms were evaluated: Partial Least Squares Discriminant Analysis (PLS-DA), L1-regularized Logistic Regression, Support Vector Machine (RBF kernel), Random Forest, a shallow Multi-Layer Perceptron (MLP), and \textbf{XGBoost} (Gradient-boosted decision trees). XGBoost was ultimately adopted as the baseline model across all primary comparisons due to its robust handling of high-dimensional, correlated spectral features. Models were evaluated under both naturally unbalanced and strictly balanced training regimes (achieved via segment-proportional undersampling to preserve within-class diversity).
 
 
+\newpage
 \subsection{Autoencoder-Based Anomaly Detection}
 \label{subsec:anomaly_detection}
 

@@ -288,22 +288,23 @@ Finally, early in the research phase, fully automated unsupervised clustering (e
 This study successfully demonstrated that visible--near-infrared (VIS-NIR) spectral imaging can reliably detect table grape cracking ('Scarlotta' cultivar) under uncontrolled field conditions, even during the early stages prior to severe macroscopic degradation. The physical mechanism enabling this detection is deeply rooted in the biomechanics of the crack: the destruction of the waxy cuticle and subsequent cellular water loss produce a highly distinct, depressed reflectance signature, particularly in the NIR plateau and the red-edge inflection.
 
 \medskip\noindent
-Transitioning from controlled laboratory pixel-level analysis to whole-image field deployment exposed significant challenges related to background clutter, illumination variance, and extreme class imbalance. These challenges were systematically mitigated through a novel pipeline that combined a multi-class supervised learning approach (XGBoost) with geometric spatial aggregation (patch-density blob filtering). This spatial logic proved that while spectral data is necessary for identifying the chemical and structural changes of a crack, spatial context is mandatory for suppressing the geometric noise inherent to the agricultural environment. 
+Transitioning from controlled laboratory pixel-level analysis to whole-image field deployment exposed significant challenges related to background clutter, illumination variance, and extreme class imbalance. These challenges were systematically mitigated through a novel pipeline that combined a multi-class supervised learning approach (XGBoost) with geometric spatial aggregation (patch-density blob filtering).
+This spatial logic proved that while spectral data is necessary for identifying the chemical and structural changes of a crack, spatial context is mandatory for suppressing the geometric noise inherent to the agricultural environment. 
 
 \subsection{Revisiting the Research Hypotheses}
 \noindent
 The empirical results of this study directly address and validate the core research hypotheses established in the introductory chapter:
 
 \begin{itemize}
-    \item \textbf{Hypothesis 1 (Spectral Distinguishability):} Validated. The study confirmed significant physical differences in the spectral signatures of healthy and cracked tissues, particularly driven by water absorption features and oxidation markers, thereby rejecting the null hypothesis.
+    \item \textbf{Hypothesis 1 (Spectral Distinguishability):} Confirmed. The study confirmed significant physical differences in the spectral signatures of healthy and cracked tissues, particularly driven by water absorption features and oxidation markers, thereby rejecting the null hypothesis.
     
-    \item \textbf{Hypothesis 2 (Pixel-Level Classification):} Validated. The supervised XGBoost architecture effectively learned these spectral decision boundaries, achieving near-perfect classification performance (PR--AUC $\approx 1.0$) on isolated pixels, definitively proving algorithmic feasibility.
+    \item \textbf{Hypothesis 2 (Pixel-Level Classification):} Confirmed. The supervised XGBoost architecture effectively learned these spectral decision boundaries, achieving near-perfect classification performance (PR--AUC $\approx 1.0$) on isolated pixels, definitively proving algorithmic feasibility.
     
-    \item \textbf{Hypothesis 3 (Whole-Image Robustness):} Validated. While initial binary models struggled with background clutter, the transition to a 10-class background model coupled with spatial aggregation successfully isolated cracks from highly deceptive elements (e.g., dry wood), proving that robust full-image detection is achievable in the field.
+    \item \textbf{Hypothesis 3 (Whole-Image Robustness):} Confirmed. While initial binary models struggled with background clutter, the transition to a 10-class background model coupled with spatial aggregation successfully isolated cracks from highly deceptive elements (e.g., dry wood), proving that robust full-image detection is achievable in the field.
     
-    \item \textbf{Hypothesis 4 (Early Detection Capability):} Validated. The spatial-spectral pipeline successfully identified early-stage micro-cracks before they became fully visible macroscopically, achieving an independent test F1\textsubscript{CRACK} of 0.800 under early-stage conditions.
+    \item \textbf{Hypothesis 4 (Early Detection Capability):} Confirmed. The spatial-spectral pipeline successfully identified early-stage micro-cracks before they became fully visible macroscopically, achieving an independent test F1\textsubscript{CRACK} of 0.800 under early-stage conditions.
     
-    \item \textbf{Hypothesis 5 (Spectral Efficiency):} Validated. Through Backward Feature Selection (BFS), the original 159-band spectrum was successfully distilled into an optimal subset of 30 wavelengths without compromising accuracy. This proves that massive spectral redundancy exists and that full-range hyperspectral data is not strictly required for operational deployment.
+    \item \textbf{Hypothesis 5 (Spectral Efficiency):} Confirmed. Through Backward Feature Selection (BFS), the original 159-band spectrum was successfully distilled into an optimal subset of 30 wavelengths without compromising accuracy. This proves that massive spectral redundancy exists and that full-range hyperspectral data is not strictly required for operational deployment.
 \end{itemize}
 
 \medskip\noindent
@@ -311,7 +312,10 @@ Ultimately, the successful reduction to 30 stable wavelengths proves the feasibi
 
 \subsection{Future Research Directions}
 \noindent
-Future research should focus on several primary avenues to bridge the gap between this proof-of-concept and commercial agricultural deployment. First, cross-cultivar validation is essential; the spectral markers identified for 'Scarlotta Seedless' must be tested against grape varieties with differing cuticle thicknesses and anthocyanin profiles. Second, the development of a hybrid preprocessing method that retains absolute albedo information alongside SNV-normalized spectral shapes could significantly reduce residual false positives caused by bright background artifacts. Third, the hardware implementation of the selected 30-wavelength configuration into a physical, real-time multispectral camera must be validated under dynamic vineyard driving conditions.
+Future research should focus on several primary avenues to bridge the gap between this proof-of-concept and commercial agricultural deployment.
+First, cross-cultivar validation is essential; the spectral markers identified for 'Scarlotta Seedless' must be tested against grape varieties with differing cuticle thicknesses and anthocyanin profiles.
+Second, the development of a hybrid preprocessing method that retains absolute albedo information alongside SNV-normalized spectral shapes could significantly reduce residual false positives caused by bright background artifacts.
+Third, the hardware implementation of the selected 30-wavelength configuration into a physical, real-time multispectral camera must be validated under dynamic vineyard driving conditions.
 
 \medskip\noindent
 From an agronomic perspective, a highly promising avenue is to investigate how the mean spectral signature of grape clusters evolves across varying irrigation regimes. Because cracking is fundamentally driven by rapid water uptake and subsequent turgor-induced failure, clusters subjected to different water-stress levels may exhibit measurably different spectral baselines---particularly in the NIR water-absorption bands---even before micro-cracking occurs. Tracking these cluster-level spectral shifts could reveal early physiological precursors of cracking susceptibility, enabling proactive, irrigation-guided risk assessment rather than reactive post-damage detection.
