@@ -4,43 +4,43 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \contentsline {table}{\numberline {4.1}{\ignorespaces Multi-class pixel dataset: class distribution}}{33}{table.4.1}%
-\contentsline {table}{\numberline {4.2}{\ignorespaces Dataset statistics for all experimental splits}}{35}{table.4.2}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces Dataset statistics for all experimental splits}}{34}{table.4.2}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {5.1}{\ignorespaces Pixel-level classification metrics (unbalanced, binary setting). Truncated mean values. Full cross-validation statistics in Appendix~\ref {app:cv_statistics}.}}{50}{table.5.1}%
-\contentsline {table}{\numberline {5.2}{\ignorespaces Pixel-level classification: unbalanced multi-class}}{51}{table.5.2}%
-\contentsline {table}{\numberline {5.3}{\ignorespaces Autoencoder anomaly detection: binary setting}}{52}{table.5.3}%
-\contentsline {table}{\numberline {5.4}{\ignorespaces Autoencoder anomaly detection: crack-only training}}{52}{table.5.4}%
-\contentsline {table}{\numberline {5.5}{\ignorespaces Autoencoder anomaly detection: all non-CRACK training}}{52}{table.5.5}%
-\contentsline {table}{\numberline {5.6}{\ignorespaces Full-image dataset: early- and late-stage composition}}{54}{table.5.6}%
-\contentsline {table}{\numberline {5.7}{\ignorespaces Full-image crack detection: early- and late-stage performance}}{55}{table.5.7}%
-\contentsline {table}{\numberline {5.8}{\ignorespaces Full-image autoencoder-based crack detection}}{56}{table.5.8}%
-\contentsline {table}{\numberline {5.9}{\ignorespaces BFS wavelength-count threshold summary}}{59}{table.5.9}%
-\contentsline {table}{\numberline {5.10}{\ignorespaces Full-image performance across wavelength subsets}}{60}{table.5.10}%
-\contentsline {table}{\numberline {5.11}{\ignorespaces 5\,nm wavelength bins: 5/5 seed consensus}}{63}{table.5.11}%
-\contentsline {table}{\numberline {5.12}{\ignorespaces 5\,nm wavelength bins: 4/5 seed consensus}}{63}{table.5.12}%
-\contentsline {table}{\numberline {5.13}{\ignorespaces BFS wavelength stability: mean Jaccard similarity}}{64}{table.5.13}%
+\contentsline {table}{\numberline {5.1}{\ignorespaces Pixel-level classification metrics (unbalanced, binary setting). Truncated mean values. Full cross-validation statistics in Appendix~\ref {app:cv_statistics}.}}{48}{table.5.1}%
+\contentsline {table}{\numberline {5.2}{\ignorespaces Pixel-level classification: unbalanced multi-class (10 classes)}}{49}{table.5.2}%
+\contentsline {table}{\numberline {5.3}{\ignorespaces Autoencoder anomaly detection: binary setting}}{50}{table.5.3}%
+\contentsline {table}{\numberline {5.4}{\ignorespaces Autoencoder anomaly detection: crack-only training}}{50}{table.5.4}%
+\contentsline {table}{\numberline {5.5}{\ignorespaces Autoencoder anomaly detection: all non-CRACK training}}{50}{table.5.5}%
+\contentsline {table}{\numberline {5.6}{\ignorespaces Full-image dataset: early- and late-stage composition}}{52}{table.5.6}%
+\contentsline {table}{\numberline {5.7}{\ignorespaces Full-image crack detection: early- and late-stage performance}}{53}{table.5.7}%
+\contentsline {table}{\numberline {5.8}{\ignorespaces Full-image autoencoder-based crack detection}}{54}{table.5.8}%
+\contentsline {table}{\numberline {5.9}{\ignorespaces BFS wavelength-count threshold summary}}{56}{table.5.9}%
+\contentsline {table}{\numberline {5.10}{\ignorespaces Full-image performance across wavelength subsets}}{57}{table.5.10}%
+\contentsline {table}{\numberline {5.11}{\ignorespaces Consensus of 5\,nm wavelength bins across BFS seeds}}{60}{table.5.11}%
+\contentsline {table}{\numberline {5.12}{\ignorespaces BFS wavelength stability: mean Jaccard similarity}}{60}{table.5.12}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {A.1}{\ignorespaces Pixel-level classification metrics (unbalanced training set, binary). Values are reported as mean $\pm $ standard deviation across folds where available. Precision/recall and ROC--AUC refer to the \textit {Cracked} class (positive class); F1 is the weighted F1-score.}}{82}{table.A.1}%
-\contentsline {table}{\numberline {A.2}{\ignorespaces Pixel-level classification: unbalanced multi-class (full CV)}}{83}{table.A.2}%
-\contentsline {table}{\numberline {A.3}{\ignorespaces Autoencoder anomaly detection: binary (full CV)}}{83}{table.A.3}%
-\contentsline {table}{\numberline {A.4}{\ignorespaces Autoencoder anomaly detection: CRACK-only (full CV)}}{83}{table.A.4}%
-\contentsline {table}{\numberline {A.5}{\ignorespaces Autoencoder anomaly detection: non-CRACK training (full CV)}}{83}{table.A.5}%
-\contentsline {table}{\numberline {A.6}{\ignorespaces Reflectance statistics: healthy vs.\ cracked tissue}}{83}{table.A.6}%
-\contentsline {table}{\numberline {A.7}{\ignorespaces Regional spectral separability metrics}}{84}{table.A.7}%
-\contentsline {table}{\numberline {A.8}{\ignorespaces Pixel-level classification: balanced binary (full CV)}}{85}{table.A.8}%
-\contentsline {table}{\numberline {A.9}{\ignorespaces Pixel-level classification: balanced multi-class (full CV)}}{86}{table.A.9}%
-\contentsline {table}{\numberline {A.10}{\ignorespaces Autoencoder anomaly detection: non-cracked balanced (full CV)}}{87}{table.A.10}%
-\contentsline {table}{\numberline {A.11}{\ignorespaces Autoencoder anomaly detection: CRACK-only balanced (full CV)}}{87}{table.A.11}%
-\contentsline {table}{\numberline {A.12}{\ignorespaces Autoencoder anomaly detection: non-CRACK balanced (full CV)}}{88}{table.A.12}%
-\contentsline {table}{\numberline {A.13}{\ignorespaces BFS wavelength-count thresholds (full precision)}}{89}{table.A.13}%
-\contentsline {table}{\numberline {A.14}{\ignorespaces Full-image performance by wavelength subset (full precision)}}{89}{table.A.14}%
-\contentsline {table}{\numberline {A.15}{\ignorespaces Model generalization: calibration vs.\ test MCC}}{90}{table.A.15}%
-\contentsline {table}{\numberline {A.16}{\ignorespaces Jaccard similarity: top-30, varying split}}{90}{table.A.16}%
-\contentsline {table}{\numberline {A.17}{\ignorespaces Jaccard similarity: top-11, varying split}}{90}{table.A.17}%
-\contentsline {table}{\numberline {A.18}{\ignorespaces Jaccard similarity: top-30, 5\,nm bins}}{91}{table.A.18}%
-\contentsline {table}{\numberline {A.19}{\ignorespaces Jaccard similarity: top-30, 10\,nm bins}}{91}{table.A.19}%
-\contentsline {table}{\numberline {A.20}{\ignorespaces Jaccard similarity: top-30, 20\,nm bins}}{91}{table.A.20}%
-\contentsline {table}{\numberline {A.21}{\ignorespaces Jaccard similarity: top-11, 5\,nm bins}}{92}{table.A.21}%
-\contentsline {table}{\numberline {A.22}{\ignorespaces Jaccard similarity: top-11, 10\,nm bins}}{92}{table.A.22}%
-\contentsline {table}{\numberline {A.23}{\ignorespaces Jaccard similarity: top-11, 20\,nm bins}}{92}{table.A.23}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {A.1}{\ignorespaces Pixel-level classification metrics (unbalanced training set, binary). Values are reported as mean $\pm $ standard deviation across folds where available. Precision/recall and ROC--AUC refer to the \textit {Cracked} class (positive class); F1 is the weighted F1-score.}}{73}{table.A.1}%
+\contentsline {table}{\numberline {A.2}{\ignorespaces Pixel-level classification: unbalanced multi-class (full CV)}}{74}{table.A.2}%
+\contentsline {table}{\numberline {A.3}{\ignorespaces Autoencoder anomaly detection: binary (full CV)}}{74}{table.A.3}%
+\contentsline {table}{\numberline {A.4}{\ignorespaces Autoencoder anomaly detection: CRACK-only (full CV)}}{74}{table.A.4}%
+\contentsline {table}{\numberline {A.5}{\ignorespaces Autoencoder anomaly detection: non-CRACK training (full CV)}}{74}{table.A.5}%
+\contentsline {table}{\numberline {A.6}{\ignorespaces Reflectance statistics: healthy vs.\ cracked tissue}}{74}{table.A.6}%
+\contentsline {table}{\numberline {A.7}{\ignorespaces Regional spectral separability metrics}}{75}{table.A.7}%
+\contentsline {table}{\numberline {A.8}{\ignorespaces Pixel-level classification: balanced binary (full CV)}}{76}{table.A.8}%
+\contentsline {table}{\numberline {A.9}{\ignorespaces Pixel-level classification: balanced multi-class (full CV)}}{77}{table.A.9}%
+\contentsline {table}{\numberline {A.10}{\ignorespaces Autoencoder anomaly detection: non-cracked balanced (full CV)}}{78}{table.A.10}%
+\contentsline {table}{\numberline {A.11}{\ignorespaces Autoencoder anomaly detection: CRACK-only balanced (full CV)}}{78}{table.A.11}%
+\contentsline {table}{\numberline {A.12}{\ignorespaces Autoencoder anomaly detection: non-CRACK balanced (full CV)}}{79}{table.A.12}%
+\contentsline {table}{\numberline {A.13}{\ignorespaces BFS wavelength-count thresholds (full precision)}}{80}{table.A.13}%
+\contentsline {table}{\numberline {A.14}{\ignorespaces Full-image performance by wavelength subset (full precision)}}{81}{table.A.14}%
+\contentsline {table}{\numberline {A.15}{\ignorespaces Model generalization: calibration vs.\ test MCC}}{81}{table.A.15}%
+\contentsline {table}{\numberline {A.16}{\ignorespaces Jaccard similarity: top-30, varying split}}{81}{table.A.16}%
+\contentsline {table}{\numberline {A.17}{\ignorespaces Jaccard similarity: top-11, varying split}}{82}{table.A.17}%
+\contentsline {table}{\numberline {A.18}{\ignorespaces Jaccard similarity: top-30, 5\,nm bins}}{82}{table.A.18}%
+\contentsline {table}{\numberline {A.19}{\ignorespaces Jaccard similarity: top-30, 10\,nm bins}}{82}{table.A.19}%
+\contentsline {table}{\numberline {A.20}{\ignorespaces Jaccard similarity: top-30, 20\,nm bins}}{83}{table.A.20}%
+\contentsline {table}{\numberline {A.21}{\ignorespaces Jaccard similarity: top-11, 5\,nm bins}}{83}{table.A.21}%
+\contentsline {table}{\numberline {A.22}{\ignorespaces Jaccard similarity: top-11, 10\,nm bins}}{83}{table.A.22}%
+\contentsline {table}{\numberline {A.23}{\ignorespaces Jaccard similarity: top-11, 20\,nm bins}}{83}{table.A.23}%

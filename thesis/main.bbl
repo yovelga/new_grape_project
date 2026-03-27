@@ -472,52 +472,6 @@
       \field{pages}{3758}
       \range{pages}{1}
     \endentry
-    \entry{bioucas2013hyperspectral}{article}{}{}
-      \true{moreauthor}
-      \true{morelabelname}
-      \name{author}{3}{}{%
-        {{un=0,uniquepart=base,hash=d6f4a4169a533e7f56ab134016a8314e}{%
-           family={Bioucas-Dias},
-           familyi={B\bibinithyphendelim D\bibinitperiod},
-           given={José\bibnamedelima M.},
-           giveni={J\bibinitperiod\bibinitdelim M\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=9b3ce6468cd35a018e12616afcd1f795}{%
-           family={Plaza},
-           familyi={P\bibinitperiod},
-           given={Antonio},
-           giveni={A\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=01c50c5ae75cebee86dca145c4ab7fe2}{%
-           family={Camps-Valls},
-           familyi={C\bibinithyphendelim V\bibinitperiod},
-           given={Gustau},
-           giveni={G\bibinitperiod},
-           givenun=0}}%
-      }
-      \strng{namehash}{d8d10b07099f3b183b924af92a69bf0a}
-      \strng{fullhash}{fe44b80f0c1f4c80614002484d64e22b}
-      \strng{fullhashraw}{fe44b80f0c1f4c80614002484d64e22b}
-      \strng{bibnamehash}{fe44b80f0c1f4c80614002484d64e22b}
-      \strng{authorbibnamehash}{fe44b80f0c1f4c80614002484d64e22b}
-      \strng{authornamehash}{d8d10b07099f3b183b924af92a69bf0a}
-      \strng{authorfullhash}{fe44b80f0c1f4c80614002484d64e22b}
-      \strng{authorfullhashraw}{fe44b80f0c1f4c80614002484d64e22b}
-      \field{sortinit}{B}
-      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{journaltitle}{IEEE Geoscience and Remote Sensing Magazine}
-      \field{number}{2}
-      \field{title}{Hyperspectral remote sensing data analysis and future challenges}
-      \field{volume}{1}
-      \field{year}{2013}
-      \field{pages}{6\bibrangedash 36}
-      \range{pages}{31}
-    \endentry
     \entry{blackburn2007}{article}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=ebca2a92582a34621c3db7b67e1d6646}{%
@@ -789,6 +743,59 @@
       \endverb
       \verb{url}
       \verb https://www.mdpi.com/2072-4292/16/24/4695
+      \endverb
+    \endentry
+    \entry{Cheng2019AppleDRS}{article}{}{}
+      \name{author}{4}{}{%
+        {{un=0,uniquepart=base,hash=ebd1c7850e98467636bf14b6e73e542e}{%
+           family={Cheng},
+           familyi={C\bibinitperiod},
+           given={Nan-Yu},
+           giveni={N\bibinithyphendelim Y\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=6938283baa8b55c61d2a0a57235c4c1b}{%
+           family={Chen},
+           familyi={C\bibinitperiod},
+           given={Chien-Chih},
+           giveni={C\bibinithyphendelim C\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=95b3ef73534643ae5dead107fec50c1d}{%
+           family={Liang},
+           familyi={L\bibinitperiod},
+           given={Bo-Jian},
+           giveni={B\bibinithyphendelim J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=d889cd740579cf611a65a90c57f19818}{%
+           family={Tseng},
+           familyi={T\bibinitperiod},
+           given={Sheng-Hao},
+           giveni={S\bibinithyphendelim H\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{58aa0c15d3bcaa8f4d1c302b89226241}
+      \strng{fullhash}{d4cb0d15980dd363694803ff72a565b3}
+      \strng{fullhashraw}{d4cb0d15980dd363694803ff72a565b3}
+      \strng{bibnamehash}{d4cb0d15980dd363694803ff72a565b3}
+      \strng{authorbibnamehash}{d4cb0d15980dd363694803ff72a565b3}
+      \strng{authornamehash}{58aa0c15d3bcaa8f4d1c302b89226241}
+      \strng{authorfullhash}{d4cb0d15980dd363694803ff72a565b3}
+      \strng{authorfullhashraw}{d4cb0d15980dd363694803ff72a565b3}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Applied Sciences}
+      \field{number}{11}
+      \field{title}{Nondestructive Evaluation of Apple Fruit Quality by Frequency-Domain Diffuse Reflectance Spectroscopy: Variations in Apple Skin and Flesh}
+      \field{volume}{9}
+      \field{year}{2019}
+      \field{pages}{2355}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.3390/app9112355
       \endverb
     \endentry
     \entry{cohen1988statistical}{book}{}{}
@@ -1163,6 +1170,113 @@
       \verb 10.3390/su16146064
       \endverb
     \endentry
+    \entry{Gitelson1994ChlorophyllReflectance}{article}{}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=d73b43e383076ed93379534ff88de9d7}{%
+           family={Gitelson},
+           familyi={G\bibinitperiod},
+           given={Anatoly},
+           giveni={A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=14b32f076dd2c8d0828b62c789230656}{%
+           family={Merzlyak},
+           familyi={M\bibinitperiod},
+           given={Mark\bibnamedelima N.},
+           giveni={M\bibinitperiod\bibinitdelim N\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{66387a661638e08c82523946ef8bdb5a}
+      \strng{fullhash}{66387a661638e08c82523946ef8bdb5a}
+      \strng{fullhashraw}{66387a661638e08c82523946ef8bdb5a}
+      \strng{bibnamehash}{66387a661638e08c82523946ef8bdb5a}
+      \strng{authorbibnamehash}{66387a661638e08c82523946ef8bdb5a}
+      \strng{authornamehash}{66387a661638e08c82523946ef8bdb5a}
+      \strng{authorfullhash}{66387a661638e08c82523946ef8bdb5a}
+      \strng{authorfullhashraw}{66387a661638e08c82523946ef8bdb5a}
+      \field{sortinit}{G}
+      \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Journal of Photochemistry and Photobiology B: Biology}
+      \field{number}{3}
+      \field{title}{Quantitative Estimation of Chlorophyll-a Using Reflectance Spectra: Experiments with Autumn Chestnut and Maple Leaves}
+      \field{volume}{22}
+      \field{year}{1994}
+      \field{pages}{247\bibrangedash 252}
+      \range{pages}{6}
+      \verb{doi}
+      \verb 10.1016/1011-1344(93)06963-4
+      \endverb
+    \endentry
+    \entry{Grimm2019CatastrophicFruitCracking}{article}{}{}
+      \name{author}{6}{}{%
+        {{un=0,uniquepart=base,hash=8bb00814166e05c3da5a4475af84376a}{%
+           family={Grimm},
+           familyi={G\bibinitperiod},
+           given={Eckhard},
+           giveni={E\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=e89ab7ff121cabeed00c53ed15208e65}{%
+           family={Hahn},
+           familyi={H\bibinitperiod},
+           given={Jan},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=988454034a8ac7e7bf5ec82635ae7c5a}{%
+           family={Pflugfelder},
+           familyi={P\bibinitperiod},
+           given={Daniel},
+           giveni={D\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=3ab01011f44d8b30ed4c45721d3a8f42}{%
+           family={Schmidt},
+           familyi={S\bibinitperiod},
+           given={Moritz\bibnamedelima Jonathan},
+           giveni={M\bibinitperiod\bibinitdelim J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=32828039b07a2862647b29a5df9ee80d}{%
+           family={Dusschoten},
+           familyi={D\bibinitperiod},
+           given={Dagmar},
+           giveni={D\bibinitperiod},
+           givenun=0,
+           prefix={van},
+           prefixi={v\bibinitperiod}}}%
+        {{un=0,uniquepart=base,hash=f145baf0001648e29272036dd83d66d3}{%
+           family={Knoche},
+           familyi={K\bibinitperiod},
+           given={Moritz},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{f7047628c241fe2fcd6fc1f6af376a23}
+      \strng{fullhash}{15d15b4b50f31703a2222ba29211d48b}
+      \strng{fullhashraw}{15d15b4b50f31703a2222ba29211d48b}
+      \strng{bibnamehash}{15d15b4b50f31703a2222ba29211d48b}
+      \strng{authorbibnamehash}{15d15b4b50f31703a2222ba29211d48b}
+      \strng{authornamehash}{f7047628c241fe2fcd6fc1f6af376a23}
+      \strng{authorfullhash}{15d15b4b50f31703a2222ba29211d48b}
+      \strng{authorfullhashraw}{15d15b4b50f31703a2222ba29211d48b}
+      \field{sortinit}{G}
+      \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Horticulture Research}
+      \field{title}{Localized Bursting of Mesocarp Cells Triggers Catastrophic Fruit Cracking}
+      \field{volume}{6}
+      \field{year}{2019}
+      \field{pages}{79}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.1038/s41438-019-0161-3
+      \endverb
+    \endentry
     \entry{horticulturae11111320}{article}{}{}
       \name{author}{5}{}{%
         {{un=0,uniquepart=base,hash=12ad914931a3aea1d9034161330d66d9}{%
@@ -1475,6 +1589,83 @@
       \endverb
       \verb{url}
       \verb https://arxiv.org/abs/2508.08107
+      \endverb
+    \endentry
+    \entry{Imran2020RedEdgeNIRShoulder}{article}{}{}
+      \name{author}{8}{}{%
+        {{un=0,uniquepart=base,hash=cb02eb224a438d2d72e9ad7948f3cfff}{%
+           family={Imran},
+           familyi={I\bibinitperiod},
+           given={Hafiz\bibnamedelima Ali},
+           giveni={H\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=e49dfaf6e38851ee749d3684818c8b58}{%
+           family={Gianelle},
+           familyi={G\bibinitperiod},
+           given={Damiano},
+           giveni={D\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=9bd4f12a0a58acb47589656860aa0f73}{%
+           family={Rocchini},
+           familyi={R\bibinitperiod},
+           given={Duccio},
+           giveni={D\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=55d73a53ae1c10042f93ddbb45dabef8}{%
+           family={Dalponte},
+           familyi={D\bibinitperiod},
+           given={Michele},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=58fda386c557e82f0486a85e9bea7205}{%
+           family={Martín},
+           familyi={M\bibinitperiod},
+           given={M.\bibnamedelimi Pilar},
+           giveni={M\bibinitperiod\bibinitdelim P\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=51a87a8b1a9502b552058013c8818b91}{%
+           family={Sakowska},
+           familyi={S\bibinitperiod},
+           given={Karolina},
+           giveni={K\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=fe555f33aaf9c07be7a896de9a8bc936}{%
+           family={Wohlfahrt},
+           familyi={W\bibinitperiod},
+           given={Georg},
+           giveni={G\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=43e6b1cb681cc8db454a1a930c542ca7}{%
+           family={Vescovo},
+           familyi={V\bibinitperiod},
+           given={Loris},
+           giveni={L\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{4415dabac2f30e709256d32690f5e71e}
+      \strng{fullhash}{af0f58b0baf9b6e013aa393b66583012}
+      \strng{fullhashraw}{af0f58b0baf9b6e013aa393b66583012}
+      \strng{bibnamehash}{af0f58b0baf9b6e013aa393b66583012}
+      \strng{authorbibnamehash}{af0f58b0baf9b6e013aa393b66583012}
+      \strng{authornamehash}{4415dabac2f30e709256d32690f5e71e}
+      \strng{authorfullhash}{af0f58b0baf9b6e013aa393b66583012}
+      \strng{authorfullhashraw}{af0f58b0baf9b6e013aa393b66583012}
+      \field{sortinit}{I}
+      \field{sortinithash}{8d291c51ee89b6cd86bf5379f0b151d8}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Remote Sensing}
+      \field{number}{14}
+      \field{title}{VIS-NIR, Red-Edge and NIR-Shoulder Based Normalized Vegetation Indices Response to Co-Varying Leaf and Canopy Structural Traits in Heterogeneous Grasslands}
+      \field{volume}{12}
+      \field{year}{2020}
+      \field{pages}{2254}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.3390/rs12142254
       \endverb
     \endentry
     \entry{kaltenborn2025data}{article}{}{}
@@ -1923,6 +2114,64 @@
       \verb 10.3390/s23083915
       \endverb
     \endentry
+    \entry{Lu2020OpticalPropertiesReview}{article}{}{}
+      \name{author}{5}{}{%
+        {{un=0,uniquepart=base,hash=5482bed5601f2625b8c7a5b282e65457}{%
+           family={Lu},
+           familyi={L\bibinitperiod},
+           given={Renfu},
+           giveni={R\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=4cff50c63d683642df72672adacab12e}{%
+           family={Van\bibnamedelima Beers},
+           familyi={V\bibinitperiod\bibinitdelim B\bibinitperiod},
+           given={Robbe},
+           giveni={R\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=759e1983841f293c1953b66066386249}{%
+           family={Saeys},
+           familyi={S\bibinitperiod},
+           given={Wouter},
+           giveni={W\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=0ee2cffef664ad24f71c556bcdb68bbf}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Changying},
+           giveni={C\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=47471d4b4ea4325556d5f8536b818355}{%
+           family={Cen},
+           familyi={C\bibinitperiod},
+           given={Haiyan},
+           giveni={H\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{8a1d0a74a31f87791ce829a6b17eec46}
+      \strng{fullhash}{1fad0f6aa449df41f06cc5d5b49c073e}
+      \strng{fullhashraw}{1fad0f6aa449df41f06cc5d5b49c073e}
+      \strng{bibnamehash}{1fad0f6aa449df41f06cc5d5b49c073e}
+      \strng{authorbibnamehash}{1fad0f6aa449df41f06cc5d5b49c073e}
+      \strng{authornamehash}{8a1d0a74a31f87791ce829a6b17eec46}
+      \strng{authorfullhash}{1fad0f6aa449df41f06cc5d5b49c073e}
+      \strng{authorfullhashraw}{1fad0f6aa449df41f06cc5d5b49c073e}
+      \field{sortinit}{L}
+      \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Postharvest Biology and Technology}
+      \field{title}{Measurement of Optical Properties of Fruits and Vegetables: A Review}
+      \field{volume}{159}
+      \field{year}{2020}
+      \field{pages}{111003}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.1016/j.postharvbio.2019.111003
+      \endverb
+    \endentry
     \entry{Mehta2018}{report}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=6de3074a16a4375ff8361e2f322b6be0}{%
@@ -2193,6 +2442,124 @@
       \endverb
       \verb{url}
       \verb https://www.mdpi.com/2311-7524/11/5/466
+      \endverb
+    \endentry
+    \entry{Moon2020EnzymaticBrowning}{article}{}{}
+      \name{author}{4}{}{%
+        {{un=0,uniquepart=base,hash=f65b8dc9b7ef7e2fd64a27efc0b368de}{%
+           family={Moon},
+           familyi={M\bibinitperiod},
+           given={Kyoung\bibnamedelima Mi},
+           giveni={K\bibinitperiod\bibinitdelim M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=779c13e49fc909d0df84c415c520d200}{%
+           family={Kwon},
+           familyi={K\bibinitperiod},
+           given={Eun-Bin},
+           giveni={E\bibinithyphendelim B\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=ea88946fa930ecdb63800b0e677edb54}{%
+           family={Lee},
+           familyi={L\bibinitperiod},
+           given={Bonggi},
+           giveni={B\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=ce5a3f8ea55fb6000264b171b44c3d23}{%
+           family={Kim},
+           familyi={K\bibinitperiod},
+           given={Choon\bibnamedelima Young},
+           giveni={C\bibinitperiod\bibinitdelim Y\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{0281caa6cff8250dff0dc1e791ec6c57}
+      \strng{fullhash}{6f0c35cfdd6cfa62e51ad8b143e2e878}
+      \strng{fullhashraw}{6f0c35cfdd6cfa62e51ad8b143e2e878}
+      \strng{bibnamehash}{6f0c35cfdd6cfa62e51ad8b143e2e878}
+      \strng{authorbibnamehash}{6f0c35cfdd6cfa62e51ad8b143e2e878}
+      \strng{authornamehash}{0281caa6cff8250dff0dc1e791ec6c57}
+      \strng{authorfullhash}{6f0c35cfdd6cfa62e51ad8b143e2e878}
+      \strng{authorfullhashraw}{6f0c35cfdd6cfa62e51ad8b143e2e878}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Molecules}
+      \field{number}{12}
+      \field{title}{Recent Trends in Controlling the Enzymatic Browning of Fruit and Vegetable Products}
+      \field{volume}{25}
+      \field{year}{2020}
+      \field{pages}{2754}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.3390/molecules25122754
+      \endverb
+    \endentry
+    \entry{Munera2021PersimmonDamageHSI}{article}{}{}
+      \name{author}{6}{}{%
+        {{un=0,uniquepart=base,hash=924d83b48cace6d8c1563b4b6854e84c}{%
+           family={Munera},
+           familyi={M\bibinitperiod},
+           given={Sandra},
+           giveni={S\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=ebb7996d08da1788b3171b42e1eb8be0}{%
+           family={Rodríguez-Ortega},
+           familyi={R\bibinithyphendelim O\bibinitperiod},
+           given={Alejandro},
+           giveni={A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=f4ca8a579e2d61f210f63b2eef829364}{%
+           family={Aleixos},
+           familyi={A\bibinitperiod},
+           given={Nuria},
+           giveni={N\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=7d7bc0302edb895abda425729454f4af}{%
+           family={Cubero},
+           familyi={C\bibinitperiod},
+           given={Sergio},
+           giveni={S\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=fe633517c1aace19ce7a9e665c39f853}{%
+           family={Gómez-Sanchis},
+           familyi={G\bibinithyphendelim S\bibinitperiod},
+           given={Juan},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=6d34c68c797f2d3a4f38f85ba69f2770}{%
+           family={Blasco},
+           familyi={B\bibinitperiod},
+           given={José},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{2330cfa6950bca9b820849d774881215}
+      \strng{fullhash}{28a869009eb1fb0b8c9a683febdf223d}
+      \strng{fullhashraw}{28a869009eb1fb0b8c9a683febdf223d}
+      \strng{bibnamehash}{28a869009eb1fb0b8c9a683febdf223d}
+      \strng{authorbibnamehash}{28a869009eb1fb0b8c9a683febdf223d}
+      \strng{authornamehash}{2330cfa6950bca9b820849d774881215}
+      \strng{authorfullhash}{28a869009eb1fb0b8c9a683febdf223d}
+      \strng{authorfullhashraw}{28a869009eb1fb0b8c9a683febdf223d}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Foods}
+      \field{number}{9}
+      \field{title}{Detection of Invisible Damages in {Rojo Brillante} Persimmon Fruit at Different Stages Using Hyperspectral Imaging and Chemometrics}
+      \field{volume}{10}
+      \field{year}{2021}
+      \field{pages}{2170}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.3390/foods10092170
       \endverb
     \endentry
     \entry{ou2024hyperspectral}{article}{}{}
@@ -2728,12 +3095,12 @@
     \endentry
     \entry{sun2024fruit}{article}{}{}
       \name{author}{3}{}{%
-        {{un=0,uniquepart=base,hash=8e935d2e8b401b4d9e64ed1f9a77574d}{%
+        {{un=1,uniquepart=given,hash=8e935d2e8b401b4d9e64ed1f9a77574d}{%
            family={Sun},
            familyi={S\bibinitperiod},
            given={Q.},
            giveni={Q\bibinitperiod},
-           givenun=0}}%
+           givenun=1}}%
         {{un=0,uniquepart=base,hash=c9a3728dcc2397d1bab78a791b51779b}{%
            family={Li},
            familyi={L\bibinitperiod},
@@ -2759,7 +3126,6 @@
       \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
       \field{extradatescope}{labelyear}
       \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{Postharvest Biology and Technology}
@@ -2769,47 +3135,57 @@
       \verb 10.1016/j.postharvbio.2024.112095
       \endverb
     \endentry
-    \entry{thenkabail2016hyperspectral}{book}{}{}
-      \name{author}{3}{}{%
-        {{un=0,uniquepart=base,hash=e8104014cd69c4616856b6f3616cc30a}{%
-           family={Thenkarail},
-           familyi={T\bibinitperiod},
-           given={Prasad\bibnamedelima S.},
-           giveni={P\bibinitperiod\bibinitdelim S\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=a64c37f3060560db4414bdd8888fc1a6}{%
-           family={Lyon},
-           familyi={L\bibinitperiod},
-           given={John\bibnamedelima G.},
-           giveni={J\bibinitperiod\bibinitdelim G\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=8cf65f79b75c37d418b5996e488379d1}{%
-           family={Huete},
+    \entry{Sun2021PeachBruisingOptical}{article}{}{}
+      \name{author}{4}{}{%
+        {{un=1,uniquepart=given,hash=6c2abb319fd8ffeee0a4bb1fdc58e5f7}{%
+           family={Sun},
+           familyi={S\bibinitperiod},
+           given={Ye},
+           giveni={Y\bibinitperiod},
+           givenun=1}}%
+        {{un=0,uniquepart=base,hash=58bbae52377d5c75b3ebe7c00665338f}{%
+           family={Huang},
            familyi={H\bibinitperiod},
-           given={Alfredo},
-           giveni={A\bibinitperiod},
+           given={Yuping},
+           giveni={Y\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=c7abba125b5b619aa5f40b8b07242550}{%
+           family={Pan},
+           familyi={P\bibinitperiod},
+           given={Leiqing},
+           giveni={L\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=3e0ad44c75cfdfca7590f4d8132ddfdb}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Xiaochan},
+           giveni={X\bibinitperiod},
            givenun=0}}%
       }
-      \list{publisher}{1}{%
-        {CRC Press}%
-      }
-      \strng{namehash}{35be46d7663eb29a87b5c56f45f38bf4}
-      \strng{fullhash}{01f1d1eb0134961faa1c8cb666901b95}
-      \strng{fullhashraw}{01f1d1eb0134961faa1c8cb666901b95}
-      \strng{bibnamehash}{01f1d1eb0134961faa1c8cb666901b95}
-      \strng{authorbibnamehash}{01f1d1eb0134961faa1c8cb666901b95}
-      \strng{authornamehash}{35be46d7663eb29a87b5c56f45f38bf4}
-      \strng{authorfullhash}{01f1d1eb0134961faa1c8cb666901b95}
-      \strng{authorfullhashraw}{01f1d1eb0134961faa1c8cb666901b95}
-      \field{sortinit}{T}
-      \field{sortinithash}{9af77f0292593c26bde9a56e688eaee9}
+      \strng{namehash}{9195ca5527d925aceb9c46e6ae953242}
+      \strng{fullhash}{a1cc81eb04b48be9862b41650f3bccac}
+      \strng{fullhashraw}{a1cc81eb04b48be9862b41650f3bccac}
+      \strng{bibnamehash}{a1cc81eb04b48be9862b41650f3bccac}
+      \strng{authorbibnamehash}{a1cc81eb04b48be9862b41650f3bccac}
+      \strng{authornamehash}{9195ca5527d925aceb9c46e6ae953242}
+      \strng{authorfullhash}{a1cc81eb04b48be9862b41650f3bccac}
+      \strng{authorfullhashraw}{a1cc81eb04b48be9862b41650f3bccac}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
       \field{extradatescope}{labelyear}
       \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
-      \field{title}{Hyperspectral Remote Sensing of Vegetation}
-      \field{year}{2016}
+      \field{journaltitle}{Foods}
+      \field{number}{2}
+      \field{title}{Evaluation of the Changes in Optical Properties of Peaches with Different Maturity Levels during Bruising}
+      \field{volume}{10}
+      \field{year}{2021}
+      \field{pages}{388}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.3390/foods10020388
+      \endverb
     \endentry
     \entry{tian2020computer}{article}{}{}
       \name{author}{5}{}{%
@@ -3161,40 +3537,62 @@
       \verb https://www.mdpi.com/2077-0472/15/20/2167
       \endverb
     \endentry
-    \entry{wang2024frontiers}{article}{}{}
-      \name{author}{2}{}{%
-        {{un=1,uniquepart=given,hash=2ca38ebc0e0cb8064a936205d2da287f}{%
+    \entry{Wang2015FruitQualitySpectroscopy}{article}{}{}
+      \name{author}{5}{}{%
+        {{un=1,uniquepart=given,hash=408e8623fa2b1f311e860bae82300670}{%
            family={Wang},
            familyi={W\bibinitperiod},
-           given={T.},
-           giveni={T\bibinitperiod},
+           given={Hailong},
+           giveni={H\bibinitperiod},
            givenun=1}}%
-        {{un=0,uniquepart=base,hash=0d4a8cff3cc7aa7cf7a8e2b46e93005e}{%
-           family={Zhao},
-           familyi={Z\bibinitperiod},
-           given={L.},
-           giveni={L\bibinitperiod},
+        {{un=0,uniquepart=base,hash=ecf2bacc061530ef647f14af2d3a4ecd}{%
+           family={Peng},
+           familyi={P\bibinitperiod},
+           given={Jiyu},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=94e81b1db8287e7ce00f8b5dc4f3d61a}{%
+           family={Xie},
+           familyi={X\bibinitperiod},
+           given={Chuanqi},
+           giveni={C\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=ba67a17fdf2ef43f8eec582e1a8cf88b}{%
+           family={Bao},
+           familyi={B\bibinitperiod},
+           given={Yidan},
+           giveni={Y\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=802db00c75cab6fd6f17d159239e4c1f}{%
+           family={He},
+           familyi={H\bibinitperiod},
+           given={Yong},
+           giveni={Y\bibinitperiod},
            givenun=0}}%
       }
-      \strng{namehash}{662ba3a60949630a32fdf62241db84e3}
-      \strng{fullhash}{662ba3a60949630a32fdf62241db84e3}
-      \strng{fullhashraw}{662ba3a60949630a32fdf62241db84e3}
-      \strng{bibnamehash}{662ba3a60949630a32fdf62241db84e3}
-      \strng{authorbibnamehash}{662ba3a60949630a32fdf62241db84e3}
-      \strng{authornamehash}{662ba3a60949630a32fdf62241db84e3}
-      \strng{authorfullhash}{662ba3a60949630a32fdf62241db84e3}
-      \strng{authorfullhashraw}{662ba3a60949630a32fdf62241db84e3}
+      \strng{namehash}{aabf7eee89302e266aa3af6c0bba9c61}
+      \strng{fullhash}{9c06e3f990f70833001bc0cbe9eeb2fc}
+      \strng{fullhashraw}{9c06e3f990f70833001bc0cbe9eeb2fc}
+      \strng{bibnamehash}{9c06e3f990f70833001bc0cbe9eeb2fc}
+      \strng{authorbibnamehash}{9c06e3f990f70833001bc0cbe9eeb2fc}
+      \strng{authornamehash}{aabf7eee89302e266aa3af6c0bba9c61}
+      \strng{authorfullhash}{9c06e3f990f70833001bc0cbe9eeb2fc}
+      \strng{authorfullhashraw}{9c06e3f990f70833001bc0cbe9eeb2fc}
       \field{sortinit}{W}
       \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
       \field{extradatescope}{labelyear}
       \field{labeldatesource}{}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
-      \field{journaltitle}{Frontiers in Plant Science}
-      \field{title}{Hyperspectral Imaging for Monitoring Plant Physiological Status}
-      \field{year}{2024}
+      \field{journaltitle}{Sensors}
+      \field{number}{5}
+      \field{title}{Fruit Quality Evaluation Using Spectroscopy Technology: A Review}
+      \field{volume}{15}
+      \field{year}{2015}
+      \field{pages}{11889\bibrangedash 11927}
+      \range{pages}{39}
       \verb{doi}
-      \verb 10.3389/fpls.2024.1298743
+      \verb 10.3390/s150511889
       \endverb
     \endentry
     \entry{xu2025overview}{article}{}{}
@@ -3597,50 +3995,6 @@
       \verb 10.1038/s41598-024-78650-6
       \endverb
     \endentry
-    \entry{zhang2022reflectance}{article}{}{}
-      \name{author}{3}{}{%
-        {{un=1,uniquepart=given,hash=1f26f664835ac6c347db22001b657f1a}{%
-           family={Zhang},
-           familyi={Z\bibinitperiod},
-           given={Y.},
-           giveni={Y\bibinitperiod},
-           givenun=1}}%
-        {{un=0,uniquepart=base,hash=38241eaee18102cab15a125b0654c7da}{%
-           family={Chen},
-           familyi={C\bibinitperiod},
-           given={J.},
-           giveni={J\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=c47eb4bdf7506788ca8df6c79ad68a37}{%
-           family={Liu},
-           familyi={L\bibinitperiod},
-           given={Q.},
-           giveni={Q\bibinitperiod},
-           givenun=0}}%
-      }
-      \strng{namehash}{3c1307f04a2326d8574987ac3a9ef4db}
-      \strng{fullhash}{c05caa3aa85b9f272590d79e3aa6b6b2}
-      \strng{fullhashraw}{c05caa3aa85b9f272590d79e3aa6b6b2}
-      \strng{bibnamehash}{c05caa3aa85b9f272590d79e3aa6b6b2}
-      \strng{authorbibnamehash}{c05caa3aa85b9f272590d79e3aa6b6b2}
-      \strng{authornamehash}{3c1307f04a2326d8574987ac3a9ef4db}
-      \strng{authorfullhash}{c05caa3aa85b9f272590d79e3aa6b6b2}
-      \strng{authorfullhashraw}{c05caa3aa85b9f272590d79e3aa6b6b2}
-      \field{extraname}{1}
-      \field{sortinit}{Z}
-      \field{sortinithash}{96892c0b0a36bb8557c40c49813d48b3}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{journaltitle}{Remote Sensing}
-      \field{title}{Physiological Interpretation of {VIS--NIR} Hyperspectral Reflectance in Vegetation}
-      \field{volume}{14}
-      \field{year}{2022}
-      \verb{doi}
-      \verb 10.3390/rs14215345
-      \endverb
-    \endentry
     \entry{zhang2024early}{article}{}{}
       \name{author}{10}{}{%
         {{un=1,uniquepart=given,hash=7b6f505141daa7b6d93a7267897f0f59}{%
@@ -3712,7 +4066,6 @@
       \strng{authornamehash}{77611a9c40ce836afc20bb870f125b18}
       \strng{authorfullhash}{7416b4fdf1571f5450f04ff8f0e065c0}
       \strng{authorfullhashraw}{7416b4fdf1571f5450f04ff8f0e065c0}
-      \field{extraname}{2}
       \field{sortinit}{Z}
       \field{sortinithash}{96892c0b0a36bb8557c40c49813d48b3}
       \field{extradatescope}{labelyear}
@@ -4358,52 +4711,6 @@
       \field{pages}{3758}
       \range{pages}{1}
     \endentry
-    \entry{bioucas2013hyperspectral}{article}{}{}
-      \true{moreauthor}
-      \true{morelabelname}
-      \name{author}{3}{}{%
-        {{un=0,uniquepart=base,hash=d6f4a4169a533e7f56ab134016a8314e}{%
-           family={Bioucas-Dias},
-           familyi={B\bibinithyphendelim D\bibinitperiod},
-           given={José\bibnamedelima M.},
-           giveni={J\bibinitperiod\bibinitdelim M\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=9b3ce6468cd35a018e12616afcd1f795}{%
-           family={Plaza},
-           familyi={P\bibinitperiod},
-           given={Antonio},
-           giveni={A\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=01c50c5ae75cebee86dca145c4ab7fe2}{%
-           family={Camps-Valls},
-           familyi={C\bibinithyphendelim V\bibinitperiod},
-           given={Gustau},
-           giveni={G\bibinitperiod},
-           givenun=0}}%
-      }
-      \strng{namehash}{d8d10b07099f3b183b924af92a69bf0a}
-      \strng{fullhash}{fe44b80f0c1f4c80614002484d64e22b}
-      \strng{fullhashraw}{fe44b80f0c1f4c80614002484d64e22b}
-      \strng{bibnamehash}{fe44b80f0c1f4c80614002484d64e22b}
-      \strng{authorbibnamehash}{fe44b80f0c1f4c80614002484d64e22b}
-      \strng{authornamehash}{d8d10b07099f3b183b924af92a69bf0a}
-      \strng{authorfullhash}{fe44b80f0c1f4c80614002484d64e22b}
-      \strng{authorfullhashraw}{fe44b80f0c1f4c80614002484d64e22b}
-      \field{sortinit}{B}
-      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{journaltitle}{IEEE Geoscience and Remote Sensing Magazine}
-      \field{number}{2}
-      \field{title}{Hyperspectral remote sensing data analysis and future challenges}
-      \field{volume}{1}
-      \field{year}{2013}
-      \field{pages}{6\bibrangedash 36}
-      \range{pages}{31}
-    \endentry
     \entry{blackburn2007}{article}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=ebca2a92582a34621c3db7b67e1d6646}{%
@@ -4675,6 +4982,59 @@
       \endverb
       \verb{url}
       \verb https://www.mdpi.com/2072-4292/16/24/4695
+      \endverb
+    \endentry
+    \entry{Cheng2019AppleDRS}{article}{}{}
+      \name{author}{4}{}{%
+        {{un=0,uniquepart=base,hash=ebd1c7850e98467636bf14b6e73e542e}{%
+           family={Cheng},
+           familyi={C\bibinitperiod},
+           given={Nan-Yu},
+           giveni={N\bibinithyphendelim Y\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=6938283baa8b55c61d2a0a57235c4c1b}{%
+           family={Chen},
+           familyi={C\bibinitperiod},
+           given={Chien-Chih},
+           giveni={C\bibinithyphendelim C\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=95b3ef73534643ae5dead107fec50c1d}{%
+           family={Liang},
+           familyi={L\bibinitperiod},
+           given={Bo-Jian},
+           giveni={B\bibinithyphendelim J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=d889cd740579cf611a65a90c57f19818}{%
+           family={Tseng},
+           familyi={T\bibinitperiod},
+           given={Sheng-Hao},
+           giveni={S\bibinithyphendelim H\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{58aa0c15d3bcaa8f4d1c302b89226241}
+      \strng{fullhash}{d4cb0d15980dd363694803ff72a565b3}
+      \strng{fullhashraw}{d4cb0d15980dd363694803ff72a565b3}
+      \strng{bibnamehash}{d4cb0d15980dd363694803ff72a565b3}
+      \strng{authorbibnamehash}{d4cb0d15980dd363694803ff72a565b3}
+      \strng{authornamehash}{58aa0c15d3bcaa8f4d1c302b89226241}
+      \strng{authorfullhash}{d4cb0d15980dd363694803ff72a565b3}
+      \strng{authorfullhashraw}{d4cb0d15980dd363694803ff72a565b3}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Applied Sciences}
+      \field{number}{11}
+      \field{title}{Nondestructive Evaluation of Apple Fruit Quality by Frequency-Domain Diffuse Reflectance Spectroscopy: Variations in Apple Skin and Flesh}
+      \field{volume}{9}
+      \field{year}{2019}
+      \field{pages}{2355}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.3390/app9112355
       \endverb
     \endentry
     \entry{cohen1988statistical}{book}{}{}
@@ -5049,6 +5409,113 @@
       \verb 10.3390/su16146064
       \endverb
     \endentry
+    \entry{Gitelson1994ChlorophyllReflectance}{article}{}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=d73b43e383076ed93379534ff88de9d7}{%
+           family={Gitelson},
+           familyi={G\bibinitperiod},
+           given={Anatoly},
+           giveni={A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=14b32f076dd2c8d0828b62c789230656}{%
+           family={Merzlyak},
+           familyi={M\bibinitperiod},
+           given={Mark\bibnamedelima N.},
+           giveni={M\bibinitperiod\bibinitdelim N\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{66387a661638e08c82523946ef8bdb5a}
+      \strng{fullhash}{66387a661638e08c82523946ef8bdb5a}
+      \strng{fullhashraw}{66387a661638e08c82523946ef8bdb5a}
+      \strng{bibnamehash}{66387a661638e08c82523946ef8bdb5a}
+      \strng{authorbibnamehash}{66387a661638e08c82523946ef8bdb5a}
+      \strng{authornamehash}{66387a661638e08c82523946ef8bdb5a}
+      \strng{authorfullhash}{66387a661638e08c82523946ef8bdb5a}
+      \strng{authorfullhashraw}{66387a661638e08c82523946ef8bdb5a}
+      \field{sortinit}{G}
+      \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Journal of Photochemistry and Photobiology B: Biology}
+      \field{number}{3}
+      \field{title}{Quantitative Estimation of Chlorophyll-a Using Reflectance Spectra: Experiments with Autumn Chestnut and Maple Leaves}
+      \field{volume}{22}
+      \field{year}{1994}
+      \field{pages}{247\bibrangedash 252}
+      \range{pages}{6}
+      \verb{doi}
+      \verb 10.1016/1011-1344(93)06963-4
+      \endverb
+    \endentry
+    \entry{Grimm2019CatastrophicFruitCracking}{article}{}{}
+      \name{author}{6}{}{%
+        {{un=0,uniquepart=base,hash=8bb00814166e05c3da5a4475af84376a}{%
+           family={Grimm},
+           familyi={G\bibinitperiod},
+           given={Eckhard},
+           giveni={E\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=e89ab7ff121cabeed00c53ed15208e65}{%
+           family={Hahn},
+           familyi={H\bibinitperiod},
+           given={Jan},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=988454034a8ac7e7bf5ec82635ae7c5a}{%
+           family={Pflugfelder},
+           familyi={P\bibinitperiod},
+           given={Daniel},
+           giveni={D\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=3ab01011f44d8b30ed4c45721d3a8f42}{%
+           family={Schmidt},
+           familyi={S\bibinitperiod},
+           given={Moritz\bibnamedelima Jonathan},
+           giveni={M\bibinitperiod\bibinitdelim J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=32828039b07a2862647b29a5df9ee80d}{%
+           family={Dusschoten},
+           familyi={D\bibinitperiod},
+           given={Dagmar},
+           giveni={D\bibinitperiod},
+           givenun=0,
+           prefix={van},
+           prefixi={v\bibinitperiod}}}%
+        {{un=0,uniquepart=base,hash=f145baf0001648e29272036dd83d66d3}{%
+           family={Knoche},
+           familyi={K\bibinitperiod},
+           given={Moritz},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{f7047628c241fe2fcd6fc1f6af376a23}
+      \strng{fullhash}{15d15b4b50f31703a2222ba29211d48b}
+      \strng{fullhashraw}{15d15b4b50f31703a2222ba29211d48b}
+      \strng{bibnamehash}{15d15b4b50f31703a2222ba29211d48b}
+      \strng{authorbibnamehash}{15d15b4b50f31703a2222ba29211d48b}
+      \strng{authornamehash}{f7047628c241fe2fcd6fc1f6af376a23}
+      \strng{authorfullhash}{15d15b4b50f31703a2222ba29211d48b}
+      \strng{authorfullhashraw}{15d15b4b50f31703a2222ba29211d48b}
+      \field{sortinit}{G}
+      \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Horticulture Research}
+      \field{title}{Localized Bursting of Mesocarp Cells Triggers Catastrophic Fruit Cracking}
+      \field{volume}{6}
+      \field{year}{2019}
+      \field{pages}{79}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.1038/s41438-019-0161-3
+      \endverb
+    \endentry
     \entry{horticulturae11111320}{article}{}{}
       \name{author}{5}{}{%
         {{un=0,uniquepart=base,hash=12ad914931a3aea1d9034161330d66d9}{%
@@ -5361,6 +5828,83 @@
       \endverb
       \verb{url}
       \verb https://arxiv.org/abs/2508.08107
+      \endverb
+    \endentry
+    \entry{Imran2020RedEdgeNIRShoulder}{article}{}{}
+      \name{author}{8}{}{%
+        {{un=0,uniquepart=base,hash=cb02eb224a438d2d72e9ad7948f3cfff}{%
+           family={Imran},
+           familyi={I\bibinitperiod},
+           given={Hafiz\bibnamedelima Ali},
+           giveni={H\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=e49dfaf6e38851ee749d3684818c8b58}{%
+           family={Gianelle},
+           familyi={G\bibinitperiod},
+           given={Damiano},
+           giveni={D\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=9bd4f12a0a58acb47589656860aa0f73}{%
+           family={Rocchini},
+           familyi={R\bibinitperiod},
+           given={Duccio},
+           giveni={D\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=55d73a53ae1c10042f93ddbb45dabef8}{%
+           family={Dalponte},
+           familyi={D\bibinitperiod},
+           given={Michele},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=58fda386c557e82f0486a85e9bea7205}{%
+           family={Martín},
+           familyi={M\bibinitperiod},
+           given={M.\bibnamedelimi Pilar},
+           giveni={M\bibinitperiod\bibinitdelim P\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=51a87a8b1a9502b552058013c8818b91}{%
+           family={Sakowska},
+           familyi={S\bibinitperiod},
+           given={Karolina},
+           giveni={K\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=fe555f33aaf9c07be7a896de9a8bc936}{%
+           family={Wohlfahrt},
+           familyi={W\bibinitperiod},
+           given={Georg},
+           giveni={G\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=43e6b1cb681cc8db454a1a930c542ca7}{%
+           family={Vescovo},
+           familyi={V\bibinitperiod},
+           given={Loris},
+           giveni={L\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{4415dabac2f30e709256d32690f5e71e}
+      \strng{fullhash}{af0f58b0baf9b6e013aa393b66583012}
+      \strng{fullhashraw}{af0f58b0baf9b6e013aa393b66583012}
+      \strng{bibnamehash}{af0f58b0baf9b6e013aa393b66583012}
+      \strng{authorbibnamehash}{af0f58b0baf9b6e013aa393b66583012}
+      \strng{authornamehash}{4415dabac2f30e709256d32690f5e71e}
+      \strng{authorfullhash}{af0f58b0baf9b6e013aa393b66583012}
+      \strng{authorfullhashraw}{af0f58b0baf9b6e013aa393b66583012}
+      \field{sortinit}{I}
+      \field{sortinithash}{8d291c51ee89b6cd86bf5379f0b151d8}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Remote Sensing}
+      \field{number}{14}
+      \field{title}{VIS-NIR, Red-Edge and NIR-Shoulder Based Normalized Vegetation Indices Response to Co-Varying Leaf and Canopy Structural Traits in Heterogeneous Grasslands}
+      \field{volume}{12}
+      \field{year}{2020}
+      \field{pages}{2254}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.3390/rs12142254
       \endverb
     \endentry
     \entry{kaltenborn2025data}{article}{}{}
@@ -5809,6 +6353,64 @@
       \verb 10.3390/s23083915
       \endverb
     \endentry
+    \entry{Lu2020OpticalPropertiesReview}{article}{}{}
+      \name{author}{5}{}{%
+        {{un=0,uniquepart=base,hash=5482bed5601f2625b8c7a5b282e65457}{%
+           family={Lu},
+           familyi={L\bibinitperiod},
+           given={Renfu},
+           giveni={R\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=4cff50c63d683642df72672adacab12e}{%
+           family={Van\bibnamedelima Beers},
+           familyi={V\bibinitperiod\bibinitdelim B\bibinitperiod},
+           given={Robbe},
+           giveni={R\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=759e1983841f293c1953b66066386249}{%
+           family={Saeys},
+           familyi={S\bibinitperiod},
+           given={Wouter},
+           giveni={W\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=0ee2cffef664ad24f71c556bcdb68bbf}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Changying},
+           giveni={C\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=47471d4b4ea4325556d5f8536b818355}{%
+           family={Cen},
+           familyi={C\bibinitperiod},
+           given={Haiyan},
+           giveni={H\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{8a1d0a74a31f87791ce829a6b17eec46}
+      \strng{fullhash}{1fad0f6aa449df41f06cc5d5b49c073e}
+      \strng{fullhashraw}{1fad0f6aa449df41f06cc5d5b49c073e}
+      \strng{bibnamehash}{1fad0f6aa449df41f06cc5d5b49c073e}
+      \strng{authorbibnamehash}{1fad0f6aa449df41f06cc5d5b49c073e}
+      \strng{authornamehash}{8a1d0a74a31f87791ce829a6b17eec46}
+      \strng{authorfullhash}{1fad0f6aa449df41f06cc5d5b49c073e}
+      \strng{authorfullhashraw}{1fad0f6aa449df41f06cc5d5b49c073e}
+      \field{sortinit}{L}
+      \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Postharvest Biology and Technology}
+      \field{title}{Measurement of Optical Properties of Fruits and Vegetables: A Review}
+      \field{volume}{159}
+      \field{year}{2020}
+      \field{pages}{111003}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.1016/j.postharvbio.2019.111003
+      \endverb
+    \endentry
     \entry{Mehta2018}{report}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=6de3074a16a4375ff8361e2f322b6be0}{%
@@ -6079,6 +6681,124 @@
       \endverb
       \verb{url}
       \verb https://www.mdpi.com/2311-7524/11/5/466
+      \endverb
+    \endentry
+    \entry{Moon2020EnzymaticBrowning}{article}{}{}
+      \name{author}{4}{}{%
+        {{un=0,uniquepart=base,hash=f65b8dc9b7ef7e2fd64a27efc0b368de}{%
+           family={Moon},
+           familyi={M\bibinitperiod},
+           given={Kyoung\bibnamedelima Mi},
+           giveni={K\bibinitperiod\bibinitdelim M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=779c13e49fc909d0df84c415c520d200}{%
+           family={Kwon},
+           familyi={K\bibinitperiod},
+           given={Eun-Bin},
+           giveni={E\bibinithyphendelim B\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=ea88946fa930ecdb63800b0e677edb54}{%
+           family={Lee},
+           familyi={L\bibinitperiod},
+           given={Bonggi},
+           giveni={B\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=ce5a3f8ea55fb6000264b171b44c3d23}{%
+           family={Kim},
+           familyi={K\bibinitperiod},
+           given={Choon\bibnamedelima Young},
+           giveni={C\bibinitperiod\bibinitdelim Y\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{0281caa6cff8250dff0dc1e791ec6c57}
+      \strng{fullhash}{6f0c35cfdd6cfa62e51ad8b143e2e878}
+      \strng{fullhashraw}{6f0c35cfdd6cfa62e51ad8b143e2e878}
+      \strng{bibnamehash}{6f0c35cfdd6cfa62e51ad8b143e2e878}
+      \strng{authorbibnamehash}{6f0c35cfdd6cfa62e51ad8b143e2e878}
+      \strng{authornamehash}{0281caa6cff8250dff0dc1e791ec6c57}
+      \strng{authorfullhash}{6f0c35cfdd6cfa62e51ad8b143e2e878}
+      \strng{authorfullhashraw}{6f0c35cfdd6cfa62e51ad8b143e2e878}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Molecules}
+      \field{number}{12}
+      \field{title}{Recent Trends in Controlling the Enzymatic Browning of Fruit and Vegetable Products}
+      \field{volume}{25}
+      \field{year}{2020}
+      \field{pages}{2754}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.3390/molecules25122754
+      \endverb
+    \endentry
+    \entry{Munera2021PersimmonDamageHSI}{article}{}{}
+      \name{author}{6}{}{%
+        {{un=0,uniquepart=base,hash=924d83b48cace6d8c1563b4b6854e84c}{%
+           family={Munera},
+           familyi={M\bibinitperiod},
+           given={Sandra},
+           giveni={S\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=ebb7996d08da1788b3171b42e1eb8be0}{%
+           family={Rodríguez-Ortega},
+           familyi={R\bibinithyphendelim O\bibinitperiod},
+           given={Alejandro},
+           giveni={A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=f4ca8a579e2d61f210f63b2eef829364}{%
+           family={Aleixos},
+           familyi={A\bibinitperiod},
+           given={Nuria},
+           giveni={N\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=7d7bc0302edb895abda425729454f4af}{%
+           family={Cubero},
+           familyi={C\bibinitperiod},
+           given={Sergio},
+           giveni={S\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=fe633517c1aace19ce7a9e665c39f853}{%
+           family={Gómez-Sanchis},
+           familyi={G\bibinithyphendelim S\bibinitperiod},
+           given={Juan},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=6d34c68c797f2d3a4f38f85ba69f2770}{%
+           family={Blasco},
+           familyi={B\bibinitperiod},
+           given={José},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{2330cfa6950bca9b820849d774881215}
+      \strng{fullhash}{28a869009eb1fb0b8c9a683febdf223d}
+      \strng{fullhashraw}{28a869009eb1fb0b8c9a683febdf223d}
+      \strng{bibnamehash}{28a869009eb1fb0b8c9a683febdf223d}
+      \strng{authorbibnamehash}{28a869009eb1fb0b8c9a683febdf223d}
+      \strng{authornamehash}{2330cfa6950bca9b820849d774881215}
+      \strng{authorfullhash}{28a869009eb1fb0b8c9a683febdf223d}
+      \strng{authorfullhashraw}{28a869009eb1fb0b8c9a683febdf223d}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Foods}
+      \field{number}{9}
+      \field{title}{Detection of Invisible Damages in {Rojo Brillante} Persimmon Fruit at Different Stages Using Hyperspectral Imaging and Chemometrics}
+      \field{volume}{10}
+      \field{year}{2021}
+      \field{pages}{2170}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.3390/foods10092170
       \endverb
     \endentry
     \entry{ou2024hyperspectral}{article}{}{}
@@ -6614,12 +7334,12 @@
     \endentry
     \entry{sun2024fruit}{article}{}{}
       \name{author}{3}{}{%
-        {{un=0,uniquepart=base,hash=8e935d2e8b401b4d9e64ed1f9a77574d}{%
+        {{un=1,uniquepart=given,hash=8e935d2e8b401b4d9e64ed1f9a77574d}{%
            family={Sun},
            familyi={S\bibinitperiod},
            given={Q.},
            giveni={Q\bibinitperiod},
-           givenun=0}}%
+           givenun=1}}%
         {{un=0,uniquepart=base,hash=c9a3728dcc2397d1bab78a791b51779b}{%
            family={Li},
            familyi={L\bibinitperiod},
@@ -6645,7 +7365,6 @@
       \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
       \field{extradatescope}{labelyear}
       \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{Postharvest Biology and Technology}
@@ -6655,47 +7374,57 @@
       \verb 10.1016/j.postharvbio.2024.112095
       \endverb
     \endentry
-    \entry{thenkabail2016hyperspectral}{book}{}{}
-      \name{author}{3}{}{%
-        {{un=0,uniquepart=base,hash=e8104014cd69c4616856b6f3616cc30a}{%
-           family={Thenkarail},
-           familyi={T\bibinitperiod},
-           given={Prasad\bibnamedelima S.},
-           giveni={P\bibinitperiod\bibinitdelim S\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=a64c37f3060560db4414bdd8888fc1a6}{%
-           family={Lyon},
-           familyi={L\bibinitperiod},
-           given={John\bibnamedelima G.},
-           giveni={J\bibinitperiod\bibinitdelim G\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=8cf65f79b75c37d418b5996e488379d1}{%
-           family={Huete},
+    \entry{Sun2021PeachBruisingOptical}{article}{}{}
+      \name{author}{4}{}{%
+        {{un=1,uniquepart=given,hash=6c2abb319fd8ffeee0a4bb1fdc58e5f7}{%
+           family={Sun},
+           familyi={S\bibinitperiod},
+           given={Ye},
+           giveni={Y\bibinitperiod},
+           givenun=1}}%
+        {{un=0,uniquepart=base,hash=58bbae52377d5c75b3ebe7c00665338f}{%
+           family={Huang},
            familyi={H\bibinitperiod},
-           given={Alfredo},
-           giveni={A\bibinitperiod},
+           given={Yuping},
+           giveni={Y\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=c7abba125b5b619aa5f40b8b07242550}{%
+           family={Pan},
+           familyi={P\bibinitperiod},
+           given={Leiqing},
+           giveni={L\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=3e0ad44c75cfdfca7590f4d8132ddfdb}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Xiaochan},
+           giveni={X\bibinitperiod},
            givenun=0}}%
       }
-      \list{publisher}{1}{%
-        {CRC Press}%
-      }
-      \strng{namehash}{35be46d7663eb29a87b5c56f45f38bf4}
-      \strng{fullhash}{01f1d1eb0134961faa1c8cb666901b95}
-      \strng{fullhashraw}{01f1d1eb0134961faa1c8cb666901b95}
-      \strng{bibnamehash}{01f1d1eb0134961faa1c8cb666901b95}
-      \strng{authorbibnamehash}{01f1d1eb0134961faa1c8cb666901b95}
-      \strng{authornamehash}{35be46d7663eb29a87b5c56f45f38bf4}
-      \strng{authorfullhash}{01f1d1eb0134961faa1c8cb666901b95}
-      \strng{authorfullhashraw}{01f1d1eb0134961faa1c8cb666901b95}
-      \field{sortinit}{T}
-      \field{sortinithash}{9af77f0292593c26bde9a56e688eaee9}
+      \strng{namehash}{9195ca5527d925aceb9c46e6ae953242}
+      \strng{fullhash}{a1cc81eb04b48be9862b41650f3bccac}
+      \strng{fullhashraw}{a1cc81eb04b48be9862b41650f3bccac}
+      \strng{bibnamehash}{a1cc81eb04b48be9862b41650f3bccac}
+      \strng{authorbibnamehash}{a1cc81eb04b48be9862b41650f3bccac}
+      \strng{authornamehash}{9195ca5527d925aceb9c46e6ae953242}
+      \strng{authorfullhash}{a1cc81eb04b48be9862b41650f3bccac}
+      \strng{authorfullhashraw}{a1cc81eb04b48be9862b41650f3bccac}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
       \field{extradatescope}{labelyear}
       \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
-      \field{title}{Hyperspectral Remote Sensing of Vegetation}
-      \field{year}{2016}
+      \field{journaltitle}{Foods}
+      \field{number}{2}
+      \field{title}{Evaluation of the Changes in Optical Properties of Peaches with Different Maturity Levels during Bruising}
+      \field{volume}{10}
+      \field{year}{2021}
+      \field{pages}{388}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.3390/foods10020388
+      \endverb
     \endentry
     \entry{tian2020computer}{article}{}{}
       \name{author}{5}{}{%
@@ -7047,40 +7776,62 @@
       \verb https://www.mdpi.com/2077-0472/15/20/2167
       \endverb
     \endentry
-    \entry{wang2024frontiers}{article}{}{}
-      \name{author}{2}{}{%
-        {{un=1,uniquepart=given,hash=2ca38ebc0e0cb8064a936205d2da287f}{%
+    \entry{Wang2015FruitQualitySpectroscopy}{article}{}{}
+      \name{author}{5}{}{%
+        {{un=1,uniquepart=given,hash=408e8623fa2b1f311e860bae82300670}{%
            family={Wang},
            familyi={W\bibinitperiod},
-           given={T.},
-           giveni={T\bibinitperiod},
+           given={Hailong},
+           giveni={H\bibinitperiod},
            givenun=1}}%
-        {{un=0,uniquepart=base,hash=0d4a8cff3cc7aa7cf7a8e2b46e93005e}{%
-           family={Zhao},
-           familyi={Z\bibinitperiod},
-           given={L.},
-           giveni={L\bibinitperiod},
+        {{un=0,uniquepart=base,hash=ecf2bacc061530ef647f14af2d3a4ecd}{%
+           family={Peng},
+           familyi={P\bibinitperiod},
+           given={Jiyu},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=94e81b1db8287e7ce00f8b5dc4f3d61a}{%
+           family={Xie},
+           familyi={X\bibinitperiod},
+           given={Chuanqi},
+           giveni={C\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=ba67a17fdf2ef43f8eec582e1a8cf88b}{%
+           family={Bao},
+           familyi={B\bibinitperiod},
+           given={Yidan},
+           giveni={Y\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=802db00c75cab6fd6f17d159239e4c1f}{%
+           family={He},
+           familyi={H\bibinitperiod},
+           given={Yong},
+           giveni={Y\bibinitperiod},
            givenun=0}}%
       }
-      \strng{namehash}{662ba3a60949630a32fdf62241db84e3}
-      \strng{fullhash}{662ba3a60949630a32fdf62241db84e3}
-      \strng{fullhashraw}{662ba3a60949630a32fdf62241db84e3}
-      \strng{bibnamehash}{662ba3a60949630a32fdf62241db84e3}
-      \strng{authorbibnamehash}{662ba3a60949630a32fdf62241db84e3}
-      \strng{authornamehash}{662ba3a60949630a32fdf62241db84e3}
-      \strng{authorfullhash}{662ba3a60949630a32fdf62241db84e3}
-      \strng{authorfullhashraw}{662ba3a60949630a32fdf62241db84e3}
+      \strng{namehash}{aabf7eee89302e266aa3af6c0bba9c61}
+      \strng{fullhash}{9c06e3f990f70833001bc0cbe9eeb2fc}
+      \strng{fullhashraw}{9c06e3f990f70833001bc0cbe9eeb2fc}
+      \strng{bibnamehash}{9c06e3f990f70833001bc0cbe9eeb2fc}
+      \strng{authorbibnamehash}{9c06e3f990f70833001bc0cbe9eeb2fc}
+      \strng{authornamehash}{aabf7eee89302e266aa3af6c0bba9c61}
+      \strng{authorfullhash}{9c06e3f990f70833001bc0cbe9eeb2fc}
+      \strng{authorfullhashraw}{9c06e3f990f70833001bc0cbe9eeb2fc}
       \field{sortinit}{W}
       \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
       \field{extradatescope}{labelyear}
       \field{labeldatesource}{}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
-      \field{journaltitle}{Frontiers in Plant Science}
-      \field{title}{Hyperspectral Imaging for Monitoring Plant Physiological Status}
-      \field{year}{2024}
+      \field{journaltitle}{Sensors}
+      \field{number}{5}
+      \field{title}{Fruit Quality Evaluation Using Spectroscopy Technology: A Review}
+      \field{volume}{15}
+      \field{year}{2015}
+      \field{pages}{11889\bibrangedash 11927}
+      \range{pages}{39}
       \verb{doi}
-      \verb 10.3389/fpls.2024.1298743
+      \verb 10.3390/s150511889
       \endverb
     \endentry
     \entry{xu2025overview}{article}{}{}
@@ -7483,50 +8234,6 @@
       \verb 10.1038/s41598-024-78650-6
       \endverb
     \endentry
-    \entry{zhang2022reflectance}{article}{}{}
-      \name{author}{3}{}{%
-        {{un=1,uniquepart=given,hash=1f26f664835ac6c347db22001b657f1a}{%
-           family={Zhang},
-           familyi={Z\bibinitperiod},
-           given={Y.},
-           giveni={Y\bibinitperiod},
-           givenun=1}}%
-        {{un=0,uniquepart=base,hash=38241eaee18102cab15a125b0654c7da}{%
-           family={Chen},
-           familyi={C\bibinitperiod},
-           given={J.},
-           giveni={J\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=c47eb4bdf7506788ca8df6c79ad68a37}{%
-           family={Liu},
-           familyi={L\bibinitperiod},
-           given={Q.},
-           giveni={Q\bibinitperiod},
-           givenun=0}}%
-      }
-      \strng{namehash}{3c1307f04a2326d8574987ac3a9ef4db}
-      \strng{fullhash}{c05caa3aa85b9f272590d79e3aa6b6b2}
-      \strng{fullhashraw}{c05caa3aa85b9f272590d79e3aa6b6b2}
-      \strng{bibnamehash}{c05caa3aa85b9f272590d79e3aa6b6b2}
-      \strng{authorbibnamehash}{c05caa3aa85b9f272590d79e3aa6b6b2}
-      \strng{authornamehash}{3c1307f04a2326d8574987ac3a9ef4db}
-      \strng{authorfullhash}{c05caa3aa85b9f272590d79e3aa6b6b2}
-      \strng{authorfullhashraw}{c05caa3aa85b9f272590d79e3aa6b6b2}
-      \field{extraname}{1}
-      \field{sortinit}{Z}
-      \field{sortinithash}{96892c0b0a36bb8557c40c49813d48b3}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{journaltitle}{Remote Sensing}
-      \field{title}{Physiological Interpretation of {VIS--NIR} Hyperspectral Reflectance in Vegetation}
-      \field{volume}{14}
-      \field{year}{2022}
-      \verb{doi}
-      \verb 10.3390/rs14215345
-      \endverb
-    \endentry
     \entry{zhang2024early}{article}{}{}
       \name{author}{10}{}{%
         {{un=1,uniquepart=given,hash=7b6f505141daa7b6d93a7267897f0f59}{%
@@ -7598,7 +8305,6 @@
       \strng{authornamehash}{77611a9c40ce836afc20bb870f125b18}
       \strng{authorfullhash}{7416b4fdf1571f5450f04ff8f0e065c0}
       \strng{authorfullhashraw}{7416b4fdf1571f5450f04ff8f0e065c0}
-      \field{extraname}{2}
       \field{sortinit}{Z}
       \field{sortinithash}{96892c0b0a36bb8557c40c49813d48b3}
       \field{extradatescope}{labelyear}

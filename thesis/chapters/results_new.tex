@@ -57,9 +57,13 @@ The mean spectral reflectance signatures ($\pm$\,SD) for healthy and cracked gra
 
 \subsection{Spectral Separability Across Wavelength Regions}
 
-\noindent
-To systematically quantify the discriminatory power of individual spectral bands, three complementary metrics were computed (Figure~\ref{fig:spectral_separability}): \textbf{Absolute Mean Difference ($|\Delta\mu|$)} to capture the raw reflectance gap, \textbf{Cohen's $d$~\parencite{cohen1988statistical}} to measure the standardized effect size, and the \textbf{Fisher Score~\parencite{duda2001pattern}} to evaluate the ratio of inter-class separation to intra-class spread.
+% \noindent
+% To systematically quantify the discriminatory power of individual spectral bands, three complementary metrics were computed (Figure~\ref{fig:spectral_separability}): \textbf{Absolute Mean Difference ($|\Delta\mu|$)} to capture the raw reflectance gap, \textbf{Cohen's $d$~\parencite{cohen1988statistical}} to measure the standardized effect size, and the \textbf{Fisher Score~\parencite{duda2001pattern}} to evaluate the ratio of inter-class separation to intra-class spread.
 
+\subsection{Spectral Separability Across Wavelength Regions}
+
+\noindent
+To quantify the discriminatory power of individual spectral bands, three complementary metrics were examined (Figure~\ref{fig:spectral_separability}): \textbf{Absolute Mean Difference ($|\Delta\mu|$)}, reflecting the raw reflectance gap between classes; \textbf{Cohen's $d$~\parencite{cohen1988statistical}}, reflecting the standardized separation between class means; and the \textbf{Fisher Score~\parencite{duda2001pattern}}, reflecting the ratio of between-class separation to within-class spread.
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.95\textwidth]{figures/results/spectral_signatures/separability_metrics.png}
@@ -301,14 +305,14 @@ Row 2 & Late  & Test        & 60  & 60 & 34 & 26  \\
 \thispagestyle{plain}
 \FloatBarrier
 
-\begin{table}[!h]
+\begin{table}[H]
 \centering
 \caption[Full-image crack detection: early- and late-stage performance]{Full-image crack detection performance for early- and late-stage acquisition conditions. F1 (Cracked) is the primary metric; the Cracked class is positive.}
 \label{tab:full_image_early_late_metrics}
 
 \small
-\renewcommand{\arraystretch}{1.25}
-\setlength{\tabcolsep}{6pt}
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{5pt}
 
 \begin{adjustbox}{max width=\linewidth,center}
 \begin{tabular}{@{}llccccccccccccc@{}}
@@ -339,7 +343,7 @@ Late & Test &
 30 & 6 & 20 & 4 &
 0.833 & 0.826 & 0.833 & 0.882 & 0.857 & 0.872 & 0.769 & 0.833 & 0.659 \\
 
-\addlinespace[4pt]
+\addlinespace[3pt]
 
 Early & Calibration &
 24 & 10 & 130 & 8 &
@@ -354,17 +358,15 @@ Early & Test &
 \end{adjustbox}
 \end{table}
 
+\vspace{-4pt}
 \noindent
-The results on the independent test set demonstrate robust system-level performance. Under late-stage conditions (advanced cracking), the supervised pipeline achieved F1\textsubscript{CRACK}~=~0.857 (Table~\ref{tab:full_image_early_late_metrics}). More importantly, under early-stage conditions---where cracks are minimal and visually indistinct---the system maintained strong predictive capability with F1\textsubscript{CRACK}~=~0.800. The moderate performance drop between late and early stages reflects the physical difficulty of detecting incipient micro-cracks. Nevertheless, these results confirm both \hyperref[hyp:whole_image_robustness]{Hypothesis~3} and \hyperref[hyp:early_detection]{Hypothesis~4}: the spatial aggregation logic successfully suppresses background noise, enabling reliable early-warning triggers on entirely unseen vines.
+On the held-out Row~2 test set, the supervised pipeline achieved F1\textsubscript{CRACK}~=~0.857 under late-stage conditions and F1\textsubscript{CRACK}~=~0.800 under early-stage conditions (Table~\ref{tab:full_image_early_late_metrics}). The performance gap between stages is consistent with the reduced spectral contrast of incipient micro-cracks relative to advanced lesions.
 
-\clearpage
-\noindent
-Figure~\ref{fig:tp_example} demonstrates the effectiveness of the spatial aggregation pipeline on a held-out test image. While the initial pixel-level Logistic Regression produces scattered, noisy probability responses (a), the subsequent patch-based filtering successfully suppresses this noise and isolates the true crack region (b). This final detection accurately aligns with the visual ground truth shown in the corresponding RGB images (c, d).
-
-\begin{figure}[ht]
+\vspace{-2pt}
+\begin{figure}[H]
     \centering
-    \includegraphics[width=1\textwidth]{figures/results/full_images/full_images_classification/02_02/image.png}
-    \caption[True-positive detection pipeline example]{Correct detection pipeline. (a) Noisy pixel-level probability map (Logistic Regression). (b) Final output after spatial aggregation, showing isolated crack detection. (c) Reconstructed HSI-RGB image. (d) High-resolution RGB reference.}
+    \includegraphics[width=0.95\textwidth]{figures/results/full_images/full_images_classification/02_02/image.png}
+    \caption[True-positive detection pipeline example]{Representative true-positive detection on a held-out test image. (a)~Pixel-level crack probability map. (b)~Output after spatial aggregation. (c)~Reconstructed HSI--RGB image. (d)~High-resolution RGB reference.}
     \label{fig:tp_example}
 \end{figure}
 

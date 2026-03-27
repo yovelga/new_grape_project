@@ -886,3 +886,18 @@ These thin woody structures exhibit spectral signatures that partially overlap w
     \label{fig:fp_few_branches}
 \end{figure}
 \FloatBarrier
+
+\clearpage
+\section{Spectral Range Restriction: Sensor Edge Artifacts}
+\label{app:spectral_range_restriction}
+
+\noindent
+The usable spectral range was restricted to 450--925~nm, yielding 159 contiguous bands. The excluded edge regions of the original sensor range were more affected by reduced signal quality and elevated variance, consistent with known VIS--NIR hardware limitations under outdoor acquisition conditions \parencite{behmann2018specim}. Restricting the analysis to the more stable central range reduced the influence of instrumental artifacts on downstream classification.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{figures/results/discussion/Hardware_Limitations.png}
+    \caption[Specim IQ NIR spectral artifacts (Behmann et al.)]{Spectral reflectance comparison from an outdoor experiment showing increased reflectance and elevated systematic deviations in the NIR region of the Specim~IQ sensor. Reproduced from \parencite{behmann2018specim}.}
+    \label{fig:hardware_snr}
+\end{figure}
+\FloatBarrier

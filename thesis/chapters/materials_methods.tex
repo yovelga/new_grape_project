@@ -430,11 +430,13 @@ training or evaluation
 % \textbf{Restrained preprocessing design.}
 % The preprocessing pipeline was intentionally kept minimal. Additional smoothing operations were considered during preliminary stages but were not included in the final workflow. The final design therefore consisted only of boundary cleaning, spectral-range restriction, and per-spectrum SNV normalization. This restrained preprocessing strategy was adopted to avoid unnecessary alteration of the measured signal and to preserve the original spectral structure for downstream analysis.
 
+% \medskip\noindent
+% \textbf{Restrained preprocessing design.}
+% To ensure spectral signatures remained faithful to the true tissue physiology, the preprocessing pipeline was intentionally kept minimal. Preliminary spatial and spectral smoothing techniques were discarded, as they artificially inflate spatial collinearity and distort the raw physical measurements. Consequently, the final workflow relied exclusively on boundary cleaning, range restriction, and SNV normalization.
+
 \medskip\noindent
 \textbf{Restrained preprocessing design.}
-To ensure spectral signatures remained faithful to the true tissue physiology, the preprocessing pipeline was intentionally kept minimal. Preliminary spatial and spectral smoothing techniques were discarded, as they artificially inflate spatial collinearity and distort the raw physical measurements. Consequently, the final workflow relied exclusively on boundary cleaning, range restriction, and SNV normalization.
-
-
+To ensure spectral signatures remained faithful to the true tissue physiology, the preprocessing pipeline was intentionally kept minimal. Preliminary spatial and spectral smoothing techniques were discarded, as they artificially inflate spatial collinearity and distort the raw physical measurements. Consequently, the final workflow relied exclusively on boundary cleaning, range restriction, and SNV normalization. This restrained approach ensured that the downstream classification models were trained on a robust, leakage-free, and physically meaningful dataset.
 
 % -- new text --
 % \medskip\noindent
@@ -460,28 +462,30 @@ Pixel-level samples extracted from the same grape cluster are highly correlated 
 
 \medskip
 \noindent
-For the multi-class setting, this protocol was applied only to grape-containing samples, for which cluster identity was meaningful. Non-grape background classes (e.g., soil and leaves) were not naturally organized by grape-cluster groups and were therefore assigned using a fixed 80/20 train--test split. This yielded a practical domain-aware evaluation protocol while still preventing semantic leakage between the grape and non-grape categories.
+% For the multi-class setting, this protocol was applied only to grape-containing samples, for which cluster identity was meaningful. Non-grape background classes (e.g., soil and leaves) were not naturally organized by grape-cluster groups and were therefore assigned using a fixed 80/20 train--test split. This yielded a practical domain-aware evaluation protocol while still preventing semantic leakage between the grape and non-grape categories.
+In the multi-class model, the LOGO cross-validation was only applied to grape classes (cracked and intact berries), since pixels from the same grape cluster share highly similar features. On the other hand, non-grape background classes (such as soil and leaves) do not belong to specific grape clusters. However, to prevent data leakage, these background samples were divided using an 80/20 train--test split at the object level rather than the pixel level. This combined approach ensures a strict evaluation for the target grape classes while safely adding background data without mixing pixels from the same physical object.
+
 \begin{figure}[ht]
     \centering
     \begin{subfigure}[t]{0.3\textwidth}
         \centering
         \includegraphics[width=\textwidth]{figures/images_to_use/The_problem_logo.jpg}
-        \caption{Train pixels (blue) and Test pixels (red). Holding out entire clusters as indivisible units prevents data leakage.}
-    \end{subfigure}
+        \caption{Random pixel-level splitting can place train (blue) and test (red) pixels from the same cluster in different partitions.}    \end{subfigure}
     \hfill
     \begin{subfigure}[t]{0.6\textwidth}
         \centering
         \includegraphics[width=\textwidth]{figures/images_to_use/The_solution_logo.png}
-        \caption{The LOGO solution: all pixels from one cluster are held out entirely as the test set.}
+        \caption{Under LOGO, all pixels from one cluster are held out together as the test set, while pixels from the remaining clusters are used for training.}
     \end{subfigure}
-    \caption[LOGO cross-validation: problem and solution]{Illustration of the Leave-One-Group-Out (LOGO) cross-validation strategy. In each fold, all pixels from one grape cluster (group) are held out as the test set, while pixels from all remaining clusters form the training set. This ensures that no spatially correlated pixels from the same physical cluster appear in both partitions simultaneously.}
+    \caption[LOGO cross-validation: problem and solution]{Illustration of the Leave-One-Group-Out (LOGO) cross-validation strategy. In contrast to random pixel-level splitting, which can place spatially correlated pixels from the same physical cluster in both training and test partitions, LOGO holds out one entire grape cluster per fold as the test group. This preserves group-level separation and provides a more realistic estimate of generalization.}
     \label{fig:logo_illustration}
 \end{figure}
 \FloatBarrier
 
 \subsubsection{Whole-Image Leakage Prevention: Spatial Row Partitioning}
+\medskip
 \noindent
-At the whole-image level, to prevent spatial autocorrelation between adjacent vines, a strict geographical partitioning scheme was enforced. All hyperspectral records acquired from vineyard \textbf{Row 1} were designated exclusively as the calibration and training set, while records from \textbf{Row 2} served as the held-out evaluation (test) set. Because the two rows are physically disjoint (separated by distance and foliage), this row-based split robustly evaluates the model's ability to generalize to entirely new regions of the vineyard.
+At the whole-image level, to reduce spatial dependence between neighboring vines, a strict geographical partitioning scheme was applied. All hyperspectral records acquired from vineyard \textbf{Row~1} were designated exclusively as the calibration and training set, while records from \textbf{Row~2} served as the held-out evaluation set. Because the two rows are physically disjoint, this row-based split provides a robust assessment of the model's ability to generalize to entirely new regions of the vineyard.
 
 \medskip
 \noindent
@@ -560,9 +564,8 @@ Supervised classification was applied at the pixel level to discriminate between
 
 \medskip
 \noindent
-\textbf{Algorithm Selection and Training:} Six algorithms were evaluated: Partial Least Squares Discriminant Analysis (PLS-DA), L1-regularized Logistic Regression, Support Vector Machine (RBF kernel), Random Forest, a shallow Multi-Layer Perceptron (MLP), and \textbf{XGBoost} (Gradient-boosted decision trees). XGBoost was ultimately adopted as the baseline model across all primary comparisons due to its robust handling of high-dimensional, correlated spectral features. Models were evaluated under both naturally unbalanced and strictly balanced training regimes (achieved via segment-proportional undersampling to preserve within-class diversity).
-
-
+\textbf{Algorithm Selection and Training:}
+The supervised classification framework considered six candidate algorithms: PLS-DA, L1-regularized Logistic Regression, SVM with an RBF kernel, Random Forest, a shallow MLP, and XGBoost. The exact comparison set depended on the task formulation and practical computational constraints. XGBoost was adopted as the primary baseline model for the main comparisons and downstream whole-image integration due to its strong predictive performance and favorable computational scalability. Models were evaluated under both naturally unbalanced and balanced training regimes, where the balanced setting was obtained via segment-proportional undersampling to preserve within-class diversity.
 \newpage
 \subsection{Autoencoder-Based Anomaly Detection}
 \label{subsec:anomaly_detection}
@@ -597,16 +600,33 @@ where $\alpha \approx 0.3\tau$ served as a temperature parameter controlling the
 The whole-image pipeline takes the crack probabilities of individual pixels and combines them to make a single decision for the entire image. During this stage, the pixel-level models were kept frozen and were not retrained.
 \subsubsection{Pipeline Architecture and Spatial Aggregation}
 
+% \noindent
+% The whole-image aggregation pipeline follows a sequential process, illustrated in
+% Figure~\ref{fig:whole_image_protocol_overview}, and consists of the following stages:
+
+% \begin{enumerate}
+%    \item \textbf{Probability Map Generation:} The trained XGBoost model evaluates the hyperspectral image pixel by pixel, generating a map where each pixel is assigned a crack probability score between 0 and 1.
+%     \item \textbf{Morphological Integration:} To enforce spatial coherence, adjacent pixels with elevated crack probabilities are connected using morphological closing operations. This bridges tiny gaps in hairline micro-cracks and suppresses isolated noisy pixels, forming continuous regions of interest (BLOBs).
+%     \item \textbf{Geometric Filtering:} The resulting connected components are filtered based on area constraints. BLOBs smaller than a defined minimum area are discarded as noise, while structurally valid regions are retained.
+%     \item \textbf{Patch-Based Decision Logic:} The filtered probability map is divided into fixed-size spatial patches. A patch is classified as crack-positive if the density of crack-related pixels within its boundaries exceeds a calibrated threshold.
+%     \item \textbf{Global Image-Level Inference:} The final image-level decision employs a dual-condition logic to maximize noise rejection. The entire cluster is flagged as \textit{Cracked} only if both of the following conditions are met simultaneously: (1) at least one spatial patch satisfies the crack-positive criteria, \textbf{and} (2) the global proportion of crack-related pixels across the entire image exceeds a predefined overall density threshold. If either condition is not met, the image is classified as \textit{Non-Cracked}.
+% \end{enumerate}
+
 \noindent
-The whole-image aggregation pipeline follows a sequential process, illustrated in
-Figure~\ref{fig:whole_image_protocol_overview}, and consists of the following stages:
+The whole-image detection pipeline follows a sequential spatial aggregation process, illustrated in Figure~\ref{fig:whole_image_pipeline}, and consists of the following stages:
 
 \begin{enumerate}
-   \item \textbf{Probability Map Generation:} The trained XGBoost model evaluates the hyperspectral image pixel by pixel, generating a map where each pixel is assigned a crack probability score between 0 and 1.
-    \item \textbf{Morphological Integration:} To enforce spatial coherence, adjacent pixels with elevated crack probabilities are connected using morphological closing operations. This bridges tiny gaps in hairline micro-cracks and suppresses isolated noisy pixels, forming continuous regions of interest (BLOBs).
-    \item \textbf{Geometric Filtering:} The resulting connected components are filtered based on area constraints. BLOBs smaller than a defined minimum area are discarded as noise, while structurally valid regions are retained.
-    \item \textbf{Patch-Based Decision Logic:} The filtered probability map is divided into fixed-size spatial patches. A patch is classified as crack-positive if the density of crack-related pixels within its boundaries exceeds a calibrated threshold.
-    \item \textbf{Global Image-Level Inference:} The final image-level decision employs a dual-condition logic to maximize noise rejection. The entire cluster is flagged as \textit{Cracked} only if both of the following conditions are met simultaneously: (1) at least one spatial patch satisfies the crack-positive criteria, \textbf{and} (2) the global proportion of crack-related pixels across the entire image exceeds a predefined overall density threshold. If either condition is not met, the image is classified as \textit{Non-Cracked}.
+    \item \textbf{Input Hyperspectral Image:} Each sample is represented as a full hyperspectral datacube describing the spatial and spectral content of a grape cluster.
+
+    \item \textbf{Pixel-Level Classification:} The trained XGBoost model evaluates the hyperspectral image pixel by pixel, generating a crack-probability map in which each pixel is assigned a score between 0 and 1.
+
+    \item \textbf{Morphological Closing and BLOB Formation:} To enforce spatial coherence, adjacent pixels with elevated crack probabilities are connected using morphological closing operations. This bridges small gaps and suppresses isolated noisy pixels, producing contiguous connected regions of interest (BLOBs).
+
+    \item \textbf{BLOB Size Filtering:} The resulting connected components are filtered according to area constraints. BLOBs smaller than a predefined minimum size are discarded as noise, while larger candidate regions are retained for further analysis.
+
+    \item \textbf{Patch-Based Division and Decision:} The filtered probability map is divided into fixed-size spatial patches. A patch is classified as crack-positive if the proportion of crack-related pixels within its boundaries exceeds a calibrated threshold.
+
+    \item \textbf{Image-Level Output:} The final image-level decision is based on dual spatial criteria. A cluster is classified as \textit{Cracked} only if at least one patch is labeled crack-positive and the global proportion of crack-related pixels across the full image exceeds a predefined overall threshold. Otherwise, the image is classified as \textit{Non-Cracked}.
 \end{enumerate}
 
 
@@ -614,6 +634,7 @@ Figure~\ref{fig:whole_image_protocol_overview}, and consists of the following st
     \centering
     \includegraphics[width=0.9\textwidth]{figures/materials_methods/pipeline/whole_image_pipeline.jpg}
   \caption{Whole-image crack-detection pipeline from pixel-level CRACK probabilities to image-level classification via spatial aggregation.}
+  \label{fig:whole_image_pipeline}
 \end{figure}
 \FloatBarrier
 
@@ -630,7 +651,7 @@ Figure~\ref{fig:whole_image_protocol_overview}, and consists of the following st
     \textbf{(7)}~Grayscale HSI band at the selected wavelength.
     \textbf{(8)}~Raw pixel-level crack probability map.
     \textbf{(9)}~Blob map after morphological and area filtering.
-    \textbf{(10)}~Patch-based detection map (here similar to~9, as crack regions fit within single patches).}
+    \textbf{(10)}~Patch-based detection map.}
     \label{fig:ui_eda_pipeline}
 \end{figure}
 \FloatBarrier
@@ -669,66 +690,25 @@ The spatial hyperparameters for the aggregation stages (e.g., morphological kern
 \noindent
 \textit{How many wavelengths are needed to maintain crack-detection performance?}
 
-\medskip
-\noindent
-This stage evaluates whether a reduced subset of wavelengths can maintain crack-detection
-performance while preserving physical interpretability for potential multispectral sensor design. BFS was applied exclusively at the pixel level; whole-image inference used
-pixel-level models trained on either the full or reduced spectral representation without
-additional wavelength adaptation at the image level.
-
-% \medskip
-% \noindent
-% With the full detection pipeline established---from pixel-level classification through spatial aggregation---the final methodological question was whether the complete 159-band spectral representation was necessary, or whether a reduced wavelength set could preserve detection performance while simplifying future sensor requirements. BFS was applied exclusively at the pixel level; whole-image inference used pixel-level models trained on either the full or reduced spectral representation without additional wavelength adaptation at the image level.
+\subsubsection{Experimental Scope}
 
 \medskip
 \noindent
-Wavelength selection was evaluated separately for binary (\textit{Cracked} vs.\ \textit{Healthy}) and multi-class (with background classes) settings, as formulated in \S\ref{subsec:pixel_level_framework}.
+This stage examined whether crack-detection performance could be maintained using a reduced subset of wavelengths. Wavelength selection was performed exclusively at the pixel level, while whole-image inference used pixel-level models trained on either the full or reduced spectral representation without further adaptation at the image level. The analysis was conducted separately for the binary (\textit{Cracked} vs.\ \textit{Healthy}) and multi-class settings defined in \S\ref{subsec:pixel_level_framework}.
+\subsubsection{Model and Split Protocol}
 
-
-\subsubsection{Spectral Preprocessing}
-
+\medskip
 \noindent
-Pixels were preprocessed as described in \S\ref{subsec:global_preprocessing} (SNV normalization, 450--925\,nm range, 159 bands).
-
-\subsubsection{Classification Model}
-
-\noindent
-XGBoost was used as the fixed classifier for all wavelength selection experiments, consistent with the baseline model adopted in the pixel-level classification framework (\S\ref{subsec:pixel_level_framework}).
-
-\subsubsection{Two Experimental Settings}
-
-\noindent
-Wavelength selection was performed in two independent experiments:
-\begin{itemize}[leftmargin=1.5em,nosep]
-    \item \textbf{Binary setting:} Wavelengths selected for \textit{Cracked} vs.\ \textit{Healthy} classification.
-    \item \textbf{Multi-class setting:} Wavelengths selected for multi-class classification with background classes.
-\end{itemize}
-
-\subsubsection{Train-Test Split Protocol}
-A single grouped 80/20 hold-out split was defined to prevent leakage, with grouping
-at the grape-cluster level in the binary setting and at the cluster level for
-background classes in the multi-class setting. At each BFS iteration, XGBoost was
-re-trained on the 80\% training partition, while the held-out 20\% test partition
-remained fixed and served as the invariant selection criterion.
+Pixels were preprocessed as described in \S\ref{subsec:global_preprocessing}, and XGBoost was used as the fixed classifier throughout all wavelength-selection experiments. To prevent leakage, a single grouped 80/20 hold-out split was defined and kept fixed within each BFS run, with grouping at the grape-cluster level in the binary setting and at the cluster level for background classes in the multi-class setting. At each iteration, the model was re-trained on the training partition and evaluated on the fixed held-out partition using PR--AUC\textsubscript{CRACK} as the selection criterion.
 
 \subsubsection{Backward Feature Selection (BFS)}
 
 \noindent
-A deterministic wrapper-based backward feature selection (BFS) procedure was applied,
-starting from the full set of 159 wavelengths and iteratively removing the least
-informative band at each step. At each iteration, XGBoost was re-trained on the 80\%
-training partition and evaluated on the fixed 20\% hold-out set, using PR--AUC--CRACK
-as the selection criterion. This procedure yielded a monotonic elimination path and
-identified the minimal wavelength subset that preserved near-baseline performance.
+A deterministic wrapper-based backward feature selection (BFS) procedure was applied, starting from the full set of 159 wavelengths and iteratively removing the least informative band at each step. At each iteration, XGBoost was re-trained on the 80\% training partition and evaluated on the fixed 20\% hold-out set, using PR--AUC\textsubscript{CRACK} as the selection criterion. This procedure yielded a monotonic elimination path and identified the minimal wavelength subset that preserved near-baseline performance.
 
 \medskip
 \noindent
-To assess the stability of the selected wavelength subsets, the BFS procedure
-was repeated five times. The random seed supplied to the XGBoost model
-was kept fixed, while the seed controlling the grouped 80/20 train--test
-data partition was varied (split seeds 1--5). This approach evaluates the
-robustness of the wavelength selection process against variations in the data splitting.
-
+To assess stability, the BFS procedure was repeated five times. Within each run, the grouped 80/20 hold-out split was kept fixed throughout the elimination path; across runs, the split seed was varied (split seeds 1--5) in order to evaluate the robustness of the selected wavelength subsets to changes in the data partition.
 % Implementation reference (grouped 80/20 BFS split + leakage assertions):
 % src/models/classification/pixel_level/feature_selection/run_bfs_80_20_grapeid.py
 % src/models/classification/pixel_level/feature_selection/run_bfs_prauc_stability_5runs.py

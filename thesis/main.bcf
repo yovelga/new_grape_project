@@ -3112,8 +3112,9 @@
     <bcf:citekey order="25" intorder="1">shaw2002</bcf:citekey>
     <bcf:citekey order="26" intorder="1">ball2007field</bcf:citekey>
     <bcf:citekey order="26" intorder="2">Zwinkels2015</bcf:citekey>
-    <bcf:citekey order="26" intorder="3">zhang2022reflectance</bcf:citekey>
-    <bcf:citekey order="26" intorder="4">wang2024frontiers</bcf:citekey>
+    <bcf:citekey order="26" intorder="3">Gitelson1994ChlorophyllReflectance</bcf:citekey>
+    <bcf:citekey order="26" intorder="4">Wang2015FruitQualitySpectroscopy</bcf:citekey>
+    <bcf:citekey order="26" intorder="5">Lu2020OpticalPropertiesReview</bcf:citekey>
     <bcf:citekey order="27" intorder="1">liu2023sensors</bcf:citekey>
     <bcf:citekey order="27" intorder="2">Abade2025SpectrumToYield</bcf:citekey>
     <bcf:citekey order="27" intorder="3">sun2024fruit</bcf:citekey>
@@ -3149,27 +3150,31 @@
     <bcf:citekey order="41" intorder="1">haghbin2023non</bcf:citekey>
     <bcf:citekey order="41" intorder="2">zhang2024early</bcf:citekey>
     <bcf:citekey order="42" intorder="1">santos2023molecular</bcf:citekey>
-    <bcf:citekey order="42" intorder="2">YU20251506</bcf:citekey>
-    <bcf:citekey order="42" intorder="3">plants13172400</bcf:citekey>
+    <bcf:citekey order="42" intorder="2">Grimm2019CatastrophicFruitCracking</bcf:citekey>
+    <bcf:citekey order="42" intorder="3">YU20251506</bcf:citekey>
+    <bcf:citekey order="42" intorder="4">plants13172400</bcf:citekey>
     <bcf:citekey order="43" intorder="1">min2023decay</bcf:citekey>
     <bcf:citekey order="43" intorder="2">RAM2024109037</bcf:citekey>
     <bcf:citekey order="44" intorder="1">paoletti2019deep</bcf:citekey>
     <bcf:citekey order="44" intorder="2">benos2021machine</bcf:citekey>
     <bcf:citekey order="45" intorder="1">ravi2024sam2</bcf:citekey>
-    <bcf:citekey order="46" intorder="1">thenkabail2016hyperspectral</bcf:citekey>
-    <bcf:citekey order="47" intorder="1">behmann2018specim</bcf:citekey>
-    <bcf:citekey order="48" intorder="1">mishra2017close</bcf:citekey>
-    <bcf:citekey order="48" intorder="2">kaltenborn2025data</bcf:citekey>
-    <bcf:citekey order="49" intorder="1">cohen1988statistical</bcf:citekey>
-    <bcf:citekey order="50" intorder="1">duda2001pattern</bcf:citekey>
-    <bcf:citekey order="51" intorder="1">santos2023molecular</bcf:citekey>
-    <bcf:citekey order="52" intorder="1">thenkabail2016hyperspectral</bcf:citekey>
-    <bcf:citekey order="53" intorder="1">Chang2019</bcf:citekey>
-    <bcf:citekey order="53" intorder="2">YU20251506</bcf:citekey>
-    <bcf:citekey order="54" intorder="1">bioucas2013hyperspectral</bcf:citekey>
+    <bcf:citekey order="46" intorder="1">behmann2018specim</bcf:citekey>
+    <bcf:citekey order="47" intorder="1">mishra2017close</bcf:citekey>
+    <bcf:citekey order="47" intorder="2">kaltenborn2025data</bcf:citekey>
+    <bcf:citekey order="48" intorder="1">cohen1988statistical</bcf:citekey>
+    <bcf:citekey order="49" intorder="1">duda2001pattern</bcf:citekey>
+    <bcf:citekey order="50" intorder="1">Wang2015FruitQualitySpectroscopy</bcf:citekey>
+    <bcf:citekey order="50" intorder="2">Gitelson1994ChlorophyllReflectance</bcf:citekey>
+    <bcf:citekey order="50" intorder="3">santos2023molecular</bcf:citekey>
+    <bcf:citekey order="50" intorder="4">Moon2020EnzymaticBrowning</bcf:citekey>
+    <bcf:citekey order="51" intorder="1">Lu2020OpticalPropertiesReview</bcf:citekey>
+    <bcf:citekey order="51" intorder="2">Imran2020RedEdgeNIRShoulder</bcf:citekey>
+    <bcf:citekey order="52" intorder="1">Cheng2019AppleDRS</bcf:citekey>
+    <bcf:citekey order="52" intorder="2">Sun2021PeachBruisingOptical</bcf:citekey>
+    <bcf:citekey order="52" intorder="3">Munera2021PersimmonDamageHSI</bcf:citekey>
+    <bcf:citekey order="53" intorder="1">behmann2018specim</bcf:citekey>
+    <bcf:citekey order="54" intorder="1">behmann2018specim</bcf:citekey>
     <bcf:citekey order="55" intorder="1">behmann2018specim</bcf:citekey>
-    <bcf:citekey order="56" intorder="1">behmann2018specim</bcf:citekey>
-    <bcf:citekey order="57" intorder="1">behmann2018specim</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="apa">
