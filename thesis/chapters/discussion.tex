@@ -142,8 +142,8 @@ In practice, this spatial aggregation stage was essential: it removed most low-d
 % Calibration of the spatial thresholds was initially explored with brute-force search but was ultimately optimized using Optuna, which provided a more efficient route to a robust operating point. The resulting pipeline achieved strong held-out performance while maintaining substantially better precision than a naive pixel-level detection strategy.
 % \subsection{Preliminary Spectral--Spatial Cascade for Residual False Positives}
 \newpage
-\subsection{Exploratory Spectral--Spatial Validation Pipeline}
-\label{subsec:exploratory_spectral_spatial_validation_pipeline}
+\subsection{Exploratory Spectral--Spatial Cascade}
+\label{subsec:exploratory_spectral_spatial_cascade}
 
 \noindent
 A preliminary direction explored during this study was a spectral--spatial cascade for reducing residual structural false positives in the whole-image pipeline. The approach combined the hyperspectral pixel-level model as a sensitive primary detector, SAM2 for local segmentation, and an RGB-based CNN for ROI validation (Figure~\ref{fig:sam2_cnn_pipeline}).
