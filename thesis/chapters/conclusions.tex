@@ -5,24 +5,24 @@
 \section{Summary of Contributions}
 \label{sec:summary_contributions}
 \noindent
-This study successfully demonstrated that visible--near-infrared (VIS-NIR) spectral imaging can reliably detect table grape cracking ('Scarlotta' cultivar) under uncontrolled field conditions, even during the early stages prior to severe macroscopic degradation. The physical mechanism enabling this detection is deeply rooted in the biomechanics of the crack: the destruction of the waxy cuticle and subsequent cellular water loss produce a highly distinct, depressed reflectance signature, particularly in the NIR plateau and the red-edge inflection.
+This study demonstrated that visible--near-infrared (VIS-NIR) spectral imaging can reliably detect table grape cracking (``Scarlotta Seedless'' cultivar) under uncontrolled field conditions, even during the early stages prior to severe macroscopic degradation. The physical mechanism enabling this detection is deeply rooted in the biomechanics of the crack: the destruction of the waxy cuticle and subsequent cellular water loss produce a highly distinct, depressed reflectance signature, particularly in the NIR plateau and the red-edge inflection.
 
 \medskip\noindent
 Transitioning from controlled laboratory pixel-level analysis to whole-image field deployment exposed significant challenges related to background clutter, illumination variance, and extreme class imbalance. These challenges were systematically mitigated through a novel pipeline that combined a multi-class supervised learning approach with geometric spatial aggregation (patch-density blob filtering).
 
 \medskip\noindent
-This spatial logic proved that while spectral data is necessary for identifying the chemical and structural changes of a crack, spatial context is mandatory for suppressing the geometric noise inherent to the agricultural environment. 
+This spatial logic indicate that while spectral data is necessary for identifying the chemical and structural changes of a crack, spatial context is mandatory for suppressing the geometric noise inherent to the agricultural environment. 
 
 \newpage
 \section{Revisiting the Research Hypotheses}
 \label{sec:revisiting_hypotheses}
 \noindent
-The empirical results of this study directly address and validate the core research hypotheses established in the introductory chapter:
+The empirical results of this study directly address and support the core research hypotheses established in the introductory chapter:
 
 \begin{itemize}
     \item \textbf{Hypothesis 1 (Spectral Distinguishability):} Confirmed. The study confirmed significant physical differences in the spectral signatures of healthy and cracked tissues. 
     
-    \item \textbf{Hypothesis 2 (Pixel-Level Classification):} Confirmed. The supervised XGBoost architecture effectively learned these spectral decision boundaries, achieving near-perfect classification performance (PR--AUC $\approx 1.0$) on isolated pixels, definitively proving algorithmic feasibility.
+    \item \textbf{Hypothesis 2 (Pixel-Level Classification):} Confirmed. The supervised XGBoost architecture effectively learned these spectral decision boundaries, achieving near-perfect classification performance (PR--AUC $\approx 1.0$) on isolated pixels, thereby supporting algorithmic feasibility.
     
     \item \textbf{Hypothesis 3 (Whole-Image Robustness):} Confirmed. While initial binary models struggled with background clutter, the transition to a 10-class background model coupled with spatial aggregation successfully isolated cracks from highly deceptive elements (e.g., dry wood), proving that robust full-image detection is achievable in the field.
     
