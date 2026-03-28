@@ -364,7 +364,7 @@ To rigorously evaluate the system's early-warning capabilities, the whole-image 
 
 % \begin{itemize}
 %     \item \textbf{Spectral Range Restriction:} Raw signatures were cropped to the 450--925\,nm range (159 contiguous bands). This step discarded extreme wavelengths (400--450\,nm and 925--1000\,nm) known to exhibit low signal-to-noise ratios and reflectance artifacts under outdoor field conditions \parencite{behmann2018specim}.
-%     \item \textbf{Per-Spectrum Normalization:} Each remaining spectral vector was independently normalized using the \textit{Standard Normal Variate} (SNV) transformation. By mean-centering and scaling each pixel exclusively by its own standard deviation, SNV mitigates illumination variability and scattering effects without relying on dataset-level statistics. This strictly per-pixel approach intrinsically prevents data leakage between training and testing partitions \parencite{mishra2017close, kaltenborn2025data}.
+%     \item \textbf{Per-Spectrum Normalization:} Each remaining spectral vector was independently normalized using the \textit{Standard Normal Variate} (SNV) transformation. By mean-centering and scaling each pixel exclusively by its own standard deviation, SNV mitigates illumination variability and scattering effects without relying on dataset-level statistics. This strictly per-pixel approach intrinsically prevents data leakage between training and testing partitions \parencite{mishra2017close}.
 % \end{itemize}
 
 % \clearpage
@@ -404,7 +404,7 @@ training or evaluation
 \medskip\noindent
 \begin{itemize}
     \item \textbf{Spectral range restriction:} Spectra range were restricted to the 450--925~nm range, yielding 159 contiguous bands. The extreme regions of the original Specim IQ acquisition range (400--450~nm and 925--1000~nm) were excluded because they are more susceptible to reduced signal quality and elevated variance under outdoor acquisition conditions. This behavior is consistent with previously reported sensor limitations in VIS--NIR field imaging \parencite{behmann2018specim}.
-    \item \textbf{Per-spectrum normalization using SNV:} Each spectral vector was independently mean-centered and scaled by its own standard deviation via the Standard Normal Variate (SNV) transformation. SNV suppresses additive and multiplicative artifacts from illumination geometry and surface scattering without relying on any dataset-level statistics, thereby intrinsically preventing information leakage across data partitions \parencite{mishra2017close, kaltenborn2025data}.
+    \item \textbf{Per-spectrum normalization using SNV:} Each spectral vector was independently mean-centered and scaled by its own standard deviation via the Standard Normal Variate (SNV) transformation. SNV suppresses additive and multiplicative artifacts from illumination geometry and surface scattering without relying on any dataset-level statistics, thereby intrinsically preventing information leakage across data partitions \parencite{mishra2017close}.
 \end{itemize}
 
 

@@ -231,39 +231,6 @@
       \endverb
       \keyw{Deep learning,CNN,Smart farming,Weed and pest detection,Disease detection,Yield estimation}
     \endentry
-    \entry{ball2007field}{book}{}{}
-      \name{author}{1}{}{%
-        {{un=0,uniquepart=base,hash=7deba6762adab6f8765ff4889fb122e9}{%
-           family={Ball},
-           familyi={B\bibinitperiod},
-           given={S.\bibnamedelimi R.},
-           giveni={S\bibinitperiod\bibinitdelim R\bibinitperiod},
-           givenun=0}}%
-      }
-      \list{location}{1}{%
-        {Bellingham, WA}%
-      }
-      \list{publisher}{1}{%
-        {SPIE Press}%
-      }
-      \strng{namehash}{7deba6762adab6f8765ff4889fb122e9}
-      \strng{fullhash}{7deba6762adab6f8765ff4889fb122e9}
-      \strng{fullhashraw}{7deba6762adab6f8765ff4889fb122e9}
-      \strng{bibnamehash}{7deba6762adab6f8765ff4889fb122e9}
-      \strng{authorbibnamehash}{7deba6762adab6f8765ff4889fb122e9}
-      \strng{authornamehash}{7deba6762adab6f8765ff4889fb122e9}
-      \strng{authorfullhash}{7deba6762adab6f8765ff4889fb122e9}
-      \strng{authorfullhashraw}{7deba6762adab6f8765ff4889fb122e9}
-      \field{sortinit}{B}
-      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{Field guide to spectroscopy}
-      \field{year}{2007}
-    \endentry
     \entry{behmann2018specim}{article}{}{}
       \true{moreauthor}
       \true{morelabelname}
@@ -355,41 +322,35 @@
       \field{pages}{441}
       \range{pages}{1}
     \endentry
-    \entry{benelli2020hyperspectral}{article}{}{}
-      \name{author}{4}{}{%
-        {{un=0,uniquepart=base,hash=c60be5504f5931ff976bbac797747c39}{%
+    \entry{Benelli2020}{article}{}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=ea624824485e4c9ee9349b842abb7c44}{%
            family={Benelli},
            familyi={B\bibinitperiod},
-           given={A.},
+           given={Alessandro},
            giveni={A\bibinitperiod},
            givenun=0}}%
-        {{un=0,uniquepart=base,hash=1759862faff85f22b585533f7b473688}{%
+        {{un=0,uniquepart=base,hash=87e21dd6de3ae55869646a3dca9460a0}{%
            family={Cevoli},
            familyi={C\bibinitperiod},
-           given={C.},
+           given={Cristian},
            giveni={C\bibinitperiod},
            givenun=0}}%
-        {{un=0,uniquepart=base,hash=7b05d716e3e476294a149180cb6f3df4}{%
+        {{un=0,uniquepart=base,hash=d930110c0aa6ec3c12e9f540f516f024}{%
            family={Fabbri},
            familyi={F\bibinitperiod},
-           given={A.},
+           given={Alessandro},
            giveni={A\bibinitperiod},
            givenun=0}}%
-        {{un=0,uniquepart=base,hash=80914010dafd6e69b58533814f980bb9}{%
-           family={Ragni},
-           familyi={R\bibinitperiod},
-           given={L.},
-           giveni={L\bibinitperiod},
-           givenun=0}}%
       }
-      \strng{namehash}{bf330f2cf993bb9b48d31839a9334b8c}
-      \strng{fullhash}{eb25ebdfc5744b284ee40ba37f1addd1}
-      \strng{fullhashraw}{eb25ebdfc5744b284ee40ba37f1addd1}
-      \strng{bibnamehash}{eb25ebdfc5744b284ee40ba37f1addd1}
-      \strng{authorbibnamehash}{eb25ebdfc5744b284ee40ba37f1addd1}
-      \strng{authornamehash}{bf330f2cf993bb9b48d31839a9334b8c}
-      \strng{authorfullhash}{eb25ebdfc5744b284ee40ba37f1addd1}
-      \strng{authorfullhashraw}{eb25ebdfc5744b284ee40ba37f1addd1}
+      \strng{namehash}{cc7e5f57b8d04ea49bc881cf0f565a22}
+      \strng{fullhash}{e6eb42f8b8aa096249df144e358311ba}
+      \strng{fullhashraw}{e6eb42f8b8aa096249df144e358311ba}
+      \strng{bibnamehash}{e6eb42f8b8aa096249df144e358311ba}
+      \strng{authorbibnamehash}{e6eb42f8b8aa096249df144e358311ba}
+      \strng{authornamehash}{cc7e5f57b8d04ea49bc881cf0f565a22}
+      \strng{authorfullhash}{e6eb42f8b8aa096249df144e358311ba}
+      \strng{authorfullhashraw}{e6eb42f8b8aa096249df144e358311ba}
       \field{sortinit}{B}
       \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
       \field{extradatescope}{labelyear}
@@ -397,14 +358,15 @@
       \true{uniqueprimaryauthor}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
-      \field{journaltitle}{Biosystems Engineering}
-      \field{title}{Hyperspectral imaging and mini-video devices for non-destructive analysis of fruit quality: A review}
-      \field{volume}{192}
+      \field{journaltitle}{Journal of Agricultural Engineering}
+      \field{number}{3}
+      \field{title}{In-field hyperspectral imaging: An overview on the ground-based applications in agriculture}
+      \field{volume}{51}
       \field{year}{2020}
-      \field{pages}{142\bibrangedash 152}
+      \field{pages}{129\bibrangedash 139}
       \range{pages}{11}
       \verb{doi}
-      \verb 10.1016/j.biosystemseng.2020.01.018
+      \verb 10.4081/jae.2020.1030
       \endverb
     \endentry
     \entry{benos2021machine}{article}{}{}
@@ -1065,64 +1027,6 @@
       \field{pages}{14\bibrangedash 22}
       \range{pages}{9}
     \endentry
-    \entry{c5ae649d7cf34cb7aaf3b08a25dbd79d}{article}{}{}
-      \name{author}{5}{}{%
-        {{un=0,uniquepart=base,hash=1b268bda513279fe9546259e8d68a477}{%
-           family={Fass},
-           familyi={F\bibinitperiod},
-           given={Eitan},
-           giveni={E\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=5a735ccf5d61a65400345312786febb1}{%
-           family={Shlomi},
-           familyi={S\bibinitperiod},
-           given={Eldar},
-           giveni={E\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=db36efec8eb6f29c505ed7d9f694a905}{%
-           family={Ziv},
-           familyi={Z\bibinitperiod},
-           given={Carmit},
-           giveni={C\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=355733350a1f09825df20b4c4effa3a8}{%
-           family={Glikman},
-           familyi={G\bibinitperiod},
-           given={Oren},
-           giveni={O\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=994665910c7c1199974fe5e2506e0661}{%
-           family={Helman},
-           familyi={H\bibinitperiod},
-           given={David},
-           giveni={D\bibinitperiod},
-           givenun=0}}%
-      }
-      \strng{namehash}{b8ecdeaac236ee800f495418c25f64a0}
-      \strng{fullhash}{b1794507bd92a4ec48f7043e83af66b9}
-      \strng{fullhashraw}{b1794507bd92a4ec48f7043e83af66b9}
-      \strng{bibnamehash}{b1794507bd92a4ec48f7043e83af66b9}
-      \strng{authorbibnamehash}{b1794507bd92a4ec48f7043e83af66b9}
-      \strng{authornamehash}{b8ecdeaac236ee800f495418c25f64a0}
-      \strng{authorfullhash}{b1794507bd92a4ec48f7043e83af66b9}
-      \strng{authorfullhashraw}{b1794507bd92a4ec48f7043e83af66b9}
-      \field{sortinit}{F}
-      \field{sortinithash}{2638baaa20439f1b5a8f80c6c08a13b4}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{journaltitle}{Computers and Electronics in Agriculture}
-      \field{title}{Machine learning models based on hyperspectral imaging for pre-harvest tomato fruit quality monitoring}
-      \field{volume}{229}
-      \field{year}{2025}
-      \field{pages}{109788}
-      \range{pages}{1}
-      \verb{doi}
-      \verb 10.1016/j.compag.2024.109788
-      \endverb
-    \endentry
     \entry{su16146064}{article}{}{}
       \name{author}{3}{}{%
         {{un=0,uniquepart=base,hash=7f84e8a4035b14f0c78ec0b7cbc2fcec}{%
@@ -1668,43 +1572,6 @@
       \verb 10.3390/rs12142254
       \endverb
     \endentry
-    \entry{kaltenborn2025data}{article}{}{}
-      \true{moreauthor}
-      \true{morelabelname}
-      \name{author}{1}{}{%
-        {{un=0,uniquepart=base,hash=7d50623c603c87a3b4b6604ab0b382cd}{%
-           family={Kaltenborn},
-           familyi={K\bibinitperiod},
-           given={J},
-           giveni={J\bibinitperiod},
-           givenun=0}}%
-      }
-      \list{publisher}{1}{%
-        {Nature Publishing Group}%
-      }
-      \strng{namehash}{a6119f7ea22e74f9137ae8d4dbea5155}
-      \strng{fullhash}{a6119f7ea22e74f9137ae8d4dbea5155}
-      \strng{fullhashraw}{a6119f7ea22e74f9137ae8d4dbea5155}
-      \strng{bibnamehash}{a6119f7ea22e74f9137ae8d4dbea5155}
-      \strng{authorbibnamehash}{a6119f7ea22e74f9137ae8d4dbea5155}
-      \strng{authornamehash}{a6119f7ea22e74f9137ae8d4dbea5155}
-      \strng{authorfullhash}{a6119f7ea22e74f9137ae8d4dbea5155}
-      \strng{authorfullhashraw}{a6119f7ea22e74f9137ae8d4dbea5155}
-      \field{sortinit}{K}
-      \field{sortinithash}{c02bf6bff1c488450c352b40f5d853ab}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{journaltitle}{Scientific Reports}
-      \field{number}{1}
-      \field{title}{Data splitting to avoid information leakage with DataSAIL}
-      \field{volume}{15}
-      \field{year}{2025}
-      \field{pages}{1\bibrangedash 15}
-      \range{pages}{15}
-    \endentry
     \entry{kanwal2025quality}{article}{}{}
       \name{author}{9}{}{%
         {{un=0,uniquepart=base,hash=a8a30e0e6eea33e1bb7acb6cb7606e5e}{%
@@ -2070,35 +1937,47 @@
       \field{pages}{265\bibrangedash 271}
       \range{pages}{7}
     \endentry
-    \entry{liu2023sensors}{article}{}{}
-      \name{author}{3}{}{%
-        {{un=0,uniquepart=base,hash=ce084360cc68e7db4fe6cae1287b3adf}{%
+    \entry{LIU2025117630}{article}{}{}
+      \name{author}{5}{}{%
+        {{un=0,uniquepart=base,hash=1b0ec7a92a6562bfce637ef1a63d371a}{%
            family={Liu},
            familyi={L\bibinitperiod},
-           given={Y.},
-           giveni={Y\bibinitperiod},
+           given={Chaoxian},
+           giveni={C\bibinitperiod},
            givenun=0}}%
-        {{un=0,uniquepart=base,hash=32e563370422457790db030ab2c13183}{%
-           family={Zhang},
+        {{un=0,uniquepart=base,hash=b2152e7656a6e6eb5a286a54efa58521}{%
+           family={Wu},
+           familyi={W\bibinitperiod},
+           given={Xubo},
+           giveni={X\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=3dd44b70c82b6af3bcd68a8f6b96826b}{%
+           family={Yang},
+           familyi={Y\bibinitperiod},
+           given={Weiqiang},
+           giveni={W\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=02b493731e67c9b4e48842d2d0ab5e9f}{%
+           family={Zeng},
            familyi={Z\bibinitperiod},
-           given={H.},
-           giveni={H\bibinitperiod},
+           given={Shan},
+           giveni={S\bibinitperiod},
            givenun=0}}%
-        {{un=0,uniquepart=base,hash=3702f1c146e64a6c91fc47b81ea59fc7}{%
+        {{un=0,uniquepart=base,hash=89724312e7e4efa566ffc7f1cce50527}{%
            family={Wang},
            familyi={W\bibinitperiod},
-           given={J.},
+           given={Jianxun},
            giveni={J\bibinitperiod},
            givenun=0}}%
       }
-      \strng{namehash}{0954792dbe24f33db81eda5a866f3dba}
-      \strng{fullhash}{201c1e8e8375c524a4b95017df19b00d}
-      \strng{fullhashraw}{201c1e8e8375c524a4b95017df19b00d}
-      \strng{bibnamehash}{201c1e8e8375c524a4b95017df19b00d}
-      \strng{authorbibnamehash}{201c1e8e8375c524a4b95017df19b00d}
-      \strng{authornamehash}{0954792dbe24f33db81eda5a866f3dba}
-      \strng{authorfullhash}{201c1e8e8375c524a4b95017df19b00d}
-      \strng{authorfullhashraw}{201c1e8e8375c524a4b95017df19b00d}
+      \strng{namehash}{f597e3520aac25449720d3a156211c47}
+      \strng{fullhash}{24218cdebeb53b55bcc9b32ad87daf94}
+      \strng{fullhashraw}{24218cdebeb53b55bcc9b32ad87daf94}
+      \strng{bibnamehash}{24218cdebeb53b55bcc9b32ad87daf94}
+      \strng{authorbibnamehash}{24218cdebeb53b55bcc9b32ad87daf94}
+      \strng{authornamehash}{f597e3520aac25449720d3a156211c47}
+      \strng{authorfullhash}{24218cdebeb53b55bcc9b32ad87daf94}
+      \strng{authorfullhashraw}{24218cdebeb53b55bcc9b32ad87daf94}
       \field{sortinit}{L}
       \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
       \field{extradatescope}{labelyear}
@@ -2106,13 +1985,24 @@
       \true{uniqueprimaryauthor}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
-      \field{journaltitle}{Sensors}
-      \field{title}{Early Detection of Plant Physiological Stress Using {VIS--NIR} Hyperspectral Imaging}
-      \field{volume}{23}
-      \field{year}{2023}
+      \field{abstract}{Hyperspectral imaging (HSI) has revolutionized the non-destructive detection of fruit defects by integrating spectral and spatial information. However, detecting early-stage minor bruises in apples remains challenging due to weak hyperspectral signals, high data dimensionality, and low computational efficiency. To address these issues, this study proposes a novel hyperspectral apple bruise detection network, termed 3D-HDI. The model constructs a backbone network using multiple 3D convolutions and integrates a feature enhancement module with a path aggregation network to amplify spectral signals and improve damage differentiation. Furthermore, it replaces pixel-by-pixel classification with a region-based detection head, significantly enhancing computational efficiency and accuracy. Experimental results demonstrate that the proposed model achieves a higher recognition rate (96.25\%) while maintaining comparable detection efficiency, outperforming traditional classification networks such as 3D-EfficientNet, 3D-MobileNet, and 3D-AlexNet. This research advances the application of HSI and deep learning in fruit quality assessment, providing a robust solution for early-stage bruises detection.}
+      \field{issn}{0963-9969}
+      \field{journaltitle}{Food Research International}
+      \field{title}{Early detection of apple bruises using spectral-spatial enhanced 3D CNN and region-based hyperspectral analysis}
+      \field{volume}{222}
+      \field{year}{2025}
+      \field{pages}{117630}
+      \range{pages}{1}
       \verb{doi}
-      \verb 10.3390/s23083915
+      \verb https://doi.org/10.1016/j.foodres.2025.117630
       \endverb
+      \verb{urlraw}
+      \verb https://www.sciencedirect.com/science/article/pii/S0963996925019684
+      \endverb
+      \verb{url}
+      \verb https://www.sciencedirect.com/science/article/pii/S0963996925019684
+      \endverb
+      \keyw{Hyperspectral imaging,Non-destructive detection,Deep learning,Feature enhancement,3D convolution}
     \endentry
     \entry{Lu2020OpticalPropertiesReview}{article}{}{}
       \name{author}{5}{}{%
@@ -2348,101 +2238,6 @@
       \field{year}{2017}
       \field{pages}{49\bibrangedash 67}
       \range{pages}{19}
-    \endentry
-    \entry{horticulturae11050466}{article}{}{}
-      \name{author}{10}{}{%
-        {{un=0,uniquepart=base,hash=969d12e0b4e1fdf360d2117061d79d9b}{%
-           family={Monteiro},
-           familyi={M\bibinitperiod},
-           given={Harleson\bibnamedelimb Sidney\bibnamedelima Almeida},
-           giveni={H\bibinitperiod\bibinitdelim S\bibinitperiod\bibinitdelim A\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=593af594f551d10796218384ade59b8f}{%
-           family={Tecchio},
-           familyi={T\bibinitperiod},
-           given={Marco\bibnamedelima Antonio},
-           giveni={M\bibinitperiod\bibinitdelim A\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=f7fb19c0da74746ebef313b07f09d4ee}{%
-           family={Brito},
-           familyi={B\bibinitperiod},
-           given={Sinara\bibnamedelimb de\bibnamedelimb Nazaré\bibnamedelima Santana},
-           giveni={S\bibinitperiod\bibinitdelim d\bibinitperiod\bibinitdelim N\bibinitperiod\bibinitdelim S\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=3c1f7595fa3a07e3f9fc7267b29cb84c}{%
-           family={Neto},
-           familyi={N\bibinitperiod},
-           given={Francisco\bibnamedelimb José\bibnamedelima Domingues},
-           giveni={F\bibinitperiod\bibinitdelim J\bibinitperiod\bibinitdelim D\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=99a708a6ecaf26e0d71a5bbeb7017992}{%
-           family={Sánchez},
-           familyi={S\bibinitperiod},
-           given={Camilo\bibnamedelimb André\bibnamedelimb Pereira\bibnamedelima Contreras},
-           giveni={C\bibinitperiod\bibinitdelim A\bibinitperiod\bibinitdelim P\bibinitperiod\bibinitdelim C\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=1f4a78c2bc5398785464474028b5dd5e}{%
-           family={Alonso},
-           familyi={A\bibinitperiod},
-           given={Juan\bibnamedelima Carlos},
-           giveni={J\bibinitperiod\bibinitdelim C\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=86c2d4d24975b362071f004e7c93911b}{%
-           family={Feliciano},
-           familyi={F\bibinitperiod},
-           given={Daví\bibnamedelimb Eduardo\bibnamedelima Furno},
-           giveni={D\bibinitperiod\bibinitdelim E\bibinitperiod\bibinitdelim F\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=a2aad6cc05beaf1b67d9f39b488913e2}{%
-           family={Maniero},
-           familyi={M\bibinitperiod},
-           given={Carolina\bibnamedelima Ragoni},
-           giveni={C\bibinitperiod\bibinitdelim R\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=6f6e52b425fa749e0380528f56f108f2}{%
-           family={Cunha},
-           familyi={C\bibinitperiod},
-           given={Pedro\bibnamedelimb Henrique\bibnamedelima Hortolani},
-           giveni={P\bibinitperiod\bibinitdelim H\bibinitperiod\bibinitdelim H\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=512c96cb380b69869da02b1828d96bf3}{%
-           family={Silva},
-           familyi={S\bibinitperiod},
-           given={Marcelo\bibnamedelimb de\bibnamedelima Souza},
-           giveni={M\bibinitperiod\bibinitdelim d\bibinitperiod\bibinitdelim S\bibinitperiod},
-           givenun=0}}%
-      }
-      \strng{namehash}{c7df69db9d27ca614d35ca5091142856}
-      \strng{fullhash}{cd6da7ea0df1ffcc34500a77bee2bd9d}
-      \strng{fullhashraw}{cd6da7ea0df1ffcc34500a77bee2bd9d}
-      \strng{bibnamehash}{cd6da7ea0df1ffcc34500a77bee2bd9d}
-      \strng{authorbibnamehash}{cd6da7ea0df1ffcc34500a77bee2bd9d}
-      \strng{authornamehash}{c7df69db9d27ca614d35ca5091142856}
-      \strng{authorfullhash}{cd6da7ea0df1ffcc34500a77bee2bd9d}
-      \strng{authorfullhashraw}{cd6da7ea0df1ffcc34500a77bee2bd9d}
-      \field{sortinit}{M}
-      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{abstract}{The cultivation of table grapes in Brazil is economically significant, with production influenced by edaphoclimatic factors and rootstock selection. The cultivar 'BRS Núbia' (Vitis vinifera L. x Vitis labrusca L.) is a promising alternative; however, its phenological behavior, thermal requirements, and compatibility with different rootstocks under subtropical conditions require further evaluation. This study aimed to assess the duration of phenological stages, thermal requirement, and ripening dynamics of 'BRS Núbia' grapevines grafted onto the rootstocks 'IAC 572 Jales', 'IAC 766 Campinas', and 'Paulsen 1103'. The experiment was conducted in São Manuel, São Paulo, Brazil during the 2021 and 2022 production cycles using a split-plot experimental design (3 × 2). Evaluations included the duration of phenological stages from pruning to budburst, flowering, fruit set, onset of ripening, and harvest, as well as the ripening curve and thermal accumulation from pruning to harvest. Rootstocks did not significantly affect (p > 0.05) the duration of phenological stages; however, differences were observed between production cycles. The 2022 cycle was longer (167.7 days) compared to 2021 (142.6 days), with greater thermal accumulation (1871.7 GDDs vs. 1743.4 GDDs). The analysis of phenological stages revealed that, across both production cycles evaluated, the 'BRS Núbia' cultivar required an average accumulation of 1807.5 growing degree days from pruning to harvest. Soluble solids content ranged from 17.43 to 18.50°Brix, and titratable acidity decreased throughout maturation. The maturation index was highest in vines grafted onto 'Paulsen 1103', indicating its positive influence on fruit quality. The 'BRS Núbia' grapevine exhibited a mean thermal requirement of 1807.5 growing degree days (GDDs) to complete its phenological cycle, which lasted approximately 150 days under subtropical conditions.}
-      \field{issn}{2311-7524}
-      \field{journaltitle}{Horticulturae}
-      \field{number}{5}
-      \field{title}{Phenological Development, Thermal Requirement, and Quality of 'BRS Núbia' (Vitis vinifera L. x Vitis labrusca L.) Grapes on Different Rootstocks}
-      \field{volume}{11}
-      \field{year}{2025}
-      \verb{doi}
-      \verb 10.3390/horticulturae11050466
-      \endverb
-      \verb{urlraw}
-      \verb https://www.mdpi.com/2311-7524/11/5/466
-      \endverb
-      \verb{url}
-      \verb https://www.mdpi.com/2311-7524/11/5/466
-      \endverb
     \endentry
     \entry{Moon2020EnzymaticBrowning}{article}{}{}
       \name{author}{4}{}{%
@@ -2941,69 +2736,6 @@
       \field{pages}{1130857}
       \range{pages}{1}
     \endentry
-    \entry{Scarlotta2022}{article}{}{}
-      \true{moreauthor}
-      \true{morelabelname}
-      \name{author}{1}{}{%
-        {{un=0,uniquepart=base,hash=78d6affc3a98b283ad7d07a7e96d1081}{%
-           family={{Scarlotta Seedless Consortium}},
-           familyi={S\bibinitperiod}}}%
-      }
-      \strng{namehash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
-      \strng{fullhash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
-      \strng{fullhashraw}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
-      \strng{bibnamehash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
-      \strng{authorbibnamehash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
-      \strng{authornamehash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
-      \strng{authorfullhash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
-      \strng{authorfullhashraw}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
-      \field{extraname}{1}
-      \field{sortinit}{S}
-      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{journaltitle}{Foods}
-      \field{number}{5}
-      \field{title}{Assessment of Scarlotta Seedless table grape maturation and quality}
-      \field{volume}{11}
-      \field{year}{2022}
-      \field{pages}{663}
-      \range{pages}{1}
-    \endentry
-    \entry{Scarlotta2024}{article}{}{}
-      \true{moreauthor}
-      \true{morelabelname}
-      \name{author}{1}{}{%
-        {{un=0,uniquepart=base,hash=78d6affc3a98b283ad7d07a7e96d1081}{%
-           family={{Scarlotta Seedless Consortium}},
-           familyi={S\bibinitperiod}}}%
-      }
-      \strng{namehash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
-      \strng{fullhash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
-      \strng{fullhashraw}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
-      \strng{bibnamehash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
-      \strng{authorbibnamehash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
-      \strng{authornamehash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
-      \strng{authorfullhash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
-      \strng{authorfullhashraw}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
-      \field{extraname}{2}
-      \field{sortinit}{S}
-      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{journaltitle}{Postharvest Biology and Technology}
-      \field{title}{Impact of storage temperature on postharvest quality of Scarlotta Seedless}
-      \field{volume}{215}
-      \field{year}{2024}
-      \field{pages}{113013}
-      \range{pages}{1}
-    \endentry
     \entry{agronomy12102437}{article}{}{}
       \name{author}{3}{}{%
         {{un=0,uniquepart=base,hash=8889bdd2d53198474776dfe4464b2248}{%
@@ -3059,12 +2791,12 @@
     \endentry
     \entry{shaw2002}{book}{}{}
       \name{author}{2}{}{%
-        {{un=0,uniquepart=base,hash=a1f1c077e6536d93ac1f40bf9ba342dc}{%
+        {{un=1,uniquepart=given,hash=a1f1c077e6536d93ac1f40bf9ba342dc}{%
            family={Shaw},
            familyi={S\bibinitperiod},
            given={G.},
            giveni={G\bibinitperiod},
-           givenun=0}}%
+           givenun=1}}%
         {{un=0,uniquepart=base,hash=50529a5017106e07af6c5c290d760cac}{%
            family={Manolakis},
            familyi={M\bibinitperiod},
@@ -3087,11 +2819,47 @@
       \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
       \field{extradatescope}{labelyear}
       \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{Hyperspectral imaging remote sensing}
       \field{year}{2002}
+    \endentry
+    \entry{Shaw2003}{article}{}{}
+      \name{author}{2}{}{%
+        {{un=1,uniquepart=given,hash=71cf275d34e7e507cfb4d32cc49c0367}{%
+           family={Shaw},
+           familyi={S\bibinitperiod},
+           given={Gary\bibnamedelima A.},
+           giveni={G\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=1}}%
+        {{un=0,uniquepart=base,hash=fa8e687cc4df8f5126c2ce026beb0ba9}{%
+           family={Burke},
+           familyi={B\bibinitperiod},
+           given={Hsiao-hua\bibnamedelima K.},
+           giveni={H\bibinithyphendelim h\bibinitperiod\bibinitdelim K\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{cae1e5135a8b2bff25143f341566377e}
+      \strng{fullhash}{cae1e5135a8b2bff25143f341566377e}
+      \strng{fullhashraw}{cae1e5135a8b2bff25143f341566377e}
+      \strng{bibnamehash}{cae1e5135a8b2bff25143f341566377e}
+      \strng{authorbibnamehash}{cae1e5135a8b2bff25143f341566377e}
+      \strng{authornamehash}{cae1e5135a8b2bff25143f341566377e}
+      \strng{authorfullhash}{cae1e5135a8b2bff25143f341566377e}
+      \strng{authorfullhashraw}{cae1e5135a8b2bff25143f341566377e}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Lincoln Laboratory Journal}
+      \field{number}{1}
+      \field{title}{Spectral Imaging for Remote Sensing}
+      \field{volume}{14}
+      \field{year}{2003}
+      \field{pages}{3\bibrangedash 28}
+      \range{pages}{26}
     \endentry
     \entry{sun2024fruit}{article}{}{}
       \name{author}{3}{}{%
@@ -3595,64 +3363,6 @@
       \verb 10.3390/s150511889
       \endverb
     \endentry
-    \entry{xu2025overview}{article}{}{}
-      \name{author}{5}{}{%
-        {{un=0,uniquepart=base,hash=05a5aac206c23ae274c6b86ca689f642}{%
-           family={Xu},
-           familyi={X\bibinitperiod},
-           given={Jingcheng},
-           giveni={J\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=f538a30c83635e6b0662a968b510eb3a}{%
-           family={Chen},
-           familyi={C\bibinitperiod},
-           given={Linghui},
-           giveni={L\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=91093f0fdb8f02578d9bee60c73634ad}{%
-           family={Dong},
-           familyi={D\bibinitperiod},
-           given={Jun},
-           giveni={J\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=689f769dde26cd11bae8c95eead14db1}{%
-           family={Jiang},
-           familyi={J\bibinitperiod},
-           given={Linfang},
-           giveni={L\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=ebd955e63991939ec63f2d07e85566b4}{%
-           family={Hong},
-           familyi={H\bibinitperiod},
-           given={Li},
-           giveni={L\bibinitperiod},
-           givenun=0}}%
-      }
-      \list{publisher}{1}{%
-        {Frontiers Media SA}%
-      }
-      \strng{namehash}{6ea1da680041df833fa3a359ab6f5e5c}
-      \strng{fullhash}{da44759220f9f702aa31517b68b34ea9}
-      \strng{fullhashraw}{da44759220f9f702aa31517b68b34ea9}
-      \strng{bibnamehash}{da44759220f9f702aa31517b68b34ea9}
-      \strng{authorbibnamehash}{da44759220f9f702aa31517b68b34ea9}
-      \strng{authornamehash}{6ea1da680041df833fa3a359ab6f5e5c}
-      \strng{authorfullhash}{da44759220f9f702aa31517b68b34ea9}
-      \strng{authorfullhashraw}{da44759220f9f702aa31517b68b34ea9}
-      \field{sortinit}{X}
-      \field{sortinithash}{1965c258adceecf23ce3d67b05113442}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{journaltitle}{Frontiers in Sustainable Food Systems}
-      \field{title}{Overview of fruit cracking in sweet cherry (Prunus avium L.): causes, testing methods, mitigation strategies, and research perspectives}
-      \field{volume}{9}
-      \field{year}{2025}
-      \field{pages}{1534778}
-      \range{pages}{1}
-    \endentry
     \entry{yang2025jafc}{article}{}{}
       \name{author}{7}{}{%
         {{un=0,uniquepart=base,hash=7c12c6bb81a430b19d464d25687cbb9c}{%
@@ -3821,6 +3531,47 @@
       \verb https://www.sciencedirect.com/science/article/pii/S2468014125000020
       \endverb
       \keyw{,Aquaporin,Fruit cracking,Mesocarp cell,,Water absorption}
+    \endentry
+    \entry{Yuen2010}{article}{}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=513ec09248d3061d645dfe0bf7aacc44}{%
+           family={Yuen},
+           familyi={Y\bibinitperiod},
+           given={Peter\bibnamedelimb W.\bibnamedelimi T.},
+           giveni={P\bibinitperiod\bibinitdelim W\bibinitperiod\bibinitdelim T\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=35d41f46e6f0feebc748be902b1e6b17}{%
+           family={Richardson},
+           familyi={R\bibinitperiod},
+           given={Mark},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{c99f7aa69f5e4a03f497d435855f6c71}
+      \strng{fullhash}{c99f7aa69f5e4a03f497d435855f6c71}
+      \strng{fullhashraw}{c99f7aa69f5e4a03f497d435855f6c71}
+      \strng{bibnamehash}{c99f7aa69f5e4a03f497d435855f6c71}
+      \strng{authorbibnamehash}{c99f7aa69f5e4a03f497d435855f6c71}
+      \strng{authornamehash}{c99f7aa69f5e4a03f497d435855f6c71}
+      \strng{authorfullhash}{c99f7aa69f5e4a03f497d435855f6c71}
+      \strng{authorfullhashraw}{c99f7aa69f5e4a03f497d435855f6c71}
+      \field{sortinit}{Y}
+      \field{sortinithash}{fd67ad5a9ef0f7456bdd9aab10fe1495}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{The Imaging Science Journal}
+      \field{number}{5}
+      \field{title}{An introduction to hyperspectral imaging and its application for security, surveillance and target acquisition}
+      \field{volume}{58}
+      \field{year}{2010}
+      \field{pages}{241\bibrangedash 253}
+      \range{pages}{13}
+      \verb{doi}
+      \verb 10.1179/174313110X12771950995716
+      \endverb
     \endentry
     \entry{plants14162462}{article}{}{}
       \name{author}{6}{}{%
@@ -4220,40 +3971,6 @@
       \endverb
       \verb{url}
       \verb https://www.sciencedirect.com/science/article/pii/S1386142525007498
-      \endverb
-    \endentry
-    \entry{Zwinkels2015}{inbook}{}{}
-      \name{author}{1}{}{%
-        {{un=0,uniquepart=base,hash=015221accdd3df5a3e85c186a8abefd5}{%
-           family={Zwinkels},
-           familyi={Z\bibinitperiod},
-           given={J.\bibnamedelimi C.},
-           giveni={J\bibinitperiod\bibinitdelim C\bibinitperiod},
-           givenun=0}}%
-      }
-      \list{publisher}{1}{%
-        {Springer}%
-      }
-      \strng{namehash}{015221accdd3df5a3e85c186a8abefd5}
-      \strng{fullhash}{015221accdd3df5a3e85c186a8abefd5}
-      \strng{fullhashraw}{015221accdd3df5a3e85c186a8abefd5}
-      \strng{bibnamehash}{015221accdd3df5a3e85c186a8abefd5}
-      \strng{authorbibnamehash}{015221accdd3df5a3e85c186a8abefd5}
-      \strng{authornamehash}{015221accdd3df5a3e85c186a8abefd5}
-      \strng{authorfullhash}{015221accdd3df5a3e85c186a8abefd5}
-      \strng{authorfullhashraw}{015221accdd3df5a3e85c186a8abefd5}
-      \field{sortinit}{Z}
-      \field{sortinithash}{96892c0b0a36bb8557c40c49813d48b3}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{booktitle}{Encyclopedia of Color Science and Technology}
-      \field{title}{Spectrophotometry}
-      \field{year}{2015}
-      \verb{doi}
-      \verb 10.1007/978-1-4419-8071-7_221
       \endverb
     \endentry
   \enddatalist
@@ -4470,39 +4187,6 @@
       \endverb
       \keyw{Deep learning,CNN,Smart farming,Weed and pest detection,Disease detection,Yield estimation}
     \endentry
-    \entry{ball2007field}{book}{}{}
-      \name{author}{1}{}{%
-        {{un=0,uniquepart=base,hash=7deba6762adab6f8765ff4889fb122e9}{%
-           family={Ball},
-           familyi={B\bibinitperiod},
-           given={S.\bibnamedelimi R.},
-           giveni={S\bibinitperiod\bibinitdelim R\bibinitperiod},
-           givenun=0}}%
-      }
-      \list{location}{1}{%
-        {Bellingham, WA}%
-      }
-      \list{publisher}{1}{%
-        {SPIE Press}%
-      }
-      \strng{namehash}{7deba6762adab6f8765ff4889fb122e9}
-      \strng{fullhash}{7deba6762adab6f8765ff4889fb122e9}
-      \strng{fullhashraw}{7deba6762adab6f8765ff4889fb122e9}
-      \strng{bibnamehash}{7deba6762adab6f8765ff4889fb122e9}
-      \strng{authorbibnamehash}{7deba6762adab6f8765ff4889fb122e9}
-      \strng{authornamehash}{7deba6762adab6f8765ff4889fb122e9}
-      \strng{authorfullhash}{7deba6762adab6f8765ff4889fb122e9}
-      \strng{authorfullhashraw}{7deba6762adab6f8765ff4889fb122e9}
-      \field{sortinit}{B}
-      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{Field guide to spectroscopy}
-      \field{year}{2007}
-    \endentry
     \entry{behmann2018specim}{article}{}{}
       \true{moreauthor}
       \true{morelabelname}
@@ -4594,41 +4278,35 @@
       \field{pages}{441}
       \range{pages}{1}
     \endentry
-    \entry{benelli2020hyperspectral}{article}{}{}
-      \name{author}{4}{}{%
-        {{un=0,uniquepart=base,hash=c60be5504f5931ff976bbac797747c39}{%
+    \entry{Benelli2020}{article}{}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=ea624824485e4c9ee9349b842abb7c44}{%
            family={Benelli},
            familyi={B\bibinitperiod},
-           given={A.},
+           given={Alessandro},
            giveni={A\bibinitperiod},
            givenun=0}}%
-        {{un=0,uniquepart=base,hash=1759862faff85f22b585533f7b473688}{%
+        {{un=0,uniquepart=base,hash=87e21dd6de3ae55869646a3dca9460a0}{%
            family={Cevoli},
            familyi={C\bibinitperiod},
-           given={C.},
+           given={Cristian},
            giveni={C\bibinitperiod},
            givenun=0}}%
-        {{un=0,uniquepart=base,hash=7b05d716e3e476294a149180cb6f3df4}{%
+        {{un=0,uniquepart=base,hash=d930110c0aa6ec3c12e9f540f516f024}{%
            family={Fabbri},
            familyi={F\bibinitperiod},
-           given={A.},
+           given={Alessandro},
            giveni={A\bibinitperiod},
            givenun=0}}%
-        {{un=0,uniquepart=base,hash=80914010dafd6e69b58533814f980bb9}{%
-           family={Ragni},
-           familyi={R\bibinitperiod},
-           given={L.},
-           giveni={L\bibinitperiod},
-           givenun=0}}%
       }
-      \strng{namehash}{bf330f2cf993bb9b48d31839a9334b8c}
-      \strng{fullhash}{eb25ebdfc5744b284ee40ba37f1addd1}
-      \strng{fullhashraw}{eb25ebdfc5744b284ee40ba37f1addd1}
-      \strng{bibnamehash}{eb25ebdfc5744b284ee40ba37f1addd1}
-      \strng{authorbibnamehash}{eb25ebdfc5744b284ee40ba37f1addd1}
-      \strng{authornamehash}{bf330f2cf993bb9b48d31839a9334b8c}
-      \strng{authorfullhash}{eb25ebdfc5744b284ee40ba37f1addd1}
-      \strng{authorfullhashraw}{eb25ebdfc5744b284ee40ba37f1addd1}
+      \strng{namehash}{cc7e5f57b8d04ea49bc881cf0f565a22}
+      \strng{fullhash}{e6eb42f8b8aa096249df144e358311ba}
+      \strng{fullhashraw}{e6eb42f8b8aa096249df144e358311ba}
+      \strng{bibnamehash}{e6eb42f8b8aa096249df144e358311ba}
+      \strng{authorbibnamehash}{e6eb42f8b8aa096249df144e358311ba}
+      \strng{authornamehash}{cc7e5f57b8d04ea49bc881cf0f565a22}
+      \strng{authorfullhash}{e6eb42f8b8aa096249df144e358311ba}
+      \strng{authorfullhashraw}{e6eb42f8b8aa096249df144e358311ba}
       \field{sortinit}{B}
       \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
       \field{extradatescope}{labelyear}
@@ -4636,14 +4314,15 @@
       \true{uniqueprimaryauthor}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
-      \field{journaltitle}{Biosystems Engineering}
-      \field{title}{Hyperspectral imaging and mini-video devices for non-destructive analysis of fruit quality: A review}
-      \field{volume}{192}
+      \field{journaltitle}{Journal of Agricultural Engineering}
+      \field{number}{3}
+      \field{title}{In-field hyperspectral imaging: An overview on the ground-based applications in agriculture}
+      \field{volume}{51}
       \field{year}{2020}
-      \field{pages}{142\bibrangedash 152}
+      \field{pages}{129\bibrangedash 139}
       \range{pages}{11}
       \verb{doi}
-      \verb 10.1016/j.biosystemseng.2020.01.018
+      \verb 10.4081/jae.2020.1030
       \endverb
     \endentry
     \entry{benos2021machine}{article}{}{}
@@ -5304,64 +4983,6 @@
       \field{pages}{14\bibrangedash 22}
       \range{pages}{9}
     \endentry
-    \entry{c5ae649d7cf34cb7aaf3b08a25dbd79d}{article}{}{}
-      \name{author}{5}{}{%
-        {{un=0,uniquepart=base,hash=1b268bda513279fe9546259e8d68a477}{%
-           family={Fass},
-           familyi={F\bibinitperiod},
-           given={Eitan},
-           giveni={E\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=5a735ccf5d61a65400345312786febb1}{%
-           family={Shlomi},
-           familyi={S\bibinitperiod},
-           given={Eldar},
-           giveni={E\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=db36efec8eb6f29c505ed7d9f694a905}{%
-           family={Ziv},
-           familyi={Z\bibinitperiod},
-           given={Carmit},
-           giveni={C\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=355733350a1f09825df20b4c4effa3a8}{%
-           family={Glikman},
-           familyi={G\bibinitperiod},
-           given={Oren},
-           giveni={O\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=994665910c7c1199974fe5e2506e0661}{%
-           family={Helman},
-           familyi={H\bibinitperiod},
-           given={David},
-           giveni={D\bibinitperiod},
-           givenun=0}}%
-      }
-      \strng{namehash}{b8ecdeaac236ee800f495418c25f64a0}
-      \strng{fullhash}{b1794507bd92a4ec48f7043e83af66b9}
-      \strng{fullhashraw}{b1794507bd92a4ec48f7043e83af66b9}
-      \strng{bibnamehash}{b1794507bd92a4ec48f7043e83af66b9}
-      \strng{authorbibnamehash}{b1794507bd92a4ec48f7043e83af66b9}
-      \strng{authornamehash}{b8ecdeaac236ee800f495418c25f64a0}
-      \strng{authorfullhash}{b1794507bd92a4ec48f7043e83af66b9}
-      \strng{authorfullhashraw}{b1794507bd92a4ec48f7043e83af66b9}
-      \field{sortinit}{F}
-      \field{sortinithash}{2638baaa20439f1b5a8f80c6c08a13b4}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{journaltitle}{Computers and Electronics in Agriculture}
-      \field{title}{Machine learning models based on hyperspectral imaging for pre-harvest tomato fruit quality monitoring}
-      \field{volume}{229}
-      \field{year}{2025}
-      \field{pages}{109788}
-      \range{pages}{1}
-      \verb{doi}
-      \verb 10.1016/j.compag.2024.109788
-      \endverb
-    \endentry
     \entry{su16146064}{article}{}{}
       \name{author}{3}{}{%
         {{un=0,uniquepart=base,hash=7f84e8a4035b14f0c78ec0b7cbc2fcec}{%
@@ -5907,43 +5528,6 @@
       \verb 10.3390/rs12142254
       \endverb
     \endentry
-    \entry{kaltenborn2025data}{article}{}{}
-      \true{moreauthor}
-      \true{morelabelname}
-      \name{author}{1}{}{%
-        {{un=0,uniquepart=base,hash=7d50623c603c87a3b4b6604ab0b382cd}{%
-           family={Kaltenborn},
-           familyi={K\bibinitperiod},
-           given={J},
-           giveni={J\bibinitperiod},
-           givenun=0}}%
-      }
-      \list{publisher}{1}{%
-        {Nature Publishing Group}%
-      }
-      \strng{namehash}{a6119f7ea22e74f9137ae8d4dbea5155}
-      \strng{fullhash}{a6119f7ea22e74f9137ae8d4dbea5155}
-      \strng{fullhashraw}{a6119f7ea22e74f9137ae8d4dbea5155}
-      \strng{bibnamehash}{a6119f7ea22e74f9137ae8d4dbea5155}
-      \strng{authorbibnamehash}{a6119f7ea22e74f9137ae8d4dbea5155}
-      \strng{authornamehash}{a6119f7ea22e74f9137ae8d4dbea5155}
-      \strng{authorfullhash}{a6119f7ea22e74f9137ae8d4dbea5155}
-      \strng{authorfullhashraw}{a6119f7ea22e74f9137ae8d4dbea5155}
-      \field{sortinit}{K}
-      \field{sortinithash}{c02bf6bff1c488450c352b40f5d853ab}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{journaltitle}{Scientific Reports}
-      \field{number}{1}
-      \field{title}{Data splitting to avoid information leakage with DataSAIL}
-      \field{volume}{15}
-      \field{year}{2025}
-      \field{pages}{1\bibrangedash 15}
-      \range{pages}{15}
-    \endentry
     \entry{kanwal2025quality}{article}{}{}
       \name{author}{9}{}{%
         {{un=0,uniquepart=base,hash=a8a30e0e6eea33e1bb7acb6cb7606e5e}{%
@@ -6309,35 +5893,47 @@
       \field{pages}{265\bibrangedash 271}
       \range{pages}{7}
     \endentry
-    \entry{liu2023sensors}{article}{}{}
-      \name{author}{3}{}{%
-        {{un=0,uniquepart=base,hash=ce084360cc68e7db4fe6cae1287b3adf}{%
+    \entry{LIU2025117630}{article}{}{}
+      \name{author}{5}{}{%
+        {{un=0,uniquepart=base,hash=1b0ec7a92a6562bfce637ef1a63d371a}{%
            family={Liu},
            familyi={L\bibinitperiod},
-           given={Y.},
-           giveni={Y\bibinitperiod},
+           given={Chaoxian},
+           giveni={C\bibinitperiod},
            givenun=0}}%
-        {{un=0,uniquepart=base,hash=32e563370422457790db030ab2c13183}{%
-           family={Zhang},
+        {{un=0,uniquepart=base,hash=b2152e7656a6e6eb5a286a54efa58521}{%
+           family={Wu},
+           familyi={W\bibinitperiod},
+           given={Xubo},
+           giveni={X\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=3dd44b70c82b6af3bcd68a8f6b96826b}{%
+           family={Yang},
+           familyi={Y\bibinitperiod},
+           given={Weiqiang},
+           giveni={W\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=02b493731e67c9b4e48842d2d0ab5e9f}{%
+           family={Zeng},
            familyi={Z\bibinitperiod},
-           given={H.},
-           giveni={H\bibinitperiod},
+           given={Shan},
+           giveni={S\bibinitperiod},
            givenun=0}}%
-        {{un=0,uniquepart=base,hash=3702f1c146e64a6c91fc47b81ea59fc7}{%
+        {{un=0,uniquepart=base,hash=89724312e7e4efa566ffc7f1cce50527}{%
            family={Wang},
            familyi={W\bibinitperiod},
-           given={J.},
+           given={Jianxun},
            giveni={J\bibinitperiod},
            givenun=0}}%
       }
-      \strng{namehash}{0954792dbe24f33db81eda5a866f3dba}
-      \strng{fullhash}{201c1e8e8375c524a4b95017df19b00d}
-      \strng{fullhashraw}{201c1e8e8375c524a4b95017df19b00d}
-      \strng{bibnamehash}{201c1e8e8375c524a4b95017df19b00d}
-      \strng{authorbibnamehash}{201c1e8e8375c524a4b95017df19b00d}
-      \strng{authornamehash}{0954792dbe24f33db81eda5a866f3dba}
-      \strng{authorfullhash}{201c1e8e8375c524a4b95017df19b00d}
-      \strng{authorfullhashraw}{201c1e8e8375c524a4b95017df19b00d}
+      \strng{namehash}{f597e3520aac25449720d3a156211c47}
+      \strng{fullhash}{24218cdebeb53b55bcc9b32ad87daf94}
+      \strng{fullhashraw}{24218cdebeb53b55bcc9b32ad87daf94}
+      \strng{bibnamehash}{24218cdebeb53b55bcc9b32ad87daf94}
+      \strng{authorbibnamehash}{24218cdebeb53b55bcc9b32ad87daf94}
+      \strng{authornamehash}{f597e3520aac25449720d3a156211c47}
+      \strng{authorfullhash}{24218cdebeb53b55bcc9b32ad87daf94}
+      \strng{authorfullhashraw}{24218cdebeb53b55bcc9b32ad87daf94}
       \field{sortinit}{L}
       \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
       \field{extradatescope}{labelyear}
@@ -6345,13 +5941,24 @@
       \true{uniqueprimaryauthor}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
-      \field{journaltitle}{Sensors}
-      \field{title}{Early Detection of Plant Physiological Stress Using {VIS--NIR} Hyperspectral Imaging}
-      \field{volume}{23}
-      \field{year}{2023}
+      \field{abstract}{Hyperspectral imaging (HSI) has revolutionized the non-destructive detection of fruit defects by integrating spectral and spatial information. However, detecting early-stage minor bruises in apples remains challenging due to weak hyperspectral signals, high data dimensionality, and low computational efficiency. To address these issues, this study proposes a novel hyperspectral apple bruise detection network, termed 3D-HDI. The model constructs a backbone network using multiple 3D convolutions and integrates a feature enhancement module with a path aggregation network to amplify spectral signals and improve damage differentiation. Furthermore, it replaces pixel-by-pixel classification with a region-based detection head, significantly enhancing computational efficiency and accuracy. Experimental results demonstrate that the proposed model achieves a higher recognition rate (96.25\%) while maintaining comparable detection efficiency, outperforming traditional classification networks such as 3D-EfficientNet, 3D-MobileNet, and 3D-AlexNet. This research advances the application of HSI and deep learning in fruit quality assessment, providing a robust solution for early-stage bruises detection.}
+      \field{issn}{0963-9969}
+      \field{journaltitle}{Food Research International}
+      \field{title}{Early detection of apple bruises using spectral-spatial enhanced 3D CNN and region-based hyperspectral analysis}
+      \field{volume}{222}
+      \field{year}{2025}
+      \field{pages}{117630}
+      \range{pages}{1}
       \verb{doi}
-      \verb 10.3390/s23083915
+      \verb https://doi.org/10.1016/j.foodres.2025.117630
       \endverb
+      \verb{urlraw}
+      \verb https://www.sciencedirect.com/science/article/pii/S0963996925019684
+      \endverb
+      \verb{url}
+      \verb https://www.sciencedirect.com/science/article/pii/S0963996925019684
+      \endverb
+      \keyw{Hyperspectral imaging,Non-destructive detection,Deep learning,Feature enhancement,3D convolution}
     \endentry
     \entry{Lu2020OpticalPropertiesReview}{article}{}{}
       \name{author}{5}{}{%
@@ -6587,101 +6194,6 @@
       \field{year}{2017}
       \field{pages}{49\bibrangedash 67}
       \range{pages}{19}
-    \endentry
-    \entry{horticulturae11050466}{article}{}{}
-      \name{author}{10}{}{%
-        {{un=0,uniquepart=base,hash=969d12e0b4e1fdf360d2117061d79d9b}{%
-           family={Monteiro},
-           familyi={M\bibinitperiod},
-           given={Harleson\bibnamedelimb Sidney\bibnamedelima Almeida},
-           giveni={H\bibinitperiod\bibinitdelim S\bibinitperiod\bibinitdelim A\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=593af594f551d10796218384ade59b8f}{%
-           family={Tecchio},
-           familyi={T\bibinitperiod},
-           given={Marco\bibnamedelima Antonio},
-           giveni={M\bibinitperiod\bibinitdelim A\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=f7fb19c0da74746ebef313b07f09d4ee}{%
-           family={Brito},
-           familyi={B\bibinitperiod},
-           given={Sinara\bibnamedelimb de\bibnamedelimb Nazaré\bibnamedelima Santana},
-           giveni={S\bibinitperiod\bibinitdelim d\bibinitperiod\bibinitdelim N\bibinitperiod\bibinitdelim S\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=3c1f7595fa3a07e3f9fc7267b29cb84c}{%
-           family={Neto},
-           familyi={N\bibinitperiod},
-           given={Francisco\bibnamedelimb José\bibnamedelima Domingues},
-           giveni={F\bibinitperiod\bibinitdelim J\bibinitperiod\bibinitdelim D\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=99a708a6ecaf26e0d71a5bbeb7017992}{%
-           family={Sánchez},
-           familyi={S\bibinitperiod},
-           given={Camilo\bibnamedelimb André\bibnamedelimb Pereira\bibnamedelima Contreras},
-           giveni={C\bibinitperiod\bibinitdelim A\bibinitperiod\bibinitdelim P\bibinitperiod\bibinitdelim C\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=1f4a78c2bc5398785464474028b5dd5e}{%
-           family={Alonso},
-           familyi={A\bibinitperiod},
-           given={Juan\bibnamedelima Carlos},
-           giveni={J\bibinitperiod\bibinitdelim C\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=86c2d4d24975b362071f004e7c93911b}{%
-           family={Feliciano},
-           familyi={F\bibinitperiod},
-           given={Daví\bibnamedelimb Eduardo\bibnamedelima Furno},
-           giveni={D\bibinitperiod\bibinitdelim E\bibinitperiod\bibinitdelim F\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=a2aad6cc05beaf1b67d9f39b488913e2}{%
-           family={Maniero},
-           familyi={M\bibinitperiod},
-           given={Carolina\bibnamedelima Ragoni},
-           giveni={C\bibinitperiod\bibinitdelim R\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=6f6e52b425fa749e0380528f56f108f2}{%
-           family={Cunha},
-           familyi={C\bibinitperiod},
-           given={Pedro\bibnamedelimb Henrique\bibnamedelima Hortolani},
-           giveni={P\bibinitperiod\bibinitdelim H\bibinitperiod\bibinitdelim H\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=512c96cb380b69869da02b1828d96bf3}{%
-           family={Silva},
-           familyi={S\bibinitperiod},
-           given={Marcelo\bibnamedelimb de\bibnamedelima Souza},
-           giveni={M\bibinitperiod\bibinitdelim d\bibinitperiod\bibinitdelim S\bibinitperiod},
-           givenun=0}}%
-      }
-      \strng{namehash}{c7df69db9d27ca614d35ca5091142856}
-      \strng{fullhash}{cd6da7ea0df1ffcc34500a77bee2bd9d}
-      \strng{fullhashraw}{cd6da7ea0df1ffcc34500a77bee2bd9d}
-      \strng{bibnamehash}{cd6da7ea0df1ffcc34500a77bee2bd9d}
-      \strng{authorbibnamehash}{cd6da7ea0df1ffcc34500a77bee2bd9d}
-      \strng{authornamehash}{c7df69db9d27ca614d35ca5091142856}
-      \strng{authorfullhash}{cd6da7ea0df1ffcc34500a77bee2bd9d}
-      \strng{authorfullhashraw}{cd6da7ea0df1ffcc34500a77bee2bd9d}
-      \field{sortinit}{M}
-      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{abstract}{The cultivation of table grapes in Brazil is economically significant, with production influenced by edaphoclimatic factors and rootstock selection. The cultivar 'BRS Núbia' (Vitis vinifera L. x Vitis labrusca L.) is a promising alternative; however, its phenological behavior, thermal requirements, and compatibility with different rootstocks under subtropical conditions require further evaluation. This study aimed to assess the duration of phenological stages, thermal requirement, and ripening dynamics of 'BRS Núbia' grapevines grafted onto the rootstocks 'IAC 572 Jales', 'IAC 766 Campinas', and 'Paulsen 1103'. The experiment was conducted in São Manuel, São Paulo, Brazil during the 2021 and 2022 production cycles using a split-plot experimental design (3 × 2). Evaluations included the duration of phenological stages from pruning to budburst, flowering, fruit set, onset of ripening, and harvest, as well as the ripening curve and thermal accumulation from pruning to harvest. Rootstocks did not significantly affect (p > 0.05) the duration of phenological stages; however, differences were observed between production cycles. The 2022 cycle was longer (167.7 days) compared to 2021 (142.6 days), with greater thermal accumulation (1871.7 GDDs vs. 1743.4 GDDs). The analysis of phenological stages revealed that, across both production cycles evaluated, the 'BRS Núbia' cultivar required an average accumulation of 1807.5 growing degree days from pruning to harvest. Soluble solids content ranged from 17.43 to 18.50°Brix, and titratable acidity decreased throughout maturation. The maturation index was highest in vines grafted onto 'Paulsen 1103', indicating its positive influence on fruit quality. The 'BRS Núbia' grapevine exhibited a mean thermal requirement of 1807.5 growing degree days (GDDs) to complete its phenological cycle, which lasted approximately 150 days under subtropical conditions.}
-      \field{issn}{2311-7524}
-      \field{journaltitle}{Horticulturae}
-      \field{number}{5}
-      \field{title}{Phenological Development, Thermal Requirement, and Quality of 'BRS Núbia' (Vitis vinifera L. x Vitis labrusca L.) Grapes on Different Rootstocks}
-      \field{volume}{11}
-      \field{year}{2025}
-      \verb{doi}
-      \verb 10.3390/horticulturae11050466
-      \endverb
-      \verb{urlraw}
-      \verb https://www.mdpi.com/2311-7524/11/5/466
-      \endverb
-      \verb{url}
-      \verb https://www.mdpi.com/2311-7524/11/5/466
-      \endverb
     \endentry
     \entry{Moon2020EnzymaticBrowning}{article}{}{}
       \name{author}{4}{}{%
@@ -7180,69 +6692,6 @@
       \field{pages}{1130857}
       \range{pages}{1}
     \endentry
-    \entry{Scarlotta2022}{article}{}{}
-      \true{moreauthor}
-      \true{morelabelname}
-      \name{author}{1}{}{%
-        {{un=0,uniquepart=base,hash=78d6affc3a98b283ad7d07a7e96d1081}{%
-           family={{Scarlotta Seedless Consortium}},
-           familyi={S\bibinitperiod}}}%
-      }
-      \strng{namehash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
-      \strng{fullhash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
-      \strng{fullhashraw}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
-      \strng{bibnamehash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
-      \strng{authorbibnamehash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
-      \strng{authornamehash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
-      \strng{authorfullhash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
-      \strng{authorfullhashraw}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
-      \field{extraname}{1}
-      \field{sortinit}{S}
-      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{journaltitle}{Foods}
-      \field{number}{5}
-      \field{title}{Assessment of Scarlotta Seedless table grape maturation and quality}
-      \field{volume}{11}
-      \field{year}{2022}
-      \field{pages}{663}
-      \range{pages}{1}
-    \endentry
-    \entry{Scarlotta2024}{article}{}{}
-      \true{moreauthor}
-      \true{morelabelname}
-      \name{author}{1}{}{%
-        {{un=0,uniquepart=base,hash=78d6affc3a98b283ad7d07a7e96d1081}{%
-           family={{Scarlotta Seedless Consortium}},
-           familyi={S\bibinitperiod}}}%
-      }
-      \strng{namehash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
-      \strng{fullhash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
-      \strng{fullhashraw}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
-      \strng{bibnamehash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
-      \strng{authorbibnamehash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
-      \strng{authornamehash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
-      \strng{authorfullhash}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
-      \strng{authorfullhashraw}{8ec0f73c716d7e8fb5e015d8e95ab6c1}
-      \field{extraname}{2}
-      \field{sortinit}{S}
-      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{journaltitle}{Postharvest Biology and Technology}
-      \field{title}{Impact of storage temperature on postharvest quality of Scarlotta Seedless}
-      \field{volume}{215}
-      \field{year}{2024}
-      \field{pages}{113013}
-      \range{pages}{1}
-    \endentry
     \entry{agronomy12102437}{article}{}{}
       \name{author}{3}{}{%
         {{un=0,uniquepart=base,hash=8889bdd2d53198474776dfe4464b2248}{%
@@ -7298,12 +6747,12 @@
     \endentry
     \entry{shaw2002}{book}{}{}
       \name{author}{2}{}{%
-        {{un=0,uniquepart=base,hash=a1f1c077e6536d93ac1f40bf9ba342dc}{%
+        {{un=1,uniquepart=given,hash=a1f1c077e6536d93ac1f40bf9ba342dc}{%
            family={Shaw},
            familyi={S\bibinitperiod},
            given={G.},
            giveni={G\bibinitperiod},
-           givenun=0}}%
+           givenun=1}}%
         {{un=0,uniquepart=base,hash=50529a5017106e07af6c5c290d760cac}{%
            family={Manolakis},
            familyi={M\bibinitperiod},
@@ -7326,11 +6775,47 @@
       \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
       \field{extradatescope}{labelyear}
       \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{Hyperspectral imaging remote sensing}
       \field{year}{2002}
+    \endentry
+    \entry{Shaw2003}{article}{}{}
+      \name{author}{2}{}{%
+        {{un=1,uniquepart=given,hash=71cf275d34e7e507cfb4d32cc49c0367}{%
+           family={Shaw},
+           familyi={S\bibinitperiod},
+           given={Gary\bibnamedelima A.},
+           giveni={G\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=1}}%
+        {{un=0,uniquepart=base,hash=fa8e687cc4df8f5126c2ce026beb0ba9}{%
+           family={Burke},
+           familyi={B\bibinitperiod},
+           given={Hsiao-hua\bibnamedelima K.},
+           giveni={H\bibinithyphendelim h\bibinitperiod\bibinitdelim K\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{cae1e5135a8b2bff25143f341566377e}
+      \strng{fullhash}{cae1e5135a8b2bff25143f341566377e}
+      \strng{fullhashraw}{cae1e5135a8b2bff25143f341566377e}
+      \strng{bibnamehash}{cae1e5135a8b2bff25143f341566377e}
+      \strng{authorbibnamehash}{cae1e5135a8b2bff25143f341566377e}
+      \strng{authornamehash}{cae1e5135a8b2bff25143f341566377e}
+      \strng{authorfullhash}{cae1e5135a8b2bff25143f341566377e}
+      \strng{authorfullhashraw}{cae1e5135a8b2bff25143f341566377e}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Lincoln Laboratory Journal}
+      \field{number}{1}
+      \field{title}{Spectral Imaging for Remote Sensing}
+      \field{volume}{14}
+      \field{year}{2003}
+      \field{pages}{3\bibrangedash 28}
+      \range{pages}{26}
     \endentry
     \entry{sun2024fruit}{article}{}{}
       \name{author}{3}{}{%
@@ -7834,64 +7319,6 @@
       \verb 10.3390/s150511889
       \endverb
     \endentry
-    \entry{xu2025overview}{article}{}{}
-      \name{author}{5}{}{%
-        {{un=0,uniquepart=base,hash=05a5aac206c23ae274c6b86ca689f642}{%
-           family={Xu},
-           familyi={X\bibinitperiod},
-           given={Jingcheng},
-           giveni={J\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=f538a30c83635e6b0662a968b510eb3a}{%
-           family={Chen},
-           familyi={C\bibinitperiod},
-           given={Linghui},
-           giveni={L\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=91093f0fdb8f02578d9bee60c73634ad}{%
-           family={Dong},
-           familyi={D\bibinitperiod},
-           given={Jun},
-           giveni={J\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=689f769dde26cd11bae8c95eead14db1}{%
-           family={Jiang},
-           familyi={J\bibinitperiod},
-           given={Linfang},
-           giveni={L\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=ebd955e63991939ec63f2d07e85566b4}{%
-           family={Hong},
-           familyi={H\bibinitperiod},
-           given={Li},
-           giveni={L\bibinitperiod},
-           givenun=0}}%
-      }
-      \list{publisher}{1}{%
-        {Frontiers Media SA}%
-      }
-      \strng{namehash}{6ea1da680041df833fa3a359ab6f5e5c}
-      \strng{fullhash}{da44759220f9f702aa31517b68b34ea9}
-      \strng{fullhashraw}{da44759220f9f702aa31517b68b34ea9}
-      \strng{bibnamehash}{da44759220f9f702aa31517b68b34ea9}
-      \strng{authorbibnamehash}{da44759220f9f702aa31517b68b34ea9}
-      \strng{authornamehash}{6ea1da680041df833fa3a359ab6f5e5c}
-      \strng{authorfullhash}{da44759220f9f702aa31517b68b34ea9}
-      \strng{authorfullhashraw}{da44759220f9f702aa31517b68b34ea9}
-      \field{sortinit}{X}
-      \field{sortinithash}{1965c258adceecf23ce3d67b05113442}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{journaltitle}{Frontiers in Sustainable Food Systems}
-      \field{title}{Overview of fruit cracking in sweet cherry (Prunus avium L.): causes, testing methods, mitigation strategies, and research perspectives}
-      \field{volume}{9}
-      \field{year}{2025}
-      \field{pages}{1534778}
-      \range{pages}{1}
-    \endentry
     \entry{yang2025jafc}{article}{}{}
       \name{author}{7}{}{%
         {{un=0,uniquepart=base,hash=7c12c6bb81a430b19d464d25687cbb9c}{%
@@ -8060,6 +7487,47 @@
       \verb https://www.sciencedirect.com/science/article/pii/S2468014125000020
       \endverb
       \keyw{,Aquaporin,Fruit cracking,Mesocarp cell,,Water absorption}
+    \endentry
+    \entry{Yuen2010}{article}{}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=513ec09248d3061d645dfe0bf7aacc44}{%
+           family={Yuen},
+           familyi={Y\bibinitperiod},
+           given={Peter\bibnamedelimb W.\bibnamedelimi T.},
+           giveni={P\bibinitperiod\bibinitdelim W\bibinitperiod\bibinitdelim T\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=35d41f46e6f0feebc748be902b1e6b17}{%
+           family={Richardson},
+           familyi={R\bibinitperiod},
+           given={Mark},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{c99f7aa69f5e4a03f497d435855f6c71}
+      \strng{fullhash}{c99f7aa69f5e4a03f497d435855f6c71}
+      \strng{fullhashraw}{c99f7aa69f5e4a03f497d435855f6c71}
+      \strng{bibnamehash}{c99f7aa69f5e4a03f497d435855f6c71}
+      \strng{authorbibnamehash}{c99f7aa69f5e4a03f497d435855f6c71}
+      \strng{authornamehash}{c99f7aa69f5e4a03f497d435855f6c71}
+      \strng{authorfullhash}{c99f7aa69f5e4a03f497d435855f6c71}
+      \strng{authorfullhashraw}{c99f7aa69f5e4a03f497d435855f6c71}
+      \field{sortinit}{Y}
+      \field{sortinithash}{fd67ad5a9ef0f7456bdd9aab10fe1495}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{The Imaging Science Journal}
+      \field{number}{5}
+      \field{title}{An introduction to hyperspectral imaging and its application for security, surveillance and target acquisition}
+      \field{volume}{58}
+      \field{year}{2010}
+      \field{pages}{241\bibrangedash 253}
+      \range{pages}{13}
+      \verb{doi}
+      \verb 10.1179/174313110X12771950995716
+      \endverb
     \endentry
     \entry{plants14162462}{article}{}{}
       \name{author}{6}{}{%
@@ -8459,40 +7927,6 @@
       \endverb
       \verb{url}
       \verb https://www.sciencedirect.com/science/article/pii/S1386142525007498
-      \endverb
-    \endentry
-    \entry{Zwinkels2015}{inbook}{}{}
-      \name{author}{1}{}{%
-        {{un=0,uniquepart=base,hash=015221accdd3df5a3e85c186a8abefd5}{%
-           family={Zwinkels},
-           familyi={Z\bibinitperiod},
-           given={J.\bibnamedelimi C.},
-           giveni={J\bibinitperiod\bibinitdelim C\bibinitperiod},
-           givenun=0}}%
-      }
-      \list{publisher}{1}{%
-        {Springer}%
-      }
-      \strng{namehash}{015221accdd3df5a3e85c186a8abefd5}
-      \strng{fullhash}{015221accdd3df5a3e85c186a8abefd5}
-      \strng{fullhashraw}{015221accdd3df5a3e85c186a8abefd5}
-      \strng{bibnamehash}{015221accdd3df5a3e85c186a8abefd5}
-      \strng{authorbibnamehash}{015221accdd3df5a3e85c186a8abefd5}
-      \strng{authornamehash}{015221accdd3df5a3e85c186a8abefd5}
-      \strng{authorfullhash}{015221accdd3df5a3e85c186a8abefd5}
-      \strng{authorfullhashraw}{015221accdd3df5a3e85c186a8abefd5}
-      \field{sortinit}{Z}
-      \field{sortinithash}{96892c0b0a36bb8557c40c49813d48b3}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{booktitle}{Encyclopedia of Color Science and Technology}
-      \field{title}{Spectrophotometry}
-      \field{year}{2015}
-      \verb{doi}
-      \verb 10.1007/978-1-4419-8071-7_221
       \endverb
     \endentry
   \enddatalist

@@ -1,54 +1,57 @@
+\select@language {english}
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {1.1}{\ignorespaces Grape berry cracking and decay progression}}{9}{figure.1.1}%
+\contentsline {figure}{\numberline {\@@number {\@@number {1}.\@@number {1}}}{\ignorespaces Grape berry cracking and decay progression}}{\@@number {9}}{figure.1.1}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {2.1}{\ignorespaces The compact biological pathway from skin cracking to a sour rot epidemic in the grape cluster, showing a clean layout without text hyphenation.}}{14}{figure.2.1}%
-\contentsline {figure}{\numberline {2.2}{\ignorespaces Illustration of hyperspectral imaging (HSI). (A) A hyperspectral data cube containing spatial information across multiple wavelength bands. (B) The spectral signature of a representative pixel selected from the cube.}}{17}{figure.2.2}%
-\contentsline {figure}{\numberline {2.3}{\ignorespaces Segments of the electromagnetic spectrum commonly used in hyperspectral imaging (Middleton Spectral Vision, n.d.).}}{18}{figure.2.3}%
-\addvspace {10\p@ }
-\addvspace {10\p@ }
-\contentsline {figure}{\numberline {4.1}{\ignorespaces Lachish vineyard overview}}{26}{figure.4.1}%
-\contentsline {figure}{\numberline {4.2}{\ignorespaces Vineyard map and tagged cluster}}{27}{figure.4.2}%
-\contentsline {figure}{\numberline {4.3}{\ignorespaces Specim IQ HSI field setup}}{28}{figure.4.3}%
-\contentsline {figure}{\numberline {4.4}{\ignorespaces FLIR T1020 thermal imaging setup}}{29}{figure.4.4}%
-\contentsline {figure}{\numberline {4.5}{\ignorespaces HSI--RGB annotation GUI}}{32}{figure.4.5}%
-\contentsline {figure}{\numberline {4.6}{\ignorespaces Boundary buffer for grape ROIs}}{32}{figure.4.6}%
-\contentsline {figure}{\numberline {4.7}{\ignorespaces Effect of SNV normalization}}{35}{figure.4.7}%
-\contentsline {figure}{\numberline {4.8}{\ignorespaces LOGO cross-validation: problem and solution}}{36}{figure.4.8}%
-\contentsline {figure}{\numberline {4.9}{\ignorespaces Row-based training and evaluation protocol}}{37}{figure.4.9}%
-\contentsline {figure}{\numberline {4.10}{\ignorespaces Schematic of the symmetric autoencoder used for anomaly detection. The encoder compresses the input spectral vector into a compact latent space (bottleneck), and the decoder reconstructs the original spectrum. The reconstruction error serves as the anomaly score.}}{39}{figure.4.10}%
-\contentsline {figure}{\numberline {4.11}{\ignorespaces Whole-image crack-detection pipeline from pixel-level CRACK probabilities to image-level classification via spatial aggregation.}}{41}{figure.4.11}%
-\contentsline {figure}{\numberline {4.12}{\ignorespaces Interactive EDA interface for the whole-image pipeline}}{41}{figure.4.12}%
-\addvspace {10\p@ }
-\contentsline {figure}{\numberline {5.1}{\ignorespaces Mean spectral signatures: healthy vs.\ cracked tissue}}{46}{figure.5.1}%
-\contentsline {figure}{\numberline {5.2}{\ignorespaces Wavelength-wise spectral separability metrics}}{47}{figure.5.2}%
-\contentsline {figure}{\numberline {5.3}{\ignorespaces True-positive detection pipeline example}}{53}{figure.5.3}%
-\contentsline {figure}{\numberline {5.4}{\ignorespaces BFS performance trajectories vs.\ number of wavelengths}}{55}{figure.5.4}%
-\contentsline {figure}{\numberline {5.5}{\ignorespaces BFS PR--AUC threshold markers}}{56}{figure.5.5}%
-\contentsline {figure}{\numberline {5.6}{\ignorespaces Top-30 wavelength popularity across BFS seeds}}{58}{figure.5.6}%
-\contentsline {figure}{\numberline {5.7}{\ignorespaces Top-30 wavelength popularity by bin size}}{59}{figure.5.7}%
-\contentsline {figure}{\numberline {5.8}{\ignorespaces Consensus wavelength bins with spectral interpretation}}{61}{figure.5.8}%
-\addvspace {10\p@ }
-\contentsline {figure}{\numberline {6.1}{\ignorespaces SNV normalization: removing illumination-induced baselines}}{63}{figure.6.1}%
-\contentsline {figure}{\numberline {6.2}{\ignorespaces Multi-class vs.\ binary crack-probability maps}}{64}{figure.6.2}%
-\contentsline {figure}{\numberline {6.3}{\ignorespaces Whole-image spatial aggregation pipeline overview}}{65}{figure.6.3}%
-\contentsline {figure}{\numberline {6.4}{\ignorespaces Proposed spectral--spatial cascade for false-positive reduction}}{66}{figure.6.4}%
+\contentsline {figure}{\numberline {\@@number {\@@number {2}.\@@number {1}}}{\ignorespaces The compact biological pathway from skin cracking to a sour rot epidemic in the grape cluster, showing a clean layout without text hyphenation.}}{\@@number {14}}{figure.2.1}%
+\contentsline {figure}{\numberline {\@@number {\@@number {2}.\@@number {2}}}{\ignorespaces Illustration of hyperspectral imaging (HSI). (A) A hyperspectral data cube containing spatial information across multiple wavelength bands. (B) The spectral signature of a representative pixel selected from the cube.}}{\@@number {17}}{figure.2.2}%
+\contentsline {figure}{\numberline {\@@number {\@@number {2}.\@@number {3}}}{\ignorespaces Segments of the electromagnetic spectrum commonly used in hyperspectral imaging (Middleton Spectral Vision, n.d.).}}{\@@number {18}}{figure.2.3}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {A.1}{\ignorespaces Regional mean reflectance by VIS/NIR range}}{75}{figure.A.1}%
-\contentsline {figure}{\numberline {A.2}{\ignorespaces BFS F1 threshold markers}}{80}{figure.A.2}%
-\contentsline {figure}{\numberline {A.3}{\ignorespaces Wavelength selection frequency: top-30 (2\,nm window)}}{84}{figure.A.3}%
-\contentsline {figure}{\numberline {A.4}{\ignorespaces BFS stability heatmap: top-30, 5\,nm bins}}{85}{figure.A.4}%
-\contentsline {figure}{\numberline {A.5}{\ignorespaces Top-11 wavelength popularity across BFS seeds}}{86}{figure.A.5}%
-\contentsline {figure}{\numberline {A.6}{\ignorespaces Top-11 wavelength popularity by bin size}}{86}{figure.A.6}%
-\contentsline {figure}{\numberline {A.7}{\ignorespaces BFS stability heatmap: top-11, 5\,nm bins}}{87}{figure.A.7}%
-\contentsline {figure}{\numberline {A.8}{\ignorespaces Wavelength selection frequency: top-11 (2\,nm window)}}{88}{figure.A.8}%
-\contentsline {figure}{\numberline {A.9}{\ignorespaces Annotation tool: healthy cluster labeling}}{89}{figure.A.9}%
-\contentsline {figure}{\numberline {A.10}{\ignorespaces Annotation tool: cracked cluster labeling}}{90}{figure.A.10}%
-\contentsline {figure}{\numberline {A.11}{\ignorespaces True Positive example 1}}{91}{figure.A.11}%
-\contentsline {figure}{\numberline {A.12}{\ignorespaces True Positive example 2}}{92}{figure.A.12}%
-\contentsline {figure}{\numberline {A.13}{\ignorespaces True Positive example 3}}{93}{figure.A.13}%
-\contentsline {figure}{\numberline {A.14}{\ignorespaces False Positive example 1: small branch}}{94}{figure.A.14}%
-\contentsline {figure}{\numberline {A.15}{\ignorespaces False Positive example 2: small branch}}{95}{figure.A.15}%
-\contentsline {figure}{\numberline {A.16}{\ignorespaces False Positive example 3: branch-like structure}}{96}{figure.A.16}%
-\contentsline {figure}{\numberline {A.17}{\ignorespaces False Positive example 4: multiple branches}}{97}{figure.A.17}%
-\contentsline {figure}{\numberline {A.18}{\ignorespaces Specim IQ NIR spectral artifacts (Behmann et al.)}}{98}{figure.A.18}%
+\contentsline {figure}{\numberline {\@@number {\@@number {4}.\@@number {1}}}{\ignorespaces Lachish vineyard overview}}{\@@number {26}}{figure.4.1}%
+\contentsline {figure}{\numberline {\@@number {\@@number {4}.\@@number {2}}}{\ignorespaces Vineyard map and tagged cluster}}{\@@number {27}}{figure.4.2}%
+\contentsline {figure}{\numberline {\@@number {\@@number {4}.\@@number {3}}}{\ignorespaces Specim IQ HSI field setup}}{\@@number {28}}{figure.4.3}%
+\contentsline {figure}{\numberline {\@@number {\@@number {4}.\@@number {4}}}{\ignorespaces FLIR T1020 thermal imaging setup}}{\@@number {29}}{figure.4.4}%
+\contentsline {figure}{\numberline {\@@number {\@@number {4}.\@@number {5}}}{\ignorespaces HSI--RGB annotation GUI}}{\@@number {32}}{figure.4.5}%
+\contentsline {figure}{\numberline {\@@number {\@@number {4}.\@@number {6}}}{\ignorespaces Boundary buffer for grape ROIs}}{\@@number {32}}{figure.4.6}%
+\contentsline {figure}{\numberline {\@@number {\@@number {4}.\@@number {7}}}{\ignorespaces Effect of SNV normalization}}{\@@number {35}}{figure.4.7}%
+\contentsline {figure}{\numberline {\@@number {\@@number {4}.\@@number {8}}}{\ignorespaces LOGO cross-validation: problem and solution}}{\@@number {36}}{figure.4.8}%
+\contentsline {figure}{\numberline {\@@number {\@@number {4}.\@@number {9}}}{\ignorespaces Row-based training and evaluation protocol}}{\@@number {37}}{figure.4.9}%
+\contentsline {figure}{\numberline {\@@number {\@@number {4}.\@@number {10}}}{\ignorespaces Schematic of the symmetric autoencoder used for anomaly detection. The encoder compresses the input spectral vector into a compact latent space (bottleneck), and the decoder reconstructs the original spectrum. The reconstruction error serves as the anomaly score.}}{\@@number {39}}{figure.4.10}%
+\contentsline {figure}{\numberline {\@@number {\@@number {4}.\@@number {11}}}{\ignorespaces Whole-image crack-detection pipeline from pixel-level CRACK probabilities to image-level classification via spatial aggregation.}}{\@@number {41}}{figure.4.11}%
+\contentsline {figure}{\numberline {\@@number {\@@number {4}.\@@number {12}}}{\ignorespaces Interactive EDA interface for the whole-image pipeline}}{\@@number {41}}{figure.4.12}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {\@@number {\@@number {5}.\@@number {1}}}{\ignorespaces Mean spectral signatures: healthy vs.\ cracked tissue}}{\@@number {46}}{figure.5.1}%
+\contentsline {figure}{\numberline {\@@number {\@@number {5}.\@@number {2}}}{\ignorespaces Wavelength-wise spectral separability metrics}}{\@@number {47}}{figure.5.2}%
+\contentsline {figure}{\numberline {\@@number {\@@number {5}.\@@number {3}}}{\ignorespaces True-positive detection pipeline example}}{\@@number {53}}{figure.5.3}%
+\contentsline {figure}{\numberline {\@@number {\@@number {5}.\@@number {4}}}{\ignorespaces BFS performance trajectories vs.\ number of wavelengths}}{\@@number {55}}{figure.5.4}%
+\contentsline {figure}{\numberline {\@@number {\@@number {5}.\@@number {5}}}{\ignorespaces BFS PR--AUC threshold markers}}{\@@number {56}}{figure.5.5}%
+\contentsline {figure}{\numberline {\@@number {\@@number {5}.\@@number {6}}}{\ignorespaces Top-30 wavelength popularity across BFS seeds}}{\@@number {58}}{figure.5.6}%
+\contentsline {figure}{\numberline {\@@number {\@@number {5}.\@@number {7}}}{\ignorespaces Top-30 wavelength popularity by bin size}}{\@@number {59}}{figure.5.7}%
+\contentsline {figure}{\numberline {\@@number {\@@number {5}.\@@number {8}}}{\ignorespaces Consensus wavelength bins with spectral interpretation}}{\@@number {61}}{figure.5.8}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {\@@number {\@@number {6}.\@@number {1}}}{\ignorespaces SNV normalization: removing illumination-induced baselines}}{\@@number {63}}{figure.6.1}%
+\contentsline {figure}{\numberline {\@@number {\@@number {6}.\@@number {2}}}{\ignorespaces Multi-class vs.\ binary crack-probability maps}}{\@@number {64}}{figure.6.2}%
+\contentsline {figure}{\numberline {\@@number {\@@number {6}.\@@number {3}}}{\ignorespaces Whole-image spatial aggregation pipeline overview}}{\@@number {65}}{figure.6.3}%
+\contentsline {figure}{\numberline {\@@number {\@@number {6}.\@@number {4}}}{\ignorespaces Proposed spectral--spatial cascade for false-positive reduction}}{\@@number {66}}{figure.6.4}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {\@@number {\if@rl \Hebrewnumeral {1}\else A\fi .\@@number {1}}}{\ignorespaces Regional mean reflectance by VIS/NIR range}}{\@@number {75}}{figure.A.1}%
+\contentsline {figure}{\numberline {\@@number {\if@rl \Hebrewnumeral {1}\else A\fi .\@@number {2}}}{\ignorespaces BFS F1 threshold markers}}{\@@number {80}}{figure.A.2}%
+\contentsline {figure}{\numberline {\@@number {\if@rl \Hebrewnumeral {1}\else A\fi .\@@number {3}}}{\ignorespaces Wavelength selection frequency: top-30 (2\,nm window)}}{\@@number {84}}{figure.A.3}%
+\contentsline {figure}{\numberline {\@@number {\if@rl \Hebrewnumeral {1}\else A\fi .\@@number {4}}}{\ignorespaces BFS stability heatmap: top-30, 5\,nm bins}}{\@@number {85}}{figure.A.4}%
+\contentsline {figure}{\numberline {\@@number {\if@rl \Hebrewnumeral {1}\else A\fi .\@@number {5}}}{\ignorespaces Top-11 wavelength popularity across BFS seeds}}{\@@number {86}}{figure.A.5}%
+\contentsline {figure}{\numberline {\@@number {\if@rl \Hebrewnumeral {1}\else A\fi .\@@number {6}}}{\ignorespaces Top-11 wavelength popularity by bin size}}{\@@number {86}}{figure.A.6}%
+\contentsline {figure}{\numberline {\@@number {\if@rl \Hebrewnumeral {1}\else A\fi .\@@number {7}}}{\ignorespaces BFS stability heatmap: top-11, 5\,nm bins}}{\@@number {87}}{figure.A.7}%
+\contentsline {figure}{\numberline {\@@number {\if@rl \Hebrewnumeral {1}\else A\fi .\@@number {8}}}{\ignorespaces Wavelength selection frequency: top-11 (2\,nm window)}}{\@@number {88}}{figure.A.8}%
+\contentsline {figure}{\numberline {\@@number {\if@rl \Hebrewnumeral {1}\else A\fi .\@@number {9}}}{\ignorespaces Annotation tool: healthy cluster labeling}}{\@@number {89}}{figure.A.9}%
+\contentsline {figure}{\numberline {\@@number {\if@rl \Hebrewnumeral {1}\else A\fi .\@@number {10}}}{\ignorespaces Annotation tool: cracked cluster labeling}}{\@@number {90}}{figure.A.10}%
+\contentsline {figure}{\numberline {\@@number {\if@rl \Hebrewnumeral {1}\else A\fi .\@@number {11}}}{\ignorespaces True Positive example 1}}{\@@number {91}}{figure.A.11}%
+\contentsline {figure}{\numberline {\@@number {\if@rl \Hebrewnumeral {1}\else A\fi .\@@number {12}}}{\ignorespaces True Positive example 2}}{\@@number {92}}{figure.A.12}%
+\contentsline {figure}{\numberline {\@@number {\if@rl \Hebrewnumeral {1}\else A\fi .\@@number {13}}}{\ignorespaces True Positive example 3}}{\@@number {93}}{figure.A.13}%
+\contentsline {figure}{\numberline {\@@number {\if@rl \Hebrewnumeral {1}\else A\fi .\@@number {14}}}{\ignorespaces False Positive example 1: small branch}}{\@@number {94}}{figure.A.14}%
+\contentsline {figure}{\numberline {\@@number {\if@rl \Hebrewnumeral {1}\else A\fi .\@@number {15}}}{\ignorespaces False Positive example 2: small branch}}{\@@number {95}}{figure.A.15}%
+\contentsline {figure}{\numberline {\@@number {\if@rl \Hebrewnumeral {1}\else A\fi .\@@number {16}}}{\ignorespaces False Positive example 3: branch-like structure}}{\@@number {96}}{figure.A.16}%
+\contentsline {figure}{\numberline {\@@number {\if@rl \Hebrewnumeral {1}\else A\fi .\@@number {17}}}{\ignorespaces False Positive example 4: multiple branches}}{\@@number {97}}{figure.A.17}%
+\contentsline {figure}{\numberline {\@@number {\if@rl \Hebrewnumeral {1}\else A\fi .\@@number {18}}}{\ignorespaces Specim IQ NIR spectral artifacts (Behmann et al.)}}{\@@number {98}}{figure.A.18}%
+\select@language {english}
+\select@language {english}

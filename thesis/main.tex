@@ -11,6 +11,7 @@
 \usepackage[T1]{fontenc}        % Font encoding for better character rendering
 \usepackage{lmodern}            % High-quality scalable Latin Modern fonts
 \usepackage[utf8]{inputenc}
+\usepackage[hebrew,english]{babel}
 
 \usepackage[backend=biber,style=apa]{biblatex}
 \DeclareLanguageMapping{english}{english-apa}
@@ -72,17 +73,13 @@
 % =====================================================================
 
 
-% --- Title Page Information ---
-\title{Early Detection of Cracking in Grapes under Field Conditions using Hyperspectral Imaging and Machine Learning}
-\author{By Yovel Gani\\[1ex]\textit{Supervised by:}\\Dr. Alon Sela, Prof. Victor Alchanatis, Prof. Irad Ben-Gal}
-\date{August 2026\\[1ex]A thesis submitted toward the degree of Master of Science (M.Sc.)}
-
-
 \begin{document}
 
-\maketitle
-
+\input{frontmatter/title_outer_en}
+\input{frontmatter/title_inner_en}
+\input{chapters/acknowledgments}
 \input{chapters/abstract}
+
 
 \tableofcontents
 \listoffigures
@@ -93,8 +90,6 @@
 \input{chapters/objectives_hypotheses}
 \input{chapters/materials_methods}
 \input{chapters/results_new}
-% \input{chapters/discussions_new}
-% \input{chapters/conclusions}
 \input{chapters/discussion.tex}
 \input{chapters/conclusions.tex}
 
@@ -102,4 +97,8 @@
 \input{chapters/appendix_results}
 
 \printbibliography
+
+\input{frontmatter/title_inner_he}
+\input{frontmatter/title_outer_he}
+
 \end{document}
