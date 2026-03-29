@@ -9,11 +9,12 @@
 \input{glyphtounicode}          % Map glyph names to Unicode for PDF extraction
 \pdfgentounicode=1              % Enable Unicode character map generation
 \usepackage[T1]{fontenc}        % Font encoding for better character rendering
-\usepackage{lmodern}            % High-quality scalable Latin Modern fonts
+\usepackage{times}              % Guideline-safe Times-style Latin text font
 \usepackage[utf8]{inputenc}
 \usepackage[hebrew,english]{babel}
+\usepackage{csquotes}
 
-\usepackage[backend=biber,style=apa]{biblatex}
+\usepackage[backend=biber,style=apa,doi=false,url=false,eprint=false]{biblatex}
 \DeclareLanguageMapping{english}{english-apa}
 \addbibresource{bibliography/references.bib}
 
@@ -24,7 +25,7 @@
 \usepackage{amssymb}       % For \mathbb and additional math symbols
 \usepackage{graphicx}       % Required for inserting images
 \usepackage{booktabs}       % For professional-looking tables
-\usepackage[margin=1in]{geometry} % Set 1-inch margins
+\usepackage[inner=3cm,outer=2cm,top=2.5cm,bottom=2.5cm]{geometry} % TAU-style thesis margins
 \usepackage{setspace}       % To control line spacing
 \usepackage{float}          % For [H] float placement
 \onehalfspacing             % Set line spacing to 1.5 for readability
@@ -45,6 +46,7 @@
 
 \newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
 
+\providecommand{\eng}[1]{\foreignlanguage{english}{#1}}
 
 \newcommand{\TODO}[1]{\textcolor{red}{\textbf{TODO: #1}}}
 
@@ -75,15 +77,42 @@
 
 \begin{document}
 
+% ============================
+% FRONT MATTER (Roman numerals)
+% ============================
+\pagenumbering{roman}
+\setcounter{page}{1}
+
 \input{frontmatter/title_outer_en}
 \input{frontmatter/title_inner_en}
+\input{frontmatter/title_outer_he}
+\input{frontmatter/title_inner_he}
+
 \input{chapters/acknowledgments}
+
+\input{frontmatter/abstract_he}
+\clearpage
+
 \input{chapters/abstract}
+\clearpage
 
 
 \tableofcontents
+\clearpage
+\input{frontmatter/abbreviations_symbols}
+\clearpage
 \listoffigures
+\clearpage
 \listoftables
+\clearpage
+
+% Optional list of abbreviations/symbols can be inserted here in the future.
+
+% ============================
+% MAIN MATTER (Arabic numerals)
+% ============================
+\pagenumbering{arabic}
+\setcounter{page}{1}
 
 \input{chapters/introduction}
 \input{chapters/literature_review}
@@ -92,13 +121,10 @@
 \input{chapters/results_new}
 \input{chapters/discussion.tex}
 \input{chapters/conclusions.tex}
-
+\printbibliography[heading=bibintoc]
 \appendix
 \input{chapters/appendix_results}
 
-\printbibliography
 
-\input{frontmatter/title_inner_he}
-\input{frontmatter/title_outer_he}
 
 \end{document}

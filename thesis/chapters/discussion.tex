@@ -120,6 +120,7 @@ The transition from pixel-level classification to whole-image field scenes expos
 \noindent
 Visual inspection of the whole-image outputs showed that the remaining false positives were driven mainly by dry woody branches, and occasionally by plastic markers. This confusion is biologically plausible: cracked tissue and dry wood both exhibit reduced water content and oxidized tissue, yielding similar VIS--NIR signatures under field conditions.
 
+\clearpage
 \subsection{Geometric Filtering and Structural Regularization}
 \noindent
 To address this residual spectral ambiguity, the pipeline incorporated spatial and geometric context. True berry cracks appeared as dense, compact pixel clusters on the berry surface, whereas branch-related responses appeared as elongated or diffuse structures. The final whole-image pipeline therefore applied morphological filtering to consolidate dense crack responses into blobs, followed by patch-based density evaluation to retain only spatially concentrated regions (Figure~\ref{fig:whole_image_pipeline_2}).
@@ -164,6 +165,7 @@ Although the auxiliary CNN achieved high accuracy on isolated calibration segmen
 \medskip\noindent
 Despite this limitation, the general concept remains promising. Future versions could benefit from scale-aware networks, improved ROI handling, or end-to-end training schemes that avoid severe resizing artifacts.
 
+\clearpage
 \section{Dimensionality Reduction, Algorithm Selection, and Sensor Design}
 \label{sec:dimensionality_and_sensors}
 

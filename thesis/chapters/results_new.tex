@@ -53,7 +53,7 @@ The mean spectral reflectance signatures ($\pm$\,SD) for healthy and cracked gra
 
 \FloatBarrier
 
-\newpage
+% \newpage
 
 
 % \noindent
@@ -65,7 +65,7 @@ The mean spectral reflectance signatures ($\pm$\,SD) for healthy and cracked gra
 To quantify the discriminatory power of individual spectral bands, three complementary metrics were examined (Figure~\ref{fig:spectral_separability}): \textbf{Absolute Mean Difference ($|\Delta\mu|$)}, reflecting the raw reflectance gap between classes; \textbf{Cohen's $d$~\parencite{cohen1988statistical}}, reflecting the standardized separation between class means; and the \textbf{Fisher Score~\parencite{duda2001pattern}}, reflecting the ratio of between-class separation to within-class spread.
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.95\textwidth]{figures/results/spectral_signatures/separability_metrics.png}
+    \includegraphics[width=0.6\textwidth]{figures/results/spectral_signatures/separability_metrics.png}
     \caption[Wavelength-wise spectral separability metrics]{Wavelength-wise spectral separability metrics between healthy and cracked tissue, including absolute mean difference, Cohen's $d$, and Fisher score.}
     \label{fig:spectral_separability}
 \end{figure}
@@ -74,7 +74,7 @@ To quantify the discriminatory power of individual spectral bands, three complem
 
 \noindent
 The separability metrics indicate that class separation is substantially higher in the NIR region, with peak discriminability consistently observed between 727--757\,nm. As detailed in the regional summaries in Appendix~\ref{app:vis_nir_summary}, healthy tissue reflectance exceeds that of cracked tissue by an average of 32\% in the NIR and 37\% in the VIS range. These clear physical differences confirm \hyperref[hyp:spectral_distinguishability]{Hypothesis~1} and provide the basis for automated classification.
-\clearpage
+% \clearpage
 \begin{landscape}
 \thispagestyle{plain}
 
@@ -103,7 +103,7 @@ Table~\ref{tab:pixel_metrics_unbalanced} reports performance across LOGO folds (
 % Binary pixel table (compact version)
 \begin{minipage}{\linewidth}
     \centering
-    \captionof{table}{Pixel-level classification metrics (unbalanced, binary setting). Truncated mean values. Full cross-validation statistics in Appendix~\ref{app:cv_statistics}.}
+    \captionof{table}[Pixel-level classification metrics (unbalanced, binary setting)]{Pixel-level classification metrics (unbalanced, binary setting). Truncated mean values. Full cross-validation statistics in Appendix~\ref{app:cv_statistics}.}
     \label{tab:pixel_metrics_unbalanced}
     \small
     \renewcommand{\arraystretch}{1.25}
@@ -129,7 +129,7 @@ All five models achieve PR--AUC\textsubscript{CRACK} $\geq 0.987$ (Table~\ref{ta
 
 \end{landscape}
 
-\clearpage
+% \clearpage
 \begin{landscape}
 \thispagestyle{plain}
 \section{Pixel-Level Multi-Class Classification}
@@ -490,7 +490,7 @@ CRACK F1      & 0.985 & 159 & 105 & 0.980 & 88  & 0.975 \\
 
 \FloatBarrier
 
-\clearpage
+% \clearpage
 \begin{landscape}
 
 \subsection{End-to-End Wavelength-Selection Results}
@@ -527,7 +527,7 @@ Late  & 159 & \textbf{0.833} & 0.825 & 0.833 & \textbf{0.882} & \textbf{0.857} &
 The results strongly confirm \hyperref[hyp:spectral_efficiency]{Hypothesis~5}. Notably, the top-30 subset achieves an F1\textsubscript{CRACK} of 0.813 under early-stage conditions, effectively matching and even slightly exceeding the 159-band baseline ($F1{=}0.800$). This slight improvement suggests that removing noisy or redundant spectral bands can actually enhance model generalization. Furthermore, even the extremely compact top-11 subset maintains robust late-stage detection ($F1_{CRACK} = 0.840$), demonstrating that the core discriminative information is preserved despite a 93\% reduction in spectral dimensionality.
 
 \end{landscape}
-\clearpage
+% \clearpage
 
 \FloatBarrier
 
@@ -553,7 +553,7 @@ Figure~\ref{fig:stability_30_popularity} visualizes the individual selection fre
 
 \FloatBarrier
 
-\newpage
+% \newpage
 % \subsubsection{Effect of Spectral Binning on Popularity}
 % \noindent
 % Figure~\ref{fig:stability_30_binning} demonstrates how progressively coarser spectral binning consolidates individual wavelength selections into broader regions. Note that the $y$-axis reports the \emph{total number of wavelength selections} pooled across all five seeds; because each seed contributes up to 30 wavelengths, multiple selections from different seeds (or even from the same seed) can fall into a single bin, producing counts greater than~5.
@@ -645,7 +645,7 @@ To properly interpret the charts, it is important to clarify how the counts are 
 
 % \FloatBarrier
 
-\newpage
+% \newpage
 \subsubsection{Consensus on Specific Spectral Bins}
 \noindent
 While Figure~\ref{fig:stability_30_binning} illustrates the overall density of selections, it is critical to identify the specific wavelengths that consistently drove the model's decisions. To evaluate this, seed-level presence was analyzed: a 5\,nm bin was counted once per seed regardless of how many individual wavelengths that specific seed placed within it. 
@@ -673,7 +673,7 @@ Table~\ref{tab:stable_bins} summarizes the most robust spectral regions discover
 \noindent
 Table~\ref{tab:binned_jaccard_summary} confirms regional stability, showing that coarser binning systematically increases the mean pairwise subset similarity across all seeds.
 
-\FloatBarrier
+
 
 \begin{table}[!htbp]
 \centering

@@ -14,7 +14,7 @@ This chapter details the experimental design, data acquisition procedures, and c
 % -----------------------------
 % DATA ACQUISITION
 % -----------------------------
-\clearpage
+% \clearpage
 \section{Data Acquisition}
 
 \subsection{Study Area and Experimental Design}
@@ -153,7 +153,7 @@ All imaging systems were spatially co-aligned to the target clusters during acqu
 % PREPROCESSING
 % -----------------------------
 
-\clearpage
+% \clearpage
 \section{Dataset Construction and Partitioning}
 \label{sec:dataset_construction}
 
@@ -206,7 +206,7 @@ The annotation workflow leveraged foundation vision models to overcome the low s
 % \noindent
 % Using this workflow, the annotator labeled berry regions with visible fissures as \textsc{CRACK} and intact tissue as \textsc{REGULAR}; background elements were assigned to dedicated non-grape classes. A binary pixel-level dataset was first constructed from grape tissues only, then expanded into a 10-class taxonomy (Table~\ref{tab:multiclass_pixel_distribution}) to enable rejection of vineyard clutter during whole-image inference.
 
-\newpage
+% \newpage
 \medskip
 \noindent
 \textbf{Labeling criteria.}
@@ -447,7 +447,7 @@ To ensure spectral signatures remained faithful to the true tissue physiology, t
 
 % Following the global spectral preprocessing, the intensity values across these 159 dimensions were normalized to a range of $[-1, 1]$. Consequently, the input for the machine learning models consisted of 159 normalized features per record, accurately representing the full spectral profile of a single pixel in a tabular format suitable for XGBoost and the other evaluated algorithms.
 
-\newpage
+% \newpage
 \subsection{Data Partitioning and Leakage Prevention Strategies}
 \label{subsec:leakage_control}
 
@@ -566,7 +566,7 @@ Supervised classification was applied at the pixel level to discriminate between
 \noindent
 \textbf{Algorithm Selection and Training:}
 The supervised classification framework considered six candidate algorithms: PLS-DA, L1-regularized Logistic Regression, SVM with an RBF kernel, Random Forest, a shallow MLP, and XGBoost. The exact comparison set depended on the task formulation and practical computational constraints. XGBoost was adopted as the primary baseline model for the main comparisons and downstream whole-image integration due to its strong predictive performance and favorable computational scalability. Models were evaluated under both naturally unbalanced and balanced training regimes, where the balanced setting was obtained via segment-proportional undersampling to preserve within-class diversity.
-\newpage
+% \newpage
 \subsection{Autoencoder-Based Anomaly Detection}
 \label{subsec:anomaly_detection}
 
@@ -576,7 +576,7 @@ To explore whether crack damage could be identified without explicit positive la
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.75\textwidth]{figures/materials_methods/autoencoder_architecture.png}
-    \caption{Schematic of the symmetric autoencoder used for anomaly detection. The encoder compresses the input spectral vector into a compact latent space (bottleneck), and the decoder reconstructs the original spectrum. The reconstruction error serves as the anomaly score.}
+    \caption[Symmetric autoencoder architecture for anomaly detection]{Schematic of the symmetric autoencoder used for anomaly detection. The encoder compresses the input spectral vector into a compact latent space (bottleneck), and the decoder reconstructs the original spectrum. The reconstruction error serves as the anomaly score.}
     \label{fig:autoencoder_arch}
 \end{figure}
 
@@ -588,7 +588,7 @@ The autoencoder was optimized with Adam and MSE loss, and trained exclusively on
 \end{equation}
 where $\alpha \approx 0.3\tau$ served as a temperature parameter controlling the sharpness of the transition.
 
-\clearpage
+% \clearpage
 \subsection{Whole-Image Detection and Aggregation Pipeline}
 \label{subsec:full_image_pipeline}
 
@@ -633,7 +633,7 @@ The whole-image detection pipeline follows a sequential spatial aggregation proc
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.9\textwidth]{figures/materials_methods/pipeline/whole_image_pipeline.jpg}
-  \caption{Whole-image crack-detection pipeline from pixel-level CRACK probabilities to image-level classification via spatial aggregation.}
+    \caption[Whole-image crack-detection pipeline]{Whole-image crack-detection pipeline from pixel-level CRACK probabilities to image-level classification via spatial aggregation.}
   \label{fig:whole_image_pipeline}
 \end{figure}
 \FloatBarrier
@@ -728,8 +728,7 @@ Unless explicitly subscripted, reported F1 refers to the weighted F1-score.
 \subsection{Reproducibility and Implementation Details}
 
 All experiments were executed in Python using fixed random seeds (default seed = 42) to ensure deterministic data splits and model training. Cross-validation partitions and held-out test sets were kept invariant across runs. Experiment outputs were stored in timestamped directories together with configuration files and cross-validation manifests to enable exact reruns of the reported pipelines.
-
-
+The codebase developed for this thesis is available in a public GitHub repository: \nolinkurl{https://github.com/yovelga/new_grape_project}.
 
 % Modeling and Evaluation Methodology
 % |--- Global Spectral Preprocessing
