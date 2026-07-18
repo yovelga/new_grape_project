@@ -249,6 +249,7 @@ To explore whether crack damage could be identified without the need for exhaust
     \end{tabular}
     \end{adjustbox}
 \end{table}
+\end{landscape}
 
 \noindent
 In the one-class binary setting, the autoencoder achieved PR--AUC\textsubscript{CRACK} ranging from 0.925 to 0.955 (Table~\ref{tab:autoencoder_pixel_results}). However, expanding this to multi-class environments proved ineffective: training exclusively on CRACK pixels resulted in trivial reconstruction (Table~\ref{tab:autoencoder_pixel_results_crack_only_multiclass}), while training on all non-CRACK classes collapsed performance (PR--AUC\textsubscript{CRACK} $\approx 0.01$, Table~\ref{tab:autoencoder_pixel_results_noncrack_multiclass}).
@@ -256,7 +257,6 @@ In the one-class binary setting, the autoencoder achieved PR--AUC\textsubscript{
 \medskip
 \noindent
 Overall, autoencoder-based formulations yielded substantially lower precision-recall performance at the pixel level compared to the supervised XGBoost baseline. Despite this performance gap, the best-performing binary autoencoder was carried forward to the whole-image detection stage to serve as an unsupervised system-level baseline. However, due to its superior discriminative power, the supervised multi-class XGBoost model was selected as the primary engine for the core evaluations and all subsequent wavelength selection (BFS) experiments.
-\end{landscape}
 
 \section{Whole-Image Crack Detection}
 \label{sec:full-image-early-late}
@@ -451,7 +451,7 @@ Having demonstrated robust whole-image detection using the full 159-band spectru
 \subsection{BFS Trajectories and Subset Selection}
 
 \noindent
-The elimination trajectories for both the primary objective (PR--AUC$_{\text{CRACK}}$) and the corresponding F1 score are illustrated in Figure~\ref{fig:bfs_dual_metric}. The curves illustrate a high degree of spectral redundancy; performance remains remarkably stable even as the majority of the original 159 wavelengths are discarded. This suggests that the key physiological markers of grape cracking are tightly concentrated within specific spectral regions rather than distributed across the entire contiguous spectrum.
+The elimination trajectories for both the primary objective (PR--AUC$_{\text{CRACK}}$) and the corresponding F1 score are illustrated in Figure~\ref{fig:bfs_dual_metric}. The curves illustrate a high degree of spectral redundancy; performance remains remarkably stable even as the majority of the original 159 wavelengths are discarded. This suggests that informative spectral patterns associated with crack discrimination are concentrated within specific spectral regions rather than distributed across the entire contiguous spectrum.
 
 \noindent
 To systematically define candidate subsets for the whole-image pipeline, performance drop thresholds of 0.5\% and 1.0\% below the maximum PR--AUC score were established (Figure~\ref{fig:bfs_threshold_markers} in Appendix~\ref{app:bfs_full_precision}). As summarized in Table~\ref{tab:bfs_thresholds_summary}, the more conservative 0.5\% tolerance yields a 30-wavelength subset, while the 1.0\% tolerance isolates an extremely compact 11-wavelength subset.
@@ -524,7 +524,7 @@ Late  & 159 & \textbf{0.833} & 0.825 & 0.833 & \textbf{0.882} & \textbf{0.857} &
 \FloatBarrier
 
 \noindent
-The results strongly confirm \hyperref[hyp:spectral_efficiency]{Hypothesis~5}. Notably, the top-30 subset achieves an F1\textsubscript{CRACK} of 0.813 under early-stage conditions, effectively matching and even slightly exceeding the 159-band baseline ($F1{=}0.800$). This slight improvement suggests that removing noisy or redundant spectral bands can actually enhance model generalization. Furthermore, even the extremely compact top-11 subset maintains robust late-stage detection ($F1_{CRACK} = 0.840$), demonstrating that the core discriminative information is preserved despite a 93\% reduction in spectral dimensionality.
+The results support \hyperref[hyp:spectral_efficiency]{Hypothesis~5} under the evaluated conditions. Notably, the top-30 subset achieves an F1\textsubscript{CRACK} of 0.813 under early-stage conditions, with performance comparable to the 159-band baseline, with a slightly higher early-stage point estimate ($F1{=}0.800$). This result indicates that substantial spectral dimensionality reduction can be achieved without materially compromising detection performance under the evaluated conditions. Furthermore, even the extremely compact top-11 subset maintains robust late-stage detection ($F1_{CRACK} = 0.840$), demonstrating that the core discriminative information is preserved despite a 93\% reduction in spectral dimensionality.
 
 \end{landscape}
 % \clearpage
@@ -651,7 +651,7 @@ To properly interpret the charts, it is important to clarify how the counts are 
 While Figure~\ref{fig:stability_30_binning} illustrates the overall density of selections, it is critical to identify the specific wavelengths that consistently drove the model's decisions. To evaluate this, seed-level presence was analyzed: a 5\,nm bin was counted once per seed regardless of how many individual wavelengths that specific seed placed within it. 
 
 \noindent
-Table~\ref{tab:stable_bins} summarizes the most robust spectral regions discovered. Fourteen distinct 5\,nm bins achieved unanimous consensus (selected by all 5 seeds), and an additional six bins were highly stable (selected by 4 out of 5 seeds). These specific bands represent the optimal candidates for designing a targeted, low-cost multispectral sensor.
+Table~\ref{tab:stable_bins} summarizes the most robust spectral regions discovered. Fourteen distinct 5\\,nm bins achieved unanimous consensus (selected by all 5 seeds), and an additional six bins were highly stable (selected by 4 out of 5 seeds). These specific bands represent promising candidates for the future design of a targeted, low-cost multispectral sensor.
 
 \begin{table}[!htbp]
     \centering

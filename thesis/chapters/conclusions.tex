@@ -5,16 +5,16 @@
 \section{Summary of Contributions}
 \label{sec:summary_contributions}
 \noindent
-This study demonstrated that visible--near-infrared (VIS-NIR) spectral imaging can reliably detect table grape cracking (``Scarlotta Seedless'' cultivar) under uncontrolled field conditions, even during the early stages prior to severe macroscopic degradation. The physical mechanism enabling this detection is deeply rooted in the biomechanics of the crack: the destruction of the waxy cuticle and subsequent cellular water loss produce a highly distinct, depressed reflectance signature, particularly in the NIR plateau and the red-edge inflection.
+This study provides a field-based proof of concept showing that visible–near-infrared (VIS-NIR) spectral imaging can detect table grape cracking in the “Scarlotta Seedless” cultivar under the evaluated vineyard conditions, including at the early stage. The observed spectral patterns are consistent with known optical consequences of cuticle disruption and tissue alteration, particularly in the NIR plateau and red-edge regions.
 
 \medskip\noindent
 Transitioning from controlled laboratory pixel-level analysis to whole-image field deployment exposed significant challenges related to background clutter, illumination variance, and extreme class imbalance. These challenges were systematically mitigated through a novel pipeline that combined a multi-class supervised learning approach with geometric spatial aggregation (patch-density blob filtering).
 
 \medskip\noindent
-This spatial logic indicate that while spectral data is necessary for identifying the chemical and structural changes of a crack, spatial context is mandatory for suppressing the geometric noise inherent to the agricultural environment. 
+This spatial logic indicates that spectral information is necessary for identifying crack-associated patterns, whereas spatial context is essential for suppressing the geometric noise inherent to the agricultural environment.
 
 \newpage
-\section{Revisiting the Research Hypotheses}
+\section{Evaluation of the Research Hypotheses}
 \label{sec:revisiting_hypotheses}
 \noindent
 The empirical results of this study directly address and support the core research hypotheses established in the introductory chapter:
@@ -24,11 +24,11 @@ The empirical results of this study directly address and support the core resear
     
     \item \textbf{Hypothesis 2 (Pixel-Level Classification):} Confirmed. The supervised XGBoost architecture effectively learned these spectral decision boundaries, achieving near-perfect classification performance (PR--AUC $\approx 1.0$) on isolated pixels, thereby supporting algorithmic feasibility.
     
-    \item \textbf{Hypothesis 3 (Whole-Image Robustness):} Confirmed. While initial binary models struggled with background clutter, the transition to a 10-class background model coupled with spatial aggregation successfully isolated cracks from highly deceptive elements (e.g., dry wood), proving that robust full-image detection is achievable in the field.
+    \item \textbf{Hypothesis 3 (Whole-Image Robustness):} Supported under the evaluated conditions. While initial binary models struggled with background clutter, the transition to a 10-class background model coupled with spatial aggregation successfully isolated cracks from highly deceptive elements (e.g., dry wood), demonstrating the feasibility of robust full-image detection in the evaluated vineyard scenes
     
-    \item \textbf{Hypothesis 4 (Early Detection Capability):} Confirmed. The spatial-spectral pipeline successfully identified early-stage micro-cracks before they became fully visible macroscopically, achieving an independent test F1\textsubscript{CRACK} of 0.800 under early-stage conditions.
+    \item \textbf{Hypothesis 4 (Early Detection Capability):} Supported under the evaluated conditions. The spatial-spectral pipeline identified cracking at its earliest observable stage, before the development of advanced macroscopic damage, achieving an independent test F1\textsubscript{CRACK} of 0.800 under early-stage conditions.
     
-    \item \textbf{Hypothesis 5 (Spectral Efficiency):} Confirmed. Through Backward Feature Selection (BFS), the original 159-band spectrum was successfully distilled into an optimal subset of 30 wavelengths without compromising accuracy. This proves that massive spectral redundancy exists and that full-range hyperspectral data is not strictly required for operational deployment.
+    \item \textbf{Hypothesis 5 (Spectral Efficiency):} Supported under the evaluated conditions. Through Backward Feature Selection (BFS), the original 159-band spectrum was reduced to a promising 30-wavelength subset while maintaining performance comparable to the full-spectrum configuration. This result suggests substantial spectral redundancy in the evaluated dataset and supports the potential of reduced-band sensing for the future development of field sensing systems.
 \end{itemize}
 
 % \medskip\noindent
@@ -42,10 +42,10 @@ The empirical results of this study directly address and support the core resear
 % Third, the hardware implementation of the selected 30-wavelength configuration into a physical, real-time multispectral camera must be validated under dynamic vineyard driving conditions.
 
 \medskip\noindent
-\textbf{Ultimately,} the successful reduction to 30 stable wavelengths demonstrates the feasibility of transitioning this technology from an expensive, fragile scientific research tool to an affordable, tractor- or UAV-mountable multispectral sensor for high-throughput precision viticulture.
+\textbf{Ultimately,} the 30-wavelength result motivates the future development and validation of an affordable multispectral prototype for high-throughput precision viticulture, including potential tractor- or UAV-mounted implementations.
 
 \newpage
-\section{Future Research Directions}
+\section{Future Work}
 \label{sec:future_work}
 \noindent
 Future research should focus on several primary avenues to bridge the gap between this proof-of-concept and commercial agricultural deployment.
@@ -69,6 +69,10 @@ Future research should focus on several primary avenues to bridge the gap betwee
 \medskip
 \noindent
 \textbf{Fifth,} further algorithmic refinement of the whole-image pipeline should explore stronger spectral--spatial integration strategies for reducing the remaining structural false positives under field conditions.
+
+\medskip
+\noindent
+\textbf{Sixth,} thermal imagery was also acquired during the field campaign but was not analyzed in the present thesis. Future research may evaluate whether thermal features, either independently or in combination with hyperspectral and RGB data, provide additional information for detecting early-stage grape cracking.
 
 % \medskip\noindent
 % From an agronomic perspective, a highly promising avenue is to investigate how the mean spectral signature of grape clusters evolves across varying irrigation regimes. Because cracking is fundamentally driven by rapid water uptake and subsequent turgor-induced failure, clusters subjected to different water-stress levels may exhibit measurably different spectral baselines---particularly in the NIR water-absorption bands---even before micro-cracking occurs. Tracking these cluster-level spectral shifts could reveal early physiological precursors of cracking susceptibility, enabling proactive, irrigation-guided risk assessment rather than reactive post-damage detection.

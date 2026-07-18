@@ -5,7 +5,7 @@
 This chapter details the experimental design, data acquisition procedures, and computational methodologies employed to detect grape cracking using hyperspectral imaging under field conditions. To address the research objectives, the methodology is organized into three progressive phases:
 
 \begin{enumerate}
-    \item \textbf{Data Acquisition:} Describes the commercial vineyard experimental setup, the multi-modal sensor suite (HSI, RGB, and Thermal), and the field collection protocols.
+    \item \textbf{Data Acquisition:} Describes the commercial vineyard experimental setup, the HSI and RGB sensor suite, and the field collection protocols.
     \item \textbf{Dataset Construction:} Details the formulation of the pixel-level and whole-image datasets, including the use of an interactive annotation pipeline powered by foundation vision models (SAM2) for precise spectral extraction.
     \item \textbf{Modeling and Evaluation Framework:} Outlines the end-to-end analytical pipeline, progressing from global spectral preprocessing and baseline pixel-level classification to robust whole-image spatial aggregation and strategic wavelength selection.
 \end{enumerate}
@@ -71,10 +71,10 @@ The experimental campaign ran continuously until late September 2024. Alongside 
     \label{fig:vineyard_example}
 \end{figure}
 
-\subsection{Multi-Modal Imaging Systems}
+\subsection{Hyperspectral and RGB Imaging Systems}
 
 \noindent
-A multi-modal sensor suite was deployed to capture complementary spectral, spatial, and thermal data. The three imaging systems were co-located and operated from a fixed working distance of approximately 1~m from the target grape clusters, ensuring consistent scale across all modalities.
+An HSI and RGB sensor suite was deployed to capture complementary spectral and spatial data. The two imaging systems were co-located and operated from a fixed working distance of approximately 1~m from the target grape clusters, ensuring consistent scale across both modalities.
 
 \subsubsection{Hyperspectral Imaging System (HSI)}
 \noindent
@@ -108,32 +108,9 @@ Hyperspectral data were acquired using the \textbf{Specim IQ} (Specim, Spectral 
 \noindent
 High-resolution visual RGB Imaging System , a \textbf{Canon EOS R5} digital camera was utilized. Equipped with a 45-megapixel full-frame CMOS sensor ($8192 \times 4608$ pixels) and a \textbf{35~mm} prime lens, the system provided a wide FOV ($54.4^\circ \times 37.8^\circ$). At the standard 1~m working distance, this configuration achieved an extreme spatial resolution of approximately \textbf{0.13~mm/pixel}. This fine resolution is essential for identifying hairline fissures and cuticular alterations prior to their visibility in the HSI data.
 
-\subsubsection{Thermal Imaging System}
-\noindent
-Surface temperatures of the canopy and clusters were monitored using a \textbf{FLIR T1020} (Teledyne FLIR LLC, USA) high-definition thermal camera (Figure~\ref{fig:thermal_setup}). This uncooled microbolometer operates in the Long-Wave Infrared (LWIR) range ($7.5$--$14~\mu$m) with a resolution of $1024 \times 768$ pixels. Equipped with a \textbf{34~mm} lens and boasting a high thermal sensitivity (NETD $<20$~mK at $30^\circ$C), the system achieved a spatial resolution of \textbf{0.81~mm/pixel} at 1~m. This allowed for precise extraction of berry surface temperatures, minimizing mixed-pixel effects from surrounding foliage.
-
-\begin{figure}[htbp]
-    \centering
-    \begin{subfigure}[t]{0.48\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{figures/materials_methods/equipment/yovel_with_thermal_camera.jpg}
-        \caption{FLIR T1020 thermal camera used for vineyard measurements.}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[t]{0.48\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{figures/materials_methods/equipment/thermal_image_with_decay_and_cracksjpg.jpg}
-        \caption{Thermal image of a grape cluster showing surface temperature variations.}
-    \end{subfigure}
-    \caption[FLIR T1020 thermal imaging setup]{Thermal imaging system and example thermal data acquired from grape clusters under vineyard conditions.}
-    \label{fig:thermal_setup}
-\end{figure}
-
-\FloatBarrier
-
 \medskip
 \noindent
-The combined multi-modal imaging campaign generated a substantial data footprint. On average, a single HSI datacube required $\approx 200$~MB, compared to 11~MB for RGB and 2.5~MB for thermal images. The entire season's dataset exceeded \textbf{575~GB}, necessitating robust computational infrastructure for downstream processing.
+The combined HSI and RGB imaging campaign generated a substantial data footprint. On average, a single HSI datacube required $\approx 200$~MB, compared to 11~MB for RGB images. The entire season's dataset exceeded \textbf{575~GB}, necessitating robust computational infrastructure for downstream processing.
 
 \subsection{Data Collection Protocol}
 
@@ -143,12 +120,11 @@ Data collection was conducted on dedicated field days, typically once per week f
 \begin{itemize}
     \item \textbf{Early Morning (RGB):} Image acquisition commenced between 07:00 and 08:00. All 240 target clusters were imaged first using the RGB system to capture baseline visual conditions under relatively uniform, soft morning lighting.
     \item \textbf{Mid-Morning (HSI):} Hyperspectral acquisition began at approximately 10:00 when solar illumination was more intense and stable. Because the HSI setup required manual re-positioning, white reference placement, and dedicated spectral focusing for each shot, a single scan took 2--3 minutes. Consequently, a representative subset of 120 clusters was imaged per session, alternating coverage across field days to encompass the entire experimental layout.
-    \item \textbf{Midday (Thermal):} Thermal imaging was purposely scheduled for peak heat hours (starting around 12:00). Utilizing the high ambient temperatures of the semi-arid Negev region maximizes thermal contrast on the berry surface. Cracked or decaying tissues---characterized by exposed moisture or altered transpirational cooling---exhibit distinct thermal signatures compared to intact skin, making them significantly more detectable under peak thermal load.
 \end{itemize}
 
 \medskip
 \noindent
-All imaging systems were spatially co-aligned to the target clusters during acquisition. While this thesis focuses primarily on the analysis of the RGB and HSI datasets, the temporal and spatial synchronization of all three modalities provides a foundation for future integrative multi-sensor fusion.
+The HSI and RGB imaging systems were spatially co-aligned to the target clusters during acquisition, providing a foundation for the combined spectral and spatial analysis presented in this thesis.
 % -----------------------------
 % PREPROCESSING
 % -----------------------------

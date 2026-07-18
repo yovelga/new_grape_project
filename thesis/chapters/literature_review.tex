@@ -77,7 +77,7 @@ This chapter establishes the theoretical and technological foundation for the no
 
 % -------------------------------------new section 2.1-2.3-------------------------------------
 \newpage
-\section{The Challenge of Grape Cracking: Physiology and Economic Impact}
+\section{Physiological Mechanisms and Economic Impact of Grape Cracking}
 
 \medskip
 \noindent
@@ -145,7 +145,7 @@ Beyond mechanical factors, cracking susceptibility is modulated by plant hormone
 
 % -------------------------------------new section 2.1-2.3-------------------------------------
 % \newpage
-\section{Bridging the Gap: The Need for Advanced Sensing in Complex Environments}
+\section{Sensing Requirements for Crack Detection under Field Conditions}
 \label{sec:advanced_sensing_need}
 
 \medskip
@@ -222,7 +222,7 @@ To interpret hyperspectral data effectively, it is important to understand how t
 \end{itemize}
 
 \noindent
-In agricultural applications, the visible and near-infrared (VIS--NIR) range (typically 400--1000~nm) is particularly valuable. The visible bands correlate strongly with plant pigments such as chlorophyll, while the NIR bands are influenced by internal cellular structure and, toward the upper end of the range, water content \parencite{Gitelson1994ChlorophyllReflectance, Wang2015FruitQualitySpectroscopy, Lu2020OpticalPropertiesReview}. This dual sensitivity makes VIS--NIR HSI well suited for early defect detection in fruit. Because water-related physiological changes affect spectral responses in the NIR range, HSI may support the detection of early stress-associated changes before clear visible symptoms emerge \parencite{Abade2025SpectrumToYield, sun2024fruit}. Consequently, HSI has been successfully employed to assess internal quality attributes (such as soluble solid content and firmness) and detect both external and internal defects, including bruises, decay, and scars, across various fruit species \parencite{yang2025jafc, frontiers2024fruit, akter2025defects, min2023decay, zhu2025bagging, tian2023mango, kanwal2025quality}. By combining the rich spectral data of HSI with advanced machine learning techniques, it is possible to transition from late-stage, post-symptomatic visual inspection to early-stage detection at the time of measurement. This establishes the necessary technological foundation for the field-ready crack detection framework proposed in this thesis.
+In agricultural applications, the visible and near-infrared (VIS--NIR) range (typically 400--1000~nm) is particularly valuable. The visible bands correlate strongly with plant pigments such as chlorophyll, while the NIR bands are influenced by internal cellular structure and, toward the upper end of the range, water content \parencite{Gitelson1994ChlorophyllReflectance, Wang2015FruitQualitySpectroscopy, Lu2020OpticalPropertiesReview}. This dual sensitivity makes VIS--NIR HSI well suited for early defect detection in fruit. Because water-related physiological changes affect spectral responses in the NIR range, HSI may support the detection of early stress-associated changes before clear visible symptoms emerge \parencite{Abade2025SpectrumToYield, sun2024fruit}. Consequently, HSI has been successfully employed to assess internal quality attributes (such as soluble solid content and firmness) and detect both external and internal defects, including bruises, decay, and scars, across various fruit species \parencite{yang2025jafc, frontiers2024fruit, akter2025defects, min2023decay, zhu2025bagging, tian2023mango, kanwal2025quality}. By combining the rich spectral data of HSI with advanced machine learning techniques, it is possible to transition from late-stage, post-symptomatic visual inspection to early-stage detection at the time of measurement. This provides the technological basis for the field-based proof-of-concept crack-detection framework evaluated in this thesis.
 
 \section{Machine Learning Paradigms for Hyperspectral Data}
 \label{sec:ml_hsi}
@@ -247,7 +247,7 @@ Beyond algorithm selection, the choice of modeling paradigm dictates system robu
 % \noindent
 % \textbf{Proposed Approach:} To bridge the gap between theoretical micro-scale detection and practical field application, this thesis champions a hybrid and pragmatic framework. By leveraging the data-efficiency and interpretability of classical machine learning algorithms for pixel-level spectral analysis, combined with robust spatial aggregation techniques, this research explicitly addresses the data scarcity and background clutter inherent to field-based hyperspectral agriculture. This targeted strategy not only circumvents the overfitting risks associated with deep learning in low-data regimes but also delivers a computationally efficient, deployable solution tailored specifically for the early, proactive detection of grape cracking.
 
-\section{Related Work: From Visible Defect Detection to Early Warning}
+\section{Optical Methods for Fruit Defect Detection}
 \label{sec:related_work}
 
 \medskip
@@ -283,7 +283,7 @@ A critical bottleneck in advancing HSI research toward deep learning solutions i
 \noindent
 Despite these promising results in controlled settings, the vast majority of both visible and early-detection studies remain confined to highly controlled laboratory or postharvest environments. Operational field deployment introduces substantial environmental variability, including changing illumination and background effects, which can alter spectral responses and degrade model transferability \parencite{Benelli2020, agriculture15202167}. Because dense data annotation under such challenging field conditions is prohibitively difficult, true preharvest frameworks that provide early-warning signals under realistic vineyard conditions remain critically scarce \parencite{haghbin2023non, zhang2024early}.
 
-\section{The Research Gap: Towards Proactive In-Field Detection}
+\section{Research Gap in Field-Based Grape Crack Detection}
 \label{sec:research_gap}
 
 \medskip
@@ -292,4 +292,4 @@ The literature review reveals a significant conceptual and methodological discon
 
 \medskip
 \noindent
-The present study is directly positioned to address this gap. By integrating VIS--NIR hyperspectral imaging with optimized classical machine learning and spectral wavelength selection, this research moves beyond reactive defect detection toward early-stage identification under actual vineyard variability. The proposed framework offers a practical advantage: rather than relying exclusively on data-hungry deep learning pipelines, it leverages the data-efficiency and interpretability of classical learning algorithms, which are often more suitable when training data are limited and field variability is high \parencite{paoletti2019deep, benos2021machine}. By explicitly linking sensitive pixel-level spectral classification with robust whole-image spatial aggregation (see Section~\ref{subsec:full_image_pipeline}), the framework is designed to suppress background interference and support more reliable image-level decisions under realistic field conditions. Ultimately, this thesis presents a practical early-warning framework for identifying the physiological onset of grape cracking under field conditions.
+The present study is directly positioned to address this gap. By integrating VIS--NIR hyperspectral imaging with optimized classical machine learning and spectral wavelength selection, this research moves beyond reactive defect detection toward early-stage identification under actual vineyard variability. The proposed framework offers a practical advantage: rather than relying exclusively on data-hungry deep learning pipelines, it leverages the data-efficiency and interpretability of classical learning algorithms, which are often more suitable when training data are limited and field variability is high \parencite{paoletti2019deep, benos2021machine}. By explicitly linking sensitive pixel-level spectral classification with robust whole-image spatial aggregation (see Section~\ref{subsec:full_image_pipeline}), the framework is designed to suppress background interference and support more reliable image-level decisions under realistic field conditions. Ultimately, this thesis presents a field-based proof-of-concept framework for detecting crack-associated spectral patterns at the earliest observable stage of grape cracking under vineyard conditions.
